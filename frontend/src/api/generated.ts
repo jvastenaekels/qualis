@@ -281,6 +281,23 @@ export function useReadUsersMeApiMeGet<
 
 /**
  * Update current user profile.
+
+Email changes go through a dual-confirmation flow (F-03-011):
+instead of overwriting ``users.email`` directly, the requested
+address is parked on ``users.pending_email`` and two single-use
+JWTs are emailed:
+
+* a confirmation link to the **new** address (consume → swap),
+* a cancellation link to the **old** address (consume → clear
+  ``pending_email`` only).
+
+The PATCH response carries the user with ``email`` unchanged and
+``pending_email`` populated; clients should surface a "check your
+new inbox to confirm" hint to the user. This response shape is
+identical whether the requested address is free, already taken
+by another user, or matches a pending request: the address-taken
+case fails at confirm time, not at PATCH time, so that PATCH
+callers cannot enumerate registered emails through this endpoint.
  * @summary Update User Me
  */
 export const updateUserMeApiMePatch = (userUpdate: UserUpdate) => {
@@ -1029,8 +1046,13 @@ export const useVerifyEmailApiEmailVerifyPost = <TError = HTTPValidationError, T
  * Resend a verification email to an unverified account.
 
 Always returns 200 (anti-enum). If the user exists and is unverified,
-a fresh token is emailed. Otherwise, a fake bcrypt call equalises latency
-so callers cannot distinguish the two code paths by timing.
+a fresh token is emailed.
+
+Constant-time: a single ``get_password_hash`` runs unconditionally so
+the known and unknown arms take comparable wall-clock. Pre-fix
+(F-03-006) the bcrypt pad sat in the ``else`` branch only, so the
+known-unverified path returned ~7 ms while the unknown path took
+~540 ms — a clear enumeration signal.
  * @summary Resend Verification
  */
 export const resendVerificationApiEmailVerifyResendPost = (
@@ -1298,11 +1320,215 @@ export const usePasswordResetConfirmApiPasswordResetConfirmPost = <
 };
 
 /**
+ * Confirm an email-change request (F-03-011).
+
+Consume an ``email_change_confirm`` JWT and swap
+``users.email <- users.pending_email``. Single-use semantics
+are enforced two ways:
+
+1. The token's ``new_email`` claim must equal the user's current
+   ``pending_email``. A second PATCH /me overwrites
+   ``pending_email`` with a new value, so the prior confirm
+   token now fails this check.
+2. The swap clears ``pending_email``, so a re-played token
+   finds nothing to swap and returns 400.
+
+Returns 400 (not 200 anti-enum) on token / user / pending
+mismatch: the token itself is the secret, an attacker cannot
+guess valid ones, so a specific status here does not enable
+enumeration. Returns 409 when the new email is taken — the
+swap would violate the unique constraint on ``users.email``.
+Note: ``password_changed_at`` is **not** bumped — an email
+change is not a credential rotation, so existing access tokens
+remain valid.
+ * @summary Email Change Confirm
+ */
+export const emailChangeConfirmApiEmailChangeConfirmPost = (
+    emailTokenSubmit: EmailTokenSubmit,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/email-change/confirm`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailTokenSubmit,
+        signal,
+    });
+};
+
+export const getEmailChangeConfirmApiEmailChangeConfirmPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>,
+        TError,
+        { data: EmailTokenSubmit },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationKey = ['emailChangeConfirmApiEmailChangeConfirmPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>,
+        { data: EmailTokenSubmit }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return emailChangeConfirmApiEmailChangeConfirmPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type EmailChangeConfirmApiEmailChangeConfirmPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>
+>;
+export type EmailChangeConfirmApiEmailChangeConfirmPostMutationBody = EmailTokenSubmit;
+export type EmailChangeConfirmApiEmailChangeConfirmPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Email Change Confirm
+ */
+export const useEmailChangeConfirmApiEmailChangeConfirmPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>,
+            TError,
+            { data: EmailTokenSubmit },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof emailChangeConfirmApiEmailChangeConfirmPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationOptions = getEmailChangeConfirmApiEmailChangeConfirmPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Cancel an in-flight email-change request (F-03-011).
+
+Consume an ``email_change_cancel`` JWT and clear
+``users.pending_email`` without touching ``users.email``. No
+other side-effect: the cancellation link is a safety valve for
+the legitimate account owner, not a security boundary.
+
+Idempotent: a cancellation token whose user has no pending
+change still returns 200 — the desired end-state (no pending
+request) is already reached.
+ * @summary Email Change Cancel
+ */
+export const emailChangeCancelApiEmailChangeCancelPost = (
+    emailTokenSubmit: EmailTokenSubmit,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/email-change/cancel`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailTokenSubmit,
+        signal,
+    });
+};
+
+export const getEmailChangeCancelApiEmailChangeCancelPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>,
+        TError,
+        { data: EmailTokenSubmit },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationKey = ['emailChangeCancelApiEmailChangeCancelPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>,
+        { data: EmailTokenSubmit }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return emailChangeCancelApiEmailChangeCancelPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type EmailChangeCancelApiEmailChangeCancelPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>
+>;
+export type EmailChangeCancelApiEmailChangeCancelPostMutationBody = EmailTokenSubmit;
+export type EmailChangeCancelApiEmailChangeCancelPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Email Change Cancel
+ */
+export const useEmailChangeCancelApiEmailChangeCancelPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>,
+            TError,
+            { data: EmailTokenSubmit },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof emailChangeCancelApiEmailChangeCancelPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationOptions = getEmailChangeCancelApiEmailChangeCancelPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Self-serve 2FA disable — request the link.
 
 Anti-enum: returns 200 regardless of whether the user exists or has
-2FA enabled. A bcrypt call equalises latency on the no-op path so the
-response time doesn't leak account state.
+2FA enabled.
+
+Constant-time: a single ``get_password_hash`` runs unconditionally
+on every call so the known and unknown arms take comparable
+wall-clock. Pre-fix (F-03-007) the pad was only on the no-op
+branch, so a known-with-2FA email returned ~5 ms while an unknown
+email took ~600 ms — leaking which addresses had 2FA enabled.
  * @summary Twofa Disable Request
  */
 export const twofaDisableRequestApi2faDisableRequestPost = (
@@ -14037,6 +14263,10 @@ export const getReadUsersMeApiMeGetResponseMock = (
     is_active: faker.datatype.boolean(),
     is_superuser: faker.datatype.boolean(),
     is_totp_enabled: faker.datatype.boolean(),
+    pending_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     owned_project_quota: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -14065,6 +14295,10 @@ export const getUpdateUserMeApiMePatchResponseMock = (
     is_active: faker.datatype.boolean(),
     is_superuser: faker.datatype.boolean(),
     is_totp_enabled: faker.datatype.boolean(),
+    pending_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     owned_project_quota: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -14120,6 +14354,13 @@ export const getRegisterUserApiRegisterPostResponseMock = (
         is_active: faker.datatype.boolean(),
         is_superuser: faker.datatype.boolean(),
         is_totp_enabled: faker.datatype.boolean(),
+        pending_email: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            undefined,
+        ]),
         owned_project_quota: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 {
@@ -14215,6 +14456,28 @@ export const getPasswordResetRequestApiPasswordResetRequestPostResponseMock = (
 });
 
 export const getPasswordResetConfirmApiPasswordResetConfirmPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getEmailChangeConfirmApiEmailChangeConfirmPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getEmailChangeCancelApiEmailChangeCancelPostResponseMock = (
     overrideResponse: Partial<AckResponse> = {}
 ): AckResponse => ({
     status: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -17341,6 +17604,13 @@ export const getListUsersApiAdminUsersGetResponseMock = (
             is_active: faker.datatype.boolean(),
             is_superuser: faker.datatype.boolean(),
             is_totp_enabled: faker.datatype.boolean(),
+            pending_email: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
             owned_project_quota: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     {
@@ -17374,6 +17644,10 @@ export const getCreateUserApiAdminUsersPostResponseMock = (
     is_active: faker.datatype.boolean(),
     is_superuser: faker.datatype.boolean(),
     is_totp_enabled: faker.datatype.boolean(),
+    pending_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     owned_project_quota: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -17495,6 +17769,13 @@ export const getListProjectsApiAdminProjectsGetResponseMock = (
                             is_active: faker.datatype.boolean(),
                             is_superuser: faker.datatype.boolean(),
                             is_totp_enabled: faker.datatype.boolean(),
+                            pending_email: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
                             owned_project_quota: faker.helpers.arrayElement([
                                 faker.helpers.arrayElement([
                                     {
@@ -17554,6 +17835,13 @@ export const getCreateProjectApiAdminProjectsPostResponseMock = (
                 is_active: faker.datatype.boolean(),
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
+                pending_email: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 owned_project_quota: faker.helpers.arrayElement([
                     faker.helpers.arrayElement([
                         {
@@ -17606,6 +17894,13 @@ export const getGetProjectApiAdminProjectsSlugGetResponseMock = (
                 is_active: faker.datatype.boolean(),
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
+                pending_email: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 owned_project_quota: faker.helpers.arrayElement([
                     faker.helpers.arrayElement([
                         {
@@ -17659,6 +17954,13 @@ export const getUpdateProjectApiAdminProjectsSlugPatchResponseMock = (
                 is_active: faker.datatype.boolean(),
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
+                pending_email: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 owned_project_quota: faker.helpers.arrayElement([
                     faker.helpers.arrayElement([
                         {
@@ -17707,6 +18009,13 @@ export const getListProjectMembersApiAdminProjectsSlugMembersGetResponseMock = (
                 is_active: faker.datatype.boolean(),
                 is_superuser: faker.datatype.boolean(),
                 is_totp_enabled: faker.datatype.boolean(),
+                pending_email: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 owned_project_quota: faker.helpers.arrayElement([
                     faker.helpers.arrayElement([
                         {
@@ -17748,6 +18057,13 @@ export const getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchRespons
         is_active: faker.datatype.boolean(),
         is_superuser: faker.datatype.boolean(),
         is_totp_enabled: faker.datatype.boolean(),
+        pending_email: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            undefined,
+        ]),
         owned_project_quota: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 {
@@ -19096,6 +19412,58 @@ export const getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler = (
                             ? await overrideResponse(info)
                             : overrideResponse
                         : getPasswordResetConfirmApiPasswordResetConfirmPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getEmailChangeConfirmApiEmailChangeConfirmPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/email-change/confirm',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getEmailChangeConfirmApiEmailChangeConfirmPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getEmailChangeCancelApiEmailChangeCancelPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/email-change/cancel',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getEmailChangeCancelApiEmailChangeCancelPostResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -21652,6 +22020,8 @@ export const getQualisAPIMock = () => [
     getResendVerificationApiEmailVerifyResendPostMockHandler(),
     getPasswordResetRequestApiPasswordResetRequestPostMockHandler(),
     getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler(),
+    getEmailChangeConfirmApiEmailChangeConfirmPostMockHandler(),
+    getEmailChangeCancelApiEmailChangeCancelPostMockHandler(),
     getTwofaDisableRequestApi2faDisableRequestPostMockHandler(),
     getTwofaDisableConfirmApi2faDisableConfirmPostMockHandler(),
     getCreateStudyApiAdminStudiesPostMockHandler(),

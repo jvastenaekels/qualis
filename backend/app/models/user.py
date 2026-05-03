@@ -45,6 +45,12 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
     )
+    # F-03-011: pending email-change destination. NULL when no change is
+    # in flight; populated by PATCH /me when the user requests an email
+    # change. Cleared by /email-change/confirm (after the swap) and
+    # /email-change/cancel (without a swap). See migration
+    # a3f1c2e9b4d7_add_pending_email_column.py.
+    pending_email: Mapped[str | None] = mapped_column(String(254), nullable=True)
 
     # Relationships
     memberships: Mapped[list["ProjectMember"]] = relationship(  # type: ignore[name-defined]  # noqa: F821

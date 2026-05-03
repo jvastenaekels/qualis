@@ -305,7 +305,7 @@ Derived properties consulted from in-scope files:
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
-| major | 5 |
+| major | 6 |
 | minor | 2 |
 | observation | 2 |
 
@@ -787,6 +787,96 @@ Derived properties consulted from in-scope files:
   rejected after rotation; fresh post-rotation token works; legacy
   no-`iat` tokens rejected after rotation; `iat == pwa` boundary
   accepted so the rotation handler can re-mint in the same second).
+
+### F-03-011 — No email-change confirmation flow (account-takeover lock-out vector)
+
+- **Severity:** major
+- **Audience:** [Prod] [SoftwareX] [OSS] [Self-hoster]
+- **Location:**
+  - `backend/app/routers/auth.py:356-397` (pre-fix `update_user_me` —
+    direct write to `users.email` with no confirmation loop)
+  - `backend/app/models/user.py` (no `pending_email` column pre-fix)
+- **Tool:** static review
+- **Observation:** `PATCH /me` accepted `user_update.email`,
+  uniqueness-checked it, and overwrote `users.email` directly. There
+  was **no** second-factor email loop: no token issued to either the
+  old or the new address; no notification to the legitimate owner;
+  no path back into the account once the rotation landed. Combined
+  with F-03-010 (access tokens not invalidated by password change,
+  fixed in this PR but only for in-flight tokens after the rotation),
+  the attack chain is straightforward: an attacker who briefly holds
+  a live session — XSS, leaked bearer token, hijacked browser, lost
+  device, prior compromise window before F-03-010 was deployed —
+  PATCHes `/me` with their own email, gains permanent control of
+  password-reset and 2FA-disable links, and locks the legitimate
+  owner out. The owner has no notification on their old address (so
+  they only discover the takeover at next login, by which point the
+  attacker has rotated the password too) and no cancellation path.
+- **Impact:** silent account takeover from a transient
+  authenticated-session compromise. The attack window is the
+  existing access-token lifetime (8h post-F-03-010, 8h pre-F-03-010
+  even after a password change) — long enough to chain a session
+  hijack into a permanent account-control transfer. Severity is
+  **major** because the attack requires an authenticated session
+  (so it is not a pre-auth blocker), but it converts every
+  in-session compromise into a persistent one and bypasses the
+  primary remediation a user has (changing their password — which
+  only goes to the attacker's mailbox once the email is rotated).
+- **Recommendation:** dual-confirmation flow. `PATCH /me` no longer
+  rotates `users.email` in place; it parks the requested address
+  on a new column `users.pending_email` and dispatches two
+  short-lived JWTs:
+  - an `email_change_confirm` token to the **new** address
+    (consume → swap `email <- pending_email` and clear
+    `pending_email`).
+  - an `email_change_cancel` token to the **old** address
+    (consume → clear `pending_email` only; one-click
+    "this wasn't me").
+  The confirm token carries the requested `new_email` as a JWT
+  claim, cross-checked against the user's current `pending_email`
+  at consume time. Single-use is enforced by that mismatch (a
+  second `PATCH /me` overwrites `pending_email`, invalidating any
+  prior confirm token without needing the JTI denylist) and by the
+  swap clearing `pending_email` (so a re-played consume hits a
+  cleared row and 400s). `password_changed_at` is **not** bumped
+  on confirm — this is an email change, not a credential
+  rotation — so existing access tokens remain valid through the
+  swap. Anti-enumeration: `PATCH /me`'s response shape is
+  identical whether the requested address is free, taken by
+  another user, or matches a pending request — the address-taken
+  case fails at confirm time (DB unique constraint → 409), not
+  at PATCH time, so callers cannot enumerate registered emails
+  through `/me`.
+- **Effort:** S — one nullable column (`users.pending_email`),
+  one new service module (`email_change_service.py`), two new
+  endpoints (`/email-change/confirm`, `/email-change/cancel`),
+  two new email templates, modified `PATCH /me` handler. Migration
+  is purely additive (no backfill required). Frontend currently
+  disables the email field in the Account Settings form, so the
+  visible UX is unchanged for self-serve users; only direct API
+  callers (admin tooling, integration scripts) and a future
+  "let users change their email" UX work see the new flow.
+- **Disposition:** fixed in this PR.
+- **Frontend disposition:** schema regenerated to expose
+  `pending_email` on `UserRead`; the existing `AccountSettingsPage`
+  email field is `disabled` and only sends `full_name`, so no
+  visible-UX change is required to ship the backend flow safely.
+  A "Pending: <new>" hint + cancel/resend affordances are
+  deferred to backlog (Wave 2b — "Wire frontend pending-email UX")
+  as the path to re-enabling email editing in the UI.
+- **Exploit script:** none filed. The pre-fix gap is a one-line
+  PATCH against `/me` from any authenticated session; the security
+  invariant is that the post-fix flow rejects the rotation until
+  the new address proves control. The regression tests below
+  cover that invariant directly.
+- **Regression test:** `backend/tests/security/wave_2/test_email_change_confirmation.py`
+  (10 tests across 6 classes: happy path PATCH→pending+two emails;
+  confirm swaps and clears; password_changed_at is NOT bumped on
+  confirm; cancel clears pending; cancel idempotent on no-pending;
+  confirm replay rejected; new_email claim mismatch rejected;
+  expired confirm token rejected; PATCH /me uniform-by-response
+  for taken-vs-free target; second PATCH replaces pending and
+  invalidates the prior confirm token).
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 

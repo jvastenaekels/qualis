@@ -221,6 +221,67 @@ def send_twofa_disabled_notification(
     )
 
 
+def send_email_change_confirmation(email_to: str, confirm_url: str) -> None:
+    """Send the confirmation link to the NEW email address (F-03-011).
+
+    The link's purpose is to prove the user controls the destination
+    mailbox. Consuming it swaps ``users.email`` to the new value.
+    """
+    subject = "Confirm your new Qualis email address"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Confirm your new email</h2>
+            <p>Someone (hopefully you) requested to change the email address on a Qualis account to this one.</p>
+            <p>Click the link below to confirm and switch your account email:</p>
+            <p><a href="{confirm_url}">{confirm_url}</a></p>
+            <p>This link expires in 1 hour and can only be used once. If you did not request this, you can safely ignore this email — no change has been made yet.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="email-change-confirmation",
+    )
+
+
+def send_email_change_notification(
+    email_to: str, *, new_email: str, cancel_url: str
+) -> None:
+    """Notify the OLD email address that a change was requested (F-03-011).
+
+    Sent in parallel with the confirmation link to the new address.
+    Lets the legitimate account owner cancel the change if it was
+    initiated by an attacker who reached the authenticated session.
+    """
+    subject = "Email change requested on your Qualis account"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Email change requested</h2>
+            <p>Someone requested to change the email address on your Qualis account to:</p>
+            <p><strong>{new_email}</strong></p>
+            <p>If this was you, no action is required — you should also receive a confirmation link at the new address. Click the link there to complete the change.</p>
+            <p>If this was <strong>not</strong> you, click below to cancel the request and keep your current email:</p>
+            <p><a href="{cancel_url}">{cancel_url}</a></p>
+            <p>This cancellation link expires in 24 hours. You should also change your Qualis password immediately if you suspect your account is compromised.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="email-change-notification",
+    )
+
+
 def send_twofa_login_otp(email_to: str, code: str) -> None:
     subject = "Your Qualis login code"
     html_content = f"""

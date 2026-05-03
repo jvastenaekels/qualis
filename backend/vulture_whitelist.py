@@ -369,6 +369,9 @@ password_reset_request
 password_reset_confirm
 twofa_disable_request
 twofa_disable_confirm
+# F-03-011 — email-change dual-confirmation flow
+email_change_confirm
+email_change_cancel
 get_last_email
 requires_email_verification
 is_jti_consumed
@@ -378,3 +381,5 @@ aud
 exp
 iat
 pwa
+new_email
+pending_email

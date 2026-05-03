@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { UserReadFullName } from './userReadFullName';
+import type { UserReadPendingEmail } from './userReadPendingEmail';
 import type { UserReadOwnedProjectQuota } from './userReadOwnedProjectQuota';
 
 /**
@@ -17,5 +18,6 @@ export interface UserRead {
     is_active: boolean;
     is_superuser: boolean;
     is_totp_enabled: boolean;
+    pending_email?: UserReadPendingEmail;
     owned_project_quota?: UserReadOwnedProjectQuota;
 }

@@ -32,6 +32,7 @@ from app.utils.email import (
     send_twofa_disabled_notification,
     send_twofa_login_otp,
 )
+from app.services.email_change_service import initiate_email_change
 from app.services.email_otp_service import (
     OTPLockoutError,
     OTPRateLimitError,
@@ -359,18 +360,39 @@ async def update_user_me(
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    """Update current user profile."""
+    """Update current user profile.
+
+    Email changes go through a dual-confirmation flow (F-03-011):
+    instead of overwriting ``users.email`` directly, the requested
+    address is parked on ``users.pending_email`` and two single-use
+    JWTs are emailed:
+
+    * a confirmation link to the **new** address (consume → swap),
+    * a cancellation link to the **old** address (consume → clear
+      ``pending_email`` only).
+
+    The PATCH response carries the user with ``email`` unchanged and
+    ``pending_email`` populated; clients should surface a "check your
+    new inbox to confirm" hint to the user. This response shape is
+    identical whether the requested address is free, already taken
+    by another user, or matches a pending request: the address-taken
+    case fails at confirm time, not at PATCH time, so that PATCH
+    callers cannot enumerate registered emails through this endpoint.
+    """
     try:
-        # Check email uniqueness if changing email
-        if user_update.email and user_update.email != current_user.email:
-            query = select(User).where(User.email == user_update.email)
-            result = await db.execute(query)
-            if result.scalar_one_or_none():
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Email already registered",
-                )
-            current_user.email = user_update.email
+        # F-03-011: email change → enter dual-confirmation flow.
+        # Idempotent in two cases that don't trigger the flow:
+        #   - the submitted address equals the user's current email
+        #     (no change requested),
+        #   - the submitted address equals the already-pending value
+        #     (a duplicate PATCH; we treat it as a no-op rather than
+        #     re-issue tokens, to bound email-spam amplification).
+        if (
+            user_update.email
+            and user_update.email != current_user.email
+            and user_update.email != current_user.pending_email
+        ):
+            await initiate_email_change(db, current_user, user_update.email)
 
         if user_update.full_name is not None:
             current_user.full_name = user_update.full_name
@@ -707,6 +729,114 @@ async def password_reset_confirm(
         resource="user",
         resource_id=user.id,
     )
+    return AckResponse(status="ok")
+
+
+@router.post("/email-change/confirm", response_model=AckResponse)
+async def email_change_confirm(
+    payload: EmailTokenSubmit, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Confirm an email-change request (F-03-011).
+
+    Consume an ``email_change_confirm`` JWT and swap
+    ``users.email <- users.pending_email``. Single-use semantics
+    are enforced two ways:
+
+    1. The token's ``new_email`` claim must equal the user's current
+       ``pending_email``. A second PATCH /me overwrites
+       ``pending_email`` with a new value, so the prior confirm
+       token now fails this check.
+    2. The swap clears ``pending_email``, so a re-played token
+       finds nothing to swap and returns 400.
+
+    Returns 400 (not 200 anti-enum) on token / user / pending
+    mismatch: the token itself is the secret, an attacker cannot
+    guess valid ones, so a specific status here does not enable
+    enumeration. Returns 409 when the new email is taken — the
+    swap would violate the unique constraint on ``users.email``.
+    Note: ``password_changed_at`` is **not** bumped — an email
+    change is not a credential rotation, so existing access tokens
+    remain valid.
+    """
+    try:
+        claims = decode_email_token(
+            payload.token, expected_purpose="email_change_confirm"
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=400, detail="invalid_token")
+
+    new_email = claims.get("new_email")
+    if new_email is None or user.pending_email != new_email:
+        # Token was issued for a different (or older) pending request.
+        # This is the single-use gate: a second PATCH /me overwrites
+        # pending_email with a new value and the prior confirm token
+        # mismatches here.
+        raise HTTPException(status_code=400, detail="token_already_consumed")
+
+    try:
+        user.email = new_email
+        user.pending_email = None
+        await db.commit()
+    except IntegrityError:
+        # Address taken since the change was requested. The unique
+        # constraint on users.email is the authoritative gate; we do
+        # not pre-check at PATCH time (anti-enumeration on PATCH /me).
+        await db.rollback()
+        raise HTTPException(status_code=409, detail="email_already_registered")
+
+    log_admin_action(
+        actor_user_id=user.id,
+        action="email_change_confirm",
+        resource="user",
+        resource_id=user.id,
+    )
+    return AckResponse(status="ok")
+
+
+@router.post("/email-change/cancel", response_model=AckResponse)
+async def email_change_cancel(
+    payload: EmailTokenSubmit, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Cancel an in-flight email-change request (F-03-011).
+
+    Consume an ``email_change_cancel`` JWT and clear
+    ``users.pending_email`` without touching ``users.email``. No
+    other side-effect: the cancellation link is a safety valve for
+    the legitimate account owner, not a security boundary.
+
+    Idempotent: a cancellation token whose user has no pending
+    change still returns 200 — the desired end-state (no pending
+    request) is already reached.
+    """
+    try:
+        claims = decode_email_token(
+            payload.token, expected_purpose="email_change_cancel"
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        # Anti-enum: respond 200, do nothing. The token bound itself to
+        # an email at issue time; if no user matches, the change request
+        # was already moot.
+        return AckResponse(status="ok")
+
+    if user.pending_email is not None:
+        user.pending_email = None
+        await db.commit()
+        log_admin_action(
+            actor_user_id=user.id,
+            action="email_change_cancel",
+            resource="user",
+            resource_id=user.id,
+        )
     return AckResponse(status="ok")
 
 

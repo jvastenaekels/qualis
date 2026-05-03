@@ -11,7 +11,13 @@ from typing_extensions import Required
 
 from app.core.config import settings
 
-EmailTokenPurpose = Literal["email_verify", "password_reset", "twofa_disable"]
+EmailTokenPurpose = Literal[
+    "email_verify",
+    "password_reset",
+    "twofa_disable",
+    "email_change_confirm",
+    "email_change_cancel",
+]
 
 EMAIL_TOKEN_ISSUER = "qualis"
 EMAIL_TOKEN_AUDIENCE = "auth-email"
@@ -26,6 +32,7 @@ class EmailTokenPayload(TypedDict, total=False):
     iat: Required[int]
     jti: Required[str]
     pwa: int  # password_reset only
+    new_email: str  # email_change_confirm only — anti-tamper anchor
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -118,17 +125,26 @@ def create_email_token(
     purpose: EmailTokenPurpose,
     expires_delta: timedelta,
     password_changed_at: datetime | None = None,
+    new_email: str | None = None,
 ) -> str:
     """Issue a signed JWT for one of the link-based auth-email flows.
 
     For purpose='password_reset', password_changed_at is REQUIRED — its
     epoch-second value is encoded as `pwa` claim and re-validated at
     consume time as replay defense (a rotated password kills the token).
+
+    For purpose='email_change_confirm', new_email is REQUIRED — the
+    requested target address is anchored in the token so an attacker
+    who exfiltrates the link cannot redirect the swap to a different
+    address. The router cross-checks this claim against the user's
+    current ``pending_email`` at consume time (F-03-011).
     """
     if purpose == "password_reset" and password_changed_at is None:
         raise ValueError(
             "password_reset token requires password_changed_at for replay defense"
         )
+    if purpose == "email_change_confirm" and new_email is None:
+        raise ValueError("email_change_confirm token requires new_email anchor")
 
     now = datetime.now(tz=timezone.utc)
     payload: dict[str, Any] = {  # type: ignore[explicit-any]
@@ -142,6 +158,8 @@ def create_email_token(
     }
     if password_changed_at is not None:
         payload["pwa"] = int(password_changed_at.timestamp() * 1_000_000)
+    if new_email is not None:
+        payload["new_email"] = new_email
 
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 

@@ -36,7 +36,7 @@
           "auth"
         ],
         "summary": "Update User Me",
-        "description": "Update current user profile.",
+        "description": "Update current user profile.\n\nEmail changes go through a dual-confirmation flow (F-03-011):\ninstead of overwriting ``users.email`` directly, the requested\naddress is parked on ``users.pending_email`` and two single-use\nJWTs are emailed:\n\n* a confirmation link to the **new** address (consume \u2192 swap),\n* a cancellation link to the **old** address (consume \u2192 clear\n  ``pending_email`` only).\n\nThe PATCH response carries the user with ``email`` unchanged and\n``pending_email`` populated; clients should surface a \"check your\nnew inbox to confirm\" hint to the user. This response shape is\nidentical whether the requested address is free, already taken\nby another user, or matches a pending request: the address-taken\ncase fails at confirm time, not at PATCH time, so that PATCH\ncallers cannot enumerate registered emails through this endpoint.",
         "operationId": "update_user_me_api_me_patch",
         "requestBody": {
           "content": {
@@ -395,7 +395,7 @@
           "auth"
         ],
         "summary": "Resend Verification",
-        "description": "Resend a verification email to an unverified account.\n\nAlways returns 200 (anti-enum). If the user exists and is unverified,\na fresh token is emailed. Otherwise, a fake bcrypt call equalises latency\nso callers cannot distinguish the two code paths by timing.",
+        "description": "Resend a verification email to an unverified account.\n\nAlways returns 200 (anti-enum). If the user exists and is unverified,\na fresh token is emailed.\n\nConstant-time: a single ``get_password_hash`` runs unconditionally so\nthe known and unknown arms take comparable wall-clock. Pre-fix\n(F-03-006) the bcrypt pad sat in the ``else`` branch only, so the\nknown-unverified path returned ~7 ms while the unknown path took\n~540 ms \u2014 a clear enumeration signal.",
         "operationId": "resend_verification_api_email_verify_resend_post",
         "requestBody": {
           "content": {
@@ -515,13 +515,97 @@
         }
       }
     },
+    "/api/email-change/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Email Change Confirm",
+        "description": "Confirm an email-change request (F-03-011).\n\nConsume an ``email_change_confirm`` JWT and swap\n``users.email <- users.pending_email``. Single-use semantics\nare enforced two ways:\n\n1. The token's ``new_email`` claim must equal the user's current\n   ``pending_email``. A second PATCH /me overwrites\n   ``pending_email`` with a new value, so the prior confirm\n   token now fails this check.\n2. The swap clears ``pending_email``, so a re-played token\n   finds nothing to swap and returns 400.\n\nReturns 400 (not 200 anti-enum) on token / user / pending\nmismatch: the token itself is the secret, an attacker cannot\nguess valid ones, so a specific status here does not enable\nenumeration. Returns 409 when the new email is taken \u2014 the\nswap would violate the unique constraint on ``users.email``.\nNote: ``password_changed_at`` is **not** bumped \u2014 an email\nchange is not a credential rotation, so existing access tokens\nremain valid.",
+        "operationId": "email_change_confirm_api_email_change_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/email-change/cancel": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Email Change Cancel",
+        "description": "Cancel an in-flight email-change request (F-03-011).\n\nConsume an ``email_change_cancel`` JWT and clear\n``users.pending_email`` without touching ``users.email``. No\nother side-effect: the cancellation link is a safety valve for\nthe legitimate account owner, not a security boundary.\n\nIdempotent: a cancellation token whose user has no pending\nchange still returns 200 \u2014 the desired end-state (no pending\nrequest) is already reached.",
+        "operationId": "email_change_cancel_api_email_change_cancel_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/2fa/disable/request": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Twofa Disable Request",
-        "description": "Self-serve 2FA disable \u2014 request the link.\n\nAnti-enum: returns 200 regardless of whether the user exists or has\n2FA enabled. A bcrypt call equalises latency on the no-op path so the\nresponse time doesn't leak account state.",
+        "description": "Self-serve 2FA disable \u2014 request the link.\n\nAnti-enum: returns 200 regardless of whether the user exists or has\n2FA enabled.\n\nConstant-time: a single ``get_password_hash`` runs unconditionally\non every call so the known and unknown arms take comparable\nwall-clock. Pre-fix (F-03-007) the pad was only on the no-op\nbranch, so a known-with-2FA email returned ~5 ms while an unknown\nemail took ~600 ms \u2014 leaking which addresses had 2FA enabled.",
         "operationId": "twofa_disable_request_api_2fa_disable_request_post",
         "requestBody": {
           "content": {
@@ -12241,6 +12325,17 @@
           "is_totp_enabled": {
             "type": "boolean",
             "title": "Is Totp Enabled"
+          },
+          "pending_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Email"
           },
           "owned_project_quota": {
             "anyOf": [

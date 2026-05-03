@@ -33,6 +33,10 @@ class UserRead(UserBase):
     is_active: bool
     is_superuser: bool
     is_totp_enabled: bool
+    # F-03-011: requested-but-unconfirmed email-change destination,
+    # NULL when no change is in flight. Frontend uses it to surface a
+    # "Pending: <new>" hint and offer a "cancel" / "resend" action.
+    pending_email: str | None = None
     # Populated by /auth/me; absent (None) elsewhere — nested UserRead
     # objects (e.g. inside ProjectMemberRead.user) don't need to carry it.
     owned_project_quota: QuotaInfo | None = None

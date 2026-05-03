@@ -371,6 +371,7 @@ export * from './userCreateResponse';
 export * from './userRead';
 export * from './userReadFullName';
 export * from './userReadOwnedProjectQuota';
+export * from './userReadPendingEmail';
 export * from './userUpdate';
 export * from './userUpdateEmail';
 export * from './userUpdateFullName';

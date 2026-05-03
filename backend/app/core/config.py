@@ -82,6 +82,14 @@ class Settings(BaseSettings):
     EMAIL_VERIFY_TOKEN_EXPIRE_HOURS: int = 24
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 1
     TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES: int = 15
+    # Email-change dual-confirmation flow (F-03-011). The confirmation
+    # link goes to the new address and must be short-lived (an attacker
+    # who briefly accesses the new mailbox should not get a multi-day
+    # window). The cancellation link goes to the old address and is
+    # given a longer window so a legitimate owner who is travelling
+    # still has time to react.
+    EMAIL_CHANGE_CONFIRM_TOKEN_EXPIRE_HOURS: int = 1
+    EMAIL_CHANGE_CANCEL_TOKEN_EXPIRE_HOURS: int = 24
 
     # Audio Recording Limits
     AUDIO_MAX_FILE_SIZE_MB: int = 10

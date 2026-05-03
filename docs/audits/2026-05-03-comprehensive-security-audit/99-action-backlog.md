@@ -104,6 +104,41 @@ Cumulative across all seven waves. Items move through:
   `backend/tests/security/wave_2/test_session_invalidation.py` (5 tests).
   Exploit script: `.raw/exploits/F-03-010.py`. Source:
   `03-auth-email-flows.md#f-03-010`.
+- F-03-011 (severity=major) — No email-change confirmation flow.
+  Pre-fix `PATCH /me` wrote `user_update.email` straight to `users.email`
+  with no second-factor email loop: no notification to the old address,
+  no token issued to either side, no path back for the legitimate owner.
+  Any transient authenticated-session compromise (XSS, stolen bearer,
+  hijacked browser) converted into permanent account control. **closed**
+  in Wave 2 Task 7 (commit `<pending>`): added `users.pending_email`
+  column (migration `a3f1c2e9b4d7`); `PATCH /me` now parks the requested
+  address on `pending_email` and dispatches confirm-link to NEW + cancel-link
+  to OLD; new endpoints `/api/email-change/confirm` (swap) and
+  `/api/email-change/cancel` (clear). Confirm token carries `new_email`
+  claim cross-checked against `pending_email` for single-use semantics
+  without JTI denylist. PATCH /me responds uniformly whether the target
+  is free or taken (anti-enumeration; address-taken case fails at confirm
+  time via DB unique constraint, not at PATCH time). Pinned by
+  `backend/tests/security/wave_2/test_email_change_confirmation.py`
+  (10 tests across 6 classes). Source: `03-auth-email-flows.md#f-03-011`.
+
+### Wave 2b — deferred follow-ups (carry-over from Wave 2)
+
+- NEW (severity=observation) — Wire frontend pending-email UX.
+  F-03-011 ships the backend dual-confirmation flow but `AccountSettingsPage`
+  still renders the email field as `disabled` (the old "contact an admin to
+  change" UX). Re-enabling email editing in the UI requires: (a) display a
+  "Pending: <new>" hint inline with the email field when `user.pending_email`
+  is set; (b) surface a "cancel pending change" affordance that calls
+  `/api/email-change/cancel` with a token the user receives by email (not in
+  the SPA); (c) surface a "resend confirmation link" affordance (currently
+  achievable by re-submitting `PATCH /me` with the same address — the
+  duplicate-PATCH idempotence guard means the user must edit-then-revert to
+  re-issue, which is awkward); (d) host the `/email-change/confirm` and
+  `/email-change/cancel` consume pages in the SPA so the link in the email
+  lands on a Qualis page rather than a 404. Out of scope for Wave 2 (~30
+  minutes was the threshold; the four-item list above is half a day).
+  Source: `03-auth-email-flows.md#f-03-011` (frontend disposition).
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._

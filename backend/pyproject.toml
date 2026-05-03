@@ -84,6 +84,8 @@ module = [
     "app.services.email_token_consume_service",
     "app.services.email_otp_service",
     "app.middleware.log_scrub",
+    # F-03-011 — email-change dual-confirmation flow
+    "app.services.email_change_service",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
