@@ -1,0 +1,143 @@
+# Security scans — supply-chain CI gate (Wave 6 Task 3).
+#
+# Closes:
+#   * F-01-002 partial-fix gap (gitleaks pre-commit / CI gate).
+#   * Wave 1 NEW observation (pip-audit on every PR).
+#   * Wave 1 NEW observation (npm-audit hardening as a dedicated gate).
+#   * Wave 2 NEW observation (request.url-in-loggers lint).
+#
+# Each step fails the workflow only on high/critical findings (or
+# non-zero exit for gitleaks, since gitleaks emits any-or-nothing).
+# Tools are invoked as their own CLIs rather than third-party actions
+# to keep the SHA-pin surface small.
+#
+# Pinning policy: see .github/workflows/ci.yml header.
+name: Security Scans
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: Gitleaks (secret scan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history for `gitleaks detect --source .`
+      - name: Install gitleaks
+        run: |
+          set -e
+          GITLEAKS_VERSION=8.21.2
+          curl -sSL -o /tmp/gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          mkdir -p /tmp/gitleaks
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp/gitleaks
+          sudo install /tmp/gitleaks/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+      - name: Run gitleaks
+        # `--gitleaksignore` defaults to .gitleaksignore at repo root.
+        # `--redact` keeps any leak fingerprints out of the public log.
+        run: gitleaks detect --source . --redact --verbose
+
+  pip-audit:
+    name: pip-audit (Python SCA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install dependencies
+        run: cd backend && uv sync
+      - name: Run pip-audit
+        # Ignore list mirrors backend Makefile and ci.yml backend-lint;
+        # rationale documented in SECURITY.md. Each --ignore-vuln has a
+        # paired tracking entry in the audit backlog.
+        run: |
+          cd backend && uv run pip-audit \
+            --ignore-vuln GHSA-wj6h-64fc-37mp \
+            --ignore-vuln CVE-2026-3219 \
+            --ignore-vuln CVE-2026-4539 \
+            --ignore-vuln CVE-2026-28684 \
+            --ignore-vuln CVE-2026-25645
+
+  npm-audit:
+    name: npm audit (frontend SCA)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run npm audit (high/critical only)
+        # xlsx CVEs accepted per SECURITY.md (write-only usage). The
+        # ci.yml frontend-lint job filters by GHSA allowlist; this
+        # workflow uses the simpler --audit-level=high gate per the
+        # plan spec — any finding above the allowlist is reflected
+        # there too.
+        run: |
+          set -e
+          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9'
+          audit_json=$(npm audit --json) || true
+          unknown=$(echo "$audit_json" | jq -r --arg a "$accepted" '
+            [.vulnerabilities | to_entries[].value
+             | select(.severity == "high" or .severity == "critical")
+             | .via[] | objects
+             | select((.url // "") | test($a) | not)
+             | .url] | unique | join("\n")
+          ')
+          if [ -n "$unknown" ]; then
+            echo "Unhandled high/critical advisories:"
+            echo "$unknown"
+            exit 1
+          fi
+          echo "All high+ advisories are within the SECURITY.md allowlist."
+
+  semgrep:
+    name: Semgrep (SAST — OWASP Top Ten)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install semgrep
+        run: pip install semgrep==1.95.0
+      - name: Run semgrep (OWASP Top Ten)
+        # --error: exit non-zero on any finding (semgrep's own "error"
+        # severity is high+). The OWASP Top Ten ruleset is the spec
+        # default; tighter rulesets can be added in a follow-up.
+        run: semgrep --config p/owasp-top-ten --error backend/app frontend/src
+
+  logger-url-lint:
+    name: Logger-URL lint (request.url scrubber bypass)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run lint script
+        # Pure stdlib AST walk; no install needed beyond Python.
+        run: python backend/scripts/lint_logger_urls.py
