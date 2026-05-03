@@ -24,7 +24,7 @@ Cumulative across all seven waves. Items move through:
 
 - F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT access token lifetime is 8h with no refresh / no revocation on password change.
   Scheduled for Wave 2. Access-token revocation half closed by F-03-010
-  (Wave 2 Task 6, commit `<COMMIT_SHA>`); refresh-token half pending Wave 2
+  (Wave 2 Task 6, commit `94d33870`); refresh-token half pending Wave 2
   Task 10. Source: `01-prior-findings-status.md#f-01-010`.
 - F-03-001 (severity=observation) — JTI replay race in 2FA-disable confirm.
   **closed** in Wave 2 Task 3: false positive. Inventory + re-read confirmed the
@@ -97,7 +97,7 @@ Cumulative across all seven waves. Items move through:
   `get_current_user` never consulted `password_changed_at`; a leaked bearer
   token survived the full 8h `ACCESS_TOKEN_EXPIRE_MINUTES` window even after
   the user explicitly rotated their password. Closes the access-token half
-  of the F-01-010 carry-over. **closed** in commit `<COMMIT_SHA>` (Wave 2
+  of the F-01-010 carry-over. **closed** in commit `94d33870` (Wave 2
   Task 6): `create_access_token` now embeds `iat`; `get_current_user`
   rejects tokens with `iat < int(user.password_changed_at.timestamp())`;
   `change_password` bumps `password_changed_at`. Pinned by

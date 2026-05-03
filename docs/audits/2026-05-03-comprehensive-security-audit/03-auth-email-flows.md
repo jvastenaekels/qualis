@@ -793,7 +793,7 @@ Derived properties consulted from in-scope files:
 _Status section filled by Task 10._
 
 **Status update (2026-05-03):** Access-token half closed by F-03-010
-(commit `<COMMIT_SHA>`); refresh-token half pending Task 10.
+(commit `94d33870`); refresh-token half pending Task 10.
 
 ## Resolved since prior
 
