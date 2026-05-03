@@ -382,7 +382,7 @@ Cumulative across all seven waves. Items move through:
 ## Wave 6 — Supply chain
 
 - F-01-013 (carry-over from 2026-04-25, severity=minor) — CSP `style-src 'unsafe-inline'` reduces XSS protection.
-  **deferred to Wave 6b** in Wave 6 (commit `<wave-doc>`). Rationale: 73 inline-style sites in
+  **deferred to Wave 6b** in Wave 6 (commit `e50d5763`). Rationale: 73 inline-style sites in
   `frontend/src/` including ~6 framer-motion `MotionValue` props (`style={{ x, y, rotate }}`) that
   cannot move to Tailwind classes — they're imperative animation values. Proper fix is a nonce-based
   CSP requiring per-render nonce wiring through React (Vite plugin + ASGI middleware + React context),
