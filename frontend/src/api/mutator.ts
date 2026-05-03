@@ -1,5 +1,7 @@
 import { toast } from 'sonner';
 import { ApiError, reportBug } from './client';
+import i18n from '../i18n';
+import { resolveApiErrorKey } from '../lib/error-utils';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -69,9 +71,11 @@ function buildRequestHeaders(
 /** Side effects (toasts, redirect, bug-report) for error responses. */
 function handleErrorStatus(
     status: number,
+    method: string,
     url: string,
     errorText: string,
-    parsedMessage: string
+    parsedMessage: string,
+    parsedCode: string | undefined
 ): void {
     if (status === 401 && !url.includes('/api/token') && !url.includes('/api/study/')) {
         // biome-ignore lint/suspicious/noExplicitAny: window hack to suppress unsaved-changes dialog
@@ -91,19 +95,51 @@ function handleErrorStatus(
     }
 
     if (status === 403) {
-        console.warn('Access Forbidden:', url);
-        toast.error('Access Denied', {
-            description: 'You do not have permission to perform this action.',
+        console.warn('Access Forbidden:', method, url);
+        // Skip toast for GETs — those are background fetches; surfacing a
+        // toast for every read-side 403 is noise (e.g. a viewer landing on
+        // a page that pre-fetches data they're not entitled to). Mutations
+        // are user-triggered, so the toast is informative there.
+        if (method.toUpperCase() === 'GET') return;
+        const { key, fallback } = resolveApiErrorKey({
+            code: parsedCode,
+            message: parsedMessage,
+        });
+        const description = key
+            ? i18n.t(key, fallback)
+            : parsedMessage ||
+              i18n.t(
+                  'errors.access_denied_description',
+                  'You do not have permission to perform this action.'
+              );
+        toast.error(i18n.t('errors.access_denied_title', 'Access Denied'), {
+            id: `403:${method}:${url}`, // dedupe identical 403s on the same endpoint
+            description,
         });
     }
     if (status === 429) {
-        toast.error('Too Many Requests', {
-            description: 'Please wait a moment before trying again.',
+        toast.error(i18n.t('errors.rate_limited_title', 'Too Many Requests'), {
+            id: `429:${url}`,
+            description: i18n.t(
+                'errors.rate_limited_description',
+                'Please wait a moment before trying again.'
+            ),
         });
     }
     if (status === 409) {
-        toast.error('Conflict', {
-            description: parsedMessage || 'The resource has been modified or already exists.',
+        const { key, fallback } = resolveApiErrorKey({
+            code: parsedCode,
+            message: parsedMessage,
+        });
+        toast.error(i18n.t('errors.conflict_title', 'Conflict'), {
+            id: `409:${method}:${url}`,
+            description: key
+                ? i18n.t(key, fallback)
+                : parsedMessage ||
+                  i18n.t(
+                      'errors.conflict_description',
+                      'The resource has been modified or already exists.'
+                  ),
         });
     }
     if (status >= 500) {
@@ -119,11 +155,11 @@ function buildRequestBody(data: unknown, isFormData: boolean): BodyInit | undefi
     return isFormData ? (data as BodyInit) : JSON.stringify(data);
 }
 
-async function processResponse<T>(response: Response, url: string): Promise<T> {
+async function processResponse<T>(response: Response, method: string, url: string): Promise<T> {
     if (!response.ok) {
         const errorText = await response.text();
         const { message, code, details } = parseErrorBody(errorText);
-        handleErrorStatus(response.status, url, errorText, message);
+        handleErrorStatus(response.status, method, url, errorText, message, code);
         throw new ApiError(response.status, message, code, details);
     }
     if (response.status === 204) {
@@ -179,7 +215,7 @@ export const customInstance = async <T>({
         });
 
         clearTimeout(timeoutId);
-        return await processResponse<T>(response, url);
+        return await processResponse<T>(response, method, url);
     } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
             // External-signal abort vs our own timeout

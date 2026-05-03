@@ -2616,6 +2616,12 @@
     "errors": {
         "member_limit_reached": "Projektin jäsenraja saavutettu.",
         "owner_project_limit_reached": "Et voi omistaa enempää projekteja.",
-        "owner_role_immutable": "Omistajarooli voidaan määrittää vain projektin luonnin yhteydessä."
+        "owner_role_immutable": "Omistajarooli voidaan määrittää vain projektin luonnin yhteydessä.",
+        "access_denied_title": "Käyttö estetty",
+        "access_denied_description": "Sinulla ei ole oikeutta suorittaa tätä toimintoa.",
+        "rate_limited_title": "Liikaa pyyntöjä",
+        "rate_limited_description": "Odota hetki ja yritä uudelleen.",
+        "conflict_title": "Ristiriita",
+        "conflict_description": "Resurssi on muokattu tai se on jo olemassa."
     }
 }
