@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
+import { useStudyDesigner, projectStudyToUpdate } from '@/store/useStudyDesigner';
+import { isDraftInSync } from './useStudyPersistence.helpers';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import type { StudyUpdate, StudyRead } from '@/api/model';
 import { useBlocker, useParams } from 'react-router-dom';
@@ -56,34 +57,29 @@ export function useStudyPersistence() {
     // Exposed blocker for UI handling
     // We intentionally removed the window.confirm logic here to let the UI handle it via the blocker object
 
-    // 4. Change Detection Logic
     useEffect(() => {
         if (!draft || !effectiveSlug) return;
 
-        // Detect if something actually changed relative to what's on server or last saved
-        const originalDraft = original ? projectStudyToUpdate(original) : null;
+        const synced = isDraftInSync(
+            draft,
+            original ? projectStudyToUpdate(original) : null,
+            lastSavedDraftRef.current
+        );
 
-        // If draft content matches original content or last saved content
-        const isSyncedWithOriginal = areStudiesEqual(draft, originalDraft);
-        const isSyncedWithLastSave =
-            lastSavedDraftRef.current &&
-            areStudiesEqual(draft, JSON.parse(lastSavedDraftRef.current));
-
-        if (isSyncedWithOriginal || isSyncedWithLastSave) {
+        if (synced) {
             if (syncStatus !== 'synced' && syncStatus !== 'saving') {
                 setSyncStatus('synced');
             }
             return;
         }
 
-        // Mark as modified if not already saving
         if (syncStatus !== 'modified' && syncStatus !== 'saving' && syncStatus !== 'error') {
             setSyncStatus('modified');
         }
 
-        // 5. Local Backup Logic
-        // We keep a local backup in localStorage keyed by slug
-        // This is a safety measure against crashes/refreshes.
+        // 5. Local Backup Logic — keeps a localStorage snapshot keyed by slug
+        // as a safety net against crashes/refreshes. Debounced 1s so we don't
+        // hammer storage on every keystroke.
         const backupTimer = setTimeout(() => {
             if (syncStatus === 'modified' || syncStatus === 'saving') {
                 const backupData = {
@@ -95,10 +91,10 @@ export function useStudyPersistence() {
                     `qualis-draft-backup-${effectiveSlug}`,
                     JSON.stringify(backupData)
                 );
-                // Also update the test draft key so open test tabs can react via 'storage' event
+                // Also update the test-draft key so open test tabs react via 'storage' event.
                 localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
             }
-        }, 1000); // Debounce backup
+        }, 1000);
 
         return () => clearTimeout(backupTimer);
     }, [draft, effectiveSlug, original, setSyncStatus, syncStatus]);
