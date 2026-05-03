@@ -1,12 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStudyDesigner, projectStudyToUpdate } from '@/store/useStudyDesigner';
-import { isDraftInSync } from './useStudyPersistence.helpers';
+import { isDraftInSync, resolveServerConflict } from './useStudyPersistence.helpers';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import type { StudyUpdate, StudyRead } from '@/api/model';
 import { useBlocker, useParams } from 'react-router-dom';
 import type { ApiError } from '@/api/client';
-import { mergeStudyUpdates } from '@/utils/mergeStudy';
 import { toast } from 'sonner';
 
 /**
@@ -99,13 +98,82 @@ export function useStudyPersistence() {
         return () => clearTimeout(backupTimer);
     }, [draft, effectiveSlug, original, setSyncStatus, syncStatus]);
 
+    // Applies a resolved 409 conflict to local state.
+    const applyConflict = useCallback(
+        (apiError: ApiError & { details: { server_state: StudyRead } }) => {
+            const serverRead = apiError.details.server_state;
+            const serverUpdate = projectStudyToUpdate(serverRead);
+            const originalUpdate = original ? projectStudyToUpdate(original) : null;
+            const resolution = resolveServerConflict(
+                draft as StudyUpdate,
+                serverUpdate,
+                originalUpdate
+            );
+
+            if (resolution.kind === 'merged') {
+                if (resolution.warnings.length > 0) {
+                    toast.info(
+                        t('admin.study.save.synced_warnings', {
+                            fields: resolution.warnings.join(', '),
+                        })
+                    );
+                } else {
+                    toast.info(t('admin.study.save.synced_concurrent'));
+                }
+                updateOriginal(serverRead);
+                updateDraft((d) => {
+                    Object.keys(d).forEach((k) => {
+                        // @ts-expect-error
+                        if (resolution.merged[k] === undefined) delete d[k];
+                    });
+                    Object.assign(d, resolution.merged);
+                });
+                lastSavedDraftRef.current = null;
+                setSyncStatus('modified');
+                return true;
+            }
+
+            toast.error(
+                t(
+                    'admin.study.save.conflict',
+                    'Conflict detected. Some changes could not be merged.'
+                )
+            );
+            setSyncStatus('error');
+            return false;
+        },
+        [draft, original, updateOriginal, updateDraft, setSyncStatus, t]
+    );
+
+    // Handles errors from the save mutation.
+    const handleSaveError = useCallback(
+        (error: unknown) => {
+            if (error instanceof Error && error.name === 'AbortError') return;
+
+            const apiError = error as ApiError & { details: { server_state: StudyRead } };
+
+            if (apiError?.status === 409 && apiError.details?.server_state) {
+                try {
+                    applyConflict(apiError);
+                } catch (mergeError) {
+                    console.error('Merge failed', mergeError);
+                    setSyncStatus('error');
+                }
+            } else {
+                console.error('Save failed:', error);
+                setSyncStatus('error');
+                toast.error(t('admin.study.save.error', 'Failed to save changes'));
+            }
+        },
+        [applyConflict, setSyncStatus, t]
+    );
+
     // 5. Manual Save Function
     const save = useCallback(async () => {
         if (!draft || !effectiveSlug || syncStatus === 'saving') return;
 
         const draftJson = JSON.stringify(draft);
 
-        // Cancel any in-flight requests
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
@@ -119,93 +187,14 @@ export function useStudyPersistence() {
                 data: draft as StudyUpdate,
             });
 
-            // Success
             lastSavedDraftRef.current = draftJson;
             setSyncStatus('synced');
             setLastSavedAt(new Date());
-
-            // Sync original and draft immediately to reflect server state
-            // This also ensures last_updated_at matches the server's new timestamp
             setStudy(result);
-
-            // Ensure test draft is synced on successful save
             localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
-
             toast.success(t('admin.study.save.success'));
         } catch (error) {
-            if (error instanceof Error && error.name === 'AbortError') {
-                return;
-            }
-
-            const apiError = error as ApiError & {
-                details: { server_state: StudyRead };
-            };
-
-            // Optimistic Locking: 409 Conflict
-            if (apiError?.status === 409 && apiError.details?.server_state) {
-                try {
-                    const serverRead = apiError.details.server_state;
-                    const serverUpdate = projectStudyToUpdate(serverRead);
-                    const originalUpdate = original ? projectStudyToUpdate(original) : null;
-
-                    const mergeResult = mergeStudyUpdates(
-                        draft,
-                        serverUpdate,
-                        originalUpdate,
-                        'local-wins'
-                    );
-
-                    if (mergeResult.success && mergeResult.merged) {
-                        if (mergeResult.warnings && mergeResult.warnings.length > 0) {
-                            toast.info(
-                                t('admin.study.save.synced_warnings', {
-                                    fields: mergeResult.warnings.join(', '),
-                                })
-                            );
-                        } else {
-                            toast.info(t('admin.study.save.synced_concurrent'));
-                        }
-
-                        // 1. Update Baseline (server state becomes new original)
-                        updateOriginal(serverRead);
-
-                        // 2. Update Draft with Merged Content
-                        updateDraft((d) => {
-                            // Clear existing keys to ensure removal works
-                            Object.keys(d).forEach((k) => {
-                                // @ts-expect-error
-                                if (mergeResult.merged[k] === undefined) delete d[k];
-                            });
-                            Object.assign(d, mergeResult.merged);
-                        });
-
-                        // 3. Mark as modified because the user still hasn't "saved" this merged result
-                        // to the backend, or they might want to review it.
-                        // Actually, in manual mode, maybe we should still be in 'modified' state?
-                        // If we just merged and haven't pushed it back to server, we are definitely NOT synced.
-                        lastSavedDraftRef.current = null; // Forces re-evaluation
-                        setSyncStatus('modified');
-                        return;
-                    } else {
-                        // Hard Conflict
-                        toast.error(
-                            t(
-                                'admin.study.save.conflict',
-                                'Conflict detected. Some changes could not be merged.'
-                            )
-                        );
-                        setSyncStatus('error');
-                        return;
-                    }
-                } catch (mergeError) {
-                    console.error('Merge failed', mergeError);
-                    setSyncStatus('error');
-                }
-            } else {
-                console.error('Save failed:', error);
-                setSyncStatus('error');
-                toast.error(t('admin.study.save.error', 'Failed to save changes'));
-            }
+            handleSaveError(error);
         }
     }, [
         draft,
@@ -215,9 +204,7 @@ export function useStudyPersistence() {
         updateMutation,
         setLastSavedAt,
         setStudy,
-        original,
-        updateDraft,
-        updateOriginal,
+        handleSaveError,
         t,
     ]);
 

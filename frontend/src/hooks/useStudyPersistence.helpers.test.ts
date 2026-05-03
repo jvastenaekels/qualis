@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isDraftInSync } from './useStudyPersistence.helpers';
+import { isDraftInSync, resolveServerConflict } from './useStudyPersistence.helpers';
 
 describe('isDraftInSync', () => {
     it('returns true when draft equals original', () => {
@@ -32,5 +32,43 @@ describe('isDraftInSync', () => {
         const draft = { id: 1, title: 'a' };
         const original = { id: 1, title: 'a' };
         expect(isDraftInSync(draft, original, null)).toBe(true);
+    });
+});
+
+describe('resolveServerConflict', () => {
+    it('returns hard-conflict when merge fails', () => {
+        const result = resolveServerConflict(
+            { id: 1, title: 'local' } as unknown as Parameters<typeof resolveServerConflict>[0],
+            { id: 1, title: 'server' } as unknown as Parameters<typeof resolveServerConflict>[1],
+            null,
+            () => ({ success: false, merged: null, warnings: [] })
+        );
+        expect(result.kind).toBe('hard-conflict');
+    });
+
+    it('returns merged on success', () => {
+        const result = resolveServerConflict(
+            { id: 1, title: 'local' } as unknown as Parameters<typeof resolveServerConflict>[0],
+            { id: 1, title: 'server' } as unknown as Parameters<typeof resolveServerConflict>[1],
+            null,
+            () => ({ success: true, merged: { id: 1, title: 'merged' }, warnings: [] })
+        );
+        expect(result.kind).toBe('merged');
+        if (result.kind === 'merged') {
+            expect(result.merged).toEqual({ id: 1, title: 'merged' });
+            expect(result.warnings).toEqual([]);
+        }
+    });
+
+    it('forwards warnings on partial merge', () => {
+        const result = resolveServerConflict(
+            { id: 1, title: 'local' } as unknown as Parameters<typeof resolveServerConflict>[0],
+            { id: 1, title: 'server' } as unknown as Parameters<typeof resolveServerConflict>[1],
+            null,
+            () => ({ success: true, merged: { id: 1 }, warnings: ['title'] })
+        );
+        if (result.kind === 'merged') {
+            expect(result.warnings).toEqual(['title']);
+        }
     });
 });
