@@ -54,24 +54,24 @@ Cumulative across all seven waves. Items move through:
   Source: `03-auth-email-flows.md#f-03-004`.
 - F-03-005 (severity=major) — `/api/token` enumeration via timing differential.
   Pre-fix the unknown-email arm skipped `verify_password`, leaking existence at
-  ~339 ms mean delta over N=100. **closed** in Wave 2 Task 5: added a fixed
-  decoy bcrypt hash (`_LOGIN_DECOY_HASH`) and run `verify_password` against it
-  on the no-such-user branch; both 401 arms now spend a bcrypt cycle. Pinned by
-  `backend/tests/security/wave_2/test_email_enumeration.py::TestTokenEnumeration`
+  ~339 ms mean delta over N=100. **closed** in commit `f76d0ada` (Wave 2 Task 5):
+  added a fixed decoy bcrypt hash (`_LOGIN_DECOY_HASH`) and run `verify_password`
+  against it on the no-such-user branch; both 401 arms now spend a bcrypt cycle.
+  Pinned by `backend/tests/security/wave_2/test_email_enumeration.py::TestTokenEnumeration`
   (status+body equality, mean delta < 30 ms). Exploit script:
   `.raw/exploits/F-03-005.py`. Source: `03-auth-email-flows.md#f-03-005`.
 - F-03-006 (severity=major) — `/api/email/verify/resend` enumeration via timing
   differential. Pre-fix the bcrypt anti-enum pad sat in the `else` branch only,
-  leaking known-unverified emails at ~533 ms mean delta. **closed** in Wave 2
-  Task 5: moved `get_password_hash` out of `else` so it runs unconditionally,
-  mirroring the password-reset-request pattern. Pinned by
+  leaking known-unverified emails at ~533 ms mean delta. **closed** in commit
+  `f76d0ada` (Wave 2 Task 5): moved `get_password_hash` out of `else` so it runs
+  unconditionally, mirroring the password-reset-request pattern. Pinned by
   `backend/tests/security/wave_2/test_email_enumeration.py::TestVerifyResendEnumeration`.
   Exploit script: `.raw/exploits/F-03-006.py`.
   Source: `03-auth-email-flows.md#f-03-006`.
 - F-03-007 (severity=major) — `/api/2fa/disable/request` enumeration via timing
   differential. Pre-fix same pattern as F-03-006, leaking accounts with email-channel
-  2FA enabled at ~595 ms mean delta. **closed** in Wave 2 Task 5: moved the
-  `get_password_hash` pad out of `else`. Pinned by
+  2FA enabled at ~595 ms mean delta. **closed** in commit `f76d0ada` (Wave 2
+  Task 5): moved the `get_password_hash` pad out of `else`. Pinned by
   `backend/tests/security/wave_2/test_email_enumeration.py::TestTwofaDisableRequestEnumeration`.
   Exploit script: `.raw/exploits/F-03-007.py`.
   Source: `03-auth-email-flows.md#f-03-007`.
