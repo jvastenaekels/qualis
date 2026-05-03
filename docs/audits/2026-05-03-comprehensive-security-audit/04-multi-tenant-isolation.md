@@ -156,7 +156,121 @@ Prior bug it patched. The `researcher`/`member` rename is mostly cosmetic — wh
 
 ### Cross-tenant access matrix
 
-_Filled by Task 3 after running the parametrised IDOR harness._
+**Harness:** `backend/tests/security/wave_3/test_admin_idor_harness.py`
+**Run at commit:** `76aa9804`
+**Wall-clock:** 210s (3m 30s) for 82 parametrised cases + 1 coverage assertion.
+**Result:** 82 passed / 0 failed (out of 89 inventory routes; 7 not applicable, see below).
+
+Each row sends a request as Bob (project-A member) targeting a project-B object id (or
+`X-Project-ID` header). The expected response is a 403 (header-based dependency) or
+404 (slug-based dependency, existence-disclosure-collapsed). The harness records the
+actual status; any value outside the expected set is a finding for Task 4.
+
+| # | Method | Path template | Pattern | Result | Status set |
+|---|---|---|---|---|---|
+| 1 | GET | /api/admin/projects/{slug} | A_SLUG | passed | 403/404 |
+| 2 | PATCH | /api/admin/projects/{slug} | A_SLUG | passed | 403/404 |
+| 3 | GET | /api/admin/projects/{slug}/members | A_SLUG | passed | 403/404 |
+| 4 | PATCH | /api/admin/projects/{slug}/members/{user_id} | A_SLUG | passed | 403/404 |
+| 5 | DELETE | /api/admin/projects/{slug}/members/{user_id} | A_SLUG | passed | 403/404 |
+| 6 | DELETE | /api/admin/projects/{slug} | A_SLUG | passed | 403/404 |
+| 7 | POST | /api/admin/projects/{slug}/invitations | A_SLUG | passed | 403/404 |
+| 8 | GET | /api/admin/recruitment/{slug}/links | A_SLUG | passed | 403/404 |
+| 9 | POST | /api/admin/recruitment/{slug}/links | A_SLUG | passed | 403/404 |
+| 10 | DELETE | /api/admin/recruitment/links/{link_id} | B | passed | 403/404 |
+| 11 | GET | /api/admin/concourses/{cid}/memo | B | passed | 403/404 |
+| 12 | GET | /api/admin/studies/{sid}/memo | B | passed | 403/404 |
+| 13 | GET | /api/admin/concourses/{cid}/memo/unread | B | passed | 403/404 |
+| 14 | GET | /api/admin/studies/{sid}/memo/unread | B | passed | 403/404 |
+| 15 | POST | /api/admin/concourses/{cid}/memo/entries | B | passed | 403/404 |
+| 16 | POST | /api/admin/studies/{sid}/memo/entries | B | passed | 403/404 |
+| 17 | PATCH | /api/admin/memo-entries/{eid} | B | passed | 403/404 |
+| 18 | DELETE | /api/admin/memo-entries/{eid} | B | passed | 403/404 |
+| 19 | POST | /api/admin/memo-entries/{eid}/comments | B | passed | 403/404 |
+| 20 | PATCH | /api/admin/memo-comments/{cid} | B | passed | 403/404 |
+| 21 | DELETE | /api/admin/memo-comments/{cid} | B | passed | 403/404 |
+| 22 | POST | /api/admin/memo-comments/{cid}/resolve | B | passed | 403/404 |
+| 23 | POST | /api/admin/memo-comments/{cid}/unresolve | B | passed | 403/404 |
+| 24 | GET | /api/admin/studies/{slug}/participants | A_SLUG | passed | 403/404 |
+| 25 | GET | /api/admin/studies/participants/{participant_id} | B | passed | 403/404 |
+| 26 | PATCH | /api/admin/studies/participants/{participant_id}/discard | B | passed | 403/404 |
+| 27 | DELETE | /api/admin/studies/{slug}/participants | A_SLUG | passed | 403/404 |
+| 28 | DELETE | /api/admin/studies/{slug}/participants/{participant_id}/personal-data | A_SLUG | passed | 403/404 |
+| 29 | GET | /api/admin/studies/{slug}/export/csv | A_SLUG | passed | 403/404 |
+| 30 | GET | /api/admin/studies/{slug}/export/pqmethod | A_SLUG | passed | 403/404 |
+| 31 | GET | /api/admin/studies/{slug}/export/r-kit | A_SLUG | passed | 403/404 |
+| 32 | GET | /api/admin/studies/{slug}/dump | A_SLUG | passed | 403/404 |
+| 33 | GET | /api/admin/studies/{slug}/participants/{participant_id}/export/csv | A_SLUG | passed | 403/404 |
+| 34 | GET | /api/admin/studies/{slug}/participants/{participant_id}/export/json | A_SLUG | passed | 403/404 |
+| 35 | GET | /api/admin/studies/{slug}/participants/{participant_id}/export/audio | A_SLUG | passed | 403/404 |
+| 36 | GET | /api/admin/studies/{slug}/export/package | A_SLUG | passed | 403/404 |
+| 37 | GET | /api/admin/studies/{slug}/data-inventory | A_SLUG | passed | 403/404 |
+| 38 | GET | /api/admin/studies/{slug}/anonymise-preview | A_SLUG | passed | 403/404 |
+| 39 | POST | /api/admin/studies/{slug}/anonymise-bulk | A_SLUG | passed | 403/404 |
+| 40 | POST | /api/admin/studies | A_HEADER | passed | 403/404 |
+| 41 | GET | /api/admin/studies | A_HEADER | passed | 403/404 |
+| 42 | GET | /api/admin/studies/{slug} | A_SLUG | passed | 403/404 |
+| 43 | PATCH | /api/admin/studies/{slug} | A_SLUG | passed | 403/404 |
+| 44 | POST | /api/admin/studies/{slug}/validate | A_SLUG | passed | 403/404 |
+| 45 | POST | /api/admin/studies/{slug}/state | A_SLUG | passed | 403/404 |
+| 46 | POST | /api/admin/studies/{slug}/reset | A_SLUG | passed | 403/404 |
+| 47 | DELETE | /api/admin/studies/{slug} | A_SLUG | passed | 403/404 |
+| 48 | POST | /api/admin/studies/{slug}/import-concourse | A_SLUG | passed | 403/404 |
+| 49 | GET | /api/admin/studies/{slug}/stale-statements | A_SLUG | passed | 403/404 |
+| 50 | POST | /api/admin/studies/{slug}/sync-statement/{statement_id} | A_SLUG | passed | 403/404 |
+| 51 | POST | /api/admin/studies/{slug}/sync-all-stale | A_SLUG | passed | 403/404 |
+| 52 | GET | /api/admin/studies/{slug}/analysis/eigenvalues | A_SLUG | passed | 403/404 |
+| 53 | POST | /api/admin/studies/{slug}/analysis/run | A_SLUG | passed | 403/404 |
+| 54 | POST | /api/admin/studies/{slug}/analysis/preview-range | A_SLUG | passed | 403/404 |
+| 55 | GET | /api/admin/studies/{slug}/analysis/runs | A_SLUG | passed | 403/404 |
+| 56 | GET | /api/admin/studies/{slug}/analysis/runs/{run_id} | A_SLUG | passed | 403/404 |
+| 57 | PATCH | /api/admin/studies/{slug}/analysis/runs/{run_id} | A_SLUG | passed | 403/404 |
+| 58 | DELETE | /api/admin/studies/{slug}/analysis/runs/{run_id} | A_SLUG | passed | 403/404 |
+| 59 | GET | /api/admin/studies/{slug}/analysis/audios | A_SLUG | passed | 403/404 |
+| 60 | GET | /api/admin/studies/{slug}/analysis/comments | A_SLUG | passed | 403/404 |
+| 61 | GET | /api/admin/studies/{slug}/stats | A_SLUG | passed | 403/404 |
+| 62 | GET | /api/admin/studies/{slug}/export/config | A_SLUG | passed | 403/404 |
+| 63 | GET | /api/admin/studies/{slug}/storage-usage | A_SLUG | passed | 403/404 |
+| 64 | GET | /api/admin/concourses/tags | A_HEADER | passed | 403/404 |
+| 65 | POST | /api/admin/concourses/tags | A_HEADER | passed | 403/404 |
+| 66 | DELETE | /api/admin/concourses/tags/{tag_id} | A_HEADER | passed | 403/404 |
+| 67 | POST | /api/admin/concourses | A_HEADER | passed | 403/404 |
+| 68 | GET | /api/admin/concourses | A_HEADER | passed | 403/404 |
+| 69 | GET | /api/admin/concourses/{concourse_id} | A_HEADER | passed | 403/404 |
+| 70 | PATCH | /api/admin/concourses/{concourse_id} | A_HEADER | passed | 403/404 |
+| 71 | DELETE | /api/admin/concourses/{concourse_id} | A_HEADER | passed | 403/404 |
+| 72 | POST | /api/admin/concourses/{concourse_id}/items | A_HEADER | passed | 403/404 |
+| 73 | POST | /api/admin/concourses/{concourse_id}/items/bulk | A_HEADER | passed | 403/404 |
+| 74 | POST | /api/admin/concourses/{concourse_id}/items/import | A_HEADER | passed | 403/404 |
+| 75 | PATCH | /api/admin/concourses/{concourse_id}/items/{item_id} | A_HEADER | passed | 403/404 |
+| 76 | DELETE | /api/admin/concourses/{concourse_id}/items/{item_id} | A_HEADER | passed | 403/404 |
+| 77 | GET | /api/admin/concourses/{concourse_id}/items/{item_id}/versions | A_HEADER | passed | 403/404 |
+| 78 | GET | /api/admin/concourses/{concourse_id}/items/{item_id}/comments | A_HEADER | passed | 403/404 |
+| 79 | POST | /api/admin/concourses/{concourse_id}/items/{item_id}/comments | A_HEADER | passed | 403/404 |
+| 80 | DELETE | /api/admin/users/{user_id} | A_HEADER | passed | 403/404 |
+| 81 | POST | /api/admin/studies/import | A_HEADER | passed | 403/404 |
+| 82 | POST | /api/admin/studies/validate-import | A_HEADER | passed | 403/404 |
+
+**Routes excluded from the cross-tenant harness (7 of 89).** No project-B target id
+exists for these routes; their isolation is asserted elsewhere (filter-by-membership
+clause, superuser gate, or anti-enum semantics).
+
+| Method | Path | Reason |
+|---|---|---|
+| GET | /api/admin/projects | enumeration scoped to caller's memberships (in-handler filter) |
+| POST | /api/admin/projects | creates a new project; no cross-tenant target |
+| GET | /api/admin/invitations/verify | unauthenticated; token-tampering coverage lives in Wave 1 |
+| POST | /api/admin/invitations/accept | auth-only token consumption; token must match caller's email |
+| GET | /api/admin/users | superuser-gated; cross-project N/A |
+| POST | /api/admin/users | superuser-gated; cross-project N/A |
+| GET | /api/admin/memo/templates | static templates; no project scope |
+
+**Outcome.** No cross-tenant leakage detected. The two membership mechanisms
+(`require_project_role` over `X-Project-ID`, and `check_*_permission` over slug) are
+behaving symmetrically and the bespoke inline checks (memos, recruitment-link delete,
+participant-id routes) match the dependency-factory contract. The harness is retained
+as a CI regression guard against future refactors that might silently bypass either
+mechanism. Filed as **F-04-001** below.
 
 ## Summary
 
@@ -165,11 +279,28 @@ _Filled by Task 3 after running the parametrised IDOR harness._
 | blocker | 0 |
 | major | 0 |
 | minor | 0 |
-| observation | 0 |
+| observation | 1 |
 
 ## Findings
 
-_Populated as findings are filed by Tasks 4-9. F-04-NNN ID space._
+### F-04-001 — Cross-tenant IDOR harness clean (observation)
+
+**Severity:** observation
+**Status:** passing (regression guard)
+**Files:** `backend/tests/security/wave_3/test_admin_idor_harness.py`,
+          `backend/tests/security/wave_3/conftest.py`
+
+A parametrised harness over the 89 admin endpoints (82 cross-tenant-applicable + 7
+top-level/superuser/unauth excluded) was implemented and run at commit `76aa9804`.
+All 82 cases asserted that a project-A member, when targeting a project-B object id
+or `X-Project-ID` header, receives a 403 or 404 denial. The harness is now a CI
+regression guard: any future change that breaks one of the two membership
+mechanisms (header-based `require_project_role` or slug-based `check_*_permission`)
+or the bespoke inline checks (memos, recruitment-link delete, participant-id
+routes) will surface here before merge.
+
+This is filed as an observation — not a finding — because nothing is broken; the
+harness's value is preventing future regressions, not fixing an existing leak.
 
 ## Resolved since prior
 
