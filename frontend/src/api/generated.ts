@@ -6668,6 +6668,15 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 
 /**
  * Export single participant results as CSV.
+
+Per-participant exports are an individual-lookup channel used for
+follow-up / support contexts. After GDPR Art. 17 anonymisation
+(``Participant.anonymised_at IS NOT NULL``) the row no longer
+represents an identifiable participant — the bulk CSV / R-Kit /
+PQMethod exports preserve the anonymous Q-sort entries as research
+data (with PII zeroed), but the per-participant endpoints 404 to
+avoid presenting an anonymised row as a follow-up target.
+See F-05-006 in Wave 4.
  * @summary Export Participant Csv
  */
 export const exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet = (
@@ -6915,6 +6924,11 @@ export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipan
 
 /**
  * Export single participant results as JSON.
+
+F-05-006: anonymised participants (``anonymised_at IS NOT NULL``)
+are excluded from per-participant follow-up exports. The bulk
+``/dump`` endpoint still surfaces them as anonymous research
+entries with PII zeroed.
  * @summary Export Participant Json
  */
 export const exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet = (
@@ -7162,6 +7176,11 @@ export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipa
 
 /**
  * Export all audio recordings for a participant as a ZIP with metadata.
+
+F-05-006: anonymised participants are excluded. (Anonymisation
+deletes their audio rows + S3 objects already, so the post-filter
+behaviour is the same — but the explicit filter keeps the API
+contract uniform with the CSV/JSON endpoints.)
  * @summary Export Participant Audio
  */
 export const exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet = (
