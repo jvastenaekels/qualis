@@ -279,7 +279,7 @@ mechanism. Filed as **F-04-001** below.
 | blocker | 0 |
 | major | 0 |
 | minor | 0 |
-| observation | 3 |
+| observation | 4 |
 
 ## Findings
 
@@ -355,6 +355,34 @@ key is never exposed without auth (presigned URLs are minted in-handler
 after the session-token check). The regression test pins the no-`participant_id`
 signature plus the 403 behaviour on cross-participant delete and presigned-URL
 fetch.
+
+### F-04-004 — Resume-code lookup is study-scoped (observation)
+
+**Severity:** observation
+**Status:** safe — lookup query joins on `Study.slug == slug`
+**Files:** `backend/app/routers/participants.py:152-189`,
+          `backend/app/resume_codes.py:649-680`,
+          `backend/tests/security/wave_3/test_resume_code_scoping.py`
+**Disposition:** false positive — even though codes are globally unique
+in the DB, the lookup at `GET /api/study/{slug}/resume/{code}` filters
+on both code AND study slug.
+
+Concern: resume codes are short (~9M `adjective-noun-NNN` combinations
+per language). A globally unguarded lookup
+(`WHERE resume_code = :code`) would let an attacker harvest codes
+belonging to participants of arbitrary studies — short codes plus a
+rate-limited brute-force become realistic over a few thousand requests.
+
+Reality: the resume handler joins `Participant` to `Study` and filters
+`Participant.resume_code == code AND Study.slug == slug`. Cross-study
+lookups return 404 even when the code is valid in some other study —
+the URL contributes the slug, and there is no global enumeration oracle.
+The uniqueness probe in `generate_unique_resume_code` is global by
+necessity (it has to pick a DB-unique code), but it's not a lookup oracle:
+it tells the *caller* whether the code is taken, never the participant.
+The regression test exercises both directions plus a static check that the
+handler source still contains `Study.slug == slug` — a future refactor that
+drops the join would break the test.
 
 ## Resolved since prior
 
