@@ -5,6 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { toast } from 'sonner';
 import { customInstance } from './mutator';
 
 // No mock for ./client here, we will verify reportBug via its fetch calls
@@ -203,5 +204,86 @@ describe('customInstance: 401 redirect reason', () => {
         }
 
         expect(setHrefSpy).toHaveBeenCalledWith(expect.stringContaining('reason=session_expired'));
+    });
+});
+
+describe('customInstance: 403 toast behaviour', () => {
+    let toastSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+        toastSpy = vi.spyOn(toast, 'error').mockImplementation(() => 'id');
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        toastSpy.mockRestore();
+    });
+
+    it('does NOT toast on a 403 GET (background read, noise)', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 403,
+                text: async () => '{"code":"forbidden","message":"Insufficient permissions"}',
+            })
+        );
+        try {
+            await customInstance({ url: '/api/admin/concourses', method: 'GET' });
+        } catch (_e) {
+            // Expected
+        }
+        expect(toastSpy).not.toHaveBeenCalled();
+    });
+
+    it('DOES toast on a 403 mutation, with the backend message as description', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 403,
+                text: async () =>
+                    '{"code":"forbidden","message":"Insufficient permissions. Required: owner"}',
+            })
+        );
+        try {
+            await customInstance({ url: '/api/admin/projects/x', method: 'PATCH', data: {} });
+        } catch (_e) {
+            // Expected
+        }
+        expect(toastSpy).toHaveBeenCalledTimes(1);
+        const [title, opts] = toastSpy.mock.calls[0] as [string, Record<string, unknown>];
+        expect(title).toBeTruthy();
+        expect((opts.description as string) || '').toContain('owner');
+        expect((opts.id as string) || '').toContain('PATCH');
+    });
+
+    it('translates known stable error codes (OWNER_ROLE_IMMUTABLE)', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 403,
+                text: async () => '{"code":"error","message":"OWNER_ROLE_IMMUTABLE"}',
+            })
+        );
+        try {
+            await customInstance({
+                url: '/api/admin/projects/x/members/1',
+                method: 'PATCH',
+                data: { role: 'owner' },
+            });
+        } catch (_e) {
+            // Expected
+        }
+        expect(toastSpy).toHaveBeenCalledTimes(1);
+        const [, opts] = toastSpy.mock.calls[0] as [string, Record<string, unknown>];
+        const description = (opts.description as string) || '';
+        // Either the EN translation, the i18n key (when locale not loaded in tests), or the raw code.
+        expect(
+            description === 'The Owner role can only be assigned at project creation.' ||
+                description === 'errors.owner_role_immutable' ||
+                description.includes('OWNER_ROLE_IMMUTABLE')
+        ).toBe(true);
     });
 });

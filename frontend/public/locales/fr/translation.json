@@ -2616,6 +2616,12 @@
     "errors": {
         "member_limit_reached": "Limite de membres du projet atteinte.",
         "owner_project_limit_reached": "Vous ne pouvez pas posséder davantage de projets.",
-        "owner_role_immutable": "Le rôle Propriétaire ne peut être attribué qu'à la création du projet."
+        "owner_role_immutable": "Le rôle Propriétaire ne peut être attribué qu'à la création du projet.",
+        "access_denied_title": "Accès refusé",
+        "access_denied_description": "Vous n'avez pas l'autorisation d'effectuer cette action.",
+        "rate_limited_title": "Trop de requêtes",
+        "rate_limited_description": "Veuillez patienter un instant avant de réessayer.",
+        "conflict_title": "Conflit",
+        "conflict_description": "La ressource a été modifiée ou existe déjà."
     }
 }
