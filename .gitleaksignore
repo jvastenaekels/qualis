@@ -1,5 +1,5 @@
 # Sample AWS credentials in published documentation and audit reports.
-# AKIAIOSFODNN7EXAMPLE is AWS's canonical sample value shown in their own
+# The flagged access-key value is AWS's canonical sample shown in their own
 # documentation; it is not a real credential and carries no access rights.
 0e12257c1ee3f392e4c92aed52cd26257b0c8414:docs/guides/s3-setup.md:aws-access-token:71
 0e12257c1ee3f392e4c92aed52cd26257b0c8414:docs/guides/s3-setup.md:aws-access-token:80
@@ -9,6 +9,7 @@
 304ba2cfe0735cb40fbe5066cdfa77beedaf3848:docs/superpowers/plans/2026-05-03-audit-wave-1-refresh-scanners.md:aws-access-token:353
 304ba2cfe0735cb40fbe5066cdfa77beedaf3848:docs/superpowers/plans/2026-05-03-audit-wave-1-refresh-scanners.md:aws-access-token:378
 40b93183332e7d99569dc7b988e84dd2d7592a17:docs/audits/2026-05-03-comprehensive-security-audit/.raw/README.md:aws-access-token:15
+894d8a0ef103bf48e01f2ff1f07f3806dd3b9d97:.gitleaksignore:aws-access-token:2
 
 # RFC 9562 canonical sample UUIDs used as test fixtures and API documentation
 # examples. Values (123e4567-e89b-12d3-a456-426614174000 and the -099 variant)
