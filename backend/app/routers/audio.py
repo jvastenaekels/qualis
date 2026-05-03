@@ -22,12 +22,21 @@ from app.limiter import limiter
 router = APIRouter(prefix="/api/audio", tags=["audio"])
 
 
-async def validate_audio_file(file: UploadFile) -> None:
+async def validate_audio_file(file: UploadFile) -> str:
     """
-    Validate audio file type and size.
+    Validate audio file type and size, return the sniffed MIME type.
 
     Args:
         file: UploadFile to validate
+
+    Returns:
+        The MIME type detected from the file's magic bytes (one of
+        ``settings.AUDIO_ALLOWED_MIME_TYPES`` — the function raises
+        before returning otherwise). The sniffed value is the
+        authoritative content type for downstream storage; the
+        client-supplied ``UploadFile.content_type`` is unverified
+        attacker-influenced data and must not be persisted as the
+        S3 ``Content-Type`` (F-06-005).
 
     Raises:
         HTTPException: If file is invalid (size or MIME type)
@@ -51,6 +60,7 @@ async def validate_audio_file(file: UploadFile) -> None:
 
     # Reset file pointer for subsequent operations
     await file.seek(0)
+    return mime
 
 
 async def check_storage_quota(
@@ -115,8 +125,11 @@ async def upload_audio(
     if not re.match(r"^[a-zA-Z0-9_-]+$", question_key):
         raise HTTPException(status_code=400, detail="Invalid question_key format")
 
-    # Validate file
-    await validate_audio_file(file)
+    # Validate file. The sniffed MIME is the authoritative content
+    # type for storage; the client-supplied UploadFile.content_type
+    # is unverified attacker input and must not be persisted as the
+    # S3 Content-Type (F-06-005).
+    sniffed_mime = await validate_audio_file(file)
 
     # Get participant and study
     result = await db.execute(
@@ -158,8 +171,14 @@ async def upload_audio(
             status_code=403, detail="Audio recording not enabled for this study"
         )
 
-    # Validate duration against study config
-    max_allowed = audio_config.get("max_duration_seconds", 600)
+    # Validate duration against study config. F-06-005a: the default
+    # comes from settings.AUDIO_MAX_DURATION_SECONDS so the cap stays
+    # consistent when a study's postsort_config["audio"] omits the key
+    # (previously defaulted to a hard-coded 600s — twice the configured
+    # 300s ceiling).
+    max_allowed = audio_config.get(
+        "max_duration_seconds", settings.AUDIO_MAX_DURATION_SECONDS
+    )
     if duration_seconds is not None and duration_seconds < 0:
         raise HTTPException(status_code=400, detail="Invalid duration")
     if duration_seconds is not None and duration_seconds > max_allowed:
@@ -172,7 +191,12 @@ async def upload_audio(
     content = await file.read()
     if len(content) == 0:
         raise HTTPException(status_code=400, detail="Empty audio file")
-    content_type = file.content_type or "audio/webm"
+    # F-06-005b: persist the magic-sniffed MIME, not the client-supplied
+    # one. validate_audio_file already enforced that the sniffed value
+    # belongs to the allowlist, so the S3 Content-Type matches the bytes
+    # actually stored — a future renderer cannot be redirected to a
+    # different decoder by a header/body mismatch.
+    content_type = sniffed_mime
 
     # Check storage quota
     await check_storage_quota(study, len(content), db)

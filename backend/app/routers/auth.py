@@ -28,6 +28,7 @@ from app.utils.security import (
 from app.utils.email import (
     send_email_verification,
     send_password_reset,
+    send_register_already_registered,
     send_twofa_disable_link,
     send_twofa_disabled_notification,
     send_twofa_login_otp,
@@ -224,6 +225,36 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")  # nosec B106
 
 
+def _build_anti_enum_register_response(
+    email: str, *, requires_email_verification: bool
+) -> UserCreateResponse:
+    """F-06-007: synthesise a generic /api/register response that does not
+    leak whether the email was already registered.
+
+    The shape mirrors a freshly created user: id=0, the submitted email,
+    is_active=False, no admin flags, no totp, no pending change. The
+    response body is byte-equal across the registered- and unregistered-
+    arms (modulo the ``email`` field, which the attacker submitted and
+    therefore already knows). The ``requires_email_verification`` flag is
+    derived from the operator's verification setting, exactly as on the
+    new-user path, so the bool is also identical across arms.
+    """
+    placeholder = UserRead(
+        id=0,
+        email=email,
+        full_name=None,
+        is_active=False,
+        is_superuser=False,
+        is_totp_enabled=False,
+        pending_email=None,
+        owned_project_quota=None,
+    )
+    return UserCreateResponse(
+        user=placeholder,
+        requires_email_verification=requires_email_verification,
+    )
+
+
 @router.post(
     "/register", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED
 )
@@ -236,30 +267,73 @@ async def register_user(
     """
     Register a new user, optionally via an invitation token.
 
+    Anti-enumeration (F-06-007): the response body and status code are
+    identical whether the submitted email is fresh or already registered.
+    A registered email triggers an out-of-band notification to the address
+    ("you already have a Qualis account") with a password-reset link
+    instead of leaking the duplicate via the API.
+
     The verification gate depends only on whether verification is active
     (EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation
     tokens grant project membership but never bypass the gate
     (spec amendment 2026-05-02).
 
-    - Verification active (any path): is_active=False, email_verified_at=NULL,
-      verification email sent, requires_email_verification=True. If an
-      invitation token was provided, the project membership is still created
-      so access applies as soon as verification completes.
+    - Verification active (fresh-email path): is_active=False,
+      email_verified_at=NULL, verification email sent,
+      requires_email_verification=True. If an invitation token was
+      provided, the project membership is still created so access
+      applies as soon as verification completes.
     - Verification inactive (operator disabled it OR SMTP not configured):
       is_active=True, email_verified_at=NOW(), requires_email_verification=False.
       Membership (if any) is applied in the same transaction. This SMTP-fallback
       rule keeps the app usable on deployments that cannot deliver mail.
+    - Duplicate-email path: no row is created, no invitation is processed,
+      a "you already have an account" email is dispatched to the address,
+      and the response mirrors the fresh-email shape.
     """
-    # 1. Check if user already exists
-    query = select(User).where(User.email == user_in.email)
-    result = await db.execute(query)
-    if result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A user with this email already exists.",
+    # The verification gate depends ONLY on whether verification is active
+    # (operator opted in via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured
+    # to actually deliver the link). When SMTP is unconfigured we degrade to
+    # active+verified to avoid producing locked-out accounts. The flag is
+    # the same on the fresh and the already-registered arms — the attacker
+    # cannot probe operator settings via the register endpoint either.
+    verification_active = settings.email_verification_active
+    needs_verification_step = verification_active
+    now = datetime.now(tz=timezone.utc)
+
+    # 1. Compute the password hash unconditionally so the duplicate and
+    #    fresh arms spend the same wall-clock on bcrypt (cost factor 12 ≈
+    #    150 ms). The hash is reused on the fresh path; on the duplicate
+    #    path it's discarded. Without this, a duplicate-email request
+    #    would short-circuit before bcrypt runs, restoring a timing
+    #    differential between arms.
+    hashed_password = get_password_hash(user_in.password)
+
+    # 2. Check if user already exists. The duplicate-email arm follows
+    #    the F-06-007 "always-200, send-email" path; it returns the
+    #    same response shape and status as the fresh arm.
+    existing_query = select(User).where(User.email == user_in.email)
+    existing = (await db.execute(existing_query)).scalar_one_or_none()
+    if existing is not None:
+        # Out-of-band notify the registered address with a recovery link.
+        # The "pwa" claim mirrors the password-reset-request shape so the
+        # link is single-use against the existing account's current
+        # password_changed_at.
+        reset_token = create_email_token(
+            email=existing.email,
+            purpose="password_reset",
+            expires_delta=timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS),
+            password_changed_at=existing.password_changed_at,
+        )
+        reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+        send_register_already_registered(email_to=existing.email, reset_url=reset_url)
+        return _build_anti_enum_register_response(
+            user_in.email, requires_email_verification=needs_verification_step
         )
 
-    # 2. Verify Invitation Token (if provided)
+    # 3. Verify Invitation Token (if provided). Invitation-token errors
+    #    are not enumeration-relevant — the token's validity is decided
+    #    by its signature, not by the email's registration state.
     invitation_payload = None
     if user_in.invitation_token:
         try:
@@ -270,30 +344,20 @@ async def register_user(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invitation token does not match the provided email.",
                 )
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
-    # The verification gate depends ONLY on whether verification is active
-    # (operator opted in via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured
-    # to actually deliver the link). When SMTP is unconfigured we degrade to
-    # active+verified to avoid producing locked-out accounts.
-    # Invitation acceptance is independent: the membership block below runs
-    # whenever there is a valid invitation, regardless of verification state.
-    # The invited user's project access is queued and applies as soon as
-    # verification completes. See spec amendment 2026-05-02.
-    verification_active = settings.email_verification_active
-    needs_verification_step = verification_active
-    now = datetime.now(tz=timezone.utc)
-
     try:
-        # 3. Create User
+        # 4. Create User
         new_user = User(
             email=user_in.email,
             full_name=user_in.full_name,
-            hashed_password=get_password_hash(user_in.password),
+            hashed_password=hashed_password,
             is_active=not needs_verification_step,
             email_verified_at=None if needs_verification_step else now,
             password_changed_at=now,
@@ -302,7 +366,7 @@ async def register_user(
         # Flush to get ID, but be ready to rollback
         await db.flush()
 
-        # 4. Process invitation (link to project)
+        # 5. Process invitation (link to project)
         invitation_project_id = (
             invitation_payload.get("project_id")
             or invitation_payload.get("workspace_id")
@@ -320,14 +384,31 @@ async def register_user(
             db.add(project_member)
 
         await db.commit()
-    except IntegrityError as e:
+    except IntegrityError:
+        # F-06-007: race-condition fallback — between the SELECT at
+        # step 2 and the INSERT here, a concurrent request inserted the
+        # same email. Fold this into the same anti-enumeration response
+        # as the steady-state duplicate path: dispatch the "already
+        # registered" email and return the generic shape. Don't log
+        # the exception detail (could carry the email).
         await db.rollback()
-        logger.error(
-            f"Integrity check failed during user registration: {e}", exc_info=True
-        )
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email likely already exists",
+        logger.info("register: race-condition duplicate folded into anti-enum path")
+        existing_after = (await db.execute(existing_query)).scalar_one_or_none()
+        if existing_after is not None:
+            reset_token = create_email_token(
+                email=existing_after.email,
+                purpose="password_reset",
+                expires_delta=timedelta(
+                    hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS
+                ),
+                password_changed_at=existing_after.password_changed_at,
+            )
+            reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+            send_register_already_registered(
+                email_to=existing_after.email, reset_url=reset_url
+            )
+        return _build_anti_enum_register_response(
+            user_in.email, requires_email_verification=needs_verification_step
         )
     except Exception as e:
         await db.rollback()
@@ -338,7 +419,7 @@ async def register_user(
         )
     await db.refresh(new_user)
 
-    # 5. Send verification email for self-signup path (only when active)
+    # 6. Send verification email for self-signup path (only when active)
     if needs_verification_step:
         token = create_email_token(
             email=new_user.email,
@@ -348,9 +429,12 @@ async def register_user(
         verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
         send_email_verification(email_to=new_user.email, verify_url=verify_url)
 
-    return UserCreateResponse(
-        user=UserRead.model_validate(new_user),
-        requires_email_verification=needs_verification_step,
+    # F-06-007: return the same generic shape used by the duplicate-email
+    # path — the new user's id/full_name are not in the response body so
+    # the two arms are byte-equal. Frontend uses
+    # ``requires_email_verification`` to navigate, not the user fields.
+    return _build_anti_enum_register_response(
+        user_in.email, requires_email_verification=needs_verification_step
     )
 
 

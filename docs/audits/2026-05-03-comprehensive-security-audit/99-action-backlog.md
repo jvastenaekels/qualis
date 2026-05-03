@@ -78,12 +78,14 @@ Cumulative across all seven waves. Items move through:
   Exploit script: `.raw/exploits/F-03-007.py`.
   Source: `03-auth-email-flows.md#f-03-007`.
 - F-03-008 (severity=minor) — `/api/register` enumeration via response body and
-  status (400 `"already exists"` vs 201 user record). **deferred** to Wave 5
-  (business-logic abuse): closing this requires a registration redesign
-  (return 200 always, send distinct emails to existing-vs-new users) which
-  trades enumeration resistance for signup UX — a product decision, not a
-  one-line patch. Bounded today by the `5/minute` per-IP rate limit. Source:
-  `03-auth-email-flows.md#f-03-008`.
+  status (400 `"already exists"` vs 201 user record). **closed (backend half)**
+  in Wave 5 by F-06-007 (commit `f60e754b`): always-201 contract, identical
+  body shape across arms, out-of-band "you already have a Qualis account" email
+  to the registered address with a recovery link, constant-time bcrypt before
+  the existence SELECT, IntegrityError race-path folded into the same anti-enum
+  response. Pinned by `backend/tests/security/wave_5/test_register_enumeration.py`
+  (7 tests). UX half (registration page copy) deferred to Wave 5b backlog.
+  Source: `03-auth-email-flows.md#f-03-008`, `06-business-logic-abuse.md#f-06-007`.
 - F-03-009 (severity=observation) — `/api/password/reset/request` residual
   timing-floor differential. The endpoint is already constant-time at the
   bcrypt level (correct by design pre-Wave-2); the residual ~130 ms minimum-floor
@@ -282,11 +284,100 @@ Cumulative across all seven waves. Items move through:
 
 ## Wave 5 — Business-logic abuse
 
-- F-03-008 (carry-over from Wave 2, severity=minor) — `/api/register` body+status
-  email enumeration. Closing this requires a registration redesign (return 200
-  always, send distinct "you already have an account" vs verification emails)
-  which trades enumeration resistance for signup UX. Source:
-  `03-auth-email-flows.md#f-03-008`.
+- F-06-001 (severity=minor) — Resume-code per-code rate-limit lockout
+  (distributed brute-force). Per-IP 30/minute alone left the 9M-entropy
+  resume-code space enumerable across multiple IPs in days; added a
+  layered `10/hour` slowapi limit keyed by `sha256(slug|code)` to bound
+  cost to ~100 years per code. **closed** in commit `fdc233da`. Pinned
+  by `backend/tests/security/wave_5/test_resume_code_brute_force.py`
+  (7 tests, key-function isolation + decorator chain). Source:
+  `06-business-logic-abuse.md#f-06-001`.
+- F-06-002 (severity=observation) — Draft-responses session-token bearer
+  model. Possession of `session_token` = right to read/overwrite/clear
+  the draft. Cross-study lookup (Wave 3 F-04-004), per-code rate limit
+  (F-06-001), and 122-bit token entropy bound the attacker surface;
+  what survives is a shared-device threat already addressed by consent
+  text and the explicit "resume on another device" UX promise.
+  **closed (no code change)** — pinned by
+  `backend/tests/security/wave_5/test_draft_responses_isolation.py`
+  (8 tests). Filed in commit `b9c53003`. Source:
+  `06-business-logic-abuse.md#f-06-002`.
+- F-06-003 (severity=observation) — Recruitment capacity gate uses
+  SELECT FOR UPDATE. `increment_usage` runs the read under a row-level
+  lock; `validate_link_token` deliberately omits capacity gating. The
+  only consumer (`submission_service`) flushes inside the outer
+  transaction the router commits, so the lock holds end-to-end.
+  **closed (no code change)** — pinned by
+  `backend/tests/security/wave_5/test_recruitment_capacity_race.py`
+  (5 tests). Filed in commit `5aa21ad5`. Source:
+  `06-business-logic-abuse.md#f-06-003`.
+- F-06-004 (severity=n/a) — `is_test_run` flag column dropped by
+  migration `b3a47d8e9f12`; nothing for a participant to flip on the
+  server side. The frontend "preview" button at `StudyDesignPage.tsx:245`
+  opens `?mode=test` in a new tab but never reaches the backend.
+  **n/a** — the absence is the contract. Filed in commit `d9b89c64`.
+  Source: `06-business-logic-abuse.md#f-06-004`.
+- F-06-005 (severity=minor) — Audio upload abuse-resistance
+  (duration default + sniffed-MIME persistence). Two minor gaps:
+  (a) duration cap defaulted to a hard-coded 600s when the study
+  config omitted `max_duration_seconds`, twice the configured 300s
+  ceiling; (b) S3 `Content-Type` came from `UploadFile.content_type`
+  instead of the magic-sniffed value. Both fixed in one commit:
+  `validate_audio_file` returns the sniffed MIME, `upload_audio`
+  uses it as the storage `content_type`, the duration default reads
+  `settings.AUDIO_MAX_DURATION_SECONDS`. **closed** in commit
+  `1d8bab2d`. Pinned by
+  `backend/tests/security/wave_5/test_audio_upload_abuse.py`
+  (6 tests). Pre-existing 14-case `test_audio.py` integration suite
+  remains green. Source: `06-business-logic-abuse.md#f-06-005`.
+- F-06-006 (severity=observation) — Submission idempotency and
+  ownership-claim integrity. `Participant.session_token` unique
+  constraint + IntegrityError-rollback path bounds double-submit;
+  `SELECT FOR UPDATE` in `_find_or_create_participant` serializes
+  concurrent submits; `participant.study_id != study.id` check
+  rejects submit-on-behalf; `already_submitted=True` short-circuit
+  on completed participants. Doc-cite correction: the Wave 5 plan
+  referenced "F-04-003 pinned ownership for submissions" but
+  F-04-003 actually pinned audio; submissions use the same
+  session_token-bearer model under a different prior ID. **closed
+  (no code change)** — pinned by
+  `backend/tests/security/wave_5/test_submission_idempotency.py`
+  (6 tests). Filed in commit `c468245c`. Source:
+  `06-business-logic-abuse.md#f-06-006`.
+- F-06-007 (severity=minor) — `/api/register` body+status email
+  enumeration (closes Wave 2 carry-over F-03-008). Always-201
+  contract, identical body across known/unknown arms, out-of-band
+  "you already have a Qualis account" email with recovery link,
+  constant-time bcrypt before existence SELECT,
+  IntegrityError-race fallback folded into the same anti-enum
+  response. **closed (backend half)** in commit `f60e754b`.
+  Pinned by `backend/tests/security/wave_5/test_register_enumeration.py`
+  (7 tests). Source: `06-business-logic-abuse.md#f-06-007`.
+
+### Wave 5b backlog (deferred)
+
+- (Wave 5b, frontend) — Registration page UX copy after the F-06-007
+  always-201 redesign. Today the page renders the legacy "account
+  created — check your email" success message regardless of which
+  arm the backend took. Honest copy ("if this email is unregistered,
+  check your inbox to verify; if it's registered, check your inbox
+  to recover") needs (i) a translation-key reformulation across
+  en/fr/fi, (ii) a confirm-modal review with stakeholders, (iii)
+  removal of any frontend-side body parsing that distinguishes the
+  two arms (none today, but pinned). Source:
+  `06-business-logic-abuse.md#f-06-007`.
+- (Wave 5b, backend) — Optional per-email registration cap. Today
+  the limit is `5/minute` per IP; a per-email cap of e.g.
+  `50/hour` would slow per-address harassment via the
+  always-registered-account email pipeline. Defence-in-depth, not
+  load-bearing — the existing rate limits already make per-address
+  campaigns unattractive. Source:
+  `06-business-logic-abuse.md#f-06-007`.
+- (Wave 5b, ops) — If telemetry shows persistent campaigns hitting
+  the per-resume-code 10/hour cap, escalate to a DB-backed hard
+  lockout with admin-side reset. Today the slowapi limit is
+  sufficient; the schema migration is unjustified pending real
+  data. Source: `06-business-logic-abuse.md#f-06-001`.
 
 ## Wave 6 — Supply chain
 

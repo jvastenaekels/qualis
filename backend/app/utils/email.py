@@ -150,6 +150,42 @@ def send_email_verification(email_to: str, verify_url: str) -> None:
     )
 
 
+def send_register_already_registered(email_to: str, reset_url: str) -> None:
+    """F-06-007 anti-enumeration: when /api/register receives a known email,
+    we send this informational message to the address (instead of leaking
+    "already exists" through the API response). The link goes to the
+    password-reset flow so a legitimate owner who forgot they'd registered
+    can recover, and an attacker probing for accounts gains no signal from
+    the API itself.
+
+    Distinct subject + body from ``send_password_reset`` so the legitimate
+    owner can tell the message apart from an unsolicited reset request.
+    """
+    subject = "You already have a Qualis account"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>You already have a Qualis account</h2>
+            <p>Someone tried to create a new Qualis account with this email
+               address, but an account already exists for it.</p>
+            <p>If this was you, you can sign in with your existing password,
+               or reset it using the link below:</p>
+            <p><a href="{reset_url}">{reset_url}</a></p>
+            <p>If you did not try to register, you can safely ignore this
+               email — your account is unchanged.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="register-already-registered",
+    )
+
+
 def send_password_reset(email_to: str, reset_url: str) -> None:
     subject = "Reset your Qualis password"
     html_content = f"""

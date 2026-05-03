@@ -496,19 +496,29 @@ export const useLoginForAccessTokenApiTokenPost = <
 /**
  * Register a new user, optionally via an invitation token.
 
+Anti-enumeration (F-06-007): the response body and status code are
+identical whether the submitted email is fresh or already registered.
+A registered email triggers an out-of-band notification to the address
+("you already have a Qualis account") with a password-reset link
+instead of leaking the duplicate via the API.
+
 The verification gate depends only on whether verification is active
 (EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation
 tokens grant project membership but never bypass the gate
 (spec amendment 2026-05-02).
 
-- Verification active (any path): is_active=False, email_verified_at=NULL,
-  verification email sent, requires_email_verification=True. If an
-  invitation token was provided, the project membership is still created
-  so access applies as soon as verification completes.
+- Verification active (fresh-email path): is_active=False,
+  email_verified_at=NULL, verification email sent,
+  requires_email_verification=True. If an invitation token was
+  provided, the project membership is still created so access
+  applies as soon as verification completes.
 - Verification inactive (operator disabled it OR SMTP not configured):
   is_active=True, email_verified_at=NOW(), requires_email_verification=False.
   Membership (if any) is applied in the same transaction. This SMTP-fallback
   rule keeps the app usable on deployments that cannot deliver mail.
+- Duplicate-email path: no row is created, no invitation is processed,
+  a "you already have an account" email is dispatched to the address,
+  and the response mirrors the fresh-email shape.
  * @summary Register User
  */
 export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {

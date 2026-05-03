@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.limiter import limiter
+from app.limiter import limiter, resume_code_key_func_sync
 from app.models import Participant, ParticipantStatus, Study, StudyState
 from app.schemas import (
     ConsentInput,
@@ -220,6 +220,7 @@ async def withdraw_draft(
 
 @router.get("/resume/{code}", response_model=ResumeResponse)
 @limiter.limit("30/minute")
+@limiter.limit("10/hour", key_func=resume_code_key_func_sync)
 async def resume_session(
     request: Request,
     slug: str = Path(

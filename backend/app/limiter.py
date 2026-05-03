@@ -69,6 +69,39 @@ async def email_hash_key_func(request: Request) -> str:
     return "email:" + hashlib.sha256(email.encode("utf-8")).hexdigest()[:32]
 
 
+def resume_code_key_func_sync(request: Request) -> str:
+    """Rate-limit key based on the path-bound resume ``code``.
+
+    F-06-001: layered with the per-IP limit on
+    ``GET /api/study/{slug}/resume/{code}`` so a distributed brute-force
+    spread across many IPs is bounded by a per-code attempt cap. Returns
+    a SHA-256 prefix of the code so the limiter storage doesn't carry
+    raw codes; the slug is mixed in to reduce collision risk should the
+    same code ever appear in two studies (the DB unique constraint
+    prevents this today, but the keying stays robust under that
+    invariant changing).
+
+    Falls back to per-IP keying if the path params are missing (e.g.
+    middleware ordering edge cases). The IP-based limiter is still
+    applied separately on the same endpoint, so the fallback is
+    defence-in-depth, not the primary gate.
+    """
+    code = ""
+    slug = ""
+    path_params = getattr(request, "path_params", None)
+    if isinstance(path_params, dict):
+        raw_code = path_params.get("code", "")
+        raw_slug = path_params.get("slug", "")
+        if isinstance(raw_code, str):
+            code = raw_code.lower()
+        if isinstance(raw_slug, str):
+            slug = raw_slug.lower()
+    if not code:
+        return _get_real_ip(request)
+    composite = f"{slug}|{code}".encode("utf-8")
+    return "resume:" + hashlib.sha256(composite).hexdigest()[:32]
+
+
 def email_hash_key_func_sync(request: Request) -> str:
     """Sync version of email_hash_key_func for use with slowapi decorators.
 

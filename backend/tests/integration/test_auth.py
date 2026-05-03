@@ -68,13 +68,22 @@ class TestRegistration:
         assert user is not None
 
     async def test_register_duplicate_email(self, client: AsyncClient, test_user: User):
-        """Duplicate email returns 400."""
+        """F-06-007: duplicate email no longer leaks via 400 + body. The
+        response now mirrors the new-user shape (201 + generic body) and
+        the duplicate is signalled out-of-band via a "you already have
+        an account" email — tested in
+        ``backend/tests/security/wave_5/test_register_enumeration.py``.
+        """
         response = await client.post(
             "/api/register",
             json={"email": test_user.email, "password": "anypassword"},
         )
-        assert response.status_code == 400
-        assert "already exists" in response.json()["message"]
+        assert response.status_code == 201
+        data = response.json()
+        # Response shape: same as the new-user path (placeholder user
+        # echoing the submitted email; no admin flags).
+        assert data["user"]["email"] == test_user.email
+        assert "requires_email_verification" in data
 
     async def test_register_with_valid_invitation(
         self,
