@@ -16,7 +16,12 @@ exclude_path = []
 
 # Retry transient failures (GitHub frequently returns 502 on automated badge URL fetches).
 max_retries = 3
-retry_wait_time = 2
+retry_wait_time = 5
+
+# Per-request timeout — default 20s leaves no room for slow DOI/Zenodo redirect chains.
+# Two consecutive flaky failures (doi.org/10.32614/rj-2014-032,
+# zenodo.org/account/settings/github/) in PR #100 (2026-05-02) prompted the bump.
+timeout = 60
 
 # Treat these HTTP statuses as success (transient gateway errors that resolve on retry but
 # occasionally exhaust the retry budget on busy github.com endpoints).
