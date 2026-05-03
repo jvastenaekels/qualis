@@ -339,6 +339,17 @@ const StudyLayoutContent: React.FC = () => {
 
     const currentVisibleIndex = visibleSteps.findIndex((s) => s.id === currentStep);
 
+    // The two immersive Q-sort screens need <main> locked to the viewport so
+    // GridSort's h-full children resolve. Everywhere else, let main scroll
+    // naturally so the global Footer scrolls with content instead of being
+    // pinned to the bottom of the viewport.
+    const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
+        (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
+    );
+    const isImmersiveSortFamily = ['/fine-sort', '/rough-sort'].some((p) =>
+        location.pathname.endsWith(p)
+    );
+
     return (
         <div
             className="h-[100dvh] bg-gray-50 flex flex-col overflow-hidden"
@@ -863,11 +874,11 @@ const StudyLayoutContent: React.FC = () => {
             <main
                 id="main-scroll-container"
                 ref={mainRef}
-                className={`flex-1 w-full mx-auto relative isolate flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/fine-sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
+                className={`flex-1 w-full mx-auto relative isolate flex flex-col bg-slate-50 custom-scrollbar ${isImmersiveSort ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
                 {/* Transition Overlay / Dimming */}
                 <div
-                    className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+                    className={`${isImmersiveSort ? 'flex-1 min-h-0' : 'min-h-full'} flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
                 >
                     <ComponentErrorBoundary
                         title="Unable to load study step"
@@ -887,6 +898,12 @@ const StudyLayoutContent: React.FC = () => {
                         </Suspense>
                     </ComponentErrorBoundary>
                 </div>
+
+                {/* Global attribution footer — hidden on the two immersive Q-sort screens.
+                    Lives inside <main> so it scrolls with content rather than being pinned
+                    to the viewport. min-h-full on the wrapper above pushes it below the fold
+                    when content is short. */}
+                {!isImmersiveSortFamily && <Footer />}
             </main>
 
             {/* Mobile Footer (Primary Action) */}
@@ -894,11 +911,6 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-sticky pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     {headerAction}
                 </div>
-            )}
-
-            {/* Global attribution footer — hidden on the two immersive Q-sort screens */}
-            {!['/fine-sort', '/rough-sort'].some((p) => location.pathname.endsWith(p)) && (
-                <Footer />
             )}
         </div>
     );
