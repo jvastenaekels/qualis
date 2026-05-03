@@ -32,7 +32,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ) -> User:
-    """Validate JWT token and retrieve the current user."""
+    """Validate JWT token and retrieve the current user.
+
+    Beyond the signature/expiry check, we re-validate the token's
+    ``iat`` claim against ``user.password_changed_at`` (F-03-010): a
+    token issued before the user's last password rotation is rejected
+    so a password reset / change effectively kills in-flight access
+    tokens. Legacy tokens minted before ``iat`` was added (no claim)
+    are treated as "issued at the epoch" and therefore rejected after
+    any password change — at the cost of forcing legacy holders to
+    re-login once.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -55,6 +65,18 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if user is None:
+        raise credentials_exception
+
+    # F-03-010: reject access tokens minted before the user's current
+    # password_changed_at. Legacy tokens with no iat claim default to 0
+    # (epoch) so they are also rejected after the next password change.
+    # Equality (iat == pwa) is allowed: a token issued in the same
+    # second the password rotated is still valid (the rotation handler
+    # re-mints credentials in that same handler).
+    token_iat_raw = payload.get("iat")
+    token_iat = int(token_iat_raw) if token_iat_raw is not None else 0
+    pwa_epoch = int(user.password_changed_at.timestamp())
+    if token_iat < pwa_epoch:
         raise credentials_exception
 
     return user

@@ -418,6 +418,9 @@ async def change_password(
 
     try:
         current_user.hashed_password = get_password_hash(password_data.new_password)
+        # F-03-010: bump password_changed_at so in-flight access tokens
+        # (which carry an iat claim) are rejected by get_current_user.
+        current_user.password_changed_at = datetime.now(timezone.utc)
         await db.commit()
     except Exception as e:
         await db.rollback()

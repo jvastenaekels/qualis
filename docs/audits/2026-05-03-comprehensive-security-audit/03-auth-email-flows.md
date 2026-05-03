@@ -305,7 +305,7 @@ Derived properties consulted from in-scope files:
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
-| major | 4 |
+| major | 5 |
 | minor | 2 |
 | observation | 2 |
 
@@ -714,9 +714,86 @@ Derived properties consulted from in-scope files:
   differential would require a flake-prone test and is not
   warranted at observation severity.
 
+### F-03-010 — Access tokens not invalidated by password change
+
+- **Severity:** major
+- **Audience:** [Prod] [SoftwareX] [OSS] [Self-hoster]
+- **Location:**
+  - `backend/app/utils/security.py:46-61` (pre-fix `create_access_token` —
+    no `iat` claim emitted)
+  - `backend/app/dependencies.py:32-60` (pre-fix `get_current_user` —
+    no consultation of `user.password_changed_at`)
+  - `backend/app/routers/auth.py:405-429` (pre-fix `change_password` —
+    rotated `hashed_password` only, never bumped `password_changed_at`)
+  - `backend/app/routers/auth.py:670-707` (`password_reset_confirm` —
+    bumped `password_changed_at` and killed in-flight OTPs but not
+    in-flight access tokens)
+- **Tool:** static review + exploit script (`.raw/exploits/F-03-010.py`)
+- **Observation:** `create_access_token` minted JWTs carrying only
+  `exp` and `sub` — no `iat`, no `pwa`. `get_current_user` decoded
+  the token, looked the user up by email, and returned them
+  unconditionally; the user's `password_changed_at` column was never
+  consulted on the access path. A bearer token leaked through any
+  side channel (browser storage on a shared device, proxy log,
+  mobile-app keychain backup, mis-scrubbed log pipeline) therefore
+  stayed valid for the full remaining 8h of `ACCESS_TOKEN_EXPIRE_MINUTES`
+  even after the legitimate owner changed or reset their password.
+  The reset-confirm path in `auth.py:697-698` did the right thing
+  for OTPs (`invalidate_active_otps`) but stopped short of access
+  tokens. The self-serve `/me/password` change path was worse: it
+  did not even bump `password_changed_at`, so the existing `pwa`
+  replay defence on the password-reset link wouldn't have helped
+  either. This is the access-token half of the F-01-010 carry-over;
+  the refresh-token half (rotation, revocation list) lands in Task 10.
+- **Impact:** any process that observes a bearer token at any point
+  in its 8h lifetime can use that token after the owner explicitly
+  rotates their password — i.e. a password change does not actually
+  end the session. Concretely: a user who suspects compromise and
+  changes their password keeps the attacker's session alive for up
+  to 8h; a stolen device reset does not invalidate cached tokens; a
+  leaked log line reveals a still-usable credential. Severity is
+  **major** (not blocker) because the attacker first needs to lift
+  the token (the JWT signature still requires the secret to forge),
+  but any compromise scenario that recovers a token bypasses the
+  primary remediation a user has — changing their password.
+- **Recommendation:** add `iat` (issued-at, epoch seconds) to every
+  access token at mint time; in `get_current_user`, after the
+  signature/expiry check, compare `payload['iat']` to
+  `int(user.password_changed_at.timestamp())` and reject (401) when
+  the token's `iat` is strictly less than the column. Use `<`, not
+  `<=`, so a token minted in the same second the password rotated
+  (the legitimate re-mint case in the rotation handler) still
+  validates. Also bump `password_changed_at` in the
+  `change_password` endpoint so the self-serve flow gets the same
+  invalidation as the reset-confirm flow. Legacy tokens minted
+  before this rollout carry no `iat` claim; treat the missing claim
+  as `iat = 0` so the first password change after deploy
+  invalidates them — the cost is forcing legacy holders through one
+  re-login, which is acceptable on a security-fix rollout.
+- **Effort:** S — 2 lines added to `create_access_token`, 5-line
+  iat-vs-pwa check in `get_current_user`, 1 line in `change_password`
+  to bump `password_changed_at`. No migration (column already exists
+  per the v0.6.0 auth-email-flows migration). No frontend change.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** `.raw/exploits/F-03-010.py`. PRE-FIX the
+  script logs in, calls `/api/me` with the token (200), changes the
+  password via `/api/me/password` (200), then re-calls `/api/me`
+  with the OLD token — and gets 200, exiting 1. POST-FIX the
+  re-call gets 401 and the script exits 0. The script needs a
+  Postgres test DB (`TEST_DATABASE_URL`); same setup as the
+  F-03-005/006/007 timing exploits.
+- **Regression test:** `backend/tests/security/wave_2/test_session_invalidation.py`
+  (5 tests: `iat` claim is present on minted tokens; old token
+  rejected after rotation; fresh post-rotation token works; legacy
+  no-`iat` tokens rejected after rotation; `iat == pwa` boundary
+  accepted so the rotation handler can re-mint in the same second).
+
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 
 _Status section filled by Task 10._
+
+**Status update (2026-05-03):** Access-token half closed by F-03-010
+(commit `<COMMIT_SHA>`); refresh-token half pending Task 10.
 
 ## Resolved since prior
 

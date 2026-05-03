@@ -46,15 +46,25 @@ def get_password_hash(password: str) -> str:
 def create_access_token(
     subject: str | object, expires_delta: timedelta | None = None
 ) -> str:
-    """Create a JWT access token."""
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+    """Create a JWT access token.
 
-    to_encode = {"exp": expire, "sub": str(subject)}
+    The token carries an ``iat`` (issued-at) claim used by
+    ``dependencies.get_current_user`` to invalidate sessions after a
+    password change. ``iat`` is compared at decode time against the
+    user's current ``password_changed_at``: tokens issued before the
+    rotation are rejected (F-03-010).
+    """
+    now = datetime.now(timezone.utc)
+    if expires_delta:
+        expire = now + expires_delta
+    else:
+        expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode = {
+        "exp": expire,
+        "iat": int(now.timestamp()),
+        "sub": str(subject),
+    }
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
