@@ -443,7 +443,12 @@ _Deferred from Wave 6._
   schedule; plan a dedicated wave doc when scoped.
 
 ## Wave 7 — Deliverables
-_pending Wave 7 plan._
+
+- **Threat model** at `08-threat-model.md` — STRIDE per 6 trust boundaries, top-10 ranked risks, worst-case attack tree. **closed** in commit `e600e5ba`.
+- **GDPR memo for self-hosters** at `/docs/reference/gdpr-self-hosters.md` — 12-section operator playbook covering roles, data flows, PII inventory, lawful-basis menu, subject-rights playbook, Art. 30 + 32 + 33-34 + 35 + 44 sections, maintainer obligations. **closed** in commit `f1b9cb97`.
+- **SECURITY.md extension** at `/SECURITY.md` — added Disclosure-scope section, 16 new "Security-relevant practices" entries, two-paragraph audit history covering 2026-04-25 + 2026-05-03 audits. **closed** in commit `46292634`.
+- **Executive summary** at `00-executive-summary.md` — 328-line consolidation: severity tally, risk delta vs 2026-04-25, top-5 residual risks, methodology, wave-by-wave summary. **closed** in commit `46292634`.
+- **Audit-history index** at `/docs/audits/README.md` — pointers to both 2026-04-25 and 2026-05-03 audits. **closed** in this PR.
 
 ## Deferred items
 
