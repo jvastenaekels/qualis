@@ -110,7 +110,7 @@ Cumulative across all seven waves. Items move through:
   no token issued to either side, no path back for the legitimate owner.
   Any transient authenticated-session compromise (XSS, stolen bearer,
   hijacked browser) converted into permanent account control. **closed**
-  in Wave 2 Task 7 (commit `<pending>`): added `users.pending_email`
+  in commit `3fb51da8` (Wave 2 Task 7): added `users.pending_email`
   column (migration `a3f1c2e9b4d7`); `PATCH /me` now parks the requested
   address on `pending_email` and dispatches confirm-link to NEW + cancel-link
   to OLD; new endpoints `/api/email-change/confirm` (swap) and
