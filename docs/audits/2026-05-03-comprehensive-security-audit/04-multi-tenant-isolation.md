@@ -279,7 +279,7 @@ mechanism. Filed as **F-04-001** below.
 | blocker | 0 |
 | major | 0 |
 | minor | 0 |
-| observation | 2 |
+| observation | 3 |
 
 ## Findings
 
@@ -326,6 +326,35 @@ slug. A cross-study replay therefore fails token validation and the handler
 raises 403 "Invalid, expired, or full recruitment link". The regression test
 exercises both directions (A→B and B→A) and pins the 403 denial, plus a
 sanity 200 on the legitimate own-study path.
+
+### F-04-003 — Audio upload ownership claim integrity (observation)
+
+**Severity:** observation
+**Status:** safe — participant identity is session-token-derived; no body claim
+**Files:** `backend/app/routers/audio.py:89-231`,
+          `backend/app/services/storage_service.py:94-175`,
+          `backend/tests/security/wave_3/test_audio_upload_ownership.py`
+**Disposition:** false positive — the upload endpoint accepts no
+`participant_id` parameter; ownership is bound to the form-supplied
+`session_token` UUID.
+
+Concern: if `participant_id` were body-derived (or otherwise
+attacker-controllable), an upload could be smuggled into another
+participant's row.
+
+Reality: `POST /api/audio/upload` accepts `(file, session_token,
+question_key, duration_seconds)` only. The `participant` object is
+fetched via `Participant.session_token == session_token` join (audio.py:124),
+which is itself the participant's authentication credential. The companion
+endpoints (`DELETE /api/audio/{id}` and `GET /api/audio/{id}/url`) verify
+`participant.session_token == session_token` after a join from the
+`recording → participant` row; mismatched tokens get 403. The S3 key format
+(`audio/{study_slug}/{participant_token}/...`) leaks no cross-tenant
+information because the participant_token is itself a 128-bit UUID and the
+key is never exposed without auth (presigned URLs are minted in-handler
+after the session-token check). The regression test pins the no-`participant_id`
+signature plus the 403 behaviour on cross-participant delete and presigned-URL
+fetch.
 
 ## Resolved since prior
 
