@@ -22,6 +22,7 @@ import {
 import type { ConcourseItemVersionRead, ConcourseItemCommentRead } from '@/api/model';
 import { useQueryClient } from '@tanstack/react-query';
 import { parseApiErrorSync } from '@/lib/error-utils';
+import { diffVersionFields } from './ItemDetailSheet.helpers';
 
 interface ItemDetailSheetProps {
     open: boolean;
@@ -219,22 +220,7 @@ function VersionList({
         if (idx === 0) return null;
         const prev = sorted[idx - 1];
         if (!prev) return null;
-        const changes: string[] = [];
-        if (prev.code !== v.code) changes.push(t('admin.concourse.diff_code', 'code'));
-        if (prev.status !== v.status) changes.push(t('admin.concourse.diff_status', 'status'));
-        const prevTexts = (prev.translations_snapshot ?? [])
-            .map((tr) => `${tr.language_code}:${tr.text}`)
-            .sort()
-            .join('|');
-        const curTexts = (v.translations_snapshot ?? [])
-            .map((tr) => `${tr.language_code}:${tr.text}`)
-            .sort()
-            .join('|');
-        if (prevTexts !== curTexts) changes.push(t('admin.concourse.diff_text', 'text'));
-        const prevTags = [...(prev.tag_ids_snapshot ?? [])].sort().join(',');
-        const curTags = [...(v.tag_ids_snapshot ?? [])].sort().join(',');
-        if (prevTags !== curTags) changes.push(t('admin.concourse.diff_tags', 'tags'));
-        return changes.length > 0 ? changes : null;
+        return diffVersionFields(prev, v, t);
     };
 
     // Display newest first
