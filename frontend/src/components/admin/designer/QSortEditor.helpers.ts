@@ -6,6 +6,9 @@
  *   per-column capacity array using a Power-curve weighting (exponent 1.4 —
  *   sweet spot for reproducing common research tables) and greedy symmetric
  *   assignment with parity-break on even-column counts.
+ * - `mergeParsedItemIntoStatements`: pure mutator that applies a single
+ *   bulk-imported statement to the draft's `statements` array, handling
+ *   sync-mode merges (existing match by code) vs append/replace creation.
  */
 
 const POWER_EXPONENT = 1.4;
@@ -104,4 +107,89 @@ export function computeAutoShapedCapacities(N: number, numColumns: number): numb
     }
 
     return capacities;
+}
+
+// ---------------------------------------------------------------------------
+// Bulk-import merge
+// ---------------------------------------------------------------------------
+
+export interface ParsedStatement {
+    code?: string | null;
+    text?: string;
+    translations?: { language_code: string; text: string }[];
+}
+
+export type ImportMode = 'append' | 'replace' | 'sync';
+
+// biome-ignore lint/suspicious/noExplicitAny: load-bearing dynamic statement shape
+type Statement = any;
+
+interface DraftTranslationLite {
+    language_code: string;
+}
+
+/**
+ * Apply one parsed bulk-import item to the statements array. Mutates
+ * `statements` in place. In `'sync'` mode, items whose `code` matches an
+ * existing statement update that statement's translations rather than
+ * creating a new one. New statements are seeded with one translation per
+ * draft language; the active locale gets `item.text` when no per-language
+ * `item.translations` are provided.
+ */
+export function mergeParsedItemIntoStatements(
+    item: ParsedStatement,
+    statements: Statement[],
+    draftTranslations: DraftTranslationLite[],
+    importMode: ImportMode,
+    activeLocale: string
+): void {
+    const existing =
+        importMode === 'sync' && item.code
+            ? statements.find((s) => s.code === item.code)
+            : null;
+
+    if (existing) {
+        applyTranslationsToExisting(existing, item, activeLocale);
+        return;
+    }
+
+    const code = item.code || `s${statements.length + 1}`;
+    const translations = draftTranslations.map(({ language_code }) => {
+        const headerT = item.translations?.find((ht) => ht.language_code === language_code);
+        if (headerT) return { language_code, text: headerT.text };
+        return {
+            language_code,
+            text: language_code === activeLocale ? item.text ?? '' : '',
+        };
+    });
+    statements.push({ code, translations });
+}
+
+function applyTranslationsToExisting(
+    existing: Statement,
+    item: ParsedStatement,
+    activeLocale: string
+): void {
+    if (!Array.isArray(existing.translations)) existing.translations = [];
+
+    if (item.translations && item.translations.length > 0) {
+        for (const newT of item.translations) {
+            const tEntry = existing.translations.find(
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic translation entry
+                (t: any) => t.language_code === newT.language_code
+            );
+            if (tEntry) tEntry.text = newT.text;
+            else existing.translations.push(newT);
+        }
+        return;
+    }
+
+    if (item.text !== undefined) {
+        const tEntry = existing.translations.find(
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic translation entry
+            (t: any) => t.language_code === activeLocale
+        );
+        if (tEntry) tEntry.text = item.text;
+        else existing.translations.push({ language_code: activeLocale, text: item.text });
+    }
 }

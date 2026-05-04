@@ -32,7 +32,10 @@ import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { ImportFromConcourseDialog } from './ImportFromConcourseDialog';
-import { computeAutoShapedCapacities } from './QSortEditor.helpers';
+import {
+    computeAutoShapedCapacities,
+    mergeParsedItemIntoStatements,
+} from './QSortEditor.helpers';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet,
@@ -533,61 +536,17 @@ const QSortEditor = ({
             if (importMode === 'replace') {
                 d.statements = [];
             }
-
             const currentStatements = d.statements || [];
-
-            parsedItems.forEach((item) => {
-                let existing = null;
-                if (importMode === 'sync' && item.code) {
-                    // biome-ignore lint/suspicious/noExplicitAny: statement search
-                    existing = currentStatements.find((s: any) => s.code === item.code);
-                }
-
-                if (existing) {
-                    // Sync Traductions
-                    if (item.translations && item.translations.length > 0) {
-                        item.translations.forEach(
-                            (newT: { language_code: string; text: string }) => {
-                                const tEntry = existing.translations.find(
-                                    (t: Translation) => t.language_code === newT.language_code
-                                );
-                                if (tEntry) tEntry.text = newT.text;
-                                else existing.translations.push(newT);
-                            }
-                        );
-                    } else if (item.text) {
-                        const tEntry = existing.translations.find(
-                            (t: Translation) => t.language_code === activeLocale
-                        );
-                        if (tEntry) tEntry.text = item.text;
-                        else
-                            existing.translations.push({
-                                language_code: activeLocale,
-                                text: item.text,
-                            });
-                    }
-                } else {
-                    // Add New
-                    const code = item.code || `s${currentStatements.length + 1}`;
-                    const translations = (d.translations || []).map(
-                        (t: { language_code: string }) => {
-                            const headerT = item.translations?.find(
-                                (ht: { language_code: string; text: string }) =>
-                                    ht.language_code === t.language_code
-                            );
-                            return {
-                                language_code: t.language_code,
-                                text: headerT
-                                    ? headerT.text
-                                    : t.language_code === activeLocale
-                                      ? item.text || ''
-                                      : '',
-                            };
-                        }
-                    );
-                    currentStatements.push({ code, translations });
-                }
-            });
+            const draftLangs = (d.translations || []) as { language_code: string }[];
+            for (const item of parsedItems) {
+                mergeParsedItemIntoStatements(
+                    item,
+                    currentStatements,
+                    draftLangs,
+                    importMode,
+                    activeLocale
+                );
+            }
             d.statements = currentStatements;
         });
 

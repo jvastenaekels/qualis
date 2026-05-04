@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { computeAutoShapedCapacities } from './QSortEditor.helpers';
+import {
+    computeAutoShapedCapacities,
+    mergeParsedItemIntoStatements,
+} from './QSortEditor.helpers';
 
 describe('computeAutoShapedCapacities', () => {
     it('returns [] when numColumns is 0', () => {
@@ -94,5 +97,154 @@ describe('computeAutoShapedCapacities', () => {
         expect(r.reduce((a, b) => a + b, 0)).toBe(1);
         // The lone statement should land on the centre (index 2) for odd cols.
         expect(r[2]).toBe(1);
+    });
+});
+
+describe('mergeParsedItemIntoStatements', () => {
+    const draftLangs = [{ language_code: 'en' }, { language_code: 'fr' }];
+
+    it('append mode: adds new statement with seeded translations (active locale gets item.text)', () => {
+        const statements: { code: string; translations: { language_code: string; text: string }[] }[] = [];
+        mergeParsedItemIntoStatements(
+            { code: 'S1', text: 'Hello' },
+            statements,
+            draftLangs,
+            'append',
+            'en'
+        );
+        expect(statements).toHaveLength(1);
+        expect(statements[0]?.code).toBe('S1');
+        expect(statements[0]?.translations).toEqual([
+            { language_code: 'en', text: 'Hello' },
+            { language_code: 'fr', text: '' },
+        ]);
+    });
+
+    it('append mode: assigns auto-generated code when item.code is missing', () => {
+        const statements = [{ code: 'A', translations: [] }];
+        mergeParsedItemIntoStatements(
+            { text: 'New' },
+            statements,
+            draftLangs,
+            'append',
+            'en'
+        );
+        expect(statements).toHaveLength(2);
+        expect(statements[1]?.code).toBe('s2');
+    });
+
+    it('append mode: per-language translations override the item.text fallback', () => {
+        const statements: { code: string; translations: { language_code: string; text: string }[] }[] = [];
+        mergeParsedItemIntoStatements(
+            {
+                code: 'S1',
+                text: 'fallback',
+                translations: [
+                    { language_code: 'en', text: 'English' },
+                    { language_code: 'fr', text: 'Français' },
+                ],
+            },
+            statements,
+            draftLangs,
+            'append',
+            'en'
+        );
+        expect(statements[0]?.translations).toEqual([
+            { language_code: 'en', text: 'English' },
+            { language_code: 'fr', text: 'Français' },
+        ]);
+    });
+
+    it('sync mode: matching code updates existing translation in active locale', () => {
+        const statements = [
+            {
+                code: 'S1',
+                translations: [
+                    { language_code: 'en', text: 'old' },
+                    { language_code: 'fr', text: 'ancien' },
+                ],
+            },
+        ];
+        mergeParsedItemIntoStatements(
+            { code: 'S1', text: 'new' },
+            statements,
+            draftLangs,
+            'sync',
+            'en'
+        );
+        expect(statements).toHaveLength(1);
+        expect(statements[0]?.translations[0]?.text).toBe('new');
+        expect(statements[0]?.translations[1]?.text).toBe('ancien');
+    });
+
+    it('sync mode: matching code with item.translations updates per-language', () => {
+        const statements = [
+            {
+                code: 'S1',
+                translations: [
+                    { language_code: 'en', text: 'old en' },
+                    { language_code: 'fr', text: 'old fr' },
+                ],
+            },
+        ];
+        mergeParsedItemIntoStatements(
+            {
+                code: 'S1',
+                translations: [
+                    { language_code: 'en', text: 'new en' },
+                    { language_code: 'fr', text: 'new fr' },
+                ],
+            },
+            statements,
+            draftLangs,
+            'sync',
+            'en'
+        );
+        expect(statements[0]?.translations[0]?.text).toBe('new en');
+        expect(statements[0]?.translations[1]?.text).toBe('new fr');
+    });
+
+    it('sync mode: non-matching code creates a new statement', () => {
+        const statements = [{ code: 'S1', translations: [] }];
+        mergeParsedItemIntoStatements(
+            { code: 'S2', text: 'hello' },
+            statements,
+            draftLangs,
+            'sync',
+            'en'
+        );
+        expect(statements).toHaveLength(2);
+        expect(statements[1]?.code).toBe('S2');
+    });
+
+    it('sync mode: existing match without translations on it gets the active-locale entry pushed', () => {
+        const statements = [{ code: 'S1', translations: [] }];
+        mergeParsedItemIntoStatements(
+            { code: 'S1', text: 'late binding' },
+            statements,
+            draftLangs,
+            'sync',
+            'en'
+        );
+        expect(statements[0]?.translations).toHaveLength(1);
+        expect(statements[0]?.translations[0]).toEqual({ language_code: 'en', text: 'late binding' });
+    });
+
+    it('sync mode: per-language item.translations adds missing language entry to existing', () => {
+        const statements = [
+            { code: 'S1', translations: [{ language_code: 'en', text: 'old' }] },
+        ];
+        mergeParsedItemIntoStatements(
+            {
+                code: 'S1',
+                translations: [{ language_code: 'fr', text: 'nouveau' }],
+            },
+            statements,
+            draftLangs,
+            'sync',
+            'en'
+        );
+        expect(statements[0]?.translations).toHaveLength(2);
+        expect(statements[0]?.translations[1]).toEqual({ language_code: 'fr', text: 'nouveau' });
     });
 });
