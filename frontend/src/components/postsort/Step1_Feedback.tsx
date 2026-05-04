@@ -23,6 +23,7 @@ interface Step1Props {
     onNext: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — postsort feedback page shell (audio handlers + i18n prompt fallback chain + extreme-cards JSX map); pure-logic extraction selectExtremeCards already done in W4a
 export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const { t, i18n } = useTranslation();
     const { isDesktop } = useViewport();
@@ -82,6 +83,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const getCardText = (id: number) =>
         config?.statements.find((s) => s.id === id)?.text || t('common.unknown_card');
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — i18n prompt key-fallback chain over postsort_config.prompts × locale × default-text-key × hardcoded fallback. Marginal extract value.
     const getPrompt = (keys: string | string[], defaultTextKey: string, defaultValue?: string) => {
         const prompts = config?.postsort_config?.prompts;
         const currentLang = i18n.language || 'en';
@@ -299,6 +301,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                     </span>
                 </div>
 
+                {/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — extreme-card render with score → label/colour conditional chain (positive/neutral/negative variants × audio recording state × edit mode); the conditional JSX IS the surface */}
                 {extremeCards.map((card) => {
                     const colDef = gridColumns[card.col];
                     const scoreVal = colDef ? colDef.score : 0;

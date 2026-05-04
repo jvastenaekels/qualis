@@ -605,6 +605,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         distributionMode = 'forced',
         deckCards,
         qsort,
+        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — GridSort shell. Load-bearing autofit/zoom/responsive coupling: useEffect disables autofit on mobile selection but deliberately does NOT re-enable on deselect (otherwise zoom resets on every card placement). E2E-covered. Pure-logic extractions done by W4a (resolveNextSlot for keyboard nav).
     }) => {
         const { t } = useTranslation();
         const isForcedDistribution = distributionMode === 'forced';
@@ -790,6 +791,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 );
             }
 
+            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — renderDeckCards: viewport-conditional layout JSX (landscape-mobile/portrait-mobile/desktop variants × isLifted state × hovered/selected style); structural mapping
             return activeCards.map((card) => (
                 <div
                     key={card.id}

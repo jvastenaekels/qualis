@@ -38,6 +38,7 @@ interface SortingAnimationProps {
     scale?: number;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — decorative animation FSM (aria-hidden); per-phase setTimeout chain + ROUGH/FINE step machine. Refs and timers are intrinsic; aria-hidden = zero participant impact even on regression
 const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
     const [phase, setPhase] = useState<'ROUGH' | 'FINE'>('ROUGH');
     const [step, setStep] = useState(0);
@@ -53,6 +54,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
         return () => clearTimeout(t);
     }, []);
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — animation step machine (phase × step × hesitation × pause); see component-level rationale above
     useEffect(() => {
         if (!isReady) return;
         let timer: ReturnType<typeof setTimeout>;

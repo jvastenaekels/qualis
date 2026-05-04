@@ -30,6 +30,7 @@ interface Step2Props {
     isLoading: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — postsort form orchestrator (RHF + zod resolver + audio handlers + textAudio errors local state + final-submit multi-stage); each stage is its own concern, no further extraction without prop drilling
 export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, isLoading }) => {
     const { t, i18n } = useTranslation();
     const config = useConfigStore((state) => state.config);
@@ -229,6 +230,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     // Track text_audio validation errors separately (not handled by Zod)
     const [textAudioErrors, setTextAudioErrors] = useState<Record<string, string>>({});
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — handleFinalSubmit multi-stage validation (upload-in-progress check, text_audio per-question validation, RHF errors, then submit). Each stage is already its own concern.
     const handleFinalSubmit = async () => {
         if (isUploadInProgress) {
             toast.info(

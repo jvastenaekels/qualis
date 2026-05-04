@@ -137,6 +137,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         hasComment = false,
         hasAudio = false,
         readOnly = false,
+        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — SortableCard shell. The dynamic line-clamp useLayoutEffect uses a ResizeObserver only when `dimensions` is undefined ("only CSS-sized cards need an observer; Grid cards recompute via dimensions?.height dependency instead"). The conditional `if (dimensions) return;` before observer attach is load-bearing both for **correctness** (RO fires once synchronously on attach + setDynamicLineClamp re-renders) and for **perf** (38+ grid cards attaching their own RO would noticeably degrade scroll/drag latency). A naive `useDynamicLineClamp` hook extract would likely drop the guard.
     }) => {
         const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
             useSortable({ id, disabled: readOnly });

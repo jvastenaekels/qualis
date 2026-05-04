@@ -55,6 +55,7 @@ const InlineIcon: React.FC<{
 interface ReadingZoneProps {
     variant: 'mobile' | 'desktop' | 'landscape' | 'overlay';
 }
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — 4-variant render switch (mobile/desktop/landscape/overlay); the variant switch IS the surface, no extractable algorithmic logic
 const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const activeCard = useUIStore((state) => state.activeCard);

@@ -65,6 +65,7 @@ const ConsentPage: React.FC = () => {
     // If no config, redirect home or show loading
     if (!config) return null;
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — consent recording flow; branching IS the contract: pilot-mode skip → session-token init → consent hash construction → record-consent fetch → block navigation on failure (load-bearing GDPR guarantee — see CLAUDE.md security invariants)
     const onSubmit = async (data: ConsentForm) => {
         if (data.consent) {
             const sessionToken = token || crypto.randomUUID();
