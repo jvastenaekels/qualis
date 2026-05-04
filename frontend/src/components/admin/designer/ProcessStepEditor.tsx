@@ -286,6 +286,7 @@ export function ProcessStepEditor({
         });
 
         if (someMismatch) {
+            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — translation-array sync useEffect bound by missing process_steps schema typing on StudyTranslation; the (t as any).process_steps casts (8 sites in this block) make extraction unsafe until the typing gap is fixed (see W2-end backlog review)
             updateDraft((d) => {
                 // We use the first translation that has steps as the master order
                 const masterTranslation = d.translations?.find(

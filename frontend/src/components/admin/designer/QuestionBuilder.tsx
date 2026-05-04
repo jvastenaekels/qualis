@@ -49,6 +49,7 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
+import { copyMultilangField, copyOptions } from './QuestionBuilder.helpers';
 import {
     Select,
     SelectContent,
@@ -149,50 +150,21 @@ const QuestionItem = ({
     const handleCopyFrom = (sourceLang: string) => {
         if (readOnly) return;
 
-        const newQuestion = { ...question };
+        const newQuestion: QuestionConfig = {
+            ...question,
+            label: copyMultilangField(question.label, sourceLang, activeLocale),
+        };
 
-        // Copy label
-        const sourceLabel =
-            typeof question.label === 'object'
-                ? question.label[sourceLang] || ''
-                : question.label || '';
-
-        newQuestion.label =
-            typeof question.label === 'object'
-                ? { ...question.label, [activeLocale]: sourceLabel }
-                : { en: question.label || '', [activeLocale]: sourceLabel };
-
-        // Copy placeholder
-        if (question.placeholder) {
-            const sourcePlaceholder =
-                typeof question.placeholder === 'object'
-                    ? question.placeholder[sourceLang] || ''
-                    : question.placeholder || '';
-
-            newQuestion.placeholder =
-                typeof question.placeholder === 'object'
-                    ? { ...question.placeholder, [activeLocale]: sourcePlaceholder }
-                    : { en: question.placeholder || '', [activeLocale]: sourcePlaceholder };
+        if (question.placeholder !== undefined) {
+            newQuestion.placeholder = copyMultilangField(
+                question.placeholder,
+                sourceLang,
+                activeLocale
+            );
         }
 
-        // Copy options
         if (question.options) {
-            newQuestion.options = question.options.map((opt) => {
-                if (typeof opt === 'string') {
-                    return {
-                        label: { en: opt, [activeLocale]: opt },
-                        value: opt,
-                    };
-                }
-                const sourceOptLabel = opt.label[sourceLang] || '';
-                return {
-                    ...opt,
-                    label: {
-                        ...opt.label,
-                        [activeLocale]: sourceOptLabel,
-                    },
-                };
-            });
+            newQuestion.options = copyOptions(question.options, sourceLang, activeLocale);
         }
 
         onUpdate(newQuestion);

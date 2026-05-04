@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Plus, Languages } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
+import { applyLanguageRestore, applyLanguageInit } from './LanguageManagerModal.helpers';
 
 interface LanguageManagerModalProps {
     isOpen: boolean;
@@ -29,86 +30,17 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
 
     const handleActivate = (langCode: string) => {
         // Check if this language exists in the original (saved) study
-        // If so, restore it instead of copying from source
+        // If so, restore it instead of copying from source.
         const existingTranslation = original?.translations?.find(
             (t) => t.language_code === langCode
         );
 
         if (existingTranslation) {
-            updateDraft((d) => {
-                // 1. Restore translation object
-                // 1. Restore translation object
-                d.translations?.push({
-                    ...existingTranslation,
-                    // Ensure we reset any copy flag if it existed
-                    _is_copy: false,
-                    // biome-ignore lint/suspicious/noExplicitAny: explicit bypass for draft update
-                } as any);
-
-                // 2. Restore statement translations
-                if (d.statements) {
-                    for (const s of d.statements) {
-                        // Find the original statement to get its translation
-                        // We match by code, assuming code is stable.
-                        // If statement was added in draft (no original), it won't have an original translation.
-                        const originalStmt = original?.statements?.find((os) => os.code === s.code);
-
-                        const originalStmtTrans = originalStmt?.translations?.find(
-                            (st) => st.language_code === langCode
-                        );
-
-                        if (originalStmtTrans) {
-                            s.translations?.push({
-                                language_code: langCode,
-                                text: originalStmtTrans.text,
-                            });
-                        } else {
-                            // If no original translation (e.g. statement is new),
-                            // we might want to copy from source?
-                            // But here we are "restoring" the language.
-                            // If the statement is new, it has no translation in this restored language.
-                            // Default to empty string.
-                            s.translations?.push({
-                                language_code: langCode,
-                                text: '',
-                            });
-                        }
-                    }
-                }
-            });
+            updateDraft((d) => applyLanguageRestore(d, langCode, original));
             return;
         }
 
-        updateDraft((d) => {
-            // 1. Create a minimal translation object if it doesn't exist
-            // (Note: updateDraft already runs normalizeStudyData which ensures translations exist)
-            // But we want to explicitly add it here if it's missing from the array
-            const exists = d.translations?.some((t) => t.language_code === langCode);
-            if (!exists) {
-                d.translations?.push({
-                    language_code: langCode,
-                    title: '',
-                    subtitle: '',
-                    description: '',
-                    instructions: '',
-                    condition_of_instruction: '',
-                    // biome-ignore lint/suspicious/noExplicitAny: explicit bypass for draft update
-                } as any);
-            }
-
-            // 2. Initialize statement translations if missing
-            if (d.statements) {
-                for (const s of d.statements) {
-                    const hasTrans = s.translations?.some((st) => st.language_code === langCode);
-                    if (!hasTrans) {
-                        s.translations?.push({
-                            language_code: langCode,
-                            text: '',
-                        });
-                    }
-                }
-            }
-        });
+        updateDraft((d) => applyLanguageInit(d, langCode));
     };
 
     const handleDeactivate = (langCode: string) => {
