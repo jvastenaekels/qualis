@@ -105,17 +105,19 @@ interface QuestionItemProps {
     availableLanguages: string[];
 }
 
-const QuestionItem = ({
-    id,
-    question,
-    onUpdate,
-    onDelete,
-    activeLocale,
-    readOnly,
-    structureLocked,
-    availableQuestions,
-    availableLanguages,
-}: QuestionItemProps) => {
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative QuestionItem render with type-icon switch + multi-section accordion + visibility-condition editor; conditional JSX IS the surface (handleCopyFrom extracted to helpers in W3a)
+const QuestionItem = (props: QuestionItemProps) => {
+    const {
+        id,
+        question,
+        onUpdate,
+        onDelete,
+        activeLocale,
+        readOnly,
+        structureLocked,
+        availableQuestions,
+        availableLanguages,
+    } = props;
     const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id,
@@ -734,6 +736,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                 newQuestionsMap[id] = rest;
             });
 
+            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — handleDragEnd over presort_config legacy/new union; branches mirror the data shape (legacy: bare record vs new: { enabled, questions }), each closes over the reconstructed map and the type discriminator
             updateDraft((d) => {
                 if (type === 'pre') {
                     // Maintain enabled state if present
@@ -794,6 +797,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
         };
 
         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — addQuestion mutates legacy/new presort_config union; branches mirror the data shape and auto-migrate legacy → new on first add
         updateDraft((d: any) => {
             if (type === 'pre') {
                 if (!d.presort_config) d.presort_config = {};
@@ -954,6 +958,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             }
                                             onUpdate={(data: QuestionConfig) => {
                                                 // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+                                                // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — inline onUpdate over legacy/new presort_config union; closes over q.id + type, not extractable cleanly without duplicating the branch surface
                                                 updateDraft((d: any) => {
                                                     if (type === 'pre') {
                                                         // Handle both legacy and new structure
@@ -975,6 +980,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             }}
                                             onDelete={() => {
                                                 // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
+                                                // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — inline onDelete over legacy/new presort_config union; mirrors the onUpdate branch above (same constraint: closes over q.id + type)
                                                 updateDraft((d: any) => {
                                                     if (type === 'pre') {
                                                         // Handle both legacy and new structure

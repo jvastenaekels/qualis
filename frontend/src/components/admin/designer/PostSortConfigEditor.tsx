@@ -22,13 +22,13 @@ import QuestionBuilder from './QuestionBuilder';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
-const PostSortConfigEditor = ({
-    readOnly,
-    structureLocked,
-}: {
+interface PostSortConfigEditorProps {
     readOnly?: boolean;
     structureLocked?: boolean;
-}) => {
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative tabbed form with conditional sections (consent / questions / audio / extreme-cards / contact); each mutation handler is a thin JSON-shape setter on postsort_config (load-bearing dynamic JSON column at the ORM boundary, see CLAUDE.md)
+const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEditorProps) => {
     const { t, i18n } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
@@ -514,6 +514,7 @@ const PostSortConfigEditor = ({
                                     checked={config?.audio?.enabled || false}
                                     onCheckedChange={(checked: boolean) => {
                                         if (checked === (config?.audio?.enabled || false)) return;
+                                        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — audio-section toggle with conditional default-config seed (steps/durations/required defaults inlined for legibility); the conditional seeding IS the contract for "first-time enable"
                                         updateDraft((d) => {
                                             if (!d.postsort_config) d.postsort_config = {};
                                             // biome-ignore lint/suspicious/noExplicitAny: complex config
