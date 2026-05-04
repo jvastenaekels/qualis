@@ -2,20 +2,6 @@ import { getLocalizedText } from '@/utils/localization';
 import type { TFunction } from 'i18next';
 
 // ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export interface SurveyAnswerItem {
-    key: string;
-    label: string;
-    /** Resolved React node — kept as unknown here so the helper stays free of
-     *  React imports; callers cast or pass a renderer. */
-    value: unknown;
-    id?: string;
-    rawTranslations?: Record<string, string> | { language_code: string; text?: string }[];
-}
-
-// ---------------------------------------------------------------------------
 // Label resolver
 // ---------------------------------------------------------------------------
 
