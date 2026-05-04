@@ -189,7 +189,7 @@ async def export_participant_csv(
     PQMethod exports preserve the anonymous Q-sort entries as research
     data (with PII zeroed), but the per-participant endpoints 404 to
     avoid presenting an anonymised row as a follow-up target.
-    See F-05-006 in Wave 4.
+    See F-05-006.
     """
     slug = study.slug
 

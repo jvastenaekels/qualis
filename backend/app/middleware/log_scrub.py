@@ -32,9 +32,10 @@ Scope of attachment:
 
 Other application loggers do not currently emit URLs with sensitive
 params; if a future contributor adds one, ``install_access_log_scrub``
-is the single point to extend (see ``_TARGET_LOGGER_NAMES``). Wave 6
-backlog tracks adding a CI lint rule that flags new ``request.url`` /
-``request.query_string`` formatting in non-attached loggers.
+is the single point to extend (see ``_TARGET_LOGGER_NAMES``). The
+``lint_logger_urls.py`` script (run by the security-scans workflow)
+flags new ``request.url`` / ``request.query_string`` formatting in
+non-attached loggers.
 """
 
 import logging

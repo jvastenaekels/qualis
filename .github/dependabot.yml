@@ -1,6 +1,4 @@
-# Dependabot config — weekly security & version updates (Wave 6 Task 10).
-#
-# Closes the Wave 6 spec item: "Dependabot / Renovate config presence."
+# Dependabot config — weekly security & version updates.
 #
 # Three ecosystems:
 #   * pip — reads backend/pyproject.toml. Qualis uses `uv` not pip

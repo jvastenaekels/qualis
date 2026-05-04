@@ -2,7 +2,7 @@
 #   * First-party actions (actions/*, github/*) may stay version-tagged.
 #   * Third-party actions are pinned by 40-char commit SHA with the tag in a
 #     trailing comment for human review.
-# Regression test: backend/tests/security/wave_6/test_supply_chain_pinning.py.
+# Regression test: backend/tests/security/supply_chain/test_supply_chain_pinning.py.
 name: Qualis CI
 
 on:

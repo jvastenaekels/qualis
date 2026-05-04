@@ -1,10 +1,7 @@
-# Security scans — supply-chain CI gate (Wave 6 Task 3).
+# Security scans — supply-chain CI gate.
 #
-# Closes:
-#   * F-01-002 partial-fix gap (gitleaks pre-commit / CI gate).
-#   * Wave 1 NEW observation (pip-audit on every PR).
-#   * Wave 1 NEW observation (npm-audit hardening as a dedicated gate).
-#   * Wave 2 NEW observation (request.url-in-loggers lint).
+# Closes F-01-002 (gitleaks gate) and the pip-audit / npm-audit /
+# request.url-in-loggers observations from the 2026-05-03 audit.
 #
 # Each step fails the workflow only on high/critical findings (or
 # non-zero exit for gitleaks, since gitleaks emits any-or-nothing).
