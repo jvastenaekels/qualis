@@ -709,12 +709,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             (e: React.KeyboardEvent) => {
                 if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
                 const target = e.target as HTMLElement;
-                const next = resolveNextSlot(
-                    target.id,
-                    e.key,
-                    gridColumns,
-                    isForcedDistribution
-                );
+                const next = resolveNextSlot(target.id, e.key, gridColumns, isForcedDistribution);
                 if (!next) return;
                 e.preventDefault();
                 document.getElementById(`slot_${next.col}_${next.row}`)?.focus();

@@ -65,9 +65,7 @@ export function resolveNextSlot(
 
     if (nextCol !== col) {
         const declaredCap = gridColumns[nextCol]?.capacity ?? 0;
-        const newColCapacity = isForcedDistribution
-            ? declaredCap
-            : Number.MAX_SAFE_INTEGER;
+        const newColCapacity = isForcedDistribution ? declaredCap : Number.MAX_SAFE_INTEGER;
         nextRow = Math.min(nextRow, newColCapacity - 1);
     }
 

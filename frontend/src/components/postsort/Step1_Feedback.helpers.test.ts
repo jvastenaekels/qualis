@@ -62,11 +62,7 @@ describe('selectExtremeCards', () => {
     });
 
     it('respects custom extremeCols (e.g. [-3, 3] instead of defaults)', () => {
-        const customGrid = [
-            { score: -3 },
-            { score: 0 },
-            { score: 3 },
-        ];
+        const customGrid = [{ score: -3 }, { score: 0 }, { score: 3 }];
         const qsort = [
             { statementId: 1, col: 0, row: 0 },
             { statementId: 2, col: 1, row: 0 },
