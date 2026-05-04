@@ -33,6 +33,11 @@ import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { ImportFromConcourseDialog } from './ImportFromConcourseDialog';
 import {
+    applyCapacityDelta,
+    computeAutoShapedCapacities,
+    mergeParsedItemIntoStatements,
+} from './QSortEditor.helpers';
+import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet,
     useSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost,
@@ -87,6 +92,7 @@ interface SortableStatementItemProps {
     isSyncing?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — large declarative dnd-kit sortable item with conditional rendering for the edit/sync/stale states (no extractable algorithmic logic; the conditional JSX IS the surface)
 function SortableStatementItem({
     item,
     idx,
@@ -295,13 +301,13 @@ function SortableStatementItem({
 
 // CSV/TSV parsing moved to @/utils/parseCsvTsv (shared with ConcourseDetailPage).
 
-const QSortEditor = ({
-    readOnly,
-    structureLocked,
-}: {
+interface QSortEditorProps {
     readOnly?: boolean;
     structureLocked?: boolean;
-}) => {
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — page-level orchestrator (6 useEffects, multiple inline handlers, tabbed JSX shell). Pure-logic extractions done by W3b T1-T3 (autoShape / mergeParsedItem / applyCapacityDelta); what remains is glue.
+const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
     const { t } = useTranslation();
     const { draft, original, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
@@ -532,61 +538,17 @@ const QSortEditor = ({
             if (importMode === 'replace') {
                 d.statements = [];
             }
-
             const currentStatements = d.statements || [];
-
-            parsedItems.forEach((item) => {
-                let existing = null;
-                if (importMode === 'sync' && item.code) {
-                    // biome-ignore lint/suspicious/noExplicitAny: statement search
-                    existing = currentStatements.find((s: any) => s.code === item.code);
-                }
-
-                if (existing) {
-                    // Sync Traductions
-                    if (item.translations && item.translations.length > 0) {
-                        item.translations.forEach(
-                            (newT: { language_code: string; text: string }) => {
-                                const tEntry = existing.translations.find(
-                                    (t: Translation) => t.language_code === newT.language_code
-                                );
-                                if (tEntry) tEntry.text = newT.text;
-                                else existing.translations.push(newT);
-                            }
-                        );
-                    } else if (item.text) {
-                        const tEntry = existing.translations.find(
-                            (t: Translation) => t.language_code === activeLocale
-                        );
-                        if (tEntry) tEntry.text = item.text;
-                        else
-                            existing.translations.push({
-                                language_code: activeLocale,
-                                text: item.text,
-                            });
-                    }
-                } else {
-                    // Add New
-                    const code = item.code || `s${currentStatements.length + 1}`;
-                    const translations = (d.translations || []).map(
-                        (t: { language_code: string }) => {
-                            const headerT = item.translations?.find(
-                                (ht: { language_code: string; text: string }) =>
-                                    ht.language_code === t.language_code
-                            );
-                            return {
-                                language_code: t.language_code,
-                                text: headerT
-                                    ? headerT.text
-                                    : t.language_code === activeLocale
-                                      ? item.text || ''
-                                      : '',
-                            };
-                        }
-                    );
-                    currentStatements.push({ code, translations });
-                }
-            });
+            const draftLangs = (d.translations || []) as { language_code: string }[];
+            for (const item of parsedItems) {
+                mergeParsedItemIntoStatements(
+                    item,
+                    currentStatements,
+                    draftLangs,
+                    importMode,
+                    activeLocale
+                );
+            }
             d.statements = currentStatements;
         });
 
@@ -630,20 +592,7 @@ const QSortEditor = ({
     const updateGridCapacity = (idx: number, delta: number) => {
         updateDraft((d) => {
             if (!d.grid_config) return;
-            const col = d.grid_config[idx];
-            if (!col) return;
-            col.capacity = Math.max(0, (col.capacity || 0) + delta);
-
-            // Symmetry Lock Logic
-            if (d.symmetry_lock ?? true) {
-                const oppositeIdx = d.grid_config.length - 1 - idx;
-                if (oppositeIdx !== idx && d.grid_config[oppositeIdx]) {
-                    d.grid_config[oppositeIdx].capacity = Math.max(
-                        0,
-                        (d.grid_config[oppositeIdx].capacity || 0) + delta
-                    );
-                }
-            }
+            applyCapacityDelta(d.grid_config, idx, delta, d.symmetry_lock ?? true);
         });
     };
 
@@ -703,72 +652,13 @@ const QSortEditor = ({
         updateDraft((d) => {
             if (!d.grid_config || d.grid_config.length === 0) return;
 
-            const numColumns = d.grid_config.length;
-            const N = totalStatements;
-            const centerIdx = Math.floor(numColumns / 2);
-            const isOddCols = numColumns % 2 !== 0;
+            const newCapacities = computeAutoShapedCapacities(
+                totalStatements,
+                d.grid_config.length
+            );
 
-            // 1. Generate Target Weights
-            // Standard Q-sorts are "quasi-normal" but flatter than pure binomial.
-            // We use a Power curve which produces a more professional forced-choice distribution.
-            const weights = [];
-            const maxDist = Math.max(centerIdx, numColumns - 1 - centerIdx);
-
-            for (let i = 0; i < numColumns; i++) {
-                const dist = Math.abs(i - centerIdx);
-                // 1.4 is a sweet spot for reproducing common research tables
-                weights.push((maxDist - dist + 1) ** 1.4);
-            }
-
-            const totalWeight = weights.reduce((a, b) => a + b, 0);
-            const idealCapacities = weights.map((w) => (w / totalWeight) * N);
-
-            // 2. Initial Distribution
-            // Start with minimum: 2 per col if N is large, 1 if medium, 0 if small
-            const minPerCol = N >= 40 ? 2 : N >= numColumns ? 1 : 0;
-            const newCapacities: number[] = new Array(numColumns).fill(minPerCol);
-            let currentTotal = newCapacities.reduce((a, b) => a + b, 0);
-
-            // 3. Greedy distribution with symmetry
-            while (currentTotal < N) {
-                let bestIdx = -1;
-                let maxDiff = -Infinity;
-
-                const limit = isOddCols ? centerIdx : centerIdx - 1;
-
-                for (let i = 0; i <= limit; i++) {
-                    const diff = (idealCapacities[i] ?? 0) - (newCapacities[i] ?? 0);
-                    if (diff > maxDiff) {
-                        maxDiff = diff;
-                        bestIdx = i;
-                    }
-                }
-
-                if (bestIdx === -1) break;
-
-                if (isOddCols && bestIdx === centerIdx) {
-                    newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
-                    currentTotal++;
-                } else {
-                    if (N - currentTotal >= 2) {
-                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
-                        const mirrorIdx = numColumns - 1 - bestIdx;
-                        newCapacities[mirrorIdx] = (newCapacities[mirrorIdx] ?? 0) + 1;
-                        currentTotal += 2;
-                    } else if (isOddCols) {
-                        newCapacities[centerIdx] = (newCapacities[centerIdx] ?? 0) + 1;
-                        currentTotal++;
-                    } else {
-                        // Even columns parity break
-                        newCapacities[bestIdx] = (newCapacities[bestIdx] ?? 0) + 1;
-                        currentTotal++;
-                    }
-                }
-            }
-
-            // Apply to draft
-            for (let i = 0; i < numColumns; i++) {
-                const col = d.grid_config?.[i];
+            for (let i = 0; i < newCapacities.length; i++) {
+                const col = d.grid_config[i];
                 const cap = newCapacities[i];
                 if (col && cap !== undefined) {
                     col.capacity = cap;
