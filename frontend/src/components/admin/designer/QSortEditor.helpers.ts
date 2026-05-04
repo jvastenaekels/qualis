@@ -191,3 +191,36 @@ function applyTranslationsToExisting(
         else existing.translations.push({ language_code: activeLocale, text: item.text });
     }
 }
+
+// ---------------------------------------------------------------------------
+// Grid capacity mutation
+// ---------------------------------------------------------------------------
+
+interface GridColumnLite {
+    score: number;
+    capacity: number;
+}
+
+/**
+ * Apply a +/- capacity delta to a column. With `symmetryLock` true (the
+ * default in the designer), the mirrored column receives the same delta.
+ * Capacities are clamped to >= 0. Mutates `grid` in place. No-ops when
+ * the index is out of range or grid is empty.
+ */
+export function applyCapacityDelta(
+    grid: GridColumnLite[],
+    idx: number,
+    delta: number,
+    symmetryLock: boolean
+): void {
+    const col = grid[idx];
+    if (!col) return;
+    col.capacity = Math.max(0, (col.capacity || 0) + delta);
+
+    if (!symmetryLock) return;
+    const oppositeIdx = grid.length - 1 - idx;
+    if (oppositeIdx === idx) return;
+    const opposite = grid[oppositeIdx];
+    if (!opposite) return;
+    opposite.capacity = Math.max(0, (opposite.capacity || 0) + delta);
+}

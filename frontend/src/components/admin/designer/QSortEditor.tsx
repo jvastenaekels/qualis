@@ -32,7 +32,11 @@ import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { ImportFromConcourseDialog } from './ImportFromConcourseDialog';
-import { computeAutoShapedCapacities, mergeParsedItemIntoStatements } from './QSortEditor.helpers';
+import {
+    applyCapacityDelta,
+    computeAutoShapedCapacities,
+    mergeParsedItemIntoStatements,
+} from './QSortEditor.helpers';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet,
@@ -587,20 +591,7 @@ const QSortEditor = ({
     const updateGridCapacity = (idx: number, delta: number) => {
         updateDraft((d) => {
             if (!d.grid_config) return;
-            const col = d.grid_config[idx];
-            if (!col) return;
-            col.capacity = Math.max(0, (col.capacity || 0) + delta);
-
-            // Symmetry Lock Logic
-            if (d.symmetry_lock ?? true) {
-                const oppositeIdx = d.grid_config.length - 1 - idx;
-                if (oppositeIdx !== idx && d.grid_config[oppositeIdx]) {
-                    d.grid_config[oppositeIdx].capacity = Math.max(
-                        0,
-                        (d.grid_config[oppositeIdx].capacity || 0) + delta
-                    );
-                }
-            }
+            applyCapacityDelta(d.grid_config, idx, delta, d.symmetry_lock ?? true);
         });
     };
 

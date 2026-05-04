@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { computeAutoShapedCapacities, mergeParsedItemIntoStatements } from './QSortEditor.helpers';
+import {
+    applyCapacityDelta,
+    computeAutoShapedCapacities,
+    mergeParsedItemIntoStatements,
+} from './QSortEditor.helpers';
 
 describe('computeAutoShapedCapacities', () => {
     it('returns [] when numColumns is 0', () => {
@@ -244,5 +248,63 @@ describe('mergeParsedItemIntoStatements', () => {
         );
         expect(statements[0]?.translations).toHaveLength(2);
         expect(statements[0]?.translations[1]).toEqual({ language_code: 'fr', text: 'nouveau' });
+    });
+});
+
+describe('applyCapacityDelta', () => {
+    const makeGrid = () => [
+        { score: -2, capacity: 1 },
+        { score: -1, capacity: 2 },
+        { score: 0, capacity: 3 },
+        { score: 1, capacity: 2 },
+        { score: 2, capacity: 1 },
+    ];
+
+    it('increments the picked column by +delta with symmetryLock=true', () => {
+        const grid = makeGrid();
+        applyCapacityDelta(grid, 0, 1, true);
+        expect(grid[0]?.capacity).toBe(2);
+        expect(grid[4]?.capacity).toBe(2); // mirrored
+    });
+
+    it('increments only the picked column with symmetryLock=false', () => {
+        const grid = makeGrid();
+        applyCapacityDelta(grid, 0, 1, false);
+        expect(grid[0]?.capacity).toBe(2);
+        expect(grid[4]?.capacity).toBe(1); // unchanged
+    });
+
+    it('clamps to 0 (no negative capacities)', () => {
+        const grid = makeGrid();
+        applyCapacityDelta(grid, 0, -10, true);
+        expect(grid[0]?.capacity).toBe(0);
+        expect(grid[4]?.capacity).toBe(0);
+    });
+
+    it('no-op on out-of-range idx', () => {
+        const grid = makeGrid();
+        const before = JSON.stringify(grid);
+        applyCapacityDelta(grid, 99, 1, true);
+        expect(JSON.stringify(grid)).toBe(before);
+    });
+
+    it('center column with odd-length grid: symmetric write is a no-op (oppositeIdx === idx)', () => {
+        const grid = makeGrid();
+        applyCapacityDelta(grid, 2, 1, true);
+        expect(grid[2]?.capacity).toBe(4);
+        // Centre is its own opposite — still increments only once total.
+        expect(grid[0]?.capacity).toBe(1);
+        expect(grid[4]?.capacity).toBe(1);
+    });
+
+    it('handles missing capacity (treats as 0)', () => {
+        const grid: { score: number; capacity: number }[] = [
+            { score: -1, capacity: 0 },
+            { score: 0, capacity: 0 },
+            { score: 1, capacity: 0 },
+        ];
+        applyCapacityDelta(grid, 0, 2, true);
+        expect(grid[0]?.capacity).toBe(2);
+        expect(grid[2]?.capacity).toBe(2);
     });
 });
