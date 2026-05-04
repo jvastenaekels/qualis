@@ -15,14 +15,6 @@ export interface SurveyAnswerItem {
     rawTranslations?: Record<string, string> | { language_code: string; text?: string }[];
 }
 
-interface SurveyAnswerGroup {
-    id: string;
-    title: string;
-    /** React node — same as value above. */
-    icon: unknown;
-    items: SurveyAnswerItem[];
-}
-
 // ---------------------------------------------------------------------------
 // Label resolver
 // ---------------------------------------------------------------------------
