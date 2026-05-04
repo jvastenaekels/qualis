@@ -35,6 +35,7 @@ import { useViewport } from '@/contexts/ViewportContext';
 
 import { cn } from '@/lib/utils';
 import { inlineMarkdownComponents } from './markdown-config';
+import { resolveNextSlot } from './GridSort.helpers';
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -706,70 +707,17 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         // --- Keyboard Focus Management (Roving-like) ---
         const handleGridKeyDown = useCallback(
             (e: React.KeyboardEvent) => {
-                // Only handle navigation if no modifiers are pressed
                 if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
-
                 const target = e.target as HTMLElement;
-                const slotId = target.id;
-
-                // Parse current position
-                // Format: slot_{col}_{row}
-                const match = slotId.match(/^slot_(\d+)_(\d+)$/);
-                if (!match || !match[1] || !match[2]) return;
-
-                const col = parseInt(match[1], 10);
-                const row = parseInt(match[2], 10);
-                const maxCols = gridColumns.length;
-                const currentColumn = gridColumns[col];
-                if (!currentColumn) return;
-
-                let nextCol = col;
-                let nextRow = row;
-
-                switch (e.key) {
-                    case 'ArrowUp':
-                        nextRow = Math.max(0, row - 1);
-                        break;
-                    case 'ArrowDown': {
-                        // In free/flexible mode the per-column capacity is a
-                        // soft visual hint, not a hard cap, so allow keyboard
-                        // navigation past the declared row count.
-                        const maxRowsInCol = isForcedDistribution
-                            ? currentColumn.capacity
-                            : Number.MAX_SAFE_INTEGER;
-                        nextRow = Math.min(maxRowsInCol - 1, row + 1);
-                        break;
-                    }
-                    case 'ArrowLeft':
-                        nextCol = Math.max(0, col - 1);
-                        break;
-                    case 'ArrowRight':
-                        nextCol = Math.min(maxCols - 1, col + 1);
-                        break;
-                    default:
-                        return; // Exit if not an arrow key
-                }
-
-                // If moving columns, clamp the row to the new column's capacity
-                // We try to stay at the same relative height (center) or just clamp
-                if (nextCol !== col) {
-                    const declaredCap = gridColumns[nextCol]?.capacity ?? 0;
-                    const newColCapacity = isForcedDistribution
-                        ? declaredCap
-                        : Number.MAX_SAFE_INTEGER;
-                    // Sophisticated logic: try to stay visually close?
-                    // Simple logic: clamp to bottom
-                    nextRow = Math.min(nextRow, newColCapacity - 1);
-                }
-
-                if (nextCol !== col || nextRow !== row) {
-                    e.preventDefault();
-                    const nextId = `slot_${nextCol}_${nextRow}`;
-                    const nextEl = document.getElementById(nextId);
-                    if (nextEl) {
-                        nextEl.focus();
-                    }
-                }
+                const next = resolveNextSlot(
+                    target.id,
+                    e.key,
+                    gridColumns,
+                    isForcedDistribution
+                );
+                if (!next) return;
+                e.preventDefault();
+                document.getElementById(`slot_${next.col}_${next.row}`)?.focus();
             },
             [gridColumns, isForcedDistribution]
         );

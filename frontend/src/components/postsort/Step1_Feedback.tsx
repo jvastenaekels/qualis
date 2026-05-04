@@ -17,6 +17,7 @@ import {
     deleteAudioRecordingApiAudioRecordingIdDelete,
 } from '@/api/generated';
 import { toast } from 'sonner';
+import { selectExtremeCards } from './Step1_Feedback.helpers';
 
 interface Step1Props {
     onNext: () => void;
@@ -73,20 +74,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     // --- Data Preparation ---
     const extremeCards = useMemo(
-        () =>
-            qsort
-                .filter((p) => {
-                    const colDef = gridColumns[p.col];
-                    if (!colDef) return false;
-                    return extremeCols.includes(colDef.score);
-                })
-                .sort((a, b) => {
-                    // Sort by score (asc) then row
-                    const scoreA = gridColumns[a.col]?.score ?? 0;
-                    const scoreB = gridColumns[b.col]?.score ?? 0;
-                    if (scoreA !== scoreB) return scoreA - scoreB;
-                    return a.row - b.row;
-                }),
+        () => selectExtremeCards(qsort, gridColumns, extremeCols),
         [qsort, gridColumns, extremeCols]
     );
 
