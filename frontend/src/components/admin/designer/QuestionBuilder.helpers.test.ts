@@ -8,11 +8,7 @@ describe('copyMultilangField', () => {
     });
 
     it('overwrites the existing activeLocale value when present', () => {
-        const out = copyMultilangField(
-            { en: 'Hello', fr: 'Bonjour', fi: 'OldFi' },
-            'fr',
-            'fi'
-        );
+        const out = copyMultilangField({ en: 'Hello', fr: 'Bonjour', fi: 'OldFi' }, 'fr', 'fi');
         expect(out.fi).toBe('Bonjour');
     });
 
@@ -42,38 +38,22 @@ describe('copyOptions', () => {
     });
 
     it('copies sourceLang label into activeLocale on object options', () => {
-        const out = copyOptions(
-            [{ label: { en: 'Yes', fr: 'Oui' }, value: 'y' }],
-            'fr',
-            'fi'
-        );
+        const out = copyOptions([{ label: { en: 'Yes', fr: 'Oui' }, value: 'y' }], 'fr', 'fi');
         expect(out[0]?.label).toEqual({ en: 'Yes', fr: 'Oui', fi: 'Oui' });
     });
 
     it('preserves the value field when object option', () => {
-        const out = copyOptions(
-            [{ label: { en: 'Yes' }, value: 'y' }],
-            'en',
-            'fr'
-        );
+        const out = copyOptions([{ label: { en: 'Yes' }, value: 'y' }], 'en', 'fr');
         expect(out[0]?.value).toBe('y');
     });
 
     it('uses empty string when sourceLang label is missing', () => {
-        const out = copyOptions(
-            [{ label: { en: 'Yes' }, value: 'y' }],
-            'fr',
-            'fi'
-        );
+        const out = copyOptions([{ label: { en: 'Yes' }, value: 'y' }], 'fr', 'fi');
         expect(out[0]?.label.fi).toBe('');
     });
 
     it('mixes string and object options correctly', () => {
-        const out = copyOptions(
-            ['One', { label: { en: 'Two' }, value: '2' }],
-            'en',
-            'fr'
-        );
+        const out = copyOptions(['One', { label: { en: 'Two' }, value: '2' }], 'en', 'fr');
         expect(out[0]).toEqual({ label: { en: 'One', fr: 'One' }, value: 'One' });
         expect(out[1]?.label).toEqual({ en: 'Two', fr: 'Two' });
     });
