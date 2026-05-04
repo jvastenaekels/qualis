@@ -9,9 +9,9 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 import { cn } from '@/lib/utils';
 import { SafeMarkdown } from '@/components/SafeMarkdown';
+import { buildOtherTranslations } from './MultiLangFieldIcon.helpers';
 
 interface MultiLangFieldIconProps {
     /** Map of language code to string value or a list of translation objects */
@@ -32,46 +32,10 @@ export const MultiLangFieldIcon = ({
 }: MultiLangFieldIconProps) => {
     const { t } = useTranslation();
 
-    const otherTranslations = useMemo(() => {
-        const result: { code: string; value: string; label: string; flag: string }[] = [];
-
-        const getLangInfo = (code: string) => {
-            const lang = SUPPORTED_LANGUAGES.find((l) => l.code === code);
-            return {
-                label: lang?.label || code,
-                flag: lang?.flag || '🌐',
-            };
-        };
-
-        if (Array.isArray(translations)) {
-            for (const item of translations) {
-                if (item.language_code === activeLocale) continue;
-                const value = item.text ?? item.value ?? '';
-                if (!value.trim()) continue;
-
-                const info = getLangInfo(item.language_code);
-                result.push({
-                    code: item.language_code,
-                    value,
-                    ...info,
-                });
-            }
-        } else {
-            for (const [code, value] of Object.entries(translations)) {
-                if (code === activeLocale) continue;
-                if (!value || !value.trim()) continue;
-
-                const info = getLangInfo(code);
-                result.push({
-                    code,
-                    value,
-                    ...info,
-                });
-            }
-        }
-
-        return result;
-    }, [translations, activeLocale]);
+    const otherTranslations = useMemo(
+        () => buildOtherTranslations(translations, activeLocale),
+        [translations, activeLocale]
+    );
 
     if (otherTranslations.length === 0) return null;
 
