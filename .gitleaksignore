@@ -28,3 +28,4 @@
 94927bd1bed07c04ba4a4cd0f9751d603a9e036b:backend/tests/integration/test_consent_flow.py:generic-api-key:32
 e1b309997a92fa5e3d67547bdf5e3ebc42d11ff7:backend/tests/integration/test_consent_flow.py:generic-api-key:32
 864fb6e5b2034bef7784c1df0cf15f567af2f247:backend/tests/integration/test_study_lifecycle.py:generic-api-key:37
+06c9d0aa4110c21466715de97e455c88bd3b2a43:frontend/src/layouts/AdminLayout.helpers.test.ts:generic-api-key:64
