@@ -2,12 +2,15 @@ import type { StudyUpdate } from '@/api/model';
 
 type ResolutionStrategy = 'manual' | 'local-wins' | 'server-wins';
 
-interface MergeResult {
+export interface MergeStudyResult {
     success: boolean;
-    merged?: StudyUpdate;
+    merged?: StudyUpdate | null;
     conflicts?: string[];
     warnings?: string[];
 }
+
+/** @deprecated Use MergeStudyResult */
+type MergeResult = MergeStudyResult;
 
 /** Track of conflicts/warnings produced while resolving each field. */
 interface MergeAccumulator {

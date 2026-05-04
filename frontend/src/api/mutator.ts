@@ -68,6 +68,79 @@ function buildRequestHeaders(
     return requestHeaders;
 }
 
+function handle401(_method: string, url: string): void {
+    if (url.includes('/api/token') || url.includes('/api/study/')) return;
+    // biome-ignore lint/suspicious/noExplicitAny: window hack to suppress unsaved-changes dialog
+    (window as any).__isAutoLogout = true;
+
+    // Distinguish "had a token, lost it" (session_expired) from
+    // "never authenticated" (auth_required) — the latter occurs
+    // when a cold visitor opens /admin and is bounced through 401.
+    const hadToken = useAuthStore.getState().token !== null;
+    useAuthStore.getState().logout();
+    useSessionStore.getState().resetSession();
+    useResponseStore.getState().resetResponses();
+    if (!window.location.pathname.includes('/login')) {
+        const reason = hadToken ? 'session_expired' : 'auth_required';
+        window.location.href = `/login?reason=${reason}`;
+    }
+}
+
+function handle403(
+    method: string,
+    url: string,
+    parsedMessage: string,
+    parsedCode: string | undefined
+): void {
+    console.warn('Access Forbidden:', method, url);
+    // Skip toast for GETs — those are background fetches; surfacing a
+    // toast for every read-side 403 is noise (e.g. a viewer landing on
+    // a page that pre-fetches data they're not entitled to). Mutations
+    // are user-triggered, so the toast is informative there.
+    if (method.toUpperCase() === 'GET') return;
+    const { key, fallback } = resolveApiErrorKey({ code: parsedCode, message: parsedMessage });
+    const description = key
+        ? i18n.t(key, fallback)
+        : parsedMessage ||
+          i18n.t(
+              'errors.access_denied_description',
+              'You do not have permission to perform this action.'
+          );
+    toast.error(i18n.t('errors.access_denied_title', 'Access Denied'), {
+        id: `403:${method}:${url}`, // dedupe identical 403s on the same endpoint
+        description,
+    });
+}
+
+function handle409(
+    method: string,
+    url: string,
+    parsedMessage: string,
+    parsedCode: string | undefined
+): void {
+    const { key, fallback } = resolveApiErrorKey({ code: parsedCode, message: parsedMessage });
+    toast.error(i18n.t('errors.conflict_title', 'Conflict'), {
+        id: `409:${method}:${url}`,
+        description: key
+            ? i18n.t(key, fallback)
+            : parsedMessage ||
+              i18n.t(
+                  'errors.conflict_description',
+                  'The resource has been modified or already exists.'
+              ),
+    });
+}
+
+function handle429(url: string): void {
+    toast.error(i18n.t('errors.rate_limited_title', 'Too Many Requests'), {
+        id: `429:${url}`,
+        description: i18n.t(
+            'errors.rate_limited_description',
+            'Please wait a moment before trying again.'
+        ),
+    });
+}
+
 /** Side effects (toasts, redirect, bug-report) for error responses. */
 function handleErrorStatus(
     status: number,
@@ -77,76 +150,12 @@ function handleErrorStatus(
     parsedMessage: string,
     parsedCode: string | undefined
 ): void {
-    if (status === 401 && !url.includes('/api/token') && !url.includes('/api/study/')) {
-        // biome-ignore lint/suspicious/noExplicitAny: window hack to suppress unsaved-changes dialog
-        (window as any).__isAutoLogout = true;
-
-        // Distinguish "had a token, lost it" (session_expired) from
-        // "never authenticated" (auth_required) — the latter occurs
-        // when a cold visitor opens /admin and is bounced through 401.
-        const hadToken = useAuthStore.getState().token !== null;
-        useAuthStore.getState().logout();
-        useSessionStore.getState().resetSession();
-        useResponseStore.getState().resetResponses();
-        if (!window.location.pathname.includes('/login')) {
-            const reason = hadToken ? 'session_expired' : 'auth_required';
-            window.location.href = `/login?reason=${reason}`;
-        }
-    }
-
-    if (status === 403) {
-        console.warn('Access Forbidden:', method, url);
-        // Skip toast for GETs — those are background fetches; surfacing a
-        // toast for every read-side 403 is noise (e.g. a viewer landing on
-        // a page that pre-fetches data they're not entitled to). Mutations
-        // are user-triggered, so the toast is informative there.
-        if (method.toUpperCase() === 'GET') return;
-        const { key, fallback } = resolveApiErrorKey({
-            code: parsedCode,
-            message: parsedMessage,
-        });
-        const description = key
-            ? i18n.t(key, fallback)
-            : parsedMessage ||
-              i18n.t(
-                  'errors.access_denied_description',
-                  'You do not have permission to perform this action.'
-              );
-        toast.error(i18n.t('errors.access_denied_title', 'Access Denied'), {
-            id: `403:${method}:${url}`, // dedupe identical 403s on the same endpoint
-            description,
-        });
-    }
-    if (status === 429) {
-        toast.error(i18n.t('errors.rate_limited_title', 'Too Many Requests'), {
-            id: `429:${url}`,
-            description: i18n.t(
-                'errors.rate_limited_description',
-                'Please wait a moment before trying again.'
-            ),
-        });
-    }
-    if (status === 409) {
-        const { key, fallback } = resolveApiErrorKey({
-            code: parsedCode,
-            message: parsedMessage,
-        });
-        toast.error(i18n.t('errors.conflict_title', 'Conflict'), {
-            id: `409:${method}:${url}`,
-            description: key
-                ? i18n.t(key, fallback)
-                : parsedMessage ||
-                  i18n.t(
-                      'errors.conflict_description',
-                      'The resource has been modified or already exists.'
-                  ),
-        });
-    }
+    if (status === 401) handle401(method, url);
+    else if (status === 403) handle403(method, url, parsedMessage, parsedCode);
+    else if (status === 409) handle409(method, url, parsedMessage, parsedCode);
+    else if (status === 429) handle429(url);
     if (status >= 500) {
-        reportBug(`Server Error ${status} at ${url}: ${errorText}`, {
-            endpoint: url,
-            status,
-        });
+        reportBug(`Server Error ${status} at ${url}: ${errorText}`, { endpoint: url, status });
     }
 }
 

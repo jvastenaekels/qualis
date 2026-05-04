@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { tuckerPhi, matchFactorsByPhi } from './tuckerPhi';
+import { tuckerPhi, matchFactorsByPhi, findBestMatchForFactor } from './tuckerPhi';
 
 describe('tuckerPhi', () => {
     it('returns 1 for identical vectors', () => {
@@ -82,5 +82,49 @@ describe('matchFactorsByPhi', () => {
         const matches = matchFactorsByPhi(a, b);
         expect(matches).toHaveLength(1);
         expect(matches[0]).toMatchObject({ aIndex: 0, bIndex: 0 });
+    });
+});
+
+describe('findBestMatchForFactor', () => {
+    const bMatrix = [
+        [1, 0],
+        [0, 1],
+        [1, 0],
+    ];
+
+    it('picks the highest |φ| from unused columns', () => {
+        const aCol = [1, 0, 1];
+        const used = new Set<number>();
+        const m = findBestMatchForFactor(0, aCol, bMatrix, used);
+        expect(m).not.toBeNull();
+        expect(m?.bIndex).toBe(0);
+        expect(m?.phi).toBeCloseTo(1, 5);
+    });
+
+    it('skips already-used columns', () => {
+        const aCol = [1, 0, 1];
+        const used = new Set([0]);
+        const m = findBestMatchForFactor(0, aCol, bMatrix, used);
+        expect(m?.bIndex).toBe(1);
+    });
+
+    it('returns null when all columns are used', () => {
+        const aCol = [1, 0, 1];
+        const used = new Set([0, 1]);
+        expect(findBestMatchForFactor(0, aCol, bMatrix, used)).toBeNull();
+    });
+
+    it('preserves negative phi for sign-flipped match', () => {
+        const flipped = [
+            [-1, 0],
+            [0, -1],
+            [-1, 0],
+        ];
+        const m = findBestMatchForFactor(0, [1, 0, 1], flipped, new Set());
+        expect(m?.phi).toBeCloseTo(-1, 5);
+    });
+
+    it('returns null for empty bMatrix row width', () => {
+        expect(findBestMatchForFactor(0, [1], [[]], new Set())).toBeNull();
     });
 });

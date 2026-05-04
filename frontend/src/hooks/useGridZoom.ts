@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useViewport } from '@/contexts/ViewportContext';
+import { computeAutoFitTransform } from './useGridZoom.helpers';
 
 interface UseGridZoomProps {
     wrapperRef: React.RefObject<HTMLDivElement | null>;
@@ -30,73 +31,25 @@ export const useGridZoom = ({
         if (!transformRef.current || !wrapperRef.current || !contentRef.current) return;
         const wrapper = wrapperRef.current;
         const content = contentRef.current;
-        const wrapperW = wrapper.clientWidth;
-        const wrapperH = wrapper.clientHeight;
-        const contentW = content.offsetWidth;
-        const contentH = content.offsetHeight;
-        if (contentW === 0 || contentH === 0) return;
 
-        const isMobile = !isDesktop;
-        const isLandscapeMobile = isMobile && isLandscape;
+        const transform = computeAutoFitTransform(
+            {
+                wrapperW: wrapper.clientWidth,
+                wrapperH: wrapper.clientHeight,
+                contentW: content.offsetWidth,
+                contentH: content.offsetHeight,
+            },
+            { isDesktop, isLandscape }
+        );
+        if (!transform) return;
 
-        let scale: number, x: number, y: number;
-
-        if (isMobile) {
-            // Center the grid in the full wrapper width. Portrait mobile used
-            // to subtract ~64px on the right so the rightmost column wouldn't
-            // sit under the floating zoom toolbar (top-right, with
-            // backdrop-blur), but the result was visibly off-center to the
-            // left and the toolbar's blur is enough to keep the underlying
-            // content readable when it does overlap. Landscape mobile already
-            // used the full wrapper width (no toolbar in the same corner);
-            // desktop has its own branch below.
-            // 2% breathing room — empirical margin so the grid doesn't kiss
-            // the wrapper edge; the toolbar's backdrop-blur tolerates the
-            // occasional overlap that the old 64–72px reservation prevented.
-            const widthScale = (wrapperW * 0.98) / contentW;
-            const heightScale = (wrapperH * (isLandscapeMobile ? 0.95 : 0.9)) / contentH;
-
-            if (isLandscapeMobile) {
-                // Landscape mobile: fit both dimensions, center vertically
-                scale = Math.min(widthScale, heightScale);
-            } else {
-                // Portrait mobile: fit width primarily
-                scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
-            }
-
-            x = (wrapperW - contentW * scale) / 2;
-
-            if (isLandscapeMobile) {
-                // Center vertically in landscape
-                y = (wrapperH - contentH * scale) / 2;
-            } else {
-                // Anchor Bottom in portrait to leave top space for numbers/text
-                y = wrapperH - contentH * scale - 10;
-            }
-        } else {
-            // Desktop: Fit both, with padding to encompass Spectrum Bar
-            const padding = 70; // Reduced to 70px to increase default zoom for better readability
-            const bottomLegendBuffer = 60; // Extra buffer for the bottom legend
-            const availableW = wrapperW - padding;
-            const availableH = wrapperH - padding - bottomLegendBuffer;
-
-            const scaleX = availableW / contentW;
-            const scaleY = availableH / contentH;
-
-            scale = Math.min(scaleX, scaleY, 1.0); // Slight cap to prevent edge-touching
-
-            // Center Horizontally
-            x = (wrapperW - contentW * scale) / 2;
-
-            // Center Vertically, but bias upwards slightly to ensure bottom legend is safe
-            // Or just precise centering based on the calculated scale which now fits height
-            y = (wrapperH - contentH * scale) / 2;
-
-            // Ensure we don't push it off top if we have space
-            if (y < 20) y = 20;
-        }
-
-        transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
+        transformRef.current.setTransform(
+            transform.x,
+            transform.y,
+            transform.scale,
+            400,
+            'easeOutQuad'
+        );
     }, [wrapperRef, contentRef, isDesktop, isLandscape]);
 
     const zoomIn = useCallback(() => {

@@ -6,6 +6,7 @@
 
 import { useCallback, useRef } from 'react';
 import type { InteractionUtils } from '../types/grid';
+import { computeNextPanPosition, computeEdgePanSpeed } from './useDragAutoInteraction.helpers';
 
 interface UseDragAutoInteractionProps {
     interactionUtils: InteractionUtils | null | undefined;
@@ -41,51 +42,43 @@ export const useDragAutoInteraction = ({
             const content = interactionUtils?.contentRef.current;
             const wrapper = interactionUtils?.wrapperRef.current;
 
-            if (transform && content && wrapper) {
-                const state = transform.instance.transformState;
-                const scale = state.scale;
-                const { dx: currentDx, dy: currentDy } = panSpeed.current;
+            if (!transform || !content || !wrapper) return;
 
-                let speedFactor = 1.0;
-                const gridEl = document.querySelector('[data-testid="grid-container"]');
-                if (gridEl) {
-                    const gridRect = gridEl.getBoundingClientRect();
-                    const { x: curX, y: curY } = lastPos.current;
-                    if (
-                        curX < gridRect.left ||
-                        curX > gridRect.right ||
-                        curY < gridRect.top ||
-                        curY > gridRect.bottom
-                    ) {
-                        speedFactor = 0.3;
-                    }
-                }
+            const state = transform.instance.transformState;
+            const gridEl = document.querySelector('[data-testid="grid-container"]');
+            const gridRect = gridEl ? gridEl.getBoundingClientRect() : null;
 
-                const effectiveDx = currentDx * speedFactor;
-                const effectiveDy = currentDy * speedFactor;
+            const next = computeNextPanPosition(
+                state,
+                panSpeed.current,
+                lastPos.current,
+                {
+                    contentW: content.offsetWidth,
+                    contentH: content.offsetHeight,
+                    wrapperW: wrapper.clientWidth,
+                    wrapperH: wrapper.clientHeight,
+                },
+                gridRect
+            );
 
-                const contentW = content.offsetWidth * scale;
-                const contentH = content.offsetHeight * scale;
-                const wrapperW = wrapper.clientWidth;
-                const wrapperH = wrapper.clientHeight;
-
-                const minX = wrapperW - contentW - wrapperW * 0.2;
-                const maxX = wrapperW * 0.2;
-                const minY = wrapperH - contentH - wrapperH * 0.2;
-                const maxY = wrapperH * 0.2;
-
-                const newX = Math.max(minX, Math.min(maxX, state.positionX + effectiveDx));
-                const newY = Math.max(minY, Math.min(maxY, state.positionY + effectiveDy));
-
-                if (newX !== state.positionX || newY !== state.positionY) {
-                    transform.setTransform(newX, newY, scale, 0);
-                    onPan?.();
-                } else {
-                    stopPan();
-                }
+            if (next) {
+                transform.setTransform(next.x, next.y, state.scale, 0);
+                onPan?.();
+            } else {
+                stopPan();
             }
         }, 16);
     }, [interactionUtils, onPan, stopPan]);
+
+    const schedulePanActivation = useCallback(() => {
+        if (panInterval.current || panActivationTimer.current) return;
+        panActivationTimer.current = setTimeout(() => {
+            panActivationTimer.current = null;
+            if (panSpeed.current.dx !== 0 || panSpeed.current.dy !== 0) {
+                startPanInterval();
+            }
+        }, 500);
+    }, [startPanInterval]);
 
     const updateInteraction = useCallback(
         (x: number, y: number) => {
@@ -107,41 +100,16 @@ export const useDragAutoInteraction = ({
             if (!wrapper) return;
 
             const rect = wrapper.getBoundingClientRect();
-            const edgeThreshold = 60;
-            const maxPanSpeed = 15;
-
-            let dx = 0;
-            let dy = 0;
-
-            if (x < rect.left + edgeThreshold) {
-                dx = maxPanSpeed * Math.min((rect.left + edgeThreshold - x) / edgeThreshold, 1);
-            } else if (x > rect.right - edgeThreshold) {
-                dx = -maxPanSpeed * Math.min((x - (rect.right - edgeThreshold)) / edgeThreshold, 1);
-            }
-
-            if (y < rect.top + edgeThreshold) {
-                dy = maxPanSpeed * Math.min((rect.top + edgeThreshold - y) / edgeThreshold, 1);
-            } else if (y > rect.bottom - edgeThreshold) {
-                dy =
-                    -maxPanSpeed * Math.min((y - (rect.bottom - edgeThreshold)) / edgeThreshold, 1);
-            }
-
+            const { dx, dy } = computeEdgePanSpeed(x, y, rect);
             panSpeed.current = { dx, dy };
 
             if (dx !== 0 || dy !== 0) {
-                if (!panInterval.current && !panActivationTimer.current) {
-                    panActivationTimer.current = setTimeout(() => {
-                        panActivationTimer.current = null;
-                        if (panSpeed.current.dx !== 0 || panSpeed.current.dy !== 0) {
-                            startPanInterval();
-                        }
-                    }, 500);
-                }
+                schedulePanActivation();
             } else {
                 stopPan();
             }
         },
-        [interactionUtils, stopPan, startPanInterval]
+        [interactionUtils, stopPan, schedulePanActivation]
     );
 
     const cleanupInteraction = useCallback(() => {

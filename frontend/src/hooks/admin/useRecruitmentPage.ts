@@ -52,6 +52,7 @@ import type { RecruitmentLinkRead, RecruitmentLinkType, StudyRead, StudyUpdate }
 import { AdminService } from '@/api/admin';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { useAdminContext } from '@/hooks/useAdminContext';
+import { buildAccessRulesUpdate } from './useRecruitmentPage.helpers';
 
 // ────────────────────────────────────────────────────────────────
 // Schemas
@@ -350,23 +351,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
         async (data: AccessRulesValues) => {
             if (!slug) return;
             try {
-                const update: Record<string, unknown> = {};
-
-                // Password edits are only valid in draft state; outside draft
-                // the backend whitelist accepts only start_date / end_date so
-                // we omit the field entirely instead of sending a no-op null
-                // that would trigger a 422.
-                if (!isSlugLocked) {
-                    if (!data.passwordEnabled) {
-                        update.access_password = null;
-                    } else if (data.accessPassword) {
-                        update.access_password = data.accessPassword;
-                    }
-                }
-
-                update.start_date = data.startDate ? new Date(data.startDate).toISOString() : null;
-                update.end_date = data.endDate ? new Date(data.endDate).toISOString() : null;
-
+                const update = buildAccessRulesUpdate(data, { isSlugLocked });
                 await AdminService.updateStudy(slug, update as unknown as StudyUpdate);
 
                 toast.success(

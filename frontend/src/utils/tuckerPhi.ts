@@ -34,6 +34,29 @@ export interface FactorMatch {
 }
 
 /**
+ * Find the unused column of bMatrix with the highest |φ| against aCol.
+ * Returns null if all columns are used or bMatrix has no factors.
+ */
+export function findBestMatchForFactor(
+    aIndex: number,
+    aCol: readonly number[],
+    bMatrix: readonly (readonly number[])[],
+    used: ReadonlySet<number>
+): FactorMatch | null {
+    const nFactorsB = bMatrix[0]?.length ?? 0;
+    let best: FactorMatch | null = null;
+    for (let j = 0; j < nFactorsB; j++) {
+        if (used.has(j)) continue;
+        const bCol = bMatrix.map((row) => row[j] ?? 0);
+        const phi = tuckerPhi(aCol, bCol);
+        if (best === null || Math.abs(phi) > Math.abs(best.phi)) {
+            best = { aIndex, bIndex: j, phi };
+        }
+    }
+    return best;
+}
+
+/**
  * Match factors of run A to factors of run B by maximum |φ|.
  * Greedy assignment: for each factor of A in order, pick the unused
  * factor of B with the highest |φ|. Sign of φ is preserved (a flipped
@@ -49,20 +72,11 @@ export function matchFactorsByPhi(
 ): FactorMatch[] {
     if (aMatrix.length === 0 || bMatrix.length === 0) return [];
     const nFactorsA = aMatrix[0]?.length ?? 0;
-    const nFactorsB = bMatrix[0]?.length ?? 0;
     const used = new Set<number>();
     const matches: FactorMatch[] = [];
     for (let i = 0; i < nFactorsA; i++) {
         const aCol = aMatrix.map((row) => row[i] ?? 0);
-        let best: FactorMatch | null = null;
-        for (let j = 0; j < nFactorsB; j++) {
-            if (used.has(j)) continue;
-            const bCol = bMatrix.map((row) => row[j] ?? 0);
-            const phi = tuckerPhi(aCol, bCol);
-            if (best === null || Math.abs(phi) > Math.abs(best.phi)) {
-                best = { aIndex: i, bIndex: j, phi };
-            }
-        }
+        const best = findBestMatchForFactor(i, aCol, bMatrix, used);
         if (best !== null) {
             used.add(best.bIndex);
             matches.push(best);

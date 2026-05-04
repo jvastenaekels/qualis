@@ -11,6 +11,7 @@ import { useUIStore } from '../store/useUIStore';
 import type { DragCard, InteractionUtils } from '../types/grid';
 import { useDragAutoInteraction } from './useDragAutoInteraction';
 import { useGridPlacement } from './useGridPlacement';
+import { resolveDropTarget } from './useFineSortDrag.helpers';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
 interface Statement {
@@ -142,45 +143,18 @@ export const useFineSortDrag = ({
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
             const { active, over } = event;
-
-            // Ensure we ALWAYS clean up drag state, even if placement fails
             try {
                 if (!over) return;
-
                 const cardId = active.id as number;
-                let overIdString = String(over.id);
+                const target = resolveDropTarget(String(over.id), responses.qsort);
 
-                // 1. Check for Deck Drop (Return to Pile)
-                if (overIdString.startsWith('deck-')) {
-                    let categoryStr = overIdString.replace('deck-', '');
-                    // Handle deck area drop
-                    if (categoryStr.startsWith('area-')) {
-                        categoryStr = categoryStr.replace('area-', '');
-                    }
-
-                    const category = categoryStr as 'agree' | 'neutral' | 'disagree';
+                if (target.kind === 'deck') {
                     actions.unplaceCard(cardId);
-                    actions.categorizeCard(cardId, category);
+                    actions.categorizeCard(cardId, target.category);
                     return;
                 }
-
-                // 2. If dropped on another card, resolve to its slot
-                if (!overIdString.startsWith('slot_')) {
-                    const cardIdAtOver = over.id as number;
-                    const placedCard = responses.qsort.find((c) => c.statementId === cardIdAtOver);
-                    if (placedCard) {
-                        overIdString = `slot_${placedCard.col}_${placedCard.row}`;
-                    }
-                }
-
-                // 3. Slot Placement
-                if (overIdString.startsWith('slot_')) {
-                    const parts = overIdString.split('_');
-                    if (parts.length === 3 && parts[1] && parts[2]) {
-                        const col = parseInt(parts[1], 10);
-                        const row = parseInt(parts[2], 10);
-                        handlePlacement(cardId, col, row);
-                    }
+                if (target.kind === 'slot') {
+                    handlePlacement(cardId, target.col, target.row);
                 }
             } catch (error) {
                 console.error('Drag end error:', error);
