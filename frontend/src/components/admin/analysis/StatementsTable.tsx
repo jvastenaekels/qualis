@@ -9,6 +9,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
+import { compareStatementScores, getDistinguishingStars } from './StatementsTable.helpers';
 
 interface StatementsTableProps {
     result: AnalysisResult;
@@ -71,28 +72,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
     const sorted = useMemo(
         () =>
             [...result.statement_scores].sort((a, b) => {
-                let cmp = 0;
-                if (sortKey === 'code') {
-                    cmp = a.code.localeCompare(b.code, undefined, { numeric: true });
-                } else if (sortKey === 'type') {
-                    const aType = distinguishingMap.has(a.statement_id)
-                        ? 1
-                        : consensusIds.has(a.statement_id)
-                          ? -1
-                          : 0;
-                    const bType = distinguishingMap.has(b.statement_id)
-                        ? 1
-                        : consensusIds.has(b.statement_id)
-                          ? -1
-                          : 0;
-                    cmp = aType - bType;
-                } else if (sortKey.startsWith('z')) {
-                    const f = Number(sortKey.slice(1));
-                    cmp = (a.z_scores[f] ?? 0) - (b.z_scores[f] ?? 0);
-                } else if (sortKey.startsWith('a')) {
-                    const f = Number(sortKey.slice(1));
-                    cmp = (a.factor_arrays[f] ?? 0) - (b.factor_arrays[f] ?? 0);
-                }
+                const cmp = compareStatementScores(a, b, sortKey, distinguishingMap, consensusIds);
                 return sortAsc ? cmp : -cmp;
             }),
         [result.statement_scores, sortKey, sortAsc, distinguishingMap, consensusIds]
@@ -118,21 +98,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
 
     const getTypeLabel = (stmtId: number): string => {
         const d = distinguishingMap.get(stmtId);
-        if (d) {
-            const maxSig = Object.values(d.significance).reduce((best, sig) => {
-                const levels = ['p<0.000001', 'p<0.001', 'p<0.01', 'p<0.05'];
-                return levels.indexOf(sig) < levels.indexOf(best) ? sig : best;
-            }, 'p<0.05');
-            const stars =
-                maxSig === 'p<0.000001'
-                    ? '****'
-                    : maxSig === 'p<0.001'
-                      ? '***'
-                      : maxSig === 'p<0.01'
-                        ? '**'
-                        : '*';
-            return `D${stars}`;
-        }
+        if (d) return `D${getDistinguishingStars(d.significance)}`;
         if (consensusIds.has(stmtId)) return 'C';
         return '';
     };
