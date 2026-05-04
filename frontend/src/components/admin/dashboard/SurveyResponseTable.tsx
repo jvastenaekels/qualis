@@ -1,5 +1,6 @@
 import type { StudyRead } from '@/api/model';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { cn } from '@/lib/utils';
 import {
     User as UserIcon,
@@ -14,8 +15,66 @@ import {
     AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { getLocalizedText } from '@/utils/localization';
 import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
+import {
+    resolveAnswerLabel,
+    resolveOptionText,
+    buildQuestionsMap,
+    classifyAnswerKey,
+} from './SurveyResponseTable.helpers';
+
+// ---------------------------------------------------------------------------
+// Module-level render helpers (extracted to keep component body under budget)
+// ---------------------------------------------------------------------------
+
+function renderValue(
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
+    questionsMap: Record<string, any>,
+    language: string,
+    t: TFunction,
+    key: string,
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic survey values
+    value: any
+): React.ReactNode {
+    if (value === true)
+        return (
+            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                {t('common.yes', 'Yes')}
+            </Badge>
+        );
+    if (value === false)
+        return (
+            <Badge variant="outline" className="text-slate-400 border-slate-200">
+                {t('common.no', 'No')}
+            </Badge>
+        );
+    if (value === null || value === undefined || value === '')
+        return <span className="text-slate-300">—</span>;
+
+    const q = questionsMap[key];
+    if (q?.options && Array.isArray(q.options)) {
+        if (Array.isArray(value)) {
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {value.map((v) => (
+                        <Badge
+                            key={v}
+                            variant="secondary"
+                            className="text-2xs font-medium bg-indigo-50 text-indigo-700 border-indigo-100"
+                        >
+                            {resolveOptionText(q.options, v, language)}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        }
+        return resolveOptionText(q.options, value, language);
+    }
+
+    if (Array.isArray(value)) return value.join(', ');
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+}
 
 interface SurveyResponseTableProps {
     study: StudyRead;
@@ -26,6 +85,7 @@ interface SurveyResponseTableProps {
     className?: string;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — JSX shell: complexity is structural (postsort/presort branch, nested card-comments loop, accordion group rendering) not algorithmic; renderValue and classifier extracted to module-level helpers above
 export function SurveyResponseTable({
     study,
     answers,
@@ -56,101 +116,12 @@ export function SurveyResponseTable({
 
     // --- Config & Question Logic ---
     const config = (type === 'presort' ? study.presort_config : study.postsort_config) || {};
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
-    const cfg = config as any;
-    const rawQuestions = cfg?.questions || cfg?.fields || (Array.isArray(cfg) ? cfg : []);
+    const questionsMap = buildQuestionsMap(config as Record<string, unknown>);
 
-    // Transform questions into a map for fast lookup
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-    const questionsMap: Record<string, any> = {};
-    if (Array.isArray(rawQuestions)) {
-        for (const q of rawQuestions) {
-            questionsMap[String(q.id)] = q;
-        }
-    } else if (typeof rawQuestions === 'object') {
-        for (const [id, q] of Object.entries(rawQuestions)) {
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-            questionsMap[id] = { id, ...(q as any) };
-        }
-    }
-
-    // --- Helpers ---
-    const getResolvedLabel = (key: string) => {
-        const q = questionsMap[key];
-        if (q) {
-            return getLocalizedText(q.label || q.text, language, key);
-        }
-
-        // Special Post-Sort Fields
-        if (key === 'email') return t('post.contact.email_label', 'Email Address');
-        if (key === 'interview_consent') return t('post.contact.interview_consent', 'Follow-up');
-        if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Results');
-        if (key === '_recruitment_token')
-            return t('admin.participant.metadata.recruitment_token', 'Ref');
-        if (key === 'missing_statement')
-            return t('post.extreme.missing_statement', 'Missing Statement');
-        if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');
-
-        return key;
-    };
-
+    // --- Helpers (bound to current render context) ---
+    const getResolvedLabel = (key: string) => resolveAnswerLabel(questionsMap, key, language, t);
     // biome-ignore lint/suspicious/noExplicitAny: dynamic survey values
-    const getResolvedValue = (key: string, value: any) => {
-        if (value === true)
-            return (
-                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
-                    {t('common.yes', 'Yes')}
-                </Badge>
-            );
-        if (value === false)
-            return (
-                <Badge variant="outline" className="text-slate-400 border-slate-200">
-                    {t('common.no', 'No')}
-                </Badge>
-            );
-        if (value === null || value === undefined || value === '')
-            return <span className="text-slate-300">—</span>;
-
-        const q = questionsMap[key];
-        if (q?.options && Array.isArray(q.options)) {
-            // Resolve options for single or multi choice
-            const resolveOptionNode = (val: string | number) => {
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic option structure
-                const opt = q.options.find((o: any) =>
-                    typeof o === 'object'
-                        ? String(o.value) === String(val)
-                        : String(o) === String(val)
-                );
-                if (opt) {
-                    return typeof opt === 'object'
-                        ? getLocalizedText(opt.label, language, String(val))
-                        : String(opt);
-                }
-                return String(val);
-            };
-
-            if (Array.isArray(value)) {
-                return (
-                    <div className="flex flex-wrap gap-1">
-                        {value.map((v) => (
-                            <Badge
-                                key={v}
-                                variant="secondary"
-                                className="text-2xs font-medium bg-indigo-50 text-indigo-700 border-indigo-100"
-                            >
-                                {resolveOptionNode(v)}
-                            </Badge>
-                        ))}
-                    </div>
-                );
-            }
-            return resolveOptionNode(value);
-        }
-
-        if (Array.isArray(value)) return value.join(', ');
-        if (typeof value === 'object') return JSON.stringify(value);
-        return String(value);
-    };
+    const render = (key: string, value: any) => renderValue(questionsMap, language, t, key, value);
 
     // --- Grouping Logic ---
     const groups: {
@@ -181,7 +152,7 @@ export function SurveyResponseTable({
             group.items.push({
                 key,
                 label: getResolvedLabel(key),
-                value: getResolvedValue(key, val),
+                value: render(key, val),
                 id: key,
                 rawTranslations,
             });
@@ -271,19 +242,7 @@ export function SurveyResponseTable({
     for (const [key, val] of Object.entries(answers)) {
         if (processedKeys.has(key)) continue;
 
-        if (
-            key === 'email' ||
-            key === 'interview_consent' ||
-            key === 'newsletter_consent' ||
-            key === '_recruitment_token'
-        ) {
-            addItem('identity', key, val);
-        } else if (key === 'missing_statement' || key === 'general_comment') {
-            addItem('feedback', key, val);
-        } else {
-            // Fallback for flat presort or unexpected postsort keys
-            addItem('questions', key, val);
-        }
+        addItem(classifyAnswerKey(key), key, val);
     }
 
     // Filter empty groups

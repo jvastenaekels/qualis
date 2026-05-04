@@ -65,6 +65,122 @@ function getPresortQuestions(
     return {};
 }
 
+// ---------------------------------------------------------------------------
+// Pure helpers extracted to keep useMemo callbacks under the complexity limit
+// ---------------------------------------------------------------------------
+
+type OptionEntry = { value: string; display: string };
+
+/** Converts a raw question option to a normalised {value, display} pair. */
+function normaliseOption(
+    opt: string | { value?: string; label: string | Record<string, string> },
+    language: string
+): OptionEntry {
+    if (typeof opt === 'string') return { value: opt, display: opt };
+    const value = opt.value ?? getLocalizedText(opt.label, language, '');
+    return { value, display: getLocalizedText(opt.label, language, value) };
+}
+
+/** Tallies a single participant's answer into the counts map. */
+function tallyAnswer(answer: unknown, counts: Map<string, number>): boolean {
+    if (
+        answer === undefined ||
+        answer === null ||
+        answer === '' ||
+        (Array.isArray(answer) && answer.length === 0)
+    ) {
+        return false; // signals "no answer"
+    }
+    if (Array.isArray(answer)) {
+        for (const val of answer) {
+            const key = String(val);
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+    } else {
+        const key = String(answer);
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return true;
+}
+
+/**
+ * Collects all chartable questions from presort and postsort configs.
+ */
+function buildChartableQuestions(
+    presortConfig: DumpResponse['study']['presort_config'],
+    postsortConfig: DumpResponse['study']['postsort_config']
+): ChartableQuestion[] {
+    const result: ChartableQuestion[] = [];
+
+    const presortQuestions = getPresortQuestions(
+        presortConfig as Record<string, unknown> | undefined
+    );
+    for (const [key, q] of Object.entries(presortQuestions)) {
+        if (CHARTABLE_TYPES.has(q.type) && Array.isArray(q.options) && q.options.length > 0) {
+            result.push({ key, def: q, getAnswer: (p) => p.presort[key] });
+        }
+    }
+
+    const postsortQuestions = (postsortConfig as Record<string, unknown> | undefined)?.questions;
+    if (postsortQuestions && typeof postsortQuestions === 'object') {
+        for (const [key, q] of Object.entries(
+            postsortQuestions as Record<string, PostsortQuestion>
+        )) {
+            if (CHARTABLE_TYPES.has(q.type) && Array.isArray(q.options) && q.options.length > 0) {
+                result.push({
+                    key,
+                    def: q,
+                    getAnswer: (p) => p.postsort.questions_answers?.[key],
+                });
+            }
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Builds a single ChartDataItem by tallying answer counts across participants.
+ */
+function buildChartDataItem(
+    question: ChartableQuestion,
+    filteredParticipants: DumpParticipant[],
+    language: string,
+    noAnswerLabel: string
+): ChartDataItem {
+    const { key: questionKey, def: questionDef, getAnswer } = question;
+
+    const entries = (questionDef.options ?? []).map((opt) => normaliseOption(opt, language));
+    const optionOrder = entries.map((e) => e.value);
+    const optionMap = new Map(entries.map((e) => [e.value, e.display]));
+
+    const counts = new Map<string, number>();
+    for (const key of optionOrder) counts.set(key, 0);
+    let noAnswerCount = 0;
+
+    for (const p of filteredParticipants) {
+        if (!tallyAnswer(getAnswer(p), counts)) noAnswerCount++;
+    }
+
+    const bars: ChartBar[] = optionOrder.map((key) => ({
+        option: optionMap.get(key) ?? key,
+        count: counts.get(key) ?? 0,
+    }));
+
+    if (noAnswerCount > 0) {
+        bars.push({ option: noAnswerLabel, count: noAnswerCount, isNoAnswer: true });
+    }
+
+    return {
+        questionKey,
+        questionLabel: getLocalizedText(questionDef.label, language, questionKey),
+        type: questionDef.type,
+        bars,
+        noAnswerCount,
+        totalParticipants: filteredParticipants.length,
+    };
+}
+
 export function QuestionDistributionCharts({
     presortConfig,
     postsortConfig,
@@ -73,115 +189,20 @@ export function QuestionDistributionCharts({
 }: QuestionDistributionChartsProps) {
     const { t } = useTranslation();
 
-    const chartableQuestions = useMemo(() => {
-        const result: ChartableQuestion[] = [];
+    const chartableQuestions = useMemo(
+        () => buildChartableQuestions(presortConfig, postsortConfig),
+        [presortConfig, postsortConfig]
+    );
 
-        // Presort questions — answers are flat in p.presort[key]
-        const presortQuestions = getPresortQuestions(
-            presortConfig as Record<string, unknown> | undefined
-        );
-        for (const [key, q] of Object.entries(presortQuestions)) {
-            if (CHARTABLE_TYPES.has(q.type) && Array.isArray(q.options) && q.options.length > 0) {
-                result.push({
-                    key,
-                    def: q,
-                    getAnswer: (p) => p.presort[key],
-                });
-            }
-        }
-
-        // Postsort questions — answers are nested in p.postsort.questions_answers[key]
-        const postsortQuestions = (postsortConfig as Record<string, unknown> | undefined)
-            ?.questions;
-        if (postsortQuestions && typeof postsortQuestions === 'object') {
-            for (const [key, q] of Object.entries(
-                postsortQuestions as Record<string, PostsortQuestion>
-            )) {
-                if (
-                    CHARTABLE_TYPES.has(q.type) &&
-                    Array.isArray(q.options) &&
-                    q.options.length > 0
-                ) {
-                    result.push({
-                        key,
-                        def: q,
-                        getAnswer: (p) => p.postsort.questions_answers?.[key],
-                    });
-                }
-            }
-        }
-
-        return result;
-    }, [presortConfig, postsortConfig]);
-
-    const chartData: ChartDataItem[] = useMemo(() => {
-        return chartableQuestions.map(({ key: questionKey, def: questionDef, getAnswer }) => {
-            const optionMap = new Map<string, string>();
-            const optionOrder: string[] = [];
-
-            for (const opt of questionDef.options ?? []) {
-                if (typeof opt === 'string') {
-                    optionMap.set(opt, opt);
-                    optionOrder.push(opt);
-                } else {
-                    const value = opt.value ?? getLocalizedText(opt.label, language, '');
-                    const display = getLocalizedText(opt.label, language, value);
-                    optionMap.set(value, display);
-                    optionOrder.push(value);
-                }
-            }
-
-            const counts = new Map<string, number>();
-            for (const key of optionOrder) counts.set(key, 0);
-            let noAnswerCount = 0;
-
-            for (const p of filteredParticipants) {
-                const answer = getAnswer(p);
-
-                if (
-                    answer === undefined ||
-                    answer === null ||
-                    answer === '' ||
-                    (Array.isArray(answer) && answer.length === 0)
-                ) {
-                    noAnswerCount++;
-                    continue;
-                }
-
-                if (Array.isArray(answer)) {
-                    for (const val of answer) {
-                        const key = String(val);
-                        counts.set(key, (counts.get(key) ?? 0) + 1);
-                    }
-                } else {
-                    const key = String(answer);
-                    counts.set(key, (counts.get(key) ?? 0) + 1);
-                }
-            }
-
-            const bars: ChartBar[] = optionOrder.map((key) => ({
-                option: optionMap.get(key) ?? key,
-                count: counts.get(key) ?? 0,
-            }));
-
-            if (noAnswerCount > 0) {
-                bars.push({
-                    option: t('admin.data.charts.no_answer', 'No answer'),
-                    count: noAnswerCount,
-                    isNoAnswer: true,
-                });
-            }
-
-            return {
-                questionKey,
-                questionLabel: getLocalizedText(questionDef.label, language, questionKey),
-                type: questionDef.type,
-                bars,
-                noAnswerCount,
-                totalParticipants: filteredParticipants.length,
-            };
-        });
-    }, [chartableQuestions, filteredParticipants, language, t]);
+    const noAnswerLabel = t('admin.data.charts.no_answer', 'No answer');
+    const chartData: ChartDataItem[] = useMemo(
+        () =>
+            chartableQuestions.map((q) =>
+                buildChartDataItem(q, filteredParticipants, language, noAnswerLabel)
+            ),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [chartableQuestions, filteredParticipants, language, noAnswerLabel]
+    );
 
     if (chartData.length === 0) return null;
 

@@ -22,6 +22,111 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from 'react-i18next';
 
+type StudyState = 'draft' | 'active' | 'paused' | 'closed';
+
+// ---------------------------------------------------------------------------
+// Pure helper: state-machine transition guard
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true when transitioning from `from` to `to` is allowed.
+ * Extracted so the map callback stays below the complexity threshold.
+ *
+ * Reverting to draft is allowed from every non-draft state (active, paused,
+ * closed) — confirmed by the existing `renderActionDialog` "Revert to Draft?"
+ * confirmation entry.
+ */
+export function isTransitionAllowed(from: string, to: string): boolean {
+    if (from === to) return false;
+    if (from === 'draft') return to === 'active';
+    if (from === 'active') return to === 'paused' || to === 'closed' || to === 'draft';
+    if (from === 'paused') return to === 'active' || to === 'closed' || to === 'draft';
+    if (from === 'closed') return to === 'active' || to === 'draft';
+    return false;
+}
+
+// ---------------------------------------------------------------------------
+// Sub-component: single status step tile
+// ---------------------------------------------------------------------------
+
+interface StepConfig {
+    readonly id: string;
+    readonly label: string;
+    readonly icon: React.ElementType;
+    readonly description: string;
+    readonly color: string;
+    readonly bg: string;
+    readonly border: string;
+    readonly activeClass: string;
+}
+
+interface StatusStepButtonProps {
+    step: StepConfig;
+    currentState: string;
+    renderActionDialog: (targetState: StudyState, children: React.ReactNode) => React.ReactNode;
+}
+
+function StatusStepButton({ step, currentState, renderActionDialog }: StatusStepButtonProps) {
+    const isActive = currentState === step.id;
+    const isClickable = isTransitionAllowed(currentState, step.id);
+
+    const content = (
+        <div
+            className={cn(
+                'relative flex flex-col items-center justify-center p-2.5 rounded-lg transition-all border',
+                isActive
+                    ? cn('bg-white shadow-sm z-10', step.activeClass, step.border)
+                    : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400 opacity-60 hover:opacity-100',
+                isClickable &&
+                    'cursor-pointer hover:border-slate-200 hover:shadow-sm hover:opacity-100'
+            )}
+        >
+            <div
+                className={cn(
+                    'h-7 w-7 rounded-full flex items-center justify-center mb-1.5 transition-colors',
+                    isActive ? step.bg : 'bg-slate-100'
+                )}
+            >
+                <step.icon className={cn('h-4 w-4', isActive ? step.color : 'text-slate-400')} />
+            </div>
+            <div className="text-sm font-bold tracking-tight mb-0.5">{step.label}</div>
+            <div className="text-2xs text-muted-foreground font-medium text-center">
+                {step.description}
+            </div>
+            {isActive && (
+                <div className="absolute top-2 right-2">
+                    <div
+                        className={cn(
+                            'h-2 w-2 rounded-full',
+                            step.id === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'
+                        )}
+                    />
+                </div>
+            )}
+        </div>
+    );
+
+    if (isClickable) {
+        return (
+            <React.Fragment key={step.id}>
+                {renderActionDialog(
+                    // biome-ignore lint/suspicious/noExplicitAny: generic ID
+                    step.id as any,
+                    <div role="button" tabIndex={0} className="outline-none">
+                        {content}
+                    </div>
+                )}
+            </React.Fragment>
+        );
+    }
+
+    return (
+        <div key={step.id} className={isActive ? '' : 'pointer-events-none grayscale opacity-40'}>
+            {content}
+        </div>
+    );
+}
+
 interface StudyStatusControlProps {
     slug: string;
     currentState: string;
@@ -189,110 +294,14 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
         <Card className="shadow-sm border border-slate-200 bg-white">
             <CardContent className="p-1">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
-                    {steps.map((step) => {
-                        const isActive = currentState === step.id;
-                        // Determine if this step is targetable
-
-                        let isClickable = false;
-                        // Logic matrix (allow most transitions for flexibility)
-                        if (currentState === 'draft' && step.id === 'active') isClickable = true;
-                        if (
-                            currentState === 'active' &&
-                            (step.id === 'paused' || step.id === 'closed')
-                        )
-                            isClickable = true;
-                        if (
-                            currentState === 'paused' &&
-                            (step.id === 'active' || step.id === 'closed' || step.id === 'draft')
-                        )
-                            isClickable = true;
-                        if (
-                            currentState === 'closed' &&
-                            (step.id === 'active' || step.id === 'draft')
-                        )
-                            isClickable = true;
-
-                        // Always allow reverting to draft if not already draft (except maybe from active? warning needed)
-                        if (currentState !== 'draft' && step.id === 'draft') isClickable = true;
-
-                        // Allow clicking current state? No.
-                        if (isActive) isClickable = false;
-
-                        const content = (
-                            <div
-                                className={cn(
-                                    'relative flex flex-col items-center justify-center p-2.5 rounded-lg transition-all border',
-                                    isActive
-                                        ? cn(
-                                              'bg-white shadow-sm z-10',
-                                              step.activeClass,
-                                              step.border
-                                          )
-                                        : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400 opacity-60 hover:opacity-100',
-                                    isClickable &&
-                                        'cursor-pointer hover:border-slate-200 hover:shadow-sm hover:opacity-100'
-                                )}
-                            >
-                                <div
-                                    className={cn(
-                                        'h-7 w-7 rounded-full flex items-center justify-center mb-1.5 transition-colors',
-                                        isActive ? step.bg : 'bg-slate-100'
-                                    )}
-                                >
-                                    <step.icon
-                                        className={cn(
-                                            'h-4 w-4',
-                                            isActive ? step.color : 'text-slate-400'
-                                        )}
-                                    />
-                                </div>
-                                <div className="text-sm font-bold tracking-tight mb-0.5">
-                                    {step.label}
-                                </div>
-                                <div className="text-2xs text-muted-foreground font-medium text-center">
-                                    {step.description}
-                                </div>
-
-                                {isActive && (
-                                    <div className="absolute top-2 right-2">
-                                        <div
-                                            className={cn(
-                                                'h-2 w-2 rounded-full',
-                                                step.id === 'active'
-                                                    ? 'bg-emerald-500 animate-pulse'
-                                                    : 'bg-slate-300'
-                                            )}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        );
-
-                        if (isClickable) {
-                            return (
-                                <React.Fragment key={step.id}>
-                                    {renderActionDialog(
-                                        // biome-ignore lint/suspicious/noExplicitAny: generic ID
-                                        step.id as any,
-                                        <div role="button" tabIndex={0} className="outline-none">
-                                            {content}
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            );
-                        }
-
-                        return (
-                            <div
-                                key={step.id}
-                                className={
-                                    isActive ? '' : 'pointer-events-none grayscale opacity-40'
-                                }
-                            >
-                                {content}
-                            </div>
-                        );
-                    })}
+                    {steps.map((step) => (
+                        <StatusStepButton
+                            key={step.id}
+                            step={step}
+                            currentState={currentState}
+                            renderActionDialog={renderActionDialog}
+                        />
+                    ))}
                 </div>
             </CardContent>
         </Card>

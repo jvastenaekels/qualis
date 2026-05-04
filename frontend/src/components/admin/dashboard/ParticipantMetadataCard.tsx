@@ -51,6 +51,7 @@ interface ParticipantMetadataCardProps {
     isDiscardPending?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — JSX shell: complexity is structural (device/browser ternaries, conditional metadata rows for submitted_at/recruitment_token/ip_address, discard/restore dialog branching) not algorithmic; no extractable helper reduces the score
 export function ParticipantMetadataCard({
     participant,
     className,
