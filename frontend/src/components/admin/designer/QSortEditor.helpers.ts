@@ -144,9 +144,7 @@ export function mergeParsedItemIntoStatements(
     activeLocale: string
 ): void {
     const existing =
-        importMode === 'sync' && item.code
-            ? statements.find((s) => s.code === item.code)
-            : null;
+        importMode === 'sync' && item.code ? statements.find((s) => s.code === item.code) : null;
 
     if (existing) {
         applyTranslationsToExisting(existing, item, activeLocale);
@@ -159,7 +157,7 @@ export function mergeParsedItemIntoStatements(
         if (headerT) return { language_code, text: headerT.text };
         return {
             language_code,
-            text: language_code === activeLocale ? item.text ?? '' : '',
+            text: language_code === activeLocale ? (item.text ?? '') : '',
         };
     });
     statements.push({ code, translations });

@@ -32,10 +32,7 @@ import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { ImportFromConcourseDialog } from './ImportFromConcourseDialog';
-import {
-    computeAutoShapedCapacities,
-    mergeParsedItemIntoStatements,
-} from './QSortEditor.helpers';
+import { computeAutoShapedCapacities, mergeParsedItemIntoStatements } from './QSortEditor.helpers';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet,

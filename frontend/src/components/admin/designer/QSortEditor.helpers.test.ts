@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-    computeAutoShapedCapacities,
-    mergeParsedItemIntoStatements,
-} from './QSortEditor.helpers';
+import { computeAutoShapedCapacities, mergeParsedItemIntoStatements } from './QSortEditor.helpers';
 
 describe('computeAutoShapedCapacities', () => {
     it('returns [] when numColumns is 0', () => {
@@ -104,7 +101,10 @@ describe('mergeParsedItemIntoStatements', () => {
     const draftLangs = [{ language_code: 'en' }, { language_code: 'fr' }];
 
     it('append mode: adds new statement with seeded translations (active locale gets item.text)', () => {
-        const statements: { code: string; translations: { language_code: string; text: string }[] }[] = [];
+        const statements: {
+            code: string;
+            translations: { language_code: string; text: string }[];
+        }[] = [];
         mergeParsedItemIntoStatements(
             { code: 'S1', text: 'Hello' },
             statements,
@@ -122,19 +122,16 @@ describe('mergeParsedItemIntoStatements', () => {
 
     it('append mode: assigns auto-generated code when item.code is missing', () => {
         const statements = [{ code: 'A', translations: [] }];
-        mergeParsedItemIntoStatements(
-            { text: 'New' },
-            statements,
-            draftLangs,
-            'append',
-            'en'
-        );
+        mergeParsedItemIntoStatements({ text: 'New' }, statements, draftLangs, 'append', 'en');
         expect(statements).toHaveLength(2);
         expect(statements[1]?.code).toBe('s2');
     });
 
     it('append mode: per-language translations override the item.text fallback', () => {
-        const statements: { code: string; translations: { language_code: string; text: string }[] }[] = [];
+        const statements: {
+            code: string;
+            translations: { language_code: string; text: string }[];
+        }[] = [];
         mergeParsedItemIntoStatements(
             {
                 code: 'S1',
@@ -227,13 +224,14 @@ describe('mergeParsedItemIntoStatements', () => {
             'en'
         );
         expect(statements[0]?.translations).toHaveLength(1);
-        expect(statements[0]?.translations[0]).toEqual({ language_code: 'en', text: 'late binding' });
+        expect(statements[0]?.translations[0]).toEqual({
+            language_code: 'en',
+            text: 'late binding',
+        });
     });
 
     it('sync mode: per-language item.translations adds missing language entry to existing', () => {
-        const statements = [
-            { code: 'S1', translations: [{ language_code: 'en', text: 'old' }] },
-        ];
+        const statements = [{ code: 'S1', translations: [{ language_code: 'en', text: 'old' }] }];
         mergeParsedItemIntoStatements(
             {
                 code: 'S1',
