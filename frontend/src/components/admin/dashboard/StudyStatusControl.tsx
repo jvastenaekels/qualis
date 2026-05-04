@@ -31,15 +31,18 @@ type StudyState = 'draft' | 'active' | 'paused' | 'closed';
 /**
  * Returns true when transitioning from `from` to `to` is allowed.
  * Extracted so the map callback stays below the complexity threshold.
+ *
+ * Reverting to draft is allowed from every non-draft state (active, paused,
+ * closed) — confirmed by the existing `renderActionDialog` "Revert to Draft?"
+ * confirmation entry.
  */
-function isTransitionAllowed(from: string, to: string): boolean {
+export function isTransitionAllowed(from: string, to: string): boolean {
     if (from === to) return false;
     if (from === 'draft') return to === 'active';
-    if (from === 'active') return to === 'paused' || to === 'closed';
+    if (from === 'active') return to === 'paused' || to === 'closed' || to === 'draft';
     if (from === 'paused') return to === 'active' || to === 'closed' || to === 'draft';
     if (from === 'closed') return to === 'active' || to === 'draft';
-    // Fallback: always allow reverting to draft
-    return to === 'draft';
+    return false;
 }
 
 // ---------------------------------------------------------------------------
