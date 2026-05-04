@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
+import { compareParticipantLoadings } from './FactorLoadingsTable.helpers';
 
 interface FactorLoadingsTableProps {
     result: AnalysisResult;
@@ -13,6 +14,62 @@ interface FactorLoadingsTableProps {
 }
 
 type SortKey = 'label' | 'flagged' | number;
+
+// ---------------------------------------------------------------------------
+// LoadingCell — colocated sub-component for a single loading <td>
+// ---------------------------------------------------------------------------
+
+interface LoadingCellProps {
+    loading: number;
+    factorNum: number;
+    isFlagged: boolean;
+    isManual: boolean;
+    participantLabel: string;
+    onToggleFlag: (factorNum: number) => void;
+}
+
+function LoadingCell({
+    loading,
+    factorNum,
+    isFlagged,
+    isManual,
+    participantLabel,
+    onToggleFlag,
+}: LoadingCellProps) {
+    return (
+        <td
+            className={cn(
+                'text-right py-1.5 px-3 font-mono text-xs tabular-nums',
+                isFlagged && 'font-bold bg-indigo-50 text-indigo-700',
+                !isFlagged && loading > 0 && 'text-blue-600',
+                !isFlagged && loading < 0 && 'text-red-500',
+                isManual &&
+                    'cursor-pointer hover:bg-indigo-100/50 transition-colors border border-dashed border-slate-200'
+            )}
+            onClick={isManual ? () => onToggleFlag(factorNum) : undefined}
+            onKeyDown={
+                isManual
+                    ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              onToggleFlag(factorNum);
+                          }
+                      }
+                    : undefined
+            }
+            tabIndex={isManual ? 0 : undefined}
+            role={isManual ? 'button' : undefined}
+            aria-label={
+                isManual
+                    ? `${isFlagged ? 'Unflag' : 'Flag'} ${participantLabel} for Factor ${factorNum}`
+                    : undefined
+            }
+        >
+            {loading > 0 ? '+' : ''}
+            {loading.toFixed(4)}
+        </td>
+    );
+}
 
 export function FactorLoadingsTable({
     result,
@@ -40,14 +97,7 @@ export function FactorLoadingsTable({
     const sorted = useMemo(
         () =>
             [...result.participants].sort((a, b) => {
-                let cmp = 0;
-                if (sortKey === 'label') {
-                    cmp = a.label.localeCompare(b.label);
-                } else if (sortKey === 'flagged') {
-                    cmp = (a.flagged_factors?.[0] ?? 0) - (b.flagged_factors?.[0] ?? 0);
-                } else if (typeof sortKey === 'number') {
-                    cmp = (a.loadings[sortKey] ?? 0) - (b.loadings[sortKey] ?? 0);
-                }
+                const cmp = compareParticipantLoadings(a, b, sortKey);
                 return sortAsc ? cmp : -cmp;
             }),
         [result.participants, sortKey, sortAsc]
@@ -171,53 +221,17 @@ export function FactorLoadingsTable({
                                     <td className="py-1.5 px-3 font-mono text-xs sticky left-0 bg-white z-[1]">
                                         {p.label}
                                     </td>
-                                    {p.loadings.map((loading, f) => {
-                                        const factorNum = f + 1;
-                                        const isFlagged = flaggedSet.has(factorNum);
-                                        const isManual = flaggingMode === 'manual';
-                                        return (
-                                            <td
-                                                key={f}
-                                                className={cn(
-                                                    'text-right py-1.5 px-3 font-mono text-xs tabular-nums',
-                                                    isFlagged &&
-                                                        'font-bold bg-indigo-50 text-indigo-700',
-                                                    !isFlagged && loading > 0 && 'text-blue-600',
-                                                    !isFlagged && loading < 0 && 'text-red-500',
-                                                    isManual &&
-                                                        'cursor-pointer hover:bg-indigo-100/50 transition-colors border border-dashed border-slate-200'
-                                                )}
-                                                onClick={
-                                                    isManual
-                                                        ? () => onToggleFlag(p.db_id, factorNum)
-                                                        : undefined
-                                                }
-                                                onKeyDown={
-                                                    isManual
-                                                        ? (e) => {
-                                                              if (
-                                                                  e.key === 'Enter' ||
-                                                                  e.key === ' '
-                                                              ) {
-                                                                  e.preventDefault();
-                                                                  onToggleFlag(p.db_id, factorNum);
-                                                              }
-                                                          }
-                                                        : undefined
-                                                }
-                                                tabIndex={isManual ? 0 : undefined}
-                                                role={isManual ? 'button' : undefined}
-                                                aria-label={
-                                                    isManual
-                                                        ? `${isFlagged ? 'Unflag' : 'Flag'} ${p.label} for Factor ${factorNum}`
-                                                        : undefined
-                                                }
-                                            >
-                                                {loading > 0 ? '+' : ''}
-                                                {loading.toFixed(4)}
-                                            </td>
-                                        );
-                                    })}
+                                    {p.loadings.map((loading, f) => (
+                                        <LoadingCell
+                                            key={f}
+                                            loading={loading}
+                                            factorNum={f + 1}
+                                            isFlagged={flaggedSet.has(f + 1)}
+                                            isManual={flaggingMode === 'manual'}
+                                            participantLabel={p.label}
+                                            onToggleFlag={(fn) => onToggleFlag(p.db_id, fn)}
+                                        />
+                                    ))}
                                     <td className="text-center py-1.5 px-3 text-xs">
                                         {flaggedSet.size > 0 ? (
                                             <span className="inline-flex items-center gap-0.5">
