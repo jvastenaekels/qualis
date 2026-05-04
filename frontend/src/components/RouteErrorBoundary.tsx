@@ -5,9 +5,14 @@
  */
 
 import * as Sentry from '@sentry/react';
-import { useRouteError, isRouteErrorResponse } from 'react-router-dom';
+import { useRouteError } from 'react-router-dom';
 import ErrorPage from '../pages/ErrorPage';
 import { ApiError } from '../api/client';
+import {
+    classifyRouteError,
+    shouldCaptureRouteError,
+    shouldThrottleChunkReload,
+} from './RouteErrorBoundary.helpers';
 
 /**
  * RouteErrorBoundary
@@ -21,49 +26,40 @@ const RouteErrorBoundary = () => {
     console.error('Route error caught:', error);
 
     // Forward to Sentry when a DSN is configured (no-op otherwise).
-    // 4xx route errors (404, etc.) are expected — only capture 5xx and unknown errors.
-    const shouldCapture = !isRouteErrorResponse(error) || error.status >= 500;
-    if (shouldCapture && error instanceof Error) {
-        Sentry.captureException(error);
-    } else if (shouldCapture && !(error instanceof ApiError)) {
-        Sentry.captureMessage(`Route error: ${String(error)}`, 'error');
-    }
-
-    if (isRouteErrorResponse(error)) {
-        return (
-            <ErrorPage
-                error={
-                    new ApiError(
-                        error.status,
-                        error.statusText || error.data?.detail || 'Route error'
-                    )
-                }
-            />
-        );
-    }
-
-    if (error instanceof ApiError) {
-        return <ErrorPage error={error} />;
-    }
-
-    if (error instanceof Error) {
-        // Handle chunk load errors after new deployments
-        if (
-            error.message.includes('Failed to fetch dynamically imported module') ||
-            error.message.includes('Importing a module script failed')
-        ) {
-            console.warn('Chunk load error detected in RouteErrorBoundary. Reloading...');
-            const storageKey = 'chunk_load_error_reload';
-            const lastReload = sessionStorage.getItem(storageKey);
-            const now = Date.now();
-
-            if (!lastReload || now - Number.parseInt(lastReload, 10) > 10000) {
-                sessionStorage.setItem(storageKey, now.toString());
-                window.location.reload();
-                return null;
-            }
+    if (shouldCaptureRouteError(error)) {
+        if (error instanceof Error) {
+            Sentry.captureException(error);
+        } else if (!(error instanceof ApiError)) {
+            Sentry.captureMessage(`Route error: ${String(error)}`, 'error');
         }
-        return <ErrorPage error={error} />;
+    }
+
+    const classification = classifyRouteError(
+        error,
+        (key) => sessionStorage.getItem(key),
+        Date.now()
+    );
+
+    if (classification.kind === 'route-response') {
+        return <ErrorPage error={new ApiError(classification.status, classification.message)} />;
+    }
+
+    if (classification.kind === 'api-error') {
+        return <ErrorPage error={classification.error} />;
+    }
+
+    if (classification.kind === 'chunk-reload') {
+        if (!shouldThrottleChunkReload(classification.lastReload, classification.now)) {
+            console.warn('Chunk load error detected in RouteErrorBoundary. Reloading...');
+            sessionStorage.setItem(classification.storageKey, classification.now.toString());
+            window.location.reload();
+            return null;
+        }
+        return <ErrorPage error={error as Error} />;
+    }
+
+    if (classification.kind === 'plain-error') {
+        return <ErrorPage error={classification.error} />;
     }
 
     return (

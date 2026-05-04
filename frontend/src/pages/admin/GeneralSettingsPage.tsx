@@ -51,6 +51,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet } from '@/api/generated';
 import { Progress } from '@/components/ui/progress';
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative settings page shell with archive/delete/retention/quota mutation handlers; better fit for a useGeneralSettingsPage hook (Phase 5G pattern in CLAUDE.md) but out of cognitive-complexity remediation scope
 export default function GeneralSettingsPage() {
     const navigate = useNavigate();
     const { study: initialStudy, slug: initialSlug } = useLoaderData() as {

@@ -20,6 +20,7 @@ interface LoaderData {
     slug: string;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative metric-card JSX shell (study state, participants count, completion, statements, recruitment links, audio, comments); precedent: AnalysisPage / StudyDesignPage / RecruitmentPage / ConcourseDetailPage per CLAUDE.md "Admin header policy" + "JSX shell complexity"
 const StudyOverviewPage = () => {
     const { stats, participants, study, slug } = useLoaderData() as LoaderData;
     const { project } = useAdminContext();

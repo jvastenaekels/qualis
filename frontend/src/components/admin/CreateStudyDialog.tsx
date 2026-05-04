@@ -34,6 +34,7 @@ import {
     getListStudiesApiAdminStudiesGetQueryKey,
 } from '@/api/generated';
 import { useAdminStore } from '@/store/useAdminStore';
+import { parseStudyCreationError } from './CreateStudyDialog.helpers';
 
 interface CreateStudyDialogProps {
     open: boolean;
@@ -136,44 +137,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
             slugTouched.current = false;
         } catch (error: unknown) {
             console.error('Study creation error:', error);
-
-            // Extract detailed error information
-            let errorMessage = t('admin.dialogs.create_study.error', 'Failed to create study');
-
-            if (error && typeof error === 'object') {
-                // Check for axios-style error response
-                const axiosError = error as {
-                    response?: { data?: { detail?: unknown } };
-                };
-                if (axiosError.response?.data?.detail) {
-                    const detail = axiosError.response.data.detail;
-
-                    // Handle Pydantic validation errors (array format)
-                    if (Array.isArray(detail)) {
-                        const fieldErrors = detail
-                            .map(
-                                (err: { loc: string[]; msg: string }) =>
-                                    `${err.loc.join('.')}: ${err.msg}`
-                            )
-                            .join('\n');
-                        errorMessage = `Validation errors:\n${fieldErrors}`;
-                        console.error('Validation errors:', detail);
-                    }
-                    // Handle string error messages
-                    else if (typeof detail === 'string') {
-                        errorMessage = detail;
-                    }
-                    // Handle object error messages
-                    else if (typeof detail === 'object') {
-                        errorMessage = JSON.stringify(detail, null, 2);
-                    }
-                }
-                // Fallback to error message if available
-                else if ('message' in error && typeof error.message === 'string') {
-                    errorMessage = error.message;
-                }
-            }
-
+            const errorMessage = parseStudyCreationError(error, t);
             toast.error(errorMessage, { duration: 10000 });
         }
     };

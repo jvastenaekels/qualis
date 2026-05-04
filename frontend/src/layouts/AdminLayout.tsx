@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
+import { resolveBreadcrumbLabel } from './AdminLayout.helpers';
 
 export default function AdminLayout() {
     const location = useLocation();
@@ -50,50 +51,13 @@ export default function AdminLayout() {
         }
     }, [location.pathname, activeStudyId, setActiveStudy]);
 
-    // Determine the current page name
-    const getCurrentPageName = () => {
-        const segments = location.pathname.split('/').filter(Boolean);
-        const last = segments[segments.length - 1];
-        if (!last) return t('admin.breadcrumbs.dashboard');
-
-        // Map common segments to i18n keys
-        const mapping: Record<string, string> = {
-            dashboard: t('admin.breadcrumbs.dashboard'),
-            design: t('admin.breadcrumbs.design'),
-            recruitment: t('admin.breadcrumbs.recruitment'),
-            data: t('admin.breadcrumbs.data', 'Data'),
-            privacy: t('admin.breadcrumbs.privacy', 'Data privacy'),
-            account: t('admin.breadcrumbs.account', 'Account settings'),
-            analysis: t('admin.breadcrumbs.analysis', 'Analysis'),
-            exports: t('admin.breadcrumbs.exports'),
-            settings: t('admin.breadcrumbs.settings'),
-            participants: t('admin.breadcrumbs.participants'),
-            concourses: t('admin.breadcrumbs.concourse', 'Concourse'),
-            members: t('admin.breadcrumbs.members', 'Team members'),
-        };
-
-        // Special cases
-        if (last === 'admin') return t('admin.breadcrumbs.dashboard');
-        if (last === activeStudyId) return t('admin.breadcrumbs.study_dashboard');
-        if (last === 'new') return t('admin.project.create.title');
-
-        // Concourse detail page: /concourses/:id → show "Concourse"
-        const prev = segments[segments.length - 2];
-        if (prev === 'concourses' && /^\d+$/.test(last)) {
-            return t('admin.breadcrumbs.concourse', 'Concourse');
-        }
-        // Participant detail page: /participants/:id → show "Participant <CODE>"
-        // where <CODE> is the first 8 chars of session_token. While the fetch
-        // is in flight we fall back to the URL id so the breadcrumb is never
-        // empty.
-        if (prev === 'participants' && /^\d+$/.test(last)) {
-            const code =
-                breadcrumbParticipant?.session_token?.substring(0, 8).toUpperCase() ?? last;
-            return t('admin.breadcrumbs.participant_n', 'Participant {{code}}', { code });
-        }
-
-        return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);
-    };
+    // Resolve the breadcrumb leaf label (extracted helper for testability).
+    const currentPageName = resolveBreadcrumbLabel(
+        location.pathname,
+        activeStudyId,
+        breadcrumbParticipant,
+        t
+    );
 
     return (
         <SidebarProvider>
@@ -151,7 +115,7 @@ export default function AdminLayout() {
                                 {/* Current Page */}
                                 <BreadcrumbItem className="shrink-0">
                                     <BreadcrumbPage className="text-sm font-bold text-slate-900">
-                                        {getCurrentPageName()}
+                                        {currentPageName}
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>

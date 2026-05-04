@@ -227,6 +227,7 @@ function ConsentLocaleRow({
 
 // ─── page ──────────────────────────────────────────────────────────────────────
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative data-privacy page shell with anonymisation preview + bulk-mutation chain + per-row action handlers; better fit for a useDataPrivacyPage hook (Phase 5G pattern in CLAUDE.md) but out of cognitive-complexity remediation scope
 export default function DataPrivacyPage() {
     const { t } = useTranslation();
     const { studySlug, projectSlug } = useParams<{ studySlug: string; projectSlug: string }>();

@@ -10,6 +10,18 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { resetAllStores } from '../utils/sessionReset';
+import {
+    computeErrorDisplay,
+    type ErrorIconKey,
+    type ValidationErrorItem,
+} from './ErrorPage.helpers';
+
+const ICON_MAP: Record<ErrorIconKey, typeof AlertTriangle> = {
+    AlertTriangle,
+    AlertOctagon,
+    RefreshCcw,
+    WifiOff,
+};
 
 interface ErrorPageProps {
     error?: Error | ApiError | null;
@@ -34,116 +46,19 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         window.location.href = '/';
     };
 
-    const {
-        title,
-        message,
-        icon: Icon,
-        showReset,
-        showHome,
-        showRetry,
-    } = useMemo(() => {
-        // 1. Explicit Props (Higher Priority)
-        if (propTitle || propMessage) {
-            return {
-                title: propTitle || t('common.errors.default_title'),
-                message: propMessage || error?.message || t('common.errors.unknown'),
-                icon: AlertTriangle,
-                showReset: false,
-                showHome: true,
-                showRetry: !!onRetry,
-            };
-        }
-
-        // 2. ApiError Handling
-        if (error instanceof ApiError) {
-            // Validation Errors
-            if (error.code === 'validation_error' && Array.isArray(error.details)) {
-                return {
-                    title: t('common.errors.validation_title') || 'Validation Error',
-                    message: t('common.errors.validation_message') || 'Please check your input.',
-                    icon: AlertTriangle,
-                    showReset: false,
-                    showHome: false,
-                    showRetry: true,
-                    validationErrors: error.details as Array<{
-                        loc: (string | number)[];
-                        msg: string;
-                    }>,
-                };
-            }
-
-            if (error.status === 404) {
-                return {
-                    title: t('common.errors.404.title'),
-                    message: t('common.errors.404.message'),
-                    icon: AlertOctagon, // or a Search icon
-                    showReset: false,
-                    showHome: true,
-                    showRetry: false,
-                };
-            }
-            if (error.status === 429) {
-                return {
-                    title: t('common.errors.429.title'),
-                    message: t('common.errors.429.message'),
-                    icon: RefreshCcw,
-                    showReset: false,
-                    showHome: false,
-                    showRetry: true,
-                };
-            }
-
-            if (error.status === 408) {
-                return {
-                    title: t('common.errors.timeout.title', 'Request Timeout'),
-                    message: t(
-                        'common.errors.timeout.message',
-                        'The server took too long to respond. Please check your connection and try again.'
-                    ),
-                    icon: WifiOff,
-                    showReset: false,
-                    showHome: false,
-                    showRetry: true,
-                };
-            }
-
-            if (error.code === 'conflict') {
-                return {
-                    title: t('common.errors.conflict_title') || 'Conflict',
-                    message: error.message || t('common.errors.conflict_message'),
-                    icon: AlertTriangle,
-                    showReset: false,
-                    showHome: false,
-                    showRetry: true,
-                };
-            }
-        }
-
-        // 3. Network Errors (Fetch failures)
-        if (
-            error?.message?.toLowerCase().includes('network') ||
-            error?.message?.toLowerCase().includes('fetch')
-        ) {
-            return {
-                title: t('common.errors.network_title'),
-                message: t('common.errors.network'),
-                icon: WifiOff,
-                showReset: false,
-                showHome: false,
-                showRetry: true,
-            };
-        }
-
-        // 4. Fallback (Generic Crash)
-        return {
-            title: t('common.errors.default_title'),
-            message: error?.message || t('common.errors.unknown'), // Use error message if available
-            icon: AlertTriangle,
-            showReset: true, // Only offer hard reset for unknown crashes
-            showHome: true,
-            showRetry: !!onRetry,
-        };
-    }, [error, propTitle, propMessage, onRetry, t]);
+    const display = useMemo(
+        () =>
+            computeErrorDisplay({
+                error,
+                propTitle,
+                propMessage,
+                hasOnRetry: !!onRetry,
+                t,
+            }),
+        [error, propTitle, propMessage, onRetry, t]
+    );
+    const { title, message, showReset, showHome, showRetry } = display;
+    const Icon = ICON_MAP[display.iconKey];
 
     const Container = isFullPage ? 'div' : React.Fragment;
     const containerProps = isFullPage
@@ -152,13 +67,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
           }
         : {};
 
-    // Helper type (can be inferred but good for clarity)
-    const validationErrors =
-        error instanceof ApiError &&
-        error.code === 'validation_error' &&
-        Array.isArray(error.details)
-            ? (error.details as Array<{ loc: (string | number)[]; msg: string }>)
-            : undefined;
+    const validationErrors: ValidationErrorItem[] | undefined = display.validationErrors;
 
     return (
         <Container {...containerProps}>
