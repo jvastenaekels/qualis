@@ -635,6 +635,30 @@ describe('Layout Global Footer', () => {
         ).toBeInTheDocument();
     });
 
+    it('renders the global Footer on /consent', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/consent'] }
+        );
+        expect(
+            screen.getByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /presort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/presort'] }
+        );
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
+    });
+
     it('hides the global Footer on /fine-sort', () => {
         renderWithProviders(
             <Routes>
@@ -653,6 +677,18 @@ describe('Layout Global Footer', () => {
                 <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
             </Routes>,
             { initialEntries: ['/study/slug/rough-sort'] }
+        );
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /post-sort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/post-sort'] }
         );
         expect(
             screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })

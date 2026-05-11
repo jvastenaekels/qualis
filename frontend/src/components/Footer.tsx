@@ -13,7 +13,7 @@ export const Footer = () => {
     const { t } = useTranslation();
 
     return (
-        <footer className="border-t border-slate-100 bg-white/70 backdrop-blur">
+        <footer className="shrink-0 border-t border-slate-100 bg-white/70 backdrop-blur">
             <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-3 text-center text-xs text-slate-400">
                 <a
                     href={REPO_URL}

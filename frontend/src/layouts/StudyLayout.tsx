@@ -341,13 +341,13 @@ const StudyLayoutContent: React.FC = () => {
 
     // The two immersive Q-sort screens need <main> locked to the viewport so
     // GridSort's h-full children resolve. Everywhere else, let main scroll
-    // naturally so the global Footer scrolls with content instead of being
+    // naturally so the entry footer scrolls with content instead of being
     // pinned to the bottom of the viewport.
     const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
         (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
     );
-    const isImmersiveSortFamily = ['/fine-sort', '/rough-sort'].some((p) =>
-        location.pathname.endsWith(p)
+    const isEntryPage = ['/welcome', '/consent'].some((path) =>
+        location.pathname.endsWith(path)
     );
 
     return (
@@ -899,11 +899,11 @@ const StudyLayoutContent: React.FC = () => {
                     </ComponentErrorBoundary>
                 </div>
 
-                {/* Global attribution footer — hidden on the two immersive Q-sort screens.
+                {/* Entry attribution footer — only shown before the task starts.
                     Lives inside <main> so it scrolls with content rather than being pinned
                     to the viewport. min-h-full on the wrapper above pushes it below the fold
                     when content is short. */}
-                {!isImmersiveSortFamily && <Footer />}
+                {isEntryPage && <Footer />}
             </main>
 
             {/* Mobile Footer (Primary Action) */}
