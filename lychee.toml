@@ -4,11 +4,13 @@
 # Skip placeholders for the SoftwareX paper DOI and the Zenodo software-release
 # DOI; both are filled in once the corresponding artefacts are published.
 # Skip the SAGE Methods URL — server returns a redirect loop on automated
-# checkers (works fine in browsers).
+# checkers (works fine in browsers). Skip the Zenodo GitHub settings URL
+# because it intermittently returns gateway errors to automated checks.
 exclude = [
     "doi\\.org/10\\.1016/j\\.softx\\.2026\\.XXXXXX",
     "doi\\.org/10\\.5281/zenodo\\.XXXXXXX",
     "doi\\.org/10\\.4135/9781446251911",
+    "zenodo\\.org/account/settings/github/",
 ]
 
 # Skip localhost URLs in tutorial code blocks
