@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/jvastenaekels/qualis/compare/v0.6.2...v0.6.3) (2026-05-04)
+
+
+### Features
+
+* **questions:** add rating-N scale question type for pre/post-sort ([#150](https://github.com/jvastenaekels/qualis/issues/150)) ([ed89d25](https://github.com/jvastenaekels/qualis/commit/ed89d25f25aa463cb4fd7fb5065352cab61bcc47))
+
 ## [0.6.2](https://github.com/jvastenaekels/qualis/compare/v0.6.1...v0.6.2) (2026-05-04)
 
 
