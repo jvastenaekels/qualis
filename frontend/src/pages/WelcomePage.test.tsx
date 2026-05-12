@@ -121,4 +121,18 @@ describe('WelcomePage', () => {
         // Verify response store was reset
         expect(useResponseStore.getState().presort).toEqual({});
     });
+
+    it('starts the welcome animation directly on fine sort when rough sort is disabled', () => {
+        useConfigStore
+            .getState()
+            .setConfig({ ...mockConfig, rough_sort_enabled: false } as unknown as StudyConfig);
+
+        renderWithProviders(<WelcomePage />);
+
+        expect(screen.queryByTestId('phase-1')).not.toBeInTheDocument();
+        expect(screen.getByTestId('phase-2')).toHaveClass('opacity-100');
+
+        const indicator = screen.getByTestId('phase-indicator');
+        expect(indicator.querySelectorAll('.rounded-full')).toHaveLength(1);
+    });
 });

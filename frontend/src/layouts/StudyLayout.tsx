@@ -56,6 +56,7 @@ import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 import { resetAllStores } from '../utils/sessionReset';
+import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
 import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 
 const steps = [
@@ -147,14 +148,14 @@ const StudyLayoutContent: React.FC = () => {
     const { retry, unlock, passwordError } = useStudyConfig();
 
     // Cross-study session cleanup
-    // If the stored session was completed for a DIFFERENT study (or a legacy session with
-    // unknown slug), reset it so the participant can start fresh in this study.
-    // Their submitted data is safe on the backend — only the local state is cleared.
+    // If the stored session belongs to a different study, reset it so the participant can
+    // start fresh in this study. Their submitted data is safe on the backend — only the
+    // local state is cleared.
     useEffect(() => {
-        if (slug && isCompleted && studySlug !== slug) {
+        if (shouldResetParticipantSessionForStudy(slug, studySlug)) {
             resetAllStores({ skipConfig: true });
         }
-    }, [slug, isCompleted, studySlug]);
+    }, [slug, studySlug]);
 
     // copyTimeoutRef and resumeButtonRef are stable refs; setters are stable too.
     // biome-ignore lint/correctness/useExhaustiveDependencies: stable refs/setters
@@ -284,8 +285,9 @@ const StudyLayoutContent: React.FC = () => {
         );
     }
 
-    // Show loading while the stale session is being reset to prevent flash of stale content
-    const isStaleCompletedSession = isCompleted && studySlug !== slug; // covers both null (legacy) and mismatched slugs
+    // Show loading while an explicitly cross-study completed session is being reset.
+    const isStaleCompletedSession =
+        isCompleted && shouldResetParticipantSessionForStudy(slug, studySlug);
     if (isStaleCompletedSession) {
         return (
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
@@ -318,8 +320,13 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Enforce One-Time Submission
-    // If completed for THIS specific study, redirect everything to post-sort (Thank You page).
-    if (isCompleted && studySlug === slug && !location.pathname.includes('post-sort')) {
+    // Legacy completed sessions may not have a study slug; treat them as same-study
+    // for backward-compatible post-sort redirects.
+    if (
+        isCompleted &&
+        (!studySlug || studySlug === slug) &&
+        !location.pathname.includes('post-sort')
+    ) {
         return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 
@@ -341,14 +348,12 @@ const StudyLayoutContent: React.FC = () => {
 
     // The two immersive Q-sort screens need <main> locked to the viewport so
     // GridSort's h-full children resolve. Everywhere else, let main scroll
-    // naturally so the global Footer scrolls with content instead of being
+    // naturally so the entry footer scrolls with content instead of being
     // pinned to the bottom of the viewport.
     const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
         (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
     );
-    const isImmersiveSortFamily = ['/fine-sort', '/rough-sort'].some((p) =>
-        location.pathname.endsWith(p)
-    );
+    const isEntryPage = ['/welcome', '/consent'].some((path) => location.pathname.endsWith(path));
 
     return (
         <div
@@ -899,11 +904,11 @@ const StudyLayoutContent: React.FC = () => {
                     </ComponentErrorBoundary>
                 </div>
 
-                {/* Global attribution footer — hidden on the two immersive Q-sort screens.
+                {/* Entry attribution footer — only shown before the task starts.
                     Lives inside <main> so it scrolls with content rather than being pinned
                     to the viewport. min-h-full on the wrapper above pushes it below the fold
                     when content is short. */}
-                {!isImmersiveSortFamily && <Footer />}
+                {isEntryPage && <Footer />}
             </main>
 
             {/* Mobile Footer (Primary Action) */}

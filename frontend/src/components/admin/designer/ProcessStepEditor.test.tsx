@@ -6,7 +6,6 @@ import { ProcessStepEditor } from './ProcessStepEditor';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
 // Build a minimal draft with the given list of process steps.
-// biome-ignore lint/suspicious/noExplicitAny: convenient partial mock for the StudyUpdate draft
 const buildDraft = (
     // biome-ignore lint/suspicious/noExplicitAny: minimal step shape for tests
     steps: any[],

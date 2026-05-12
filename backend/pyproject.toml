@@ -19,7 +19,7 @@ dependencies = [
     "starlette>=0.40.0",
     "pyotp>=2.9.0",
     "alembic>=1.18.1",
-    "python-multipart>=0.0.26",
+    "python-multipart>=0.0.27",
     "boto3>=1.36.17",
     "python-magic>=0.4.27",
     "numpy>=2.2.0",
@@ -33,6 +33,8 @@ dependencies = [
     "pygments>=2.20.0",       # CVE-2026-4539 floor (Wave 1 F-02-001)
     "python-dotenv>=1.2.2",   # CVE-2026-28684 floor (Wave 1 F-02-002)
     "requests>=2.33.0",       # CVE-2026-25645 floor (Wave 1 F-02-003)
+    "mako>=1.3.12",           # CVE-2026-44307 floor
+    "urllib3>=2.7.0",         # CVE-2026-44431 / CVE-2026-44432 floor
 ]
 
 [dependency-groups]
@@ -51,6 +53,7 @@ dev = [
     "deptry>=0.20.0",
     "pre-commit>=4.0.0",
     "hypothesis>=6.152.2",
+    "pip>=26.1",              # CVE-2026-6357 floor for audit tooling
 ]
 
 [tool.uv]
@@ -348,13 +351,13 @@ warn_return_any = true
 strict_equality = true
 
 [tool.deptry.per_rule_ignores]
-# Security-floor pins (Wave 6): pygments, python-dotenv, requests are transitive
+# Security-floor pins (Wave 6): pygments, python-dotenv, requests, mako, and urllib3 are transitive
 # deps promoted to direct entries to prevent future downgrade past the
 # CVE-fix versions (Wave 1 F-02-001/002/003). They are not imported by app
 # code; the pyproject pin is purely a floor.
 DEP002 = [
     "asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic",
-    "pygments", "python-dotenv", "requests",
+    "pygments", "python-dotenv", "requests", "mako", "urllib3",
 ]
 DEP003 = ["botocore"]  # Transitive dependency of boto3
 

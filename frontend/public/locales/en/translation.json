@@ -318,6 +318,9 @@
             "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
             "hint": "This is spontaneous. You can change your mind right after."
         },
+        "tip": {
+            "close": "Close tip"
+        },
         "complete": {
             "title": "First step complete",
             "subtitle": "We will now refine the nuances.",
@@ -350,7 +353,7 @@
             "disagree": "Most disagree",
             "neutral": "Neutral",
             "agree": "Most agree",
-            "label": "Spectrum legend"
+            "label": "Grid legend"
         },
         "actions": {
             "validate": "Confirm sort",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Place statements on the grid",
-            "instruction_label": "Instruction"
+            "instruction_label": "Instruction",
+            "expand_instructions": "Expand instructions",
+            "minimize_instructions": "Minimize instructions"
         },
         "workbench": {
             "active_card": "Active statement",
@@ -368,7 +373,11 @@
             "drag_or_tap": "Drag to grid or tap slot",
             "initial_instruction": "Tap (or drag) statement",
             "initial_instruction_mobile": "Tap statement",
+            "cancel_selection": "Cancel selection",
             "help": "How does it work?",
+            "previous_tip": "Previous tip",
+            "next_tip": "Next tip",
+            "go_to_tip": "Go to tip {{number}}",
             "methodology": {
                 "extremes": "Tip: start with what is most obvious to you (the extremes).",
                 "vertical": "In the same column, the order from top to bottom doesn't matter.",
@@ -504,7 +513,9 @@
             "n_active_other": "{{count}} active",
             "collecting": "Collecting data",
             "no_studies": "No studies yet",
-            "no_projects": "No projects yet. Create your first project to get started."
+            "no_projects": "No projects yet. Create your first project to get started.",
+            "no_projects_title": "Start your first research project",
+            "no_projects_body": "Create a project before adding concourses, Q-sets, or studies."
         },
         "memo": {
             "title_concourse": "Selection notes",
@@ -1107,7 +1118,7 @@
                 "settings": "Project settings",
                 "settings_desc": "Members & profiles",
                 "new_project": "New project",
-                "new_project_desc": "Create a new organization"
+                "new_project_desc": "Create a new project"
             },
             "roles": {
                 "owner": "Owner",
@@ -1125,10 +1136,10 @@
                 "title": "Create project",
                 "card_title": "Project details",
                 "name_label": "Project name",
-                "name_placeholder": "My university research group",
+                "name_placeholder": "Climate attitudes Q study",
                 "url_label": "Project URL",
-                "url_placeholder": "My-research-group",
-                "url_description": "This will be used in your project URL.",
+                "url_placeholder": "climate-attitudes-q-study",
+                "url_description": "This becomes the project path under /app/.",
                 "cancel": "Cancel",
                 "create_button": "Create project",
                 "creating": "Creating...",
@@ -2596,6 +2607,7 @@
         "go_to_study": "Start a new session"
     },
     "landing": {
+        "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
         "study_code_label": "Study Code",
         "study_code_placeholder": "e.g. my-study",

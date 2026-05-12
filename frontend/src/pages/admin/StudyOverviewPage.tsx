@@ -81,7 +81,10 @@ const StudyOverviewPage = () => {
                         }}
                     />
 
-                    <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+                    <div
+                        data-testid="overview-metrics-grid"
+                        className="grid gap-3 sm:gap-4 lg:grid-cols-3"
+                    >
                         {/* Sample Size */}
                         <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
                             <div
@@ -94,7 +97,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
                                     <Users className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500">
+                                <span className="min-w-0 text-xs font-bold text-slate-500 leading-tight break-words">
                                     {t('admin.study_overview.sample_size', 'Sample size (N)')}
                                 </span>
                             </div>
@@ -115,7 +118,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
                                     <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500">
+                                <span className="min-w-0 text-xs font-bold text-slate-500 leading-tight break-words">
                                     {t('admin.study_overview.completion_rate', 'Completion rate')}
                                 </span>
                             </div>
@@ -146,7 +149,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
                                     <Clock className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500">
+                                <span className="min-w-0 text-xs font-bold text-slate-500 leading-tight break-words">
                                     {t('admin.study_overview.median_duration', 'Median duration')}
                                 </span>
                             </div>
@@ -167,7 +170,10 @@ const StudyOverviewPage = () => {
                         </div>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-12 pb-12">
+                    <div
+                        data-testid="overview-content-grid"
+                        className="grid gap-6 lg:grid-cols-12 pb-12"
+                    >
                         <RecentActivityCard
                             participants={validParticipants}
                             totalParticipantCount={(participants || []).length}
@@ -177,7 +183,10 @@ const StudyOverviewPage = () => {
                             roughSortEnabled={study?.rough_sort_enabled !== false}
                         />
 
-                        <div className="col-span-12 md:col-span-4 space-y-6">
+                        <div
+                            data-testid="overview-recruitment-column"
+                            className="col-span-12 lg:col-span-4 space-y-6 min-w-0"
+                        >
                             <RecruitmentModule slug={slug || ''} />
                         </div>
                     </div>

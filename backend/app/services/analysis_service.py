@@ -270,6 +270,10 @@ def extract_centroid(
 
     Returns:
         Loadings matrix of shape (n_participants, n_factors)
+
+    Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
+    package (centroid.R, Frans Hermans, 2021), used under GPL-2+.
+    See repository NOTICE.md for full attribution.
     """
     n = cor_mat.shape[0]
     tmat = cor_mat.copy()
@@ -520,6 +524,10 @@ def flag_sorts(loadings: NDArray[np.float64], n_statements: int) -> NDArray[np.b
 
     Returns:
         Boolean flagging matrix (n_participants x n_factors)
+
+    Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
+    package (qflag, Aiora Zabala et al.), used under GPL-2+.
+    See repository NOTICE.md for full attribution.
     """
     threshold = 1.96 / np.sqrt(n_statements)
     squared = loadings**2
@@ -583,6 +591,10 @@ def compute_factor_scores(
         Tuple of (z_scores, factor_arrays) where:
         - z_scores: shape (n_statements, n_factors)
         - factor_arrays: shape (n_statements, n_factors) — integer scores
+
+    Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
+    package (qzscores, Aiora Zabala et al.), used under GPL-2+.
+    See repository NOTICE.md for full attribution.
     """
     n_statements, n_participants = dataset.shape
     n_factors = loadings.shape[1]
@@ -665,6 +677,10 @@ def compute_factor_characteristics(
 
     Returns:
         Tuple of (characteristics, factor_correlation, sed_matrix)
+
+    Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
+    package (qfcharact, Aiora Zabala et al.), used under GPL-2+.
+    See repository NOTICE.md for full attribution.
     """
     n_participants, n_factors = loadings.shape
     characteristics: list[FactorCharacteristicDict] = []
@@ -756,6 +772,10 @@ def classify_statements(
     Returns:
         Tuple of (distinguishing, consensus) where each is a list of dicts
         with keys: statement_idx, significance (dict of pair→level)
+
+    Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
+    package (qdc, Aiora Zabala et al.), used under GPL-2+.
+    See repository NOTICE.md for full attribution.
     """
     n_statements = z_scores.shape[0]
     pairs = list(combinations(range(n_factors), 2))

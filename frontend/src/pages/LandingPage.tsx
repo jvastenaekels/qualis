@@ -24,6 +24,7 @@ const LandingPage: React.FC = () => {
 
     return (
         <div className="flex-1 bg-gray-50 flex flex-col justify-center items-center p-4">
+            <h1 className="sr-only">{t('landing.page_title', 'Qualis study access')}</h1>
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
                 <div className="text-center space-y-2">
                     <div className="flex justify-center mb-6">

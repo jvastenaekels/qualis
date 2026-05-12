@@ -36,11 +36,14 @@ const FINE_STEPS = [
 
 interface SortingAnimationProps {
     scale?: number;
+    roughSortEnabled?: boolean;
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — decorative animation FSM (aria-hidden); per-phase setTimeout chain + ROUGH/FINE step machine. Refs and timers are intrinsic; aria-hidden = zero participant impact even on regression
-const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
-    const [phase, setPhase] = useState<'ROUGH' | 'FINE'>('ROUGH');
+const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale, roughSortEnabled = true }) => {
+    const [phase, setPhase] = useState<'ROUGH' | 'FINE'>(() =>
+        roughSortEnabled ? 'ROUGH' : 'FINE'
+    );
     const [step, setStep] = useState(0);
 
     const [isReady, setIsReady] = useState(false);
@@ -53,6 +56,11 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
         const t = setTimeout(() => setIsReady(true), 1500);
         return () => clearTimeout(t);
     }, []);
+
+    useEffect(() => {
+        setPhase(roughSortEnabled ? 'ROUGH' : 'FINE');
+        setStep(0);
+    }, [roughSortEnabled]);
 
     // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — animation step machine (phase × step × hesitation × pause); see component-level rationale above
     useEffect(() => {
@@ -84,13 +92,13 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 );
             } else {
                 timer = setTimeout(() => {
-                    setPhase('ROUGH');
+                    setPhase(roughSortEnabled ? 'ROUGH' : 'FINE');
                     setStep(-1);
                 }, PAUSE);
             }
         }
         return () => clearTimeout(timer);
-    }, [isReady, phase, step]);
+    }, [isReady, phase, step, roughSortEnabled]);
 
     // ROUGH COUNTS
     // Deck decreases from N to 0.
@@ -171,6 +179,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
 
     const fineSourceX = useMemo(() => {
         if (!activeFineStep) return 0;
+        if (!roughSortEnabled) return currentSourceBaseX;
         const offset = isDesktop
             ? 0
             : activeFineStep.source === 0
@@ -179,10 +188,11 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 ? 36
                 : 0;
         return currentSourceBaseX + offset;
-    }, [isDesktop, activeFineStep, currentSourceBaseX]);
+    }, [isDesktop, activeFineStep, currentSourceBaseX, roughSortEnabled]);
 
     const fineSourceY = useMemo(() => {
         if (!activeFineStep) return 0;
+        if (!roughSortEnabled) return currentSourceBaseY;
         const offset = isDesktop
             ? activeFineStep.source === 0
                 ? -32
@@ -191,7 +201,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                   : 0
             : 0;
         return currentSourceBaseY + offset;
-    }, [isDesktop, activeFineStep, currentSourceBaseY]);
+    }, [isDesktop, activeFineStep, currentSourceBaseY, roughSortEnabled]);
 
     const fineTargetX =
         (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
@@ -205,74 +215,76 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
             aria-hidden="true"
         >
             {/* ROUGH PHASE */}
-            <div
-                data-testid="phase-1"
-                style={{
-                    transform:
-                        phase === 'ROUGH'
-                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '0px'})`
-                            : `scale(${finalScale - 0.1})`,
-                }}
-                className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
+            {roughSortEnabled && (
+                <div
+                    data-testid="phase-1"
+                    style={{
+                        transform:
+                            phase === 'ROUGH'
+                                ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '0px'})`
+                                : `scale(${finalScale - 0.1})`,
+                    }}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'ROUGH' ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
-            >
-                <div className="relative z-20">
-                    <DynamicStack count={roughDeckCount} type="deck" />
-                    <AnimatePresence>
-                        {activeRoughTarget && (
-                            <motion.div
-                                key={`rough-fly-${step}`}
-                                initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                                animate={{
-                                    x: activeRoughTarget.x,
-                                    y: activeRoughTarget.y,
-                                    scale: 1,
-                                    rotate: Math.random() * 10 - 5,
-                                }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: ROUGH_DURATION, ease: 'easeInOut' }}
-                                className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm z-50 pointer-events-none"
-                                data-testid="flying-card"
-                            >
-                                <div className="w-full h-full bg-slate-50 rounded-[1px] flex items-center justify-center">
-                                    <div className="w-2 h-0.5 bg-slate-200" />
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                >
+                    <div className="relative z-20">
+                        <DynamicStack count={roughDeckCount} type="deck" />
+                        <AnimatePresence>
+                            {activeRoughTarget && (
+                                <motion.div
+                                    key={`rough-fly-${step}`}
+                                    initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                                    animate={{
+                                        x: activeRoughTarget.x,
+                                        y: activeRoughTarget.y,
+                                        scale: 1,
+                                        rotate: Math.random() * 10 - 5,
+                                    }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: ROUGH_DURATION, ease: 'easeInOut' }}
+                                    className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm z-50 pointer-events-none"
+                                    data-testid="flying-card"
+                                >
+                                    <div className="w-full h-full bg-slate-50 rounded-[1px] flex items-center justify-center">
+                                        <div className="w-2 h-0.5 bg-slate-200" />
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                    {phase === 'ROUGH' && (
+                        <>
+                            <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10">
+                                <DynamicStack
+                                    count={roughPileCounts.disagree}
+                                    icon={Frown}
+                                    type="pile"
+                                    layoutId="pile-disagree"
+                                    highlighted={activeRoughTarget?.pileId === 'disagree'}
+                                />
+                            </div>
+                            <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10">
+                                <DynamicStack
+                                    count={roughPileCounts.agree}
+                                    icon={Smile}
+                                    type="pile"
+                                    layoutId="pile-agree"
+                                    highlighted={activeRoughTarget?.pileId === 'agree'}
+                                />
+                            </div>
+                            <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10">
+                                <DynamicStack
+                                    count={roughPileCounts.neutral}
+                                    icon={Meh}
+                                    type="pile"
+                                    layoutId="pile-neutral"
+                                    highlighted={activeRoughTarget?.pileId === 'neutral'}
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
-                {phase === 'ROUGH' && (
-                    <>
-                        <div className="absolute top-[calc(50%-48px)] left-[calc(50%-48px)] z-10">
-                            <DynamicStack
-                                count={roughPileCounts.disagree}
-                                icon={Frown}
-                                type="pile"
-                                layoutId="pile-disagree"
-                                highlighted={activeRoughTarget?.pileId === 'disagree'}
-                            />
-                        </div>
-                        <div className="absolute top-[calc(50%-48px)] right-[calc(50%-48px)] z-10">
-                            <DynamicStack
-                                count={roughPileCounts.agree}
-                                icon={Smile}
-                                type="pile"
-                                layoutId="pile-agree"
-                                highlighted={activeRoughTarget?.pileId === 'agree'}
-                            />
-                        </div>
-                        <div className="absolute bottom-[calc(50%-56px)] left-1/2 -translate-x-1/2 z-10">
-                            <DynamicStack
-                                count={roughPileCounts.neutral}
-                                icon={Meh}
-                                type="pile"
-                                layoutId="pile-neutral"
-                                highlighted={activeRoughTarget?.pileId === 'neutral'}
-                            />
-                        </div>
-                    </>
-                )}
-            </div>
+            )}
 
             {/* FINE PHASE */}
             <div
@@ -351,28 +363,35 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                         transform: 'translate(-50%, -50%)',
                     }}
                 >
-                    {phase === 'FINE' && (
-                        <>
+                    {phase === 'FINE' &&
+                        (roughSortEnabled ? (
+                            <>
+                                <DynamicStack
+                                    count={fineSourceCounts[0] ?? 0}
+                                    icon={Frown}
+                                    type="source"
+                                    layoutId="pile-disagree"
+                                />
+                                <DynamicStack
+                                    count={fineSourceCounts[1] ?? 0}
+                                    icon={Meh}
+                                    type="source"
+                                    layoutId="pile-neutral"
+                                />
+                                <DynamicStack
+                                    count={fineSourceCounts[2] ?? 0}
+                                    icon={Smile}
+                                    type="source"
+                                    layoutId="pile-agree"
+                                />
+                            </>
+                        ) : (
                             <DynamicStack
-                                count={fineSourceCounts[0] ?? 0}
-                                icon={Frown}
+                                count={fineSourceCounts.reduce((sum, count) => sum + count, 0)}
                                 type="source"
-                                layoutId="pile-disagree"
+                                layoutId="deck-source"
                             />
-                            <DynamicStack
-                                count={fineSourceCounts[1] ?? 0}
-                                icon={Meh}
-                                type="source"
-                                layoutId="pile-neutral"
-                            />
-                            <DynamicStack
-                                count={fineSourceCounts[2] ?? 0}
-                                icon={Smile}
-                                type="source"
-                                layoutId="pile-agree"
-                            />
-                        </>
-                    )}
+                        ))}
                 </div>
 
                 <div className="absolute top-1/2 left-1/2 w-0 h-0 z-50">
@@ -395,34 +414,47 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                                 transition={{ duration: FINE_DURATION, ease: 'easeInOut' }}
                                 className="absolute top-0 left-0 w-[18px] h-[24px] bg-white border border-slate-300 rounded-[2px] shadow-sm pointer-events-none flex items-center justify-center z-50"
                             >
-                                {activeFineStep.source === 0 && (
+                                {roughSortEnabled && activeFineStep.source === 0 && (
                                     <Frown size={10} className="text-slate-500" />
                                 )}
-                                {activeFineStep.source === 1 && (
+                                {roughSortEnabled && activeFineStep.source === 1 && (
                                     <Meh size={10} className="text-slate-500" />
                                 )}
-                                {activeFineStep.source === 2 && (
+                                {roughSortEnabled && activeFineStep.source === 2 && (
                                     <Smile size={10} className="text-slate-500" />
                                 )}
+                                {!roughSortEnabled && <div className="w-2 h-0.5 bg-slate-200" />}
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
             </div>
 
-            <div className="absolute bottom-0 md:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
+            {roughSortEnabled ? (
                 <div
-                    className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
-                />
-                <div className="w-10 h-0.5 bg-slate-200 overflow-hidden rounded-full">
+                    data-testid="phase-indicator"
+                    className="absolute bottom-0 md:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none"
+                >
                     <div
-                        className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`}
+                        className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
+                    />
+                    <div className="w-10 h-0.5 bg-slate-200 overflow-hidden rounded-full">
+                        <div
+                            className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`}
+                        />
+                    </div>
+                    <div
+                        className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'FINE' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
                     />
                 </div>
+            ) : (
                 <div
-                    className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'FINE' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
-                />
-            </div>
+                    data-testid="phase-indicator"
+                    className="absolute bottom-0 md:-bottom-4 left-1/2 -translate-x-1/2 flex items-center z-50 pointer-events-none"
+                >
+                    <div className="transition-all duration-500 rounded-full w-2.5 h-2.5 border bg-blue-600 border-blue-600 shadow-md scale-110" />
+                </div>
+            )}
         </div>
     );
 };

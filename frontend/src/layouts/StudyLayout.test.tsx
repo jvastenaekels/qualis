@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
     changeLanguage: vi.fn(),
     navigate: vi.fn(),
     retry: vi.fn(),
+    resetAllStores: vi.fn(),
 }));
 
 // Mock dependencies
@@ -61,6 +62,10 @@ vi.mock('../hooks/useNetworkStatus', () => ({
 
 vi.mock('../hooks/useLayout', () => ({
     useLayoutState: vi.fn(() => ({ headerAction: null })),
+}));
+
+vi.mock('../utils/sessionReset', () => ({
+    resetAllStores: mocks.resetAllStores,
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -292,6 +297,7 @@ describe('Layout Loading & Error States', () => {
 
 describe('Layout Route Protection', () => {
     beforeEach(() => {
+        vi.clearAllMocks();
         useConfigStore.setState({
             // biome-ignore lint/suspicious/noExplicitAny: mock config
             config: { slug: 'test' } as any, // Minimal config to bypass loading
@@ -343,6 +349,66 @@ describe('Layout Route Protection', () => {
         );
 
         expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
+    });
+
+    it('Redirects completed legacy sessions with missing study slug to Post-Sort', () => {
+        useSessionStore.setState({
+            isCompleted: true,
+            hasConsented: true,
+            studySlug: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+                <Route path="/study/:slug/post-sort" element={<div>Post Sort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+        expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
+        expect(mocks.resetAllStores).not.toHaveBeenCalled();
+    });
+
+    it('Shows stale-session spinner while a completed other-study session is reset', () => {
+        useSessionStore.setState({
+            isCompleted: true,
+            hasConsented: true,
+            studySlug: 'other-study',
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+                <Route path="/study/:slug/post-sort" element={<div>Post Sort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+        expect(screen.queryByText('Post Sort Page')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
+        expect(mocks.resetAllStores).toHaveBeenCalledWith({ skipConfig: true });
+    });
+
+    it('Resets active other-study sessions without showing stale-session spinner', () => {
+        useSessionStore.setState({
+            isCompleted: false,
+            hasConsented: true,
+            studySlug: 'other-study',
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+        expect(screen.getByTestId('layout-header')).toBeInTheDocument();
+        expect(mocks.resetAllStores).toHaveBeenCalledWith({ skipConfig: true });
     });
 
     it('Skips rendering Pre-sort step node when disabled', () => {
@@ -635,6 +701,30 @@ describe('Layout Global Footer', () => {
         ).toBeInTheDocument();
     });
 
+    it('renders the global Footer on /consent', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/consent'] }
+        );
+        expect(
+            screen.getByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /presort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/presort'] }
+        );
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
+    });
+
     it('hides the global Footer on /fine-sort', () => {
         renderWithProviders(
             <Routes>
@@ -653,6 +743,18 @@ describe('Layout Global Footer', () => {
                 <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
             </Routes>,
             { initialEntries: ['/study/slug/rough-sort'] }
+        );
+        expect(
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
+    });
+
+    it('hides the global Footer on /post-sort', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/post-sort'] }
         );
         expect(
             screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })

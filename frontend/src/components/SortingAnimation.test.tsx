@@ -63,6 +63,24 @@ describe('SortingAnimation', () => {
         expect(phase2Container).toHaveClass('opacity-0');
     });
 
+    it('starts directly in FINE phase when rough sort is disabled', () => {
+        render(<SortingAnimation roughSortEnabled={false} />);
+
+        expect(screen.queryByTestId('phase-1')).not.toBeInTheDocument();
+
+        const phase2Container = screen.getByTestId('phase-2');
+        expect(phase2Container).toHaveClass('opacity-100');
+        expect(phase2Container).not.toHaveClass('opacity-0');
+    });
+
+    it('collapses the phase indicator to one dot when rough sort is disabled', () => {
+        render(<SortingAnimation roughSortEnabled={false} />);
+
+        const indicator = screen.getByTestId('phase-indicator');
+        expect(indicator.querySelectorAll('.rounded-full')).toHaveLength(1);
+        expect(indicator.querySelector('.w-10')).not.toBeInTheDocument();
+    });
+
     it('does NOT show flying card during initial delay', () => {
         render(<SortingAnimation />);
 

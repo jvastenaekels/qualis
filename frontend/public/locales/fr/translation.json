@@ -318,6 +318,9 @@
             "subtitle": "Glissez à **gauche** pour « Pas d'accord », à **droite** pour « D'accord », ou en **bas** pour « Neutre / Indécis ».",
             "hint": "C'est du spontané. Vous pourrez changer d'avis juste après."
         },
+        "tip": {
+            "close": "Fermer l'aide"
+        },
         "complete": {
             "title": "Première étape validée",
             "subtitle": "Nous allons maintenant affiner les nuances.",
@@ -350,7 +353,7 @@
             "disagree": "Le plus en désaccord",
             "neutral": "Neutre",
             "agree": "Le plus en accord",
-            "label": "Légende du spectre"
+            "label": "Légende de la grille"
         },
         "actions": {
             "validate": "Confirmer le tri",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Placez les énoncés sur la grille",
-            "instruction_label": "Consigne"
+            "instruction_label": "Consigne",
+            "expand_instructions": "Afficher les consignes",
+            "minimize_instructions": "Masquer les consignes"
         },
         "workbench": {
             "active_card": "Énoncé actif",
@@ -368,7 +373,11 @@
             "drag_or_tap": "Glissez ou touchez une case",
             "initial_instruction": "Touchez (ou glissez) un énoncé",
             "initial_instruction_mobile": "Touchez un énoncé",
+            "cancel_selection": "Annuler la sélection",
             "help": "Comment faire ?",
+            "previous_tip": "Astuce précédente",
+            "next_tip": "Astuce suivante",
+            "go_to_tip": "Aller à l'astuce {{number}}",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
                 "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance.",
@@ -774,7 +783,7 @@
             "error": "Impossible d'importer les énoncés depuis le concours. Réessayez.",
             "no_accepted": "Aucun élément accepté dans ce concours. Décochez « Acceptés uniquement » pour tout voir.",
             "no_items": "Ce concours n'a aucun élément.",
-            "no_concourses": "Aucun concours dans cet espace de travail. Créez-en un d'abord."
+            "no_concourses": "Aucun concours dans ce projet. Créez-en un d'abord."
         },
         "concourse_sync": {
             "update_available": "Mettre à jour",
@@ -1028,16 +1037,16 @@
                 "settings": "Paramètres du projet",
                 "settings_desc": "Membres et profils",
                 "new_project": "Nouveau projet",
-                "new_project_desc": "Créer une nouvelle organisation"
+                "new_project_desc": "Créer un nouveau projet"
             },
             "create": {
                 "title": "Créer un projet",
                 "card_title": "Détails du projet",
                 "name_label": "Nom du projet",
-                "name_placeholder": "Mon groupe de recherche universitaire",
+                "name_placeholder": "Étude Q sur les attitudes climatiques",
                 "url_label": "URL du projet",
-                "url_placeholder": "mon-groupe-recherche",
-                "url_description": "Ceci sera utilisé dans l'URL de votre projet.",
+                "url_placeholder": "attitudes-climatiques-q",
+                "url_description": "Ce chemin identifie le projet sous /app/.",
                 "cancel": "Annuler",
                 "create_button": "Créer le projet",
                 "creating": "Création...",
@@ -1248,7 +1257,7 @@
             "receiving_responses": "Études recevant des réponses",
             "total_participants": "Participants au total",
             "all_studies": "Toutes les études",
-            "all_studies_description": "Toutes les études de cet espace de travail.",
+            "all_studies_description": "Toutes les études de ce projet.",
             "languages_count_one": "{{count}} langue",
             "languages_count_other": "{{count}} langues",
             "n_participants_one": "{{count}} participant",
@@ -2437,7 +2446,9 @@
             "n_active_other": "{{count}} actives",
             "collecting": "Collecte en cours",
             "no_studies": "Aucune étude",
-            "no_projects": "Aucun projet. Créez votre premier projet pour commencer."
+            "no_projects": "Aucun projet. Créez votre premier projet pour commencer.",
+            "no_projects_title": "Lancer votre premier projet de recherche",
+            "no_projects_body": "Créez un projet avant d'ajouter des concourses, des Q-sets ou des études."
         },
         "memo": {
             "title_concourse": "Notes de sélection",
@@ -2596,6 +2607,7 @@
         "go_to_study": "Commencer une nouvelle session"
     },
     "landing": {
+        "page_title": "Accès à l'étude Qualis",
         "instruction": "Entrez le code de votre étude pour commencer.",
         "study_code_label": "Code de l'étude",
         "study_code_placeholder": "ex. mon-etude",

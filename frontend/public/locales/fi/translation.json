@@ -318,6 +318,9 @@
             "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
             "hint": "Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
         },
+        "tip": {
+            "close": "Sulje vinkki"
+        },
         "complete": {
             "title": "Ensimmäinen vaihe valmis",
             "subtitle": "Nyt tarkennetaan nyansseja.",
@@ -350,7 +353,7 @@
             "disagree": "Täysin eri mieltä",
             "neutral": "Neutraali",
             "agree": "Eniten samaa mieltä",
-            "label": "Spektrin selite"
+            "label": "Ruudukon selite"
         },
         "actions": {
             "validate": "Vahvista lajittelu",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Sijoita väitteet ruudukkoon",
-            "instruction_label": "Ohje"
+            "instruction_label": "Ohje",
+            "expand_instructions": "Näytä ohjeet",
+            "minimize_instructions": "Piilota ohjeet"
         },
         "workbench": {
             "active_card": "Aktiivinen väite",
@@ -368,7 +373,11 @@
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
             "initial_instruction": "Napauta (tai vedä) väitettä",
             "initial_instruction_mobile": "Napauta väitettä",
+            "cancel_selection": "Peruuta valinta",
             "help": "Miten tämä toimii?",
+            "previous_tip": "Edellinen vinkki",
+            "next_tip": "Seuraava vinkki",
+            "go_to_tip": "Siirry vinkkiin {{number}}",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
                 "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
@@ -774,7 +783,7 @@
             "error": "Lauseiden tuonti lausekokoelmasta epäonnistui. Yritä uudelleen.",
             "no_accepted": "Ei hyväksyttyjä kohteita tässä lausekokoelmassa. Poista valinta \"Vain hyväksytyt\" nähdäksesi kaikki.",
             "no_items": "Tässä lausekokoelmassa ei ole kohteita.",
-            "no_concourses": "Ei lausekokoelmia tässä työtilassa. Luo ensin yksi."
+            "no_concourses": "Ei lausekokoelmia tässä projektissa. Luo ensin yksi."
         },
         "concourse_sync": {
             "update_available": "Päivitä",
@@ -1022,7 +1031,7 @@
                 "settings": "Projektin asetukset",
                 "settings_desc": "Jäsenet ja profiilit",
                 "new_project": "Uusi projekti",
-                "new_project_desc": "Luo uusi organisaatio"
+                "new_project_desc": "Luo uusi projekti"
             },
             "roles": {
                 "owner": "Omistaja",
@@ -1034,10 +1043,10 @@
                 "title": "Luo projekti",
                 "card_title": "Projektin tiedot",
                 "name_label": "Projektin nimi",
-                "name_placeholder": "Yliopiston tutkimusryhmäni",
+                "name_placeholder": "Ilmastoasenteiden Q-tutkimus",
                 "url_label": "Projektin URL",
-                "url_placeholder": "tutkimusryhma",
-                "url_description": "Tätä käytetään projektisi URL-osoitteessa.",
+                "url_placeholder": "ilmastoasenteiden-q-tutkimus",
+                "url_description": "Tämä polku tunnistaa projektin /app/-osoitteen alla.",
                 "cancel": "Peruuta",
                 "create_button": "Luo projekti",
                 "creating": "Luodaan...",
@@ -1248,7 +1257,7 @@
             "receiving_responses": "Tutkimukset, jotka vastaanottavat vastauksia",
             "total_participants": "Osallistujia yhteensä",
             "all_studies": "Kaikki tutkimukset",
-            "all_studies_description": "Kaikki tämän työtilan tutkimukset.",
+            "all_studies_description": "Kaikki tämän projektin tutkimukset.",
             "languages_count_one": "{{count}} kieli",
             "languages_count_other": "{{count}} kieltä",
             "n_participants_one": "{{count}} osallistuja",
@@ -2383,7 +2392,9 @@
             "n_active_other": "{{count}} aktiivista",
             "collecting": "Tiedonkeruu käynnissä",
             "no_studies": "Ei tutkimuksia",
-            "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi."
+            "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi.",
+            "no_projects_title": "Aloita ensimmäinen tutkimusprojektisi",
+            "no_projects_body": "Luo projekti ennen concourse-kokoelmien, Q-settien tai tutkimusten lisäämistä."
         },
         "memo": {
             "title_concourse": "Valintamuistio",
@@ -2596,6 +2607,7 @@
         "go_to_study": "Aloita uusi istunto"
     },
     "landing": {
+        "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
         "study_code_label": "Study Code",
         "study_code_placeholder": "e.g. my-study",

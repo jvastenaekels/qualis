@@ -91,6 +91,11 @@ export default defineConfig({
             testMatch: /participant\/.*\.spec\.ts/,
             use: { ...devices['Desktop Chrome'] },
         },
+        {
+            name: 'Accessibility Smoke',
+            testMatch: /accessibility\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
     ],
 
     /* Run both frontend and backend servers before starting tests */

@@ -42,7 +42,7 @@ export default function EmailVerifyPage() {
     }, [params]);
 
     return (
-        <main className="mx-auto max-w-md p-8 text-center">
+        <div className="mx-auto max-w-md p-8 text-center">
             {status === 'loading' && (
                 <p>{t('auth.email.verify.verifying', 'Verifying your email…')}</p>
             )}
@@ -66,6 +66,6 @@ export default function EmailVerifyPage() {
                     </Link>
                 </>
             )}
-        </main>
+        </div>
     );
 }

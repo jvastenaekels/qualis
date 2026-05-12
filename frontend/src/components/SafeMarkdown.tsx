@@ -50,7 +50,7 @@ export const SafeMarkdown: React.FC<Props> = ({
     // div so callers can keep passing className for prose styling.
     return (
         <div
-            className={`prose prose-sm max-w-none text-slate-600 [hyphens:manual] ${className || ''}`}
+            className={`prose prose-sm max-w-none min-w-0 text-slate-600 break-words [overflow-wrap:anywhere] [hyphens:manual] ${className || ''}`}
         >
             <ReactMarkdown {...props} urlTransform={urlTransform}>
                 {sanitizedContent}

@@ -20,4 +20,19 @@ describe('PublicPageLayout', () => {
         // Footer signature: the "Powered by Qualis" attribution link to the repo.
         expect(screen.getByRole('link', { name: /Powered by Qualis/i })).toBeInTheDocument();
     });
+
+    it('wraps page content in one main landmark without including the footer', () => {
+        renderWithProviders(
+            <PublicPageLayout>
+                <div data-testid="page-content">Hello</div>
+            </PublicPageLayout>
+        );
+
+        const main = screen.getByRole('main');
+        const footerLink = screen.getByRole('link', { name: /Powered by Qualis/i });
+
+        expect(screen.getAllByRole('main')).toHaveLength(1);
+        expect(main).toContainElement(screen.getByTestId('page-content'));
+        expect(main).not.toContainElement(footerLink);
+    });
 });

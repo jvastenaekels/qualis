@@ -70,7 +70,7 @@ export default function PasswordResetConfirmPage() {
     };
 
     return (
-        <main className="mx-auto max-w-md p-8">
+        <div className="mx-auto max-w-md p-8">
             <h1 className="text-xl font-semibold mb-4">
                 {t('auth.password_reset.confirm_title', 'Choose a new password')}
             </h1>
@@ -111,6 +111,6 @@ export default function PasswordResetConfirmPage() {
                 </button>
                 {error !== null && <p className="text-red-600 text-sm">{error}</p>}
             </form>
-        </main>
+        </div>
     );
 }

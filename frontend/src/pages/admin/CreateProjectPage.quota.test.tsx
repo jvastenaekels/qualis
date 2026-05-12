@@ -40,6 +40,13 @@ beforeEach(() => {
 });
 
 describe('CreateProjectPage — owned-project quota', () => {
+    it('uses concrete project-oriented placeholders', async () => {
+        renderWithProviders(<CreateProjectPage />);
+
+        expect(await screen.findByPlaceholderText('Climate attitudes Q study')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('climate-attitudes-q-study')).toBeInTheDocument();
+    });
+
     it('enables Create button when no quota is set', async () => {
         renderWithProviders(<CreateProjectPage />);
         const button = await screen.findByRole('button', { name: /create/i });

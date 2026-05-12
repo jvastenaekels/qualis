@@ -245,7 +245,10 @@ export default function RecentActivityCard({
     }, [participants]);
 
     return (
-        <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+        <Card
+            data-testid="recent-activity-card"
+            className="col-span-12 lg:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden"
+        >
             <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 px-4 py-3">
                 <div className="space-y-0.5">
                     <CardTitle className="text-sm font-black flex items-center gap-2">

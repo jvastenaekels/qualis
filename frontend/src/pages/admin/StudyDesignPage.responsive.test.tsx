@@ -123,6 +123,23 @@ describe('StudyDesignPage Responsive Layout', () => {
         ).toBeTruthy();
     }, 10000);
 
+    it('keeps the main tab list horizontally scrollable with a visible affordance', async () => {
+        renderPage();
+
+        await screen.findByRole('tab', {
+            name: /(General|admin\.design\.tabs\.welcome)/i,
+        });
+
+        const tabList = screen.getByRole('tablist');
+
+        expect(tabList.className).toContain('overflow-x-auto');
+        expect(tabList.className).toContain('custom-scrollbar');
+        expect(tabList.className).not.toContain('scrollbar-hide');
+        expect(tabList.className).not.toContain('[&::-webkit-scrollbar]:hidden');
+        expect(tabList.className).not.toContain('[-ms-overflow-style:none]');
+        expect(tabList.className).not.toContain('[scrollbar-width:none]');
+    });
+
     it.skip('editor content area renders', async () => {
         renderPage();
 

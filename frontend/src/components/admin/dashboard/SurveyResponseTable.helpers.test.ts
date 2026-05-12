@@ -11,7 +11,7 @@ import type { TFunction } from 'i18next';
 // Minimal TFunction mock
 // ---------------------------------------------------------------------------
 
-const t = vi.fn((key: string, fallback: string) => fallback) as unknown as TFunction;
+const t = vi.fn((_key: string, fallback: string) => fallback) as unknown as TFunction;
 
 // ---------------------------------------------------------------------------
 // resolveAnswerLabel
@@ -99,20 +99,20 @@ describe('buildQuestionsMap', () => {
             ],
         };
         const map = buildQuestionsMap(config);
-        expect(map['q1']).toEqual({ id: 'q1', label: 'L1' });
-        expect(map['q2']).toEqual({ id: 'q2', label: 'L2' });
+        expect(map.q1).toEqual({ id: 'q1', label: 'L1' });
+        expect(map.q2).toEqual({ id: 'q2', label: 'L2' });
     });
 
     it('builds map from "fields" key', () => {
         const config = { fields: [{ id: 'f1', label: 'F1' }] };
         const map = buildQuestionsMap(config);
-        expect(map['f1']).toEqual({ id: 'f1', label: 'F1' });
+        expect(map.f1).toEqual({ id: 'f1', label: 'F1' });
     });
 
     it('builds map from object-style questions', () => {
         const config = { questions: { q1: { label: 'L1' } } };
         const map = buildQuestionsMap(config);
-        expect(map['q1']).toMatchObject({ id: 'q1', label: 'L1' });
+        expect(map.q1).toMatchObject({ id: 'q1', label: 'L1' });
     });
 
     it('returns empty map for empty config', () => {
@@ -122,7 +122,7 @@ describe('buildQuestionsMap', () => {
     it('handles array config (flat list)', () => {
         const config = [{ id: 'a1', label: 'A1' }];
         const map = buildQuestionsMap(config as unknown as Record<string, unknown>);
-        expect(map['a1']).toEqual({ id: 'a1', label: 'A1' });
+        expect(map.a1).toEqual({ id: 'a1', label: 'A1' });
     });
 });
 

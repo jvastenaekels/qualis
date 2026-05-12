@@ -509,7 +509,7 @@ const StudyDesignPage = () => {
                             <TabsList
                                 ref={tabsListRef}
                                 onScroll={checkScroll}
-                                className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full shadow-sm scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-xl h-12"
+                                className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full shadow-sm snap-x snap-mandatory scroll-smooth rounded-xl h-12 custom-scrollbar"
                             >
                                 <TabsTrigger
                                     value="intro"

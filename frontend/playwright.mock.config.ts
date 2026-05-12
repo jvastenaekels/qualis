@@ -73,6 +73,11 @@ export default defineConfig({
             testMatch: /.*study\/.*\.spec\.ts/,
             use: { ...devices['Pixel 5'] },
         },
+        {
+            name: 'Accessibility Smoke',
+            testMatch: /.*accessibility\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
     ],
 
     /* Run local dev server before starting tests */

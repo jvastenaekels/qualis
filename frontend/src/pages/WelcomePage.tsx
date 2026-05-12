@@ -275,7 +275,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
 
                             <div className="transform origin-center grayscale-[0.2] contrast-125 z-10 w-full flex justify-center">
-                                <SortingAnimation scale={scale} />
+                                <SortingAnimation scale={scale} roughSortEnabled={roughOn} />
                             </div>
                         </div>
                     </div>
@@ -289,15 +289,17 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     onClick={handleContinue}
                     style={{ backgroundColor: 'var(--brand-accent)' }}
                     className={cn(
-                        'group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3',
+                        'group w-full sm:w-auto min-w-0 h-auto min-h-14 px-6 sm:px-10 py-4 text-white rounded-full font-bold text-lg leading-tight hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 whitespace-normal text-center',
                         highlightKey === 'welcome.start' &&
                             'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
                     )}
                 >
-                    {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}
+                    </span>
                     <ArrowRight
                         size={20}
-                        className="group-hover:translate-x-1 transition-transform"
+                        className="shrink-0 group-hover:translate-x-1 transition-transform"
                     />
                 </button>
             </div>

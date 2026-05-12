@@ -13,13 +13,13 @@ export const Footer = () => {
     const { t } = useTranslation();
 
     return (
-        <footer className="border-t border-slate-100 bg-white/70 backdrop-blur">
-            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-3 text-center text-xs text-slate-400">
+        <footer className="shrink-0 border-t border-slate-100 bg-white/70 backdrop-blur">
+            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-3 text-center text-xs text-slate-600">
                 <a
                     href={REPO_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:text-slate-600 transition-colors"
+                    className="inline-flex items-center gap-1.5 hover:text-slate-800 transition-colors"
                 >
                     <img src="/qualis-logo.svg" alt="" className="h-4 w-4" />
                     <span>{t('footer.powered_by', 'Powered by Qualis')}</span>
@@ -29,7 +29,7 @@ export const Footer = () => {
                     href={LICENSE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-slate-600 transition-colors"
+                    className="hover:text-slate-800 transition-colors"
                 >
                     {t('footer.license', 'AGPLv3')}
                 </a>

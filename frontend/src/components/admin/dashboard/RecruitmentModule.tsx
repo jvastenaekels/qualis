@@ -46,7 +46,10 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
     };
 
     return (
-        <Card className="col-span-12 md:col-span-4 shadow-md border-none bg-white overflow-hidden h-fit">
+        <Card
+            data-testid="recruitment-module"
+            className="shadow-md border-none bg-white overflow-hidden h-fit min-w-0"
+        >
             <CardHeader className="border-b border-slate-50 bg-slate-50/30">
                 <div className="flex items-center gap-2 mb-1">
                     <Megaphone className="h-5 w-5 text-indigo-500" />
@@ -66,18 +69,23 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                     <label htmlFor="public-url" className="text-2xs font-bold text-slate-400">
                         {t('admin.recruitment.public_url_label', 'Public Participation URL')}
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 min-w-0">
                         <Input
                             id="public-url"
                             readOnly
                             value={publicUrl}
-                            className="bg-slate-50 border-slate-100 text-xs text-slate-500 font-mono focus-visible:ring-indigo-500"
+                            className="min-w-0 bg-slate-50 border-slate-100 text-xs text-slate-500 font-mono focus-visible:ring-indigo-500"
                         />
                         <Button
                             variant="outline"
                             size="icon"
                             onClick={handleCopy}
                             className="bg-white border-slate-200 hover:border-indigo-300 hover:text-indigo-600 shrink-0"
+                            aria-label={
+                                copied
+                                    ? t('admin.recruitment.copied', 'Copied')
+                                    : t('admin.recruitment.copy_url', 'Copy URL')
+                            }
                         >
                             {copied ? (
                                 <Check className="h-4 w-4 text-emerald-500" />
@@ -88,26 +96,33 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div
+                    data-testid="recruitment-actions"
+                    className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-1 xl:grid-cols-2"
+                >
                     <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => setShowQR(!showQR)}
-                        className="w-full gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border-none font-bold"
+                        className="w-full min-w-0 h-auto min-h-8 whitespace-normal text-center leading-tight gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border-none font-bold"
                     >
-                        <QrCode className="h-4 w-4" />
-                        {showQR
-                            ? t('admin.recruitment.hide_qr', 'Hide QR')
-                            : t('admin.recruitment.show_qr', 'Show QR')}
+                        <QrCode className="h-4 w-4 shrink-0" />
+                        <span className="min-w-0 break-words">
+                            {showQR
+                                ? t('admin.recruitment.hide_qr', 'Hide QR')
+                                : t('admin.recruitment.show_qr', 'Show QR')}
+                        </span>
                     </Button>
                     <Button
                         variant="outline"
                         size="sm"
                         onClick={handleOpen}
-                        className="w-full gap-2 border-slate-200 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 font-bold"
+                        className="w-full min-w-0 h-auto min-h-8 whitespace-normal text-center leading-tight gap-2 border-slate-200 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 font-bold"
                     >
-                        <ExternalLink className="h-4 w-4" />
-                        {t('admin.recruitment.live_study', 'Live Study')}
+                        <ExternalLink className="h-4 w-4 shrink-0" />
+                        <span className="min-w-0 break-words">
+                            {t('admin.recruitment.live_study', 'Live Study')}
+                        </span>
                     </Button>
                 </div>
 
@@ -136,10 +151,12 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                                 variant="outline"
                                 size="sm"
                                 onClick={handleDownloadQR}
-                                className="w-full gap-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl"
+                                className="w-full min-w-0 h-auto min-h-8 whitespace-normal text-center leading-tight gap-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl"
                             >
-                                <Download className="h-3.5 w-3.5" />
-                                {t('admin.recruitment.download_qr', 'Download Image')}
+                                <Download className="h-3.5 w-3.5 shrink-0" />
+                                <span className="min-w-0 break-words">
+                                    {t('admin.recruitment.download_qr', 'Download Image')}
+                                </span>
                             </Button>
 
                             <p className="text-xs text-slate-400 text-center leading-relaxed max-w-[200px]">

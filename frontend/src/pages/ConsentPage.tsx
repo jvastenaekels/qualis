@@ -130,7 +130,7 @@ const ConsentPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto py-6 sm:py-12 px-4 animate-in fade-in duration-500">
+        <div className="w-full max-w-2xl min-w-0 mx-auto py-6 sm:py-12 px-4 animate-in fade-in duration-500">
             <div className="mb-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                     {t('consent.title', 'Consent to Participate')}
@@ -143,7 +143,7 @@ const ConsentPage: React.FC = () => {
             <form
                 id="consent-form"
                 onSubmit={handleSubmit(onSubmit)}
-                className="bg-white p-5 sm:p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
+                className="w-full min-w-0 bg-white p-5 sm:p-8 rounded-xl border border-gray-200 shadow-sm space-y-8"
             >
                 {/* Consent Description/Legal Text */}
                 <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
@@ -197,10 +197,13 @@ const ConsentPage: React.FC = () => {
                         data-testid="consent-accept-btn"
                         disabled={!isValid}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
-                        className="w-full sm:w-auto px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className="w-full sm:w-auto min-w-0 h-auto min-h-12 px-6 sm:px-8 py-3 text-white rounded-md font-bold text-base leading-tight hover:brightness-110 shadow-md flex items-center justify-center gap-2 whitespace-normal text-center disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
-                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}{' '}
-                        <ArrowRight size={18} />
+                        <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                            {config.ui_labels?.['welcome.start'] ||
+                                t('welcome.start', 'Get Started')}
+                        </span>
+                        <ArrowRight size={18} className="shrink-0" />
                     </button>
                 </div>
             </form>
