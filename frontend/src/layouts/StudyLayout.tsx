@@ -320,8 +320,13 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Enforce One-Time Submission
-    // If completed for THIS specific study, redirect everything to post-sort (Thank You page).
-    if (isCompleted && studySlug === slug && !location.pathname.includes('post-sort')) {
+    // Legacy completed sessions may not have a study slug; treat them as same-study
+    // for backward-compatible post-sort redirects.
+    if (
+        isCompleted &&
+        (!studySlug || studySlug === slug) &&
+        !location.pathname.includes('post-sort')
+    ) {
         return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 
