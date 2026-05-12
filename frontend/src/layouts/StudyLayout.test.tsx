@@ -345,6 +345,24 @@ describe('Layout Route Protection', () => {
         expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
     });
 
+    it('Does not hold completed sessions with missing study slug on stale-session spinner', () => {
+        useSessionStore.setState({
+            isCompleted: true,
+            hasConsented: true,
+            studySlug: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+        expect(screen.getByTestId('layout-header')).toBeInTheDocument();
+    });
+
     it('Skips rendering Pre-sort step node when disabled', () => {
         useSessionStore.setState({ hasConsented: true });
         useConfigStore.setState({

@@ -148,9 +148,9 @@ const StudyLayoutContent: React.FC = () => {
     const { retry, unlock, passwordError } = useStudyConfig();
 
     // Cross-study session cleanup
-    // If the stored session was completed for a DIFFERENT study (or a legacy session with
-    // unknown slug), reset it so the participant can start fresh in this study.
-    // Their submitted data is safe on the backend — only the local state is cleared.
+    // If the stored session belongs to a different study, reset it so the participant can
+    // start fresh in this study. Their submitted data is safe on the backend — only the
+    // local state is cleared.
     useEffect(() => {
         if (shouldResetParticipantSessionForStudy(slug, studySlug)) {
             resetAllStores({ skipConfig: true });
@@ -285,8 +285,9 @@ const StudyLayoutContent: React.FC = () => {
         );
     }
 
-    // Show loading while the stale session is being reset to prevent flash of stale content
-    const isStaleCompletedSession = isCompleted && studySlug !== slug; // covers both null (legacy) and mismatched slugs
+    // Show loading while an explicitly cross-study completed session is being reset.
+    const isStaleCompletedSession =
+        isCompleted && shouldResetParticipantSessionForStudy(slug, studySlug);
     if (isStaleCompletedSession) {
         return (
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
