@@ -23,24 +23,24 @@ backend/
 1. **Install Dependencies**:
 
    ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
 2. **Database Initialization**:
    By default, the app uses **PostgreSQL**. Ensure your `DATABASE_URL` is configured in `.env`. This script creates the database schema (via Alembic) and an initial admin user (`admin@example.com`).
 
    ```bash
-   python init_db.py
+   uv run python init_db.py
    ```
 
 3. **Seeding & Updating Content**:
    Populate or update the database with studies defined in JSON files.
 
-   > **Note**: This script uses the API, so **the backend server must be running locally** (e.g., `uvicorn app.main:app`). It uses the default admin credentials or `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars.
+   > **Note**: This script uses the API, so **the backend server must be running locally** (e.g., `uv run uvicorn app.main:app`). It uses the default admin credentials or `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars.
 
    ```bash
    # Create or Update a study
-   python seed.py your-study.json
+   uv run python seed.py your-study.json
    ```
 
 4. **Utility Scripts**:
@@ -50,7 +50,7 @@ backend/
 
 5. **Running Locally**:
    ```bash
-   uvicorn app.main:app --reload
+   uv run uvicorn app.main:app --reload
    ```
 
 ## 🧪 Testing

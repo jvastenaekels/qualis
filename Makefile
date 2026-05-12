@@ -1,11 +1,11 @@
 -include .env
 export
 
-.PHONY: install run-backend run-frontend lint check test ci run-ci ci-full run-ci-full
+.PHONY: install run-backend run-frontend seed demo-up demo-seed demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
 
 install:
 	cd backend && uv sync
-	cd frontend && npm install
+	cd frontend && npm ci
 
 run-backend:
 	cd backend && uv run uvicorn app.main:app --reload
@@ -14,7 +14,21 @@ run-frontend:
 	cd frontend && npm run dev
 
 seed:
-	@echo "Usage: cd backend && uv run python seed.py <path-to-study-json>"
+	cd backend && uv run python seed.py data/example-study.json
+
+demo-up:
+	docker compose up --build -d
+
+demo-seed:
+	docker compose exec backend uv run python seed.py data/example-study.json
+
+demo-smoke:
+	curl -fsS http://localhost:3000/ >/dev/null
+	curl -fsS http://localhost:3000/health >/dev/null
+	curl -fsS http://localhost:3000/api/study/coastal-wetland-futures >/dev/null
+
+demo-down:
+	docker compose down
 
 migrate:
 	cd backend && uv run python scripts/migrate.py
@@ -56,6 +70,7 @@ check:
 	# See SECURITY.md for the deliberate-acceptance evaluation.
 	cd backend && uv run python -m app.schema_validation
 	python3 backend/scripts/check_relationships.py
+	python3 scripts/check_installation_docs.py
 	$(MAKE) check-api
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check

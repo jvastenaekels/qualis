@@ -80,7 +80,7 @@ else:
 async def lifespan(app: FastAPI):
     """Manage the application lifespan (startup/shutdown)."""
     # Schema Validation
-    logger.info(f"lifespan: DATABASE_URL is {settings.DATABASE_URL}")
+    logger.info("lifespan: database configuration loaded")
     try:
         from app.schema_validation import validate_schema
 

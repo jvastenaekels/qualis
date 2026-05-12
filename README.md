@@ -133,13 +133,49 @@ A reusable pool of candidate statements that lives at the project level, not the
 
 ## Quick start
 
-### Prerequisites
+### SoftwareX evaluation quick start (Docker)
+
+This is the recommended path for SoftwareX evaluation and first-time use. It starts PostgreSQL, the backend, and the built frontend with development demo credentials.
+
+Prerequisite:
+
+- Docker with the `docker compose` plugin
+
+```bash
+git clone https://github.com/jvastenaekels/qualis.git
+cd qualis
+
+make demo-up
+make demo-seed
+make demo-smoke
+```
+
+Open [http://localhost:3000](http://localhost:3000) and log in with:
+
+| Field | Value |
+| ----- | ----- |
+| Email | `admin@example.com` |
+| Password | `admin123` |
+
+After seeding, the example participant flow is available at [http://localhost:3000/coastal-wetland-futures](http://localhost:3000/coastal-wetland-futures).
+
+Stop the stack with:
+
+```bash
+make demo-down
+```
+
+### Local development setup
+
+Use this path when you want hot reload, local tests, or direct backend/frontend development.
+
+#### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - [Node.js](https://nodejs.org/) v24+
 - PostgreSQL 15+ (running locally or reachable by URL)
 
-### From zero
+#### From zero
 
 ```bash
 # 1. Clone and enter
@@ -154,7 +190,7 @@ cp .env.example .env
 #   - IP_HASH_SALT  (same generation as SECRET_KEY)
 #   - ENVIRONMENT=development  (enables tutorial / E2E test routes)
 
-# 3. Install dependencies (Python via uv, Node via npm)
+# 3. Install dependencies (Python via uv, Node via npm lockfile)
 make install
 
 # 4. Create the database schema
@@ -163,17 +199,17 @@ make migrate
 # 5. Initialize the database (creates an admin user from ADMIN_EMAIL/PASSWORD)
 cd backend && uv run python init_db.py && cd ..
 
-# 6. (Optional) Seed an example study to explore the participant flow
-cd backend && uv run python seed.py data/example-study.json && cd ..
-
-# 7. Run the app (two terminals)
+# 6. Run the app (two terminals)
 make run-backend     # Terminal 1: FastAPI on :8000
 make run-frontend    # Terminal 2: Vite dev server on :5173
+
+# 7. Optional: seed an example study after the backend is running
+cd backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study (step 6), you can also visit `http://localhost:5173/remote-work-perspectives` to walk the participant flow.
+If you seeded the example study, you can also visit `http://localhost:5173/coastal-wetland-futures` to walk the participant flow.
 
 ### Verifying your setup
 
@@ -184,10 +220,6 @@ make ci
 # Or run only the tests
 make test
 ```
-
-### Docker alternative
-
-A `docker-compose.yml` is provided for a self-contained Postgres + app stack. See [`docs/guides/deployment.md`](docs/guides/deployment.md) for the supported invocation.
 
 ### Deploy
 

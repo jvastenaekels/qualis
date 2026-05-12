@@ -112,7 +112,7 @@ async def seed_data():
         print(f"3. Superuser created: {admin_email}")
         print("   (Project Owner role assigned)")
         print(f"4. Default project created: {default_project.title}")
-        print("\nNote: To seed a study, use: python seed.py data/example-study.json")
+        print("\nNote: To seed a study, use: uv run python seed.py data/example-study.json")
         print("--- Initialization Complete ---")
     await engine.dispose()
 

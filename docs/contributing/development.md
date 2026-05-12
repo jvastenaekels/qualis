@@ -97,7 +97,7 @@ cd backend && uv run python init_db.py && cd ..
 cd backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
-After seeding, you can walk the participant flow at <http://localhost:5173/remote-work-perspectives>.
+After seeding, you can walk the participant flow at <http://localhost:5173/coastal-wetland-futures>.
 
 ### Run the dev servers
 

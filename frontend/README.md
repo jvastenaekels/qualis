@@ -30,7 +30,7 @@ frontend/
 1. **Install Dependencies**:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. **Run Development Server**:

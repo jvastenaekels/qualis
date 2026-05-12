@@ -1,77 +1,133 @@
 {
-  "slug": "remote-work-perspectives",
+  "slug": "coastal-wetland-futures",
   "translations": {
     "en": {
-      "title": "Perspectives on remote work",
-      "description": "A short example Q-study on attitudes towards remote work, intended as a working seed for new Qualis installations. 12 statements, forced distribution from -2 to +2.",
-      "instruction": "Sort each statement according to how strongly it represents your own view, from 'least like my view' on the left to 'most like my view' on the right.",
-      "consent_text": "This is a demo study used to illustrate the Qualis workflow. By participating you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded.",
+      "title": "Coastal Wetland Futures",
+      "description": "A synthetic demo Q-study on social-ecological trade-offs around a coastal wetland. Inspired by open-access Q-methodology research on wetland ecosystem services, climate adaptation, and landscape values. 25 statements, forced distribution from -4 to +4.",
+      "instruction": "Sort each statement according to how strongly it represents your own view about the future of the coastal wetland, from 'least like my view' on the left to 'most like my view' on the right.",
+      "consent_text": "This is a synthetic demonstration study used to illustrate the Qualis workflow. By participating you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded.",
       "thank_you_text": "Thank you for completing the example sort. This is a demonstration study; no real research conclusions are drawn from your responses."
     },
     "fr": {
-      "title": "Perspectives sur le télétravail",
-      "description": "Une courte étude Q d'exemple sur les attitudes face au télétravail, fournie comme jeu de données initial pour les nouvelles installations Qualis. 12 énoncés, distribution forcée de -2 à +2.",
-      "instruction": "Classez chaque énoncé selon le degré auquel il représente votre propre point de vue, de « le moins comme mon point de vue » à gauche à « le plus comme mon point de vue » à droite.",
-      "consent_text": "Ceci est une étude de démonstration illustrant le workflow Qualis. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée.",
+      "title": "Futurs d'une zone humide côtière",
+      "description": "Une étude Q synthétique de démonstration sur les arbitrages socio-écologiques autour d'une zone humide côtière. Elle s'inspire de recherches Q en accès ouvert sur les services écosystémiques des zones humides, l'adaptation climatique et les valeurs paysagères. 25 énoncés, distribution forcée de -4 à +4.",
+      "instruction": "Classez chaque énoncé selon le degré auquel il représente votre propre point de vue sur l'avenir de la zone humide côtière, de « le moins comme mon point de vue » à gauche à « le plus comme mon point de vue » à droite.",
+      "consent_text": "Ceci est une étude synthétique de démonstration illustrant le workflow Qualis. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée.",
       "thank_you_text": "Merci d'avoir complété ce tri d'exemple. Il s'agit d'une étude de démonstration ; aucune conclusion de recherche réelle n'est tirée de vos réponses."
     }
   },
   "default_language_code": "en",
   "grid_config": [
-    {"score": -2, "capacity": 2},
-    {"score": -1, "capacity": 3},
-    {"score": 0, "capacity": 2},
-    {"score": 1, "capacity": 3},
-    {"score": 2, "capacity": 2}
+    {"score": -4, "capacity": 2},
+    {"score": -3, "capacity": 3},
+    {"score": -2, "capacity": 3},
+    {"score": -1, "capacity": 4},
+    {"score": 0, "capacity": 1},
+    {"score": 1, "capacity": 4},
+    {"score": 2, "capacity": 3},
+    {"score": 3, "capacity": 3},
+    {"score": 4, "capacity": 2}
   ],
   "statements": [
     {"code": "S01", "translations": {
-      "en": "Working from home makes me more productive than working in an office.",
-      "fr": "Travailler depuis chez soi me rend plus productif·ve qu'au bureau."
+      "en": "Protecting the wetland's ecological functions should come before expanding tourism infrastructure.",
+      "fr": "La protection des fonctions écologiques de la zone humide doit passer avant l'expansion des infrastructures touristiques."
     }},
     {"code": "S02", "translations": {
-      "en": "I miss the spontaneous social interactions of an office.",
-      "fr": "Les interactions sociales spontanées du bureau me manquent."
+      "en": "Local livelihoods should not be sacrificed for conservation goals decided elsewhere.",
+      "fr": "Les moyens de subsistance locaux ne doivent pas être sacrifiés au nom d'objectifs de conservation décidés ailleurs."
     }},
     {"code": "S03", "translations": {
-      "en": "Remote work blurs the line between my professional and personal life.",
-      "fr": "Le télétravail brouille la frontière entre ma vie professionnelle et personnelle."
+      "en": "Water use for agriculture should be limited when it threatens lagoon health.",
+      "fr": "L'usage agricole de l'eau doit être limité lorsqu'il menace la santé de la lagune."
     }},
     {"code": "S04", "translations": {
-      "en": "Video calls are an adequate substitute for in-person meetings.",
-      "fr": "Les visioconférences remplacent adéquatement les réunions en présentiel."
+      "en": "Traditional fishing knowledge should guide wetland management decisions.",
+      "fr": "Les savoirs traditionnels liés à la pêche doivent guider les décisions de gestion de la zone humide."
     }},
     {"code": "S05", "translations": {
-      "en": "I would accept a lower salary to keep working remotely.",
-      "fr": "J'accepterais un salaire plus bas pour continuer à télétravailler."
+      "en": "Eco-tourism can fund conservation without damaging the character of the place.",
+      "fr": "L'écotourisme peut financer la conservation sans abîmer le caractère du lieu."
     }},
     {"code": "S06", "translations": {
-      "en": "Remote work disadvantages employees who are early in their careers.",
-      "fr": "Le télétravail désavantage les employé·es en début de carrière."
+      "en": "Strict protection rules often ignore the practical realities of people who live from the land.",
+      "fr": "Les règles strictes de protection ignorent souvent les réalités pratiques des personnes qui vivent de la terre."
     }},
     {"code": "S07", "translations": {
-      "en": "Saving commute time is the single biggest benefit of remote work for me.",
-      "fr": "Économiser du temps de transport est le plus grand avantage du télétravail pour moi."
+      "en": "A wetland has value in itself, even when it does not provide direct benefits to people.",
+      "fr": "Une zone humide a une valeur en elle-même, même lorsqu'elle ne fournit pas de bénéfices directs aux humains."
     }},
     {"code": "S08", "translations": {
-      "en": "My employer trusts me less when they cannot see me working.",
-      "fr": "Mon employeur me fait moins confiance quand il ne peut pas me voir travailler."
+      "en": "Public authorities should enforce clear water-use limits rather than rely on voluntary action.",
+      "fr": "Les autorités publiques doivent imposer des limites claires d'usage de l'eau plutôt que compter sur l'action volontaire."
     }},
     {"code": "S09", "translations": {
-      "en": "Remote work is environmentally responsible because it reduces commuting.",
-      "fr": "Le télétravail est écologiquement responsable car il réduit les déplacements."
+      "en": "Farmers, fishers, tourism workers, and conservationists should co-design the management plan.",
+      "fr": "Agriculteurs, pêcheurs, acteurs du tourisme et conservationnistes doivent co-concevoir le plan de gestion."
     }},
     {"code": "S10", "translations": {
-      "en": "Hybrid arrangements are better than fully remote or fully in-office.",
-      "fr": "Les formules hybrides sont meilleures que le tout-télétravail ou le tout-présentiel."
+      "en": "The wetland's cultural identity is as important as its biodiversity.",
+      "fr": "L'identité culturelle de la zone humide est aussi importante que sa biodiversité."
     }},
     {"code": "S11", "translations": {
-      "en": "Working remotely makes me feel isolated from my team.",
-      "fr": "Le télétravail me fait me sentir isolé·e de mon équipe."
+      "en": "Climate adaptation should focus on restoring natural water flows and buffers.",
+      "fr": "L'adaptation climatique doit se concentrer sur la restauration des flux d'eau naturels et des zones tampons."
     }},
     {"code": "S12", "translations": {
-      "en": "The right to remote work should be guaranteed by labour law.",
-      "fr": "Le droit au télétravail devrait être garanti par le droit du travail."
+      "en": "Economic diversification is a better long-term strategy than protecting current land uses at all costs.",
+      "fr": "La diversification économique est une meilleure stratégie à long terme que la protection à tout prix des usages actuels des terres."
+    }},
+    {"code": "S13", "translations": {
+      "en": "Scientific monitoring should carry more weight than local impressions when the two conflict.",
+      "fr": "Le suivi scientifique doit peser davantage que les impressions locales lorsque les deux se contredisent."
+    }},
+    {"code": "S14", "translations": {
+      "en": "Visitors should have easier access to the wetland so they can understand why it matters.",
+      "fr": "Les visiteurs doivent avoir un accès plus facile à la zone humide afin de comprendre pourquoi elle compte."
+    }},
+    {"code": "S15", "translations": {
+      "en": "Too much visitor access would turn the wetland into a product rather than a living place.",
+      "fr": "Un accès touristique excessif transformerait la zone humide en produit plutôt qu'en lieu vivant."
+    }},
+    {"code": "S16", "translations": {
+      "en": "Compensation should be offered when environmental rules reduce household income.",
+      "fr": "Une compensation doit être proposée lorsque les règles environnementales réduisent le revenu des ménages."
+    }},
+    {"code": "S17", "translations": {
+      "en": "The best management decisions are those that keep future options open under climate uncertainty.",
+      "fr": "Les meilleures décisions de gestion sont celles qui gardent des options ouvertes face à l'incertitude climatique."
+    }},
+    {"code": "S18", "translations": {
+      "en": "Wetland restoration should prioritize habitats for birds, fish, and plants over recreational uses.",
+      "fr": "La restauration de la zone humide doit prioriser les habitats des oiseaux, poissons et plantes plutôt que les usages récréatifs."
+    }},
+    {"code": "S19", "translations": {
+      "en": "Local people will support conservation only if they see concrete benefits for their community.",
+      "fr": "Les habitants soutiendront la conservation seulement s'ils voient des bénéfices concrets pour leur communauté."
+    }},
+    {"code": "S20", "translations": {
+      "en": "Agricultural pollution is a more urgent problem than tourism pressure.",
+      "fr": "La pollution agricole est un problème plus urgent que la pression touristique."
+    }},
+    {"code": "S21", "translations": {
+      "en": "Tourism pressure is a more urgent problem than agricultural water use.",
+      "fr": "La pression touristique est un problème plus urgent que l'usage agricole de l'eau."
+    }},
+    {"code": "S22", "translations": {
+      "en": "Management should make conflicts visible instead of hiding them behind consensus language.",
+      "fr": "La gestion doit rendre les conflits visibles plutôt que les masquer derrière un langage de consensus."
+    }},
+    {"code": "S23", "translations": {
+      "en": "Small compromises by every sector are better than a single strict rule for everyone.",
+      "fr": "De petits compromis dans chaque secteur valent mieux qu'une règle unique et stricte pour tous."
+    }},
+    {"code": "S24", "translations": {
+      "en": "The wetland should be managed as part of a wider social-ecological system, not as an isolated site.",
+      "fr": "La zone humide doit être gérée comme partie d'un système socio-écologique plus large, et non comme un site isolé."
+    }},
+    {"code": "S25", "translations": {
+      "en": "If difficult choices are delayed, climate change will make them more costly and less fair.",
+      "fr": "Si les choix difficiles sont reportés, le changement climatique les rendra plus coûteux et moins justes."
     }}
   ],
   "presort_config": {},
