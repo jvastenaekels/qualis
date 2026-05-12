@@ -11,11 +11,7 @@ const PUBLIC_PAGE_RULES = [
 ];
 
 async function expectNoPublicPageA11yViolations(page: Page) {
-    const results = await new AxeBuilder({ page })
-        // Shared footer contrast is tracked outside this public entry-page smoke scope.
-        .exclude('footer')
-        .withRules(PUBLIC_PAGE_RULES)
-        .analyze();
+    const results = await new AxeBuilder({ page }).withRules(PUBLIC_PAGE_RULES).analyze();
 
     expect(results.violations).toEqual([]);
 }
