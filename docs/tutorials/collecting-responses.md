@@ -131,7 +131,7 @@ Discarded participants are excluded from exports and analysis by default, but th
 
 For the full set of state transitions a study goes through (Active → Paused → Closed → Archived), see [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). For now, leave your tutorial study Active.
 
-> **Sharing access with team members.** To give a colleague access to monitor responses, invite them via the project Members page (`/admin/projects/<slug>/members`). Roles: `Viewer` (read-only), `Editor` (run analyses, manage recruitment), `Owner` (full access including member management). See [Admin Dashboard — Members](../reference/admin-dashboard.md#members).
+> **Sharing access with team members.** To give a colleague access to monitor responses, invite them via the project Members page (`/app/<projectSlug>/members`). Roles: `Viewer` (read-only), `Member` (run analyses, manage recruitment), `Owner` (full access including member management). See [Admin Dashboard — Members](../reference/admin-dashboard.md#members).
 
 ---
 

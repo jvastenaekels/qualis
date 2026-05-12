@@ -365,7 +365,7 @@ Permissions are scoped per-project via the `ProjectMember` relationship:
 | Role           | Ability                                                                 |
 | :------------- | :---------------------------------------------------------------------- |
 | **Owner**      | Full control over project: manage members, create/delete studies.       |
-| **Researcher** | Can create/edit studies, export results. Cannot manage project users.   |
+| **Member**     | Can create/edit studies, export results. Cannot manage project users.   |
 | **Viewer**     | Read-only access to study configuration. Cannot export data.            |
 
 ---

@@ -11,6 +11,7 @@ exclude = [
     "doi\\.org/10\\.5281/zenodo\\.XXXXXXX",
     "doi\\.org/10\\.4135/9781446251911",
     "zenodo\\.org/account/settings/github/",
+    "localhost:3000",
 ]
 
 # Skip localhost URLs in tutorial code blocks

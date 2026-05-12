@@ -11,8 +11,11 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
 
-<!-- TODO: Add hero screenshot of the Q-sort grid interface, e.g. docs/assets/hero-qsort.png -->
-<!-- Suggested capture: a participant's mid-sort view on a tablet, statements visible, grid partially populated, language switcher visible. -->
+<p align="center">
+  <img src="participant-landing.png" alt="Participant landing page" width="31%" />
+  <img src="presort-rating-participant.png" alt="Participant statement rating screen" width="31%" />
+  <img src="postsort-tab.png" alt="Post-sort response screen" width="31%" />
+</p>
 
 ---
 
@@ -121,7 +124,7 @@ A reusable pool of candidate statements that lives at the project level, not the
 - **Security headers** (HSTS, CSP, X-Frame-Options) and bcrypt password hashing.
 - **Two-factor authentication** — TOTP (authenticator app) or email-OTP as a fallback channel; self-serve recovery flow to disable 2FA when the authenticator is lost.
 - **Email-driven account flows** — sign-up email verification and password reset via time-limited tokens; graceful degradation when SMTP is not configured (dev-friendly).
-- **Role-based access control.** Project-level roles (Owner, Researcher, Viewer) control who can edit, export, or manage team members.
+- **Role-based access control.** Project-level roles (Owner, Member, Viewer) control who can edit, export, or manage team members.
 
 ### Collaboration
 
@@ -186,7 +189,7 @@ cd qualis
 cp .env.example .env
 # Edit .env to set:
 #   - DATABASE_URL  (your local Postgres connection string)
-#   - SECRET_KEY    (generate: python -c 'import secrets; print(secrets.token_urlsafe(48))')
+#   - SECRET_KEY    (generate: python3 -c 'import secrets; print(secrets.token_urlsafe(48))')
 #   - IP_HASH_SALT  (same generation as SECRET_KEY)
 #   - ENVIRONMENT=development  (enables tutorial / E2E test routes)
 

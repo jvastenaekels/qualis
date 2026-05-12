@@ -158,7 +158,7 @@ All settings are read from the `Settings` Pydantic class in `backend/app/core/co
 
 | ENV_VAR | Type | Default | Description |
 | ------- | ---- | ------- | ----------- |
-| `SECRET_KEY` | string | dev-only | JWT signing key. **Required in production.** Generate with `python -c 'import secrets; print(secrets.token_urlsafe(48))'`. |
+| `SECRET_KEY` | string | dev-only | JWT signing key. **Required in production.** Generate with `python3 -c 'import secrets; print(secrets.token_urlsafe(48))'`. |
 | `ALGORITHM` | string | `HS256` | JWT signing algorithm. |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | int | `480` | Access token lifetime (minutes). |
 | `IP_HASH_SALT` | string | dev-only | Salt for SHA-256 hashing of participant IPs. **Required in production.** |

@@ -17,7 +17,7 @@ The dashboard is scoped to a single study at a time. The active study is selecte
 | Recruitment | `/admin/studies/{slug}/recruitment` | Access links, conversion funnel |
 | Data | `/admin/studies/{slug}/data` | Participant table, charts, individual sessions, exports |
 | Analysis | `/admin/studies/{slug}/analysis` | Factor analysis runs, scree plot, results tabs |
-| Members | `/admin/projects/{slug}/members` | Project-level: invitations, roles, removal |
+| Members | `/app/{projectSlug}/members` | Project-level: invitations, roles, removal |
 | Profile | `/admin/profile` | Account settings, 2FA |
 
 A **Memos** drawer is available on every study and concourse page via a toolbar icon (see [Memos](#memos)).
@@ -230,14 +230,14 @@ Memos are included in the Research Package export. See [Data Export](../guides/d
 
 ## Members
 
-Project-scoped page (path: `/admin/projects/{slug}/members`). Lists project members with their role and supports invitations and removals. Source: `GET /api/admin/projects/{slug}/members`.
+Project-scoped page (path: `/app/{projectSlug}/members`). Lists project members with their role and supports invitations and removals. Source: `GET /api/admin/projects/{slug}/members`.
 
 ### Member table
 
 | Column | Notes |
 | ------ | ----- |
 | Member | Name + email; current user marked. |
-| Role | `Owner` / `Editor` / `Viewer` (see [API roles](api.md#roles)). Editable inline by Owners via a select. |
+| Role | `Owner` / `Member` / `Viewer` (see [API roles](api.md#roles)). Editable inline by Owners via a select. |
 | Actions | Remove member (Owners only; cannot self-remove). |
 
 ### Invitations

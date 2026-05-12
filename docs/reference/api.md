@@ -55,8 +55,8 @@ The middleware uses this to scope queries and to enforce project-membership perm
 
 Endpoints below indicate the minimum role required:
 
-- **Project roles** (apply across the whole project): `Viewer` < `Researcher` < `Owner`.
-- **Study roles** (apply per study, on top of project membership): `Viewer` < `Editor` < `Owner`.
+- **Project roles** (apply across the whole project): `Viewer` < `Member` < `Owner`.
+- **Study roles** (apply per study, on top of project membership): `Viewer` < `Editor` < `Owner`. A project `Member` has the effective study role `Editor`.
 - **Superuser** is a system-wide flag; it grants access to user-management endpoints and to a small set of destructive operations.
 
 "Public" means no authentication at all.
@@ -124,7 +124,7 @@ Wired only when `ENVIRONMENT in ("development", "test")`. The router is not regi
 
 | Method | Path | Min role | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
-| POST | `/api/admin/studies` | Researcher | 30/min | Create a study (DRAFT) in the active project |
+| POST | `/api/admin/studies` | Member | 30/min | Create a study (DRAFT) in the active project |
 | GET | `/api/admin/studies` | Viewer | — | List studies in active project (paginated) |
 | GET | `/api/admin/studies/{slug}` | Viewer | — | Study detail with statements + counts |
 | PATCH | `/api/admin/studies/{slug}` | Editor | 30/min | Update study config (structural changes only in DRAFT) |
@@ -188,8 +188,8 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | GET | `.../export/r-kit` | Editor | 10/min | R-Kit ZIP (CSV + auto-generated `qmethod` script) |
 | GET | `.../export/package` | Editor | 10/min | Research package ZIP (CSV + JSON + codebook + metadata) |
 | GET | `.../export/config` | Viewer | — | Study configuration only (no participant data) |
-| POST | `/api/admin/studies/validate-import` | Researcher | 30/min | Dry-run validation of an exported config |
-| POST | `/api/admin/studies/import` | Researcher | 30/min | Import a config; creates a new DRAFT study |
+| POST | `/api/admin/studies/validate-import` | Member | 30/min | Dry-run validation of an exported config |
+| POST | `/api/admin/studies/import` | Member | 30/min | Import a config; creates a new DRAFT study |
 | GET | `.../dump` | Editor | 10/min | Full study + participant placements as JSON |
 | GET | `.../storage-usage` | Viewer | — | Audio storage stats (bytes used, quota, % used) |
 | GET | `.../participants/{participant_id}/export/csv` | Editor | 10/min | Single participant as CSV |
@@ -201,8 +201,8 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | Method | Path | Min role | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
 | GET | `.../participants` | Viewer | — | List participants (paginated) |
-| GET | `.../participants/{participant_id}` | Researcher | — | Detail: Q-sort entries, postsort answers, audio metadata |
-| PATCH | `.../participants/{participant_id}/discard` | Researcher | 30/min | Flag/unflag a participant for exclusion (preserves the record) |
+| GET | `.../participants/{participant_id}` | Member | — | Detail: Q-sort entries, postsort answers, audio metadata |
+| PATCH | `.../participants/{participant_id}/discard` | Member | 30/min | Flag/unflag a participant for exclusion (preserves the record) |
 | DELETE | `.../participants` | Editor | 30/min | Delete all participants (study must be in DRAFT) |
 | DELETE | `.../participants/{participant_id}/personal-data` | Editor | 30/min | Admin-mediated GDPR Art. 17 erasure (preserves Q-sort data) |
 
@@ -212,7 +212,7 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | --- | --- | --- | --- | --- |
 | GET | `/api/admin/projects` | authenticated | — | List projects the user is a member of, with their role |
 | POST | `/api/admin/projects` | authenticated | 30/min | Create a project (creator becomes Owner) |
-| GET | `/api/admin/projects/{slug}` | member | — | Project detail |
+| GET | `/api/admin/projects/{slug}` | Viewer | — | Project detail |
 | PATCH | `/api/admin/projects/{slug}` | Owner | 30/min | Update project title or slug |
 | DELETE | `/api/admin/projects/{slug}` | Owner | 30/min | Delete a project (must contain no studies) |
 | GET | `/api/admin/projects/{slug}/members` | Viewer | — | List members and their roles |
@@ -239,22 +239,22 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 
 | Method | Path | Min role | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
-| GET | `/api/admin/concourses` | member | — | List concourses in the active project |
-| POST | `/api/admin/concourses` | Researcher | 30/min | Create a concourse |
-| GET | `/api/admin/concourses/{concourse_id}` | member | — | Concourse with items and comment counts |
-| PATCH | `/api/admin/concourses/{concourse_id}` | Researcher | 30/min | Update concourse title / description |
+| GET | `/api/admin/concourses` | Viewer | — | List concourses in the active project |
+| POST | `/api/admin/concourses` | Member | 30/min | Create a concourse |
+| GET | `/api/admin/concourses/{concourse_id}` | Viewer | — | Concourse with items and comment counts |
+| PATCH | `/api/admin/concourses/{concourse_id}` | Member | 30/min | Update concourse title / description |
 | DELETE | `/api/admin/concourses/{concourse_id}` | Owner | 30/min | Delete a concourse |
-| POST | `/api/admin/concourses/{concourse_id}/items` | Researcher | 60/min | Create a single item |
-| POST | `/api/admin/concourses/{concourse_id}/items/bulk` | Researcher | 10/min | Bulk-create items |
-| POST | `/api/admin/concourses/{concourse_id}/items/import` | Researcher | 10/min | Parse + dedupe + create from a text block |
-| PATCH | `/api/admin/concourses/{concourse_id}/items/{item_id}` | Researcher | 60/min | Update item text |
-| DELETE | `/api/admin/concourses/{concourse_id}/items/{item_id}` | Researcher | 60/min | Delete an item |
-| GET | `/api/admin/concourses/{concourse_id}/items/{item_id}/versions` | member | — | Item version history |
-| GET | `/api/admin/concourses/{concourse_id}/items/{item_id}/comments` | member | — | Comments on an item |
-| POST | `/api/admin/concourses/{concourse_id}/items/{item_id}/comments` | Researcher | 30/min | Add a comment |
-| GET | `/api/admin/concourses/tags` | member | — | List tags in the active project |
-| POST | `/api/admin/concourses/tags` | Researcher | 30/min | Create a tag |
-| DELETE | `/api/admin/concourses/tags/{tag_id}` | Researcher | 30/min | Delete a tag |
+| POST | `/api/admin/concourses/{concourse_id}/items` | Member | 60/min | Create a single item |
+| POST | `/api/admin/concourses/{concourse_id}/items/bulk` | Member | 10/min | Bulk-create items |
+| POST | `/api/admin/concourses/{concourse_id}/items/import` | Member | 10/min | Parse + dedupe + create from a text block |
+| PATCH | `/api/admin/concourses/{concourse_id}/items/{item_id}` | Member | 60/min | Update item text |
+| DELETE | `/api/admin/concourses/{concourse_id}/items/{item_id}` | Member | 60/min | Delete an item |
+| GET | `/api/admin/concourses/{concourse_id}/items/{item_id}/versions` | Viewer | — | Item version history |
+| GET | `/api/admin/concourses/{concourse_id}/items/{item_id}/comments` | Viewer | — | Comments on an item |
+| POST | `/api/admin/concourses/{concourse_id}/items/{item_id}/comments` | Member | 30/min | Add a comment |
+| GET | `/api/admin/concourses/tags` | Viewer | — | List tags in the active project |
+| POST | `/api/admin/concourses/tags` | Member | 30/min | Create a tag |
+| DELETE | `/api/admin/concourses/tags/{tag_id}` | Member | 30/min | Delete a tag |
 
 ### Admin — users (`/api/admin/users`)
 
