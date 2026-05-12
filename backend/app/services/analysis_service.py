@@ -558,13 +558,27 @@ def apply_manual_flags(
 
     Returns:
         Boolean flagging matrix (n_participants x n_factors)
+
+    Raises:
+        ValueError: If a manual flag references a participant outside the
+            included analysis matrix, a factor outside the requested range, or
+            if no valid defining sort remains after validation.
     """
     flags = np.zeros((n_participants, n_factors), dtype=bool)
     id_to_idx = {db_id: i for i, db_id in enumerate(participant_db_ids)}
 
     for db_id, factor_num in manual_flags.items():
-        if db_id in id_to_idx and 1 <= factor_num <= n_factors:
-            flags[id_to_idx[db_id], factor_num - 1] = True
+        if db_id not in id_to_idx:
+            raise ValueError(f"manual_flags contains unknown participant id {db_id}")
+        if not 1 <= factor_num <= n_factors:
+            raise ValueError(
+                f"manual_flags factor {factor_num} out of range for "
+                f"{n_factors}-factor solution"
+            )
+        flags[id_to_idx[db_id], factor_num - 1] = True
+
+    if not np.any(flags):
+        raise ValueError("manual_flags must define at least one participant")
 
     return flags
 
@@ -958,6 +972,35 @@ def _distribution_from_grid_config(
     return np.sort(np.array(dist, dtype=np.int64))
 
 
+def _factor_array_distribution(
+    dataset: NDArray[np.float64],
+    grid_config: list[dict[str, object]] | None,
+    distribution_mode: str | None,
+) -> NDArray[np.int64] | None:
+    """Return the distribution used to project z-scores to factor arrays.
+
+    Forced and flexible grids have a design distribution whose total capacity
+    should equal the Q-set size. Free grids only define allowed score columns
+    and soft capacity hints, so overcapacity grids must not be interpreted as
+    the factor-array shape; falling back to the observed sort distribution
+    avoids biasing arrays toward the lowest grid scores.
+    """
+    if distribution_mode == "free":
+        return None
+    if not grid_config:
+        return None
+
+    distribution = _distribution_from_grid_config(grid_config)
+    n_statements = dataset.shape[0]
+    if distribution.shape[0] != n_statements:
+        raise ValueError(
+            "grid_config capacity must match the number of statements for "
+            f"factor-array projection (capacity={distribution.shape[0]}, "
+            f"statements={n_statements})"
+        )
+    return distribution
+
+
 def run_analysis(
     dataset: NDArray[np.float64],
     n_factors: int,
@@ -967,6 +1010,7 @@ def run_analysis(
     manual_flags_matrix: NDArray[np.bool_] | None = None,
     manual_rotations: list[dict[str, object]] | None = None,
     grid_config: list[dict[str, object]] | None = None,
+    distribution_mode: str | None = None,
 ) -> AnalysisRunResult:
     """Run the complete Q-method factor analysis pipeline.
 
@@ -986,6 +1030,8 @@ def run_analysis(
             in list order (Brown 1980; Watts & Stenner 2012).
         grid_config: Study grid configuration for the forced distribution.
             If None, distribution is inferred from the first participant.
+        distribution_mode: Study distribution mode. In "free" mode, grid
+            capacities are not treated as a forced distribution.
 
     Returns:
         Dictionary with all analysis results
@@ -1042,7 +1088,7 @@ def run_analysis(
         flags = flag_sorts(rotated, n_statements)
 
     # Step 6: Z-scores and factor arrays
-    distribution = _distribution_from_grid_config(grid_config) if grid_config else None
+    distribution = _factor_array_distribution(dataset, grid_config, distribution_mode)
     z_scores, factor_arrays = compute_factor_scores(
         dataset, rotated, flags, distribution=distribution
     )
@@ -1088,6 +1134,7 @@ def compute_bootstrap_stability(
     rotation: str,
     manual_rotations: list[dict[str, object]] | None,
     grid_config: list[dict[str, object]] | None,
+    distribution_mode: str | None = None,
     rng_seed: int = 42,
 ) -> BootstrapStabilityResult:
     """Non-parametric bootstrap of Q-sorts (Zabala & Pascual 2016).
@@ -1120,6 +1167,7 @@ def compute_bootstrap_stability(
         rotation: 'varimax', 'none', or 'judgmental'.
         manual_rotations: Replayed when rotation='judgmental'.
         grid_config: Forced distribution (passed through to run_analysis).
+        distribution_mode: Study distribution mode (passed through to run_analysis).
         rng_seed: Seed for the resampling RNG; deterministic given the
             same dataset and seed.
 
@@ -1155,6 +1203,7 @@ def compute_bootstrap_stability(
                     manual_flags_matrix=None,
                     manual_rotations=manual_rotations,
                     grid_config=grid_config,
+                    distribution_mode=distribution_mode,
                 )
         except (ValueError, np.linalg.LinAlgError):
             # Skip iterations whose resample is too degenerate to factor —
@@ -1236,6 +1285,7 @@ def compute_preview_range(
     """
     dataset, _participants, _statements = build_sort_matrix(dump)
     grid_config = dump["study"]["grid_config"]
+    distribution_mode = dump["study"].get("distribution_mode", "forced")
     rows: list[PreviewSummary] = []
     for k in n_factors_range:
         result = run_analysis(
@@ -1245,6 +1295,7 @@ def compute_preview_range(
             rotation=rotation,
             flagging="auto",
             grid_config=grid_config,
+            distribution_mode=distribution_mode,
         )
         flags = result["flags"]
         n_participants = flags.shape[0]

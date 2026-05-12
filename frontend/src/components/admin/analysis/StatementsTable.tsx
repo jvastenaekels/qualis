@@ -17,7 +17,8 @@ interface StatementsTableProps {
 
 type SortKey = 'code' | 'type' | `z${number}` | `a${number}`;
 
-function zScoreColor(z: number): string {
+function zScoreColor(z: number | null): string {
+    if (z === null) return 'text-slate-400';
     if (z >= 1.5) return 'text-blue-700 bg-blue-50';
     if (z >= 0.5) return 'text-blue-600 bg-blue-50/50';
     if (z <= -1.5) return 'text-red-700 bg-red-50';
@@ -240,8 +241,9 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                                         : undefined
                                                 }
                                             >
-                                                {z > 0 ? '+' : ''}
-                                                {z.toFixed(2)}
+                                                {z === null
+                                                    ? '-'
+                                                    : `${z > 0 ? '+' : ''}${z.toFixed(2)}`}
                                                 {stab && (
                                                     <span className="text-slate-400 font-normal">
                                                         {' '}

@@ -4,6 +4,7 @@
  * Qualis API
  * OpenAPI spec version: 0.1.0
  */
+import type { StatementClassificationZScoresItem } from './statementClassificationZScoresItem';
 import type { StatementClassificationSignificance } from './statementClassificationSignificance';
 
 /**
@@ -13,7 +14,7 @@ export interface StatementClassification {
     statement_id: number;
     code: string;
     text: string;
-    z_scores: number[];
+    z_scores: StatementClassificationZScoresItem[];
     factor_arrays: number[];
     /** Pairwise significance levels, e.g. {'1-2': 'p<0.05', '1-3': 'p<0.01'} */
     significance?: StatementClassificationSignificance;

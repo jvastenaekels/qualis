@@ -144,7 +144,7 @@ class StatementScore(BaseModel):
     statement_id: int
     code: str
     text: str
-    z_scores: list[float]
+    z_scores: list[float | None]
     factor_arrays: list[int]
 
 
@@ -154,7 +154,7 @@ class StatementClassification(BaseModel):
     statement_id: int
     code: str
     text: str
-    z_scores: list[float]
+    z_scores: list[float | None]
     factor_arrays: list[int]
     significance: dict[str, str] = Field(
         default_factory=dict,

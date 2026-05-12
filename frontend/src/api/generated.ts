@@ -17285,7 +17285,12 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
         z_scores: Array.from(
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1
-        ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+        ).map(() =>
+            faker.helpers.arrayElement([
+                faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                null,
+            ])
+        ),
         factor_arrays: Array.from(
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1
@@ -17301,7 +17306,12 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
         z_scores: Array.from(
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1
-        ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+        ).map(() =>
+            faker.helpers.arrayElement([
+                faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                null,
+            ])
+        ),
         factor_arrays: Array.from(
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1
@@ -17323,7 +17333,12 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
             z_scores: Array.from(
                 { length: faker.number.int({ min: 1, max: 10 }) },
                 (_, i) => i + 1
-            ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+            ).map(() =>
+                faker.helpers.arrayElement([
+                    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                    null,
+                ])
+            ),
             factor_arrays: Array.from(
                 { length: faker.number.int({ min: 1, max: 10 }) },
                 (_, i) => i + 1

@@ -346,9 +346,7 @@ const StudyLayoutContent: React.FC = () => {
     const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
         (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
     );
-    const isEntryPage = ['/welcome', '/consent'].some((path) =>
-        location.pathname.endsWith(path)
-    );
+    const isEntryPage = ['/welcome', '/consent'].some((path) => location.pathname.endsWith(path));
 
     return (
         <div

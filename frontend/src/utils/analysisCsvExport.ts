@@ -64,7 +64,7 @@ export function generateScoresCsv(result: AnalysisResult): string {
     const rows = result.statement_scores.map((s) => [
         s.code,
         `"${s.text.replace(/"/g, '""')}"`,
-        ...s.z_scores.map((z) => z.toFixed(2)),
+        ...s.z_scores.map((z) => (z === null ? '' : z.toFixed(2))),
         ...s.factor_arrays.map(String),
         dIds.has(s.statement_id)
             ? 'D'

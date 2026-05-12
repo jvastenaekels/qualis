@@ -13,7 +13,9 @@ function cellAddr(r: number, c: number): string {
 }
 
 /** Set column widths based on content, capped at 50 characters. */
-function autoSizeColumns(ws: WorkSheet, data: (string | number | boolean)[][]) {
+type SheetCell = string | number | boolean | null;
+
+function autoSizeColumns(ws: WorkSheet, data: SheetCell[][]) {
     if (data.length === 0) return;
     const maxCols = Math.max(...data.map((row) => row.length));
     const widths: number[] = [];
@@ -68,7 +70,7 @@ export async function generateAnalysisXlsx(
     const wb = XLSX.utils.book_new();
     const nf = result.n_factors;
 
-    const makeSheet = (data: (string | number | boolean)[][]): WorkSheet => {
+    const makeSheet = (data: SheetCell[][]): WorkSheet => {
         const ws = XLSX.utils.aoa_to_sheet(data);
         autoSizeColumns(ws, data);
         return ws;

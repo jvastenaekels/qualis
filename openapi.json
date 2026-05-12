@@ -10703,7 +10703,14 @@
           },
           "z_scores": {
             "items": {
-              "type": "number"
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "type": "array",
             "title": "Z Scores"
@@ -10830,7 +10837,14 @@
           },
           "z_scores": {
             "items": {
-              "type": "number"
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "type": "array",
             "title": "Z Scores"

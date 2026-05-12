@@ -425,6 +425,7 @@ class StudyDataService:
             study=SortDataStudy(
                 statements=sort_statements,
                 grid_config=study.grid_config,
+                distribution_mode=study.distribution_mode.value,
             ),
             participants=sort_participant_data,
         )

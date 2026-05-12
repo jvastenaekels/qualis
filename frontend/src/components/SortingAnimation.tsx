@@ -363,8 +363,8 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale, roughSortEna
                         transform: 'translate(-50%, -50%)',
                     }}
                 >
-                    {phase === 'FINE' && (
-                        roughSortEnabled ? (
+                    {phase === 'FINE' &&
+                        (roughSortEnabled ? (
                             <>
                                 <DynamicStack
                                     count={fineSourceCounts[0] ?? 0}
@@ -391,8 +391,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale, roughSortEna
                                 type="source"
                                 layoutId="deck-source"
                             />
-                        )
-                    )}
+                        ))}
                 </div>
 
                 <div className="absolute top-1/2 left-1/2 w-0 h-0 z-50">

@@ -4,6 +4,7 @@
  * Qualis API
  * OpenAPI spec version: 0.1.0
  */
+import type { StatementScoreZScoresItem } from './statementScoreZScoresItem';
 
 /**
  * Z-scores and factor array values for a single statement.
@@ -12,6 +13,6 @@ export interface StatementScore {
     statement_id: number;
     code: string;
     text: string;
-    z_scores: number[];
+    z_scores: StatementScoreZScoresItem[];
     factor_arrays: number[];
 }

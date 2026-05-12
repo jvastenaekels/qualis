@@ -254,14 +254,23 @@ class TestApplyManualFlags:
         assert not flags[1, 1]
         assert flags[2, 1]  # db_id 12 → factor 2
 
-    def test_invalid_ids_ignored(self):
-        flags = apply_manual_flags(
-            n_participants=2,
-            n_factors=2,
-            manual_flags={999: 1},
-            participant_db_ids=[10, 11],
-        )
-        assert not np.any(flags)
+    def test_invalid_ids_rejected(self):
+        with pytest.raises(ValueError, match="unknown participant"):
+            apply_manual_flags(
+                n_participants=2,
+                n_factors=2,
+                manual_flags={999: 1},
+                participant_db_ids=[10, 11],
+            )
+
+    def test_invalid_factor_number_rejected(self):
+        with pytest.raises(ValueError, match="out of range"):
+            apply_manual_flags(
+                n_participants=2,
+                n_factors=2,
+                manual_flags={10: 3},
+                participant_db_ids=[10, 11],
+            )
 
 
 # --- compute_factor_scores ---
@@ -805,15 +814,15 @@ class TestBuildSortMatrixEdgeCases:
 
 
 class TestRouterHelperNaN:
-    """Tests for _build_z_scores_list NaN → 0.0 replacement."""
+    """Tests for _build_z_scores_list NaN → None replacement."""
 
-    def test_nan_replaced_with_zero(self):
-        """NaN z-scores should be replaced with 0.0 for JSON serialization."""
+    def test_nan_replaced_with_none(self):
+        """NaN z-scores should be replaced with None for JSON serialization."""
         from app.routers.admin.analysis import _build_z_scores_list
 
         z_scores = np.array([[1.5, np.nan], [0.5, -0.3]])
         result = _build_z_scores_list(z_scores, s_idx=0, n_factors=2)
-        assert result == [1.5, 0.0]
+        assert result == [1.5, None]
 
     def test_finite_values_preserved(self):
         """Finite z-scores should pass through unchanged."""
@@ -846,6 +855,37 @@ class TestGridConfigDistribution:
         )
         # Factor arrays should be produced
         assert result["factor_arrays"].shape == (9, 2)
+
+    def test_free_distribution_mode_ignores_overcapacity_grid(self):
+        """Free-mode capacities are not a forced factor-array distribution."""
+        dataset = np.array(
+            [
+                [1, 1, -1, -1],
+                [1, 0, -1, 0],
+                [0, 1, 0, -1],
+                [-1, -1, 1, 1],
+            ],
+            dtype=np.float64,
+        )
+        manual = np.ones((4, 1), dtype=bool)
+        overcapacity_grid = [
+            {"score": -1, "capacity": 3},
+            {"score": 0, "capacity": 3},
+            {"score": 1, "capacity": 3},
+        ]
+
+        result = run_analysis(
+            dataset,
+            n_factors=1,
+            extraction="pca",
+            rotation="none",
+            flagging="manual",
+            manual_flags_matrix=manual,
+            grid_config=overcapacity_grid,
+            distribution_mode="free",
+        )
+
+        assert result["factor_arrays"][:, 0].tolist() == [1, 0, 0, -1]
 
     def test_centroid_no_rotation(self, dataset):
         """Centroid extraction with no rotation should work."""

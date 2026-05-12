@@ -73,10 +73,10 @@ def _get_statement_text(stmt: StatementDumpRecord, lang: str = "en") -> str:
 
 def _build_z_scores_list(
     z_scores: NDArray[np.float64], s_idx: int, n_factors: int
-) -> list[float]:
-    """Extract z-scores for a statement, replacing NaN with 0.0."""
+) -> list[float | None]:
+    """Extract z-scores for a statement, replacing NaN with None."""
     return [
-        float(z_scores[s_idx, f]) if not np.isnan(z_scores[s_idx, f]) else 0.0
+        float(z_scores[s_idx, f]) if not np.isnan(z_scores[s_idx, f]) else None
         for f in range(n_factors)
     ]
 
@@ -181,12 +181,16 @@ async def run_factor_analysis(
     manual_flags_matrix = None
     if body.flagging == "manual" and body.manual_flags:
         participant_db_ids = [p["db_id"] for p in valid_participants]
-        manual_flags_matrix = apply_manual_flags(
-            n_participants, body.n_factors, body.manual_flags, participant_db_ids
-        )
+        try:
+            manual_flags_matrix = apply_manual_flags(
+                n_participants, body.n_factors, body.manual_flags, participant_db_ids
+            )
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
     # Extract grid_config for the forced distribution
     grid_config = dump.get("study", {}).get("grid_config")
+    distribution_mode = dump.get("study", {}).get("distribution_mode", "forced")
 
     # Convert ManualRotation Pydantic models to plain dicts for the service.
     # The service stays decoupled from Pydantic; the schema-level cross-field
@@ -209,6 +213,7 @@ async def run_factor_analysis(
             manual_flags_matrix=manual_flags_matrix,
             manual_rotations=manual_rotations_payload,
             grid_config=grid_config,
+            distribution_mode=distribution_mode,
         )
     except (ValueError, np.linalg.LinAlgError) as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -303,6 +308,7 @@ async def run_factor_analysis(
                 rotation=body.rotation,
                 manual_rotations=manual_rotations_payload,
                 grid_config=grid_config,
+                distribution_mode=distribution_mode,
             )
             # Translate row-indices in `statements` to real statement ids.
             stability_out: list[BootstrapStatementStability] = []

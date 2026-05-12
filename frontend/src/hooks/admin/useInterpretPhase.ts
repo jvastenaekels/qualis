@@ -199,8 +199,8 @@ export function useInterpretPhase(
         for (const s of runResult.statement_scores) {
             const matching = compareById.get(s.statement_id);
             if (!matching) continue;
-            aMatrix.push(s.z_scores);
-            bMatrix.push(matching.z_scores);
+            aMatrix.push(s.z_scores.map((z) => z ?? 0));
+            bMatrix.push(matching.z_scores.map((z) => z ?? 0));
         }
         if (aMatrix.length === 0) return null;
         return matchFactorsByPhi(aMatrix, bMatrix);

@@ -188,6 +188,7 @@ class SortDataStudy(TypedDict):
 
     statements: list[StatementDumpRecord]
     grid_config: list[dict[str, object]] | None
+    distribution_mode: str
 
 
 class SortDataDump(TypedDict):
