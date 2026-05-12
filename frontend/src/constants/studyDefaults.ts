@@ -107,6 +107,59 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             "Rien n'est définitif : vous pouvez déplacer les cartes ou les remettre dans la pile à tout moment.",
         ],
     },
+    de: {
+        instructions:
+            'In dieser Studie drücken Sie Ihren persönlichen Standpunkt durch einen Sortierprozess aus. Es gibt keine richtigen oder falschen Antworten; uns interessiert Ihre Perspektive.',
+        consent_title: 'Informierte Einwilligung und Vereinbarung zur Datenverarbeitung',
+        consent_description:
+            '### 1. Art der Studie und Verständnis der Teilnehmenden\\nMit dem Anklicken des untenstehenden Feldes bestätigen Sie, dass Sie die auf der Startseite beschriebenen Ziele der Studie gelesen haben. Sie verstehen, dass diese Übung die **Q-Methodologie** verwendet, eine Forschungsmethode zur Modellierung subjektiver Sichtweisen.\\n\\n* **Subjektivität:** Ihre Aufgabe besteht darin, Aussagen danach zu sortieren, wie bedeutsam sie im Verhältnis zu Ihrer persönlichen Perspektive sind.\\n* **Keine richtigen oder falschen Antworten:** Es gibt daher keine objektiv „richtigen“ oder „falschen“ Antworten, sondern nur Ihren eigenen Standpunkt.\\n\\n### 2. Datenverarbeitung und Pseudonymisierung (DSGVO-Konformität)\\n**Datenerhebung**\\nIhren Antworten (Q-Sort und Erläuterungen nach dem Sortieren) wird bei der Einreichung ein eindeutiger alphanumerischer Code zugewiesen.\\n\\n**De-Identifizierung und Aufbewahrung**\\n* **Standardverfahren:** Direkte Identifikatoren wie IP-Adressen werden sofort in einen anonymen Code umgewandelt und niemals im ursprünglichen Format gespeichert. Dieser technische Prozess stellt sicher, dass Ihre digitale Spur nach Ende der Sitzung nicht zur erneuten Identifizierung verwendet werden kann.\\n* **Ausnahme für Nachkontakt:** Wenn Sie am Ende der Studie freiwillig Kontaktdaten für eine spätere Kontaktaufnahme angeben, wird die Verbindung zwischen Ihrer Identität (E-Mail) und Ihrer Antwort für die Dauer dieser spezifischen Nachkontaktphase aufbewahrt.\\n\\n**Berichterstattung**\\nDie endgültigen Ergebnisse werden in anonymisierter Form dargestellt. Die Daten werden aggregiert, um geteilte soziale Perspektiven (Faktoren) sichtbar zu machen. Qualitative Kommentare können zitiert werden, um diese Faktoren zu kontextualisieren; sie werden jedoch geprüft, um identifizierende Details zu entfernen.\\n\\n### 3. Freiwillige Teilnahme und Recht auf Abbruch\\nIhre Teilnahme ist vollständig freiwillig. Sie können den Sortierprozess jederzeit vor der Einreichung ohne Nachteile abbrechen und den Browser schließen.\\n\\n* **Vor der Einreichung:** Wenn Sie abbrechen, bevor Sie Ihre Sortierung abschließen, werden keine Teildaten gespeichert.\\n* **Nach der Einreichung:** Aufgrund der statistischen Natur der Q-Methodologie (Faktoranalyse) ist ein individueller Rückzug möglicherweise nicht mehr umsetzbar, sobald Ihre Daten eingereicht und in den Datensatz integriert wurden.\\n\\n### 4. Datenspeicherung und Rechte\\nGemäß der Datenschutz-Grundverordnung (DSGVO) haben Sie das Recht, Zugang zu Ihren personenbezogenen Daten oder deren Berichtigung zu verlangen, solange diese identifizierbar bleiben, also vor der endgültigen Anonymisierung.',
+        pre_instruction:
+            'Teilen Sie die Karten ausgehend von Ihrem persönlichen Standpunkt in drei Stapel ein: Aussagen, denen Sie zustimmen, Aussagen, denen Sie nicht zustimmen, und Aussagen, zu denen Sie neutral oder unentschieden sind.',
+        condition_of_instruction:
+            'Bitte ordnen Sie die folgenden Aussagen von denen, denen Sie am meisten zustimmen, bis zu denen, denen Sie am wenigsten zustimmen.',
+
+        process_steps: [
+            {
+                id: 'profile',
+                title: 'Lernen wir uns kennen',
+                description: 'Zuerst beantworten Sie einige kurze einleitende Fragen.',
+                icon: 'User',
+                color: '#3b82f6',
+            },
+            {
+                id: 'rough',
+                title: 'Erste Eindrücke',
+                description:
+                    'Sie lesen die verschiedenen Aussagen und sortieren sie zunächst grob nach Ihrem persönlichen Standpunkt: ob Sie eher zustimmen, neutral sind oder nicht zustimmen. Das erleichtert die nächste Aufgabe.',
+                icon: 'Zap',
+                color: '#f59e0b',
+            },
+            {
+                id: 'fine',
+                title: 'Ihre Perspektive',
+                description:
+                    'In der Sortierphase platzieren Sie die Aussagen auf einem Raster, um Ihre Sichtweise zu verfeinern. Sie ordnen die Aussagen von „stimme am meisten zu“ bis „stimme am wenigsten zu“, indem Sie jede Aussage in das passende Feld legen. Es gibt keine richtigen oder falschen Antworten. Die beste Antwort ist diejenige, die Ihre Meinung oder Überzeugungen widerspiegelt.',
+                icon: 'Target',
+                color: '#8b5cf6',
+            },
+            {
+                id: 'post',
+                title: 'Warum',
+                description:
+                    'Bevor die Sitzung endet, beantworten Sie einige klärende Fragen, damit wir Ihre wichtigsten Entscheidungen besser verstehen können, sowie einige Fragen zu Ihrem Hintergrund.',
+                icon: 'MessageSquare',
+                color: '#10b981',
+            },
+        ],
+        methodology_tips: [
+            'Tipp: Beginnen Sie mit dem, was für Sie am offensichtlichsten ist (den Extremen).',
+            'Innerhalb derselben Spalte spielt die Reihenfolge von oben nach unten keine Rolle.',
+            'Alles muss untergebracht werden. Das kann wie ein Puzzle wirken, hilft aber dabei, Prioritäten sichtbar zu machen.',
+            'Zur Erinnerung: Aussagen werden relativ zueinander sortiert (relative Zustimmung).',
+            'Sie können in verschiedene Bereiche des Rasters hineinzoomen, um besser zu sehen.',
+            'Nichts ist endgültig: Sie können Karten jederzeit verschieben oder zurück auf den Stapel legen.',
+        ],
+    },
     fi: {
         instructions:
             'Tämä tutkimus käsittää oman näkökulmasi ilmaisemisen lajitteluprosessin kautta. Oikeita tai vääriä vastauksia ei ole; olemme kiinnostuneita vain sinun näkökulmastasi.',

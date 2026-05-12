@@ -17,7 +17,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { enUS, fr, fi } from 'date-fns/locale';
+import { de, enUS, fr, fi } from 'date-fns/locale';
 import type { Locale } from 'date-fns';
 import {
     useListConcoursesApiAdminConcoursesGet,
@@ -27,7 +27,7 @@ import type { ConcourseRead, StudyRead } from '@/api/model';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
 
-const DATE_LOCALES: Record<string, Locale> = { en: enUS, fr, fi };
+const DATE_LOCALES: Record<string, Locale> = { en: enUS, fr, fi, de };
 
 export interface DashboardAlert {
     key: string;

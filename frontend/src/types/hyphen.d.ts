@@ -9,3 +9,7 @@ declare module 'hyphen/fr' {
 declare module 'hyphen/fi' {
     export const hyphenateSync: (text: string) => string;
 }
+
+declare module 'hyphen/de' {
+    export const hyphenateSync: (text: string) => string;
+}

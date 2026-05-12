@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
-import { enUS, fr, fi } from 'date-fns/locale';
+import { de, enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface ParticipantMetadataCardProps {
@@ -69,6 +69,7 @@ export function ParticipantMetadataCard({
         en: enUS,
         fr: fr,
         fi: fi,
+        de: de,
     };
     const currentLocale = dateLocales[i18n.language] || enUS;
 

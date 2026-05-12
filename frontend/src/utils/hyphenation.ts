@@ -1,4 +1,5 @@
 import { hyphenateSync as hyphenateEn } from 'hyphen/en-us';
+import { hyphenateSync as hyphenateDe } from 'hyphen/de';
 import { hyphenateSync as hyphenateFi } from 'hyphen/fi';
 import { hyphenateSync as hyphenateFr } from 'hyphen/fr';
 
@@ -6,6 +7,7 @@ const hyphenators: Record<string, (text: string) => string> = {
     en: hyphenateEn,
     fr: hyphenateFr,
     fi: hyphenateFi,
+    de: hyphenateDe,
 };
 
 const cache = new Map<string, string>();

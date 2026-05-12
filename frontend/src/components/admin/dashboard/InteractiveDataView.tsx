@@ -108,7 +108,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
-import { enUS, fr, fi, type Locale } from 'date-fns/locale';
+import { de, enUS, fr, fi, type Locale } from 'date-fns/locale';
 
 import * as Collapsible from '@radix-ui/react-collapsible';
 import type { DumpParticipant, DumpResponse } from './types';
@@ -880,7 +880,7 @@ export default function InteractiveDataView({
     const queryClient = useQueryClient();
 
     // biome-ignore lint/suspicious/noExplicitAny: complex locale types
-    const dateLocales: Record<string, any> = { en: enUS, fr, fi };
+    const dateLocales: Record<string, any> = { en: enUS, fr, fi, de };
     const currentLocale = dateLocales[i18n.language] || enUS;
 
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);

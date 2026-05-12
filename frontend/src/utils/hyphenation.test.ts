@@ -28,6 +28,12 @@ describe('hyphenation utility', () => {
         expect(result.replaceAll(SOFT_HYPHEN, '')).toBe('environnement');
     });
 
+    it('inserts soft hyphens in German text', () => {
+        const result = hyphenate('Datenschutzgrundverordnung', 'de');
+        expect(result).toContain(SOFT_HYPHEN);
+        expect(result.replaceAll(SOFT_HYPHEN, '')).toBe('Datenschutzgrundverordnung');
+    });
+
     it('normalizes lang codes (en-US → en)', () => {
         const result = hyphenate('hyphenation', 'en-US');
         expect(result).toContain(SOFT_HYPHEN);

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Locale } from 'date-fns';
 import { formatDistanceToNow, format } from 'date-fns';
-import { enUS, fr, fi } from 'date-fns/locale';
+import { de, enUS, fr, fi } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 import type { ParticipantRead } from '@/api/model';
@@ -28,6 +28,7 @@ const dateLocales: Record<string, Locale> = {
     en: enUS,
     fr: fr,
     fi: fi,
+    de: de,
 };
 
 const DEVICE_ICONS = {
