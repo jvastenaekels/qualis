@@ -318,6 +318,9 @@
             "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
             "hint": "This is spontaneous. You can change your mind right after."
         },
+        "tip": {
+            "close": "Close tip"
+        },
         "complete": {
             "title": "First step complete",
             "subtitle": "We will now refine the nuances.",
@@ -350,7 +353,7 @@
             "disagree": "Most disagree",
             "neutral": "Neutral",
             "agree": "Most agree",
-            "label": "Spectrum legend"
+            "label": "Grid legend"
         },
         "actions": {
             "validate": "Confirm sort",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Place statements on the grid",
-            "instruction_label": "Instruction"
+            "instruction_label": "Instruction",
+            "expand_instructions": "Expand instructions",
+            "minimize_instructions": "Minimize instructions"
         },
         "workbench": {
             "active_card": "Active statement",
@@ -368,6 +373,7 @@
             "drag_or_tap": "Drag to grid or tap slot",
             "initial_instruction": "Tap (or drag) statement",
             "initial_instruction_mobile": "Tap statement",
+            "cancel_selection": "Cancel selection",
             "help": "How does it work?",
             "methodology": {
                 "extremes": "Tip: start with what is most obvious to you (the extremes).",

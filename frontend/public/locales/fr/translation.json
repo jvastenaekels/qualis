@@ -318,6 +318,9 @@
             "subtitle": "Glissez à **gauche** pour « Pas d'accord », à **droite** pour « D'accord », ou en **bas** pour « Neutre / Indécis ».",
             "hint": "C'est du spontané. Vous pourrez changer d'avis juste après."
         },
+        "tip": {
+            "close": "Fermer l'aide"
+        },
         "complete": {
             "title": "Première étape validée",
             "subtitle": "Nous allons maintenant affiner les nuances.",
@@ -350,7 +353,7 @@
             "disagree": "Le plus en désaccord",
             "neutral": "Neutre",
             "agree": "Le plus en accord",
-            "label": "Légende du spectre"
+            "label": "Légende de la grille"
         },
         "actions": {
             "validate": "Confirmer le tri",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Placez les énoncés sur la grille",
-            "instruction_label": "Consigne"
+            "instruction_label": "Consigne",
+            "expand_instructions": "Afficher les consignes",
+            "minimize_instructions": "Masquer les consignes"
         },
         "workbench": {
             "active_card": "Énoncé actif",
@@ -368,6 +373,7 @@
             "drag_or_tap": "Glissez ou touchez une case",
             "initial_instruction": "Touchez (ou glissez) un énoncé",
             "initial_instruction_mobile": "Touchez un énoncé",
+            "cancel_selection": "Annuler la sélection",
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
