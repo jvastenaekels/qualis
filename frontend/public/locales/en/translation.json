@@ -2598,6 +2598,7 @@
         "go_to_study": "Start a new session"
     },
     "landing": {
+        "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
         "study_code_label": "Study Code",
         "study_code_placeholder": "e.g. my-study",

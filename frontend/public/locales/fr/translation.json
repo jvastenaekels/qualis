@@ -2598,6 +2598,7 @@
         "go_to_study": "Commencer une nouvelle session"
     },
     "landing": {
+        "page_title": "Accès à l'étude Qualis",
         "instruction": "Entrez le code de votre étude pour commencer.",
         "study_code_label": "Code de l'étude",
         "study_code_placeholder": "ex. mon-etude",

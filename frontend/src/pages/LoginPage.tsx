@@ -191,7 +191,8 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex-1 w-full flex items-center justify-center bg-[#fafafa] p-4">
+        <main className="flex-1 w-full flex items-center justify-center bg-[#fafafa] p-4">
+            <h1 className="sr-only">{t('auth.login.card_title')}</h1>
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full" />
@@ -288,7 +289,7 @@ const LoginPage = () => {
                                         </Label>
                                         <Link
                                             to="/forgot-password"
-                                            className="text-xs text-slate-500 hover:text-slate-700 underline"
+                                            className="text-xs text-slate-600 hover:text-slate-800 underline"
                                         >
                                             {t(
                                                 'auth.login.forgot_password_link',
@@ -376,7 +377,7 @@ const LoginPage = () => {
                                         type="button"
                                         onClick={handleResend}
                                         disabled={resendCooldown > 0}
-                                        className="text-xs text-slate-500 hover:text-slate-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="text-xs text-slate-600 hover:text-slate-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {resendCooldown > 0
                                             ? t(
@@ -407,14 +408,14 @@ const LoginPage = () => {
                                     <button
                                         type="button"
                                         onClick={handleBackToCredentials}
-                                        className="flex items-center gap-1 text-slate-500 hover:text-slate-700"
+                                        className="flex items-center gap-1 text-slate-600 hover:text-slate-800"
                                     >
                                         <ArrowLeft className="h-3 w-3" />
                                         {t('auth.login.cta', 'Sign in')}
                                     </button>
                                     <Link
                                         to="/2fa/recover"
-                                        className="text-slate-500 hover:text-slate-700 underline"
+                                        className="text-slate-600 hover:text-slate-800 underline"
                                     >
                                         {t('auth.login.lost_2fa_link', 'Lost access to your 2FA?')}
                                     </Link>
@@ -424,11 +425,9 @@ const LoginPage = () => {
                     )}
                 </Card>
 
-                <p className="text-center text-2xs text-slate-400 mt-12 font-medium opacity-50">
-                    Qualis
-                </p>
+                <p className="text-center text-2xs text-slate-600 mt-12 font-medium">Qualis</p>
             </motion.div>
-        </div>
+        </main>
     );
 };
 
