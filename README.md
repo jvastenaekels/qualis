@@ -6,7 +6,7 @@
 
 **Open-source platform for Q-methodology research.**
 
-Design studies, collect Q-sorts, and run factor analysis from the browser. Supports any device, requires no software installation, and keeps data on your own server.
+Design studies, collect Q-sorts, and run factor analysis in the browser. Participants can use common phones, tablets, and desktops without installing apps or plugins; self-hosted deployments keep research data on your chosen server.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
@@ -63,7 +63,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 ### Participant experience
 
 - **Clean, readable layout.** A simple interface that lets participants focus on the sorting task.
-- **Works on any device.** Smartphone, tablet, or desktop. Participants open a link and start sorting. No apps or plugins required.
+- **Works across common devices.** Participants can open a study link on a phone, tablet, or desktop browser and start sorting without installing apps or plugins.
 - **Mobile-first drag-and-drop.** Touch-optimised sorting with auto-pan, dwell-zoom, and edge scrolling, so participants without desktop access are not excluded.
 - **Intercultural studies.** Translate statements, instructions, consent forms, and UI labels into multiple languages; participants see the study in their preferred language. Lowers the barrier to cross-cultural and multi-site Q research.
 
@@ -126,7 +126,7 @@ A reusable pool of candidate statements that lives at the project level, not the
 ### Collaboration
 
 - **Projects** to isolate research groups, each with its own members and studies.
-- **Concurrent editing** with auto-save, optimistic locking, and conflict resolution.
+- **Shared project access** for research teams, with role-based permissions for editing, exports, and member management.
 - **Invitation system** via email, or shareable link when SMTP is not configured.
 
 ---

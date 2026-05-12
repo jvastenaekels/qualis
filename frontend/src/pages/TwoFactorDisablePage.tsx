@@ -67,7 +67,7 @@ export default function TwoFactorDisablePage() {
     };
 
     return (
-        <main className="mx-auto max-w-md p-8 text-center">
+        <div className="mx-auto max-w-md p-8 text-center">
             <h1 className="text-xl font-semibold mb-3">
                 {t('auth.twofa.disable.title', 'Disable two-factor authentication')}
             </h1>
@@ -127,6 +127,6 @@ export default function TwoFactorDisablePage() {
                             )}
                 </p>
             )}
-        </main>
+        </div>
     );
 }

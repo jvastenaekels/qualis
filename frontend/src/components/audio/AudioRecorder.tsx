@@ -27,6 +27,52 @@ interface AudioRecorderProps {
 
 type RecorderState = 'idle' | 'recording' | 'stopped' | 'playing' | 'uploading';
 
+type MutableRef<T> = { current: T };
+
+const emptyAudioLevels = [0, 0, 0, 0, 0];
+
+function clearIntervalRef(ref: MutableRef<NodeJS.Timeout | null>): void {
+    if (!ref.current) return;
+    clearInterval(ref.current);
+    ref.current = null;
+}
+
+function cancelAnimationFrameRef(ref: MutableRef<number | null>): void {
+    if (!ref.current) return;
+    cancelAnimationFrame(ref.current);
+    ref.current = null;
+}
+
+function closeAudioContextRef(ref: MutableRef<AudioContext | null>): void {
+    if (!ref.current) return;
+    if (ref.current.state !== 'closed') {
+        ref.current.close();
+    }
+    ref.current = null;
+}
+
+function stopStreamRef(ref: MutableRef<MediaStream | null>): void {
+    if (!ref.current) return;
+    ref.current.getTracks().forEach((track) => {
+        track.stop();
+    });
+    ref.current = null;
+}
+
+function detachAudioPlayer(audio: HTMLAudioElement | null): void {
+    if (!audio) return;
+    audio.pause();
+    audio.onended = null;
+    audio.onerror = null;
+    audio.ontimeupdate = null;
+}
+
+function revokeBlobPlayerSource(audio: HTMLAudioElement | null): void {
+    if (audio?.src?.startsWith('blob:')) {
+        URL.revokeObjectURL(audio.src);
+    }
+}
+
 export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     questionKey: _questionKey,
     maxDurationSeconds = 180,
@@ -197,22 +243,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     // Cleanup on unmount (fixed dependencies)
     useEffect(() => {
         return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
-            if (permissionCheckIntervalRef.current)
-                clearInterval(permissionCheckIntervalRef.current);
-            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-            if (audioContextRef.current?.state !== 'closed') {
-                audioContextRef.current?.close();
-            }
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach((track) => {
-                    track.stop();
-                });
-            }
-            // Only revoke blob URLs (not presigned URLs)
-            if (audioPlayerRef.current?.src?.startsWith('blob:')) {
-                URL.revokeObjectURL(audioPlayerRef.current.src);
-            }
+            clearIntervalRef(timerRef);
+            clearIntervalRef(permissionCheckIntervalRef);
+            cancelAnimationFrameRef(animationFrameRef);
+            closeAudioContextRef(audioContextRef);
+            stopStreamRef(streamRef);
+            revokeBlobPlayerSource(audioPlayerRef.current);
         };
     }, []); // Empty deps - only run on mount/unmount
 
@@ -453,24 +489,47 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const stopRecording = () => {
         if (mediaRecorderRef.current && stateRef.current === 'recording') {
             mediaRecorderRef.current.stop();
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-                timerRef.current = null;
-            }
-            if (permissionCheckIntervalRef.current) {
-                clearInterval(permissionCheckIntervalRef.current);
-                permissionCheckIntervalRef.current = null;
-            }
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-                animationFrameRef.current = null;
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-                audioContextRef.current = null;
-            }
-            setAudioLevels([0, 0, 0, 0, 0]);
+            clearIntervalRef(timerRef);
+            clearIntervalRef(permissionCheckIntervalRef);
+            cancelAnimationFrameRef(animationFrameRef);
+            closeAudioContextRef(audioContextRef);
+            setAudioLevels(emptyAudioLevels);
         }
+    };
+
+    const refreshUrlBeforePlayback = async (): Promise<boolean> => {
+        if (!urlExpiresAt || Date.now() <= urlExpiresAt - 60 * 1000) {
+            return true;
+        }
+
+        try {
+            await refreshPresignedUrl();
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            return true;
+        } catch (error) {
+            console.error('Failed to refresh URL before playback:', error);
+            toast.error(
+                t('audio.refresh_failed', 'Could not refresh audio. Your recording is still saved.')
+            );
+            return false;
+        }
+    };
+
+    const resetPlaybackAfterFailure = () => {
+        setState('stopped');
+        setAudioLevels(emptyAudioLevels);
+    };
+
+    const cleanupPreviousPlayer = () => {
+        detachAudioPlayer(audioPlayerRef.current);
+    };
+
+    const finishPlayback = () => {
+        setState('stopped');
+        setAudioLevels(emptyAudioLevels);
+        setPlaybackPosition(0);
+        cancelAnimationFrameRef(animationFrameRef);
+        closeAudioContextRef(audioContextRef);
     };
 
     const playRecording = async () => {
@@ -479,31 +538,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         if (!currentUrl) return;
 
         // Proactively check if URL might be expired before playing
-        if (urlExpiresAt && Date.now() > urlExpiresAt - 60 * 1000) {
-            try {
-                await refreshPresignedUrl();
-                // URL refreshed, audioUrl state will update and trigger re-render
-                // Wait a tick for state update
-                await new Promise((resolve) => setTimeout(resolve, 100));
-            } catch (error) {
-                console.error('Failed to refresh URL before playback:', error);
-                toast.error(
-                    t(
-                        'audio.refresh_failed',
-                        'Could not refresh audio. Your recording is still saved.'
-                    )
-                );
-                return;
-            }
-        }
+        const canPlay = await refreshUrlBeforePlayback();
+        if (!canPlay) return;
 
         // Clean up previous Audio element to prevent orphaned playback
-        if (audioPlayerRef.current) {
-            audioPlayerRef.current.pause();
-            audioPlayerRef.current.onended = null;
-            audioPlayerRef.current.onerror = null;
-            audioPlayerRef.current.ontimeupdate = null;
-        }
+        cleanupPreviousPlayer();
 
         // Re-read ref after potential refresh
         const urlToPlay = audioUrlRef.current || currentUrl;
@@ -585,8 +624,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
             // Cancel animation frame on error
             if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-                animationFrameRef.current = null;
+                cancelAnimationFrameRef(animationFrameRef);
             }
 
             // Try refreshing URL and retrying once (guard against infinite recursion)
@@ -606,8 +644,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             'Could not play audio. Refresh the page and try again.'
                         )
                     );
-                    setState('stopped');
-                    setAudioLevels([0, 0, 0, 0, 0]);
+                    resetPlaybackAfterFailure();
                 }
             } else {
                 toast.error(
@@ -616,26 +653,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         'Could not play audio. Refresh the page and try again.'
                     )
                 );
-                setState('stopped');
-                setAudioLevels([0, 0, 0, 0, 0]);
+                resetPlaybackAfterFailure();
             }
         };
 
-        audio.onended = () => {
-            setState('stopped');
-            setAudioLevels([0, 0, 0, 0, 0]);
-            setPlaybackPosition(0);
-
-            // Cleanup Web Audio API
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-                animationFrameRef.current = null;
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-                audioContextRef.current = null;
-            }
-        };
+        audio.onended = finishPlayback;
 
         audio.ontimeupdate = () => {
             setPlaybackPosition(audio.currentTime);
@@ -643,8 +665,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
         audio.play().catch((error) => {
             console.error('Audio play() rejected:', error);
-            setState('stopped');
-            setAudioLevels([0, 0, 0, 0, 0]);
+            resetPlaybackAfterFailure();
         });
     };
 
@@ -652,17 +673,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         if (audioPlayerRef.current) {
             audioPlayerRef.current.pause();
             setState('stopped');
-            setAudioLevels([0, 0, 0, 0, 0]);
+            setAudioLevels(emptyAudioLevels);
 
             // Stop waveform animation
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-                animationFrameRef.current = null;
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-                audioContextRef.current = null;
-            }
+            cancelAnimationFrameRef(animationFrameRef);
+            closeAudioContextRef(audioContextRef);
         }
     };
 
@@ -683,15 +698,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         // Clear pending blob to prevent in-flight upload from storing stale metadata
         pendingBlobRef.current = null;
 
-        if (timerRef.current) clearInterval(timerRef.current);
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = null;
-        }
-        if (audioContextRef.current) {
-            audioContextRef.current.close();
-            audioContextRef.current = null;
-        }
+        clearIntervalRef(timerRef);
+        cancelAnimationFrameRef(animationFrameRef);
+        closeAudioContextRef(audioContextRef);
 
         // Save state for restoration on failure
         const savedAudioUrl = audioUrl;
@@ -708,7 +717,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
             setAudioUrl(null);
             setDuration(0);
-            setAudioLevels([0, 0, 0, 0, 0]);
+            setAudioLevels(emptyAudioLevels);
             setState('idle');
             setUploadStatus('idle');
             pendingBlobRef.current = null;

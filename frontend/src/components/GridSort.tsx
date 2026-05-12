@@ -184,7 +184,7 @@ const InstructionHeader: React.FC<{
                             'absolute inset-x-0 mx-auto w-fit bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600',
                             emphasizeCollapse ? 'top-2 z-header' : 'top-[112px] z-modal'
                         )}
-                        aria-label="Expand instructions"
+                        aria-label={t('fine.header.expand_instructions', 'Expand instructions')}
                     >
                         <Target size={14} />
                         <span>{t('fine.header.instruction_label', 'Instruction')}</span>
@@ -218,7 +218,10 @@ const InstructionHeader: React.FC<{
                             type="button"
                             onClick={() => setIsMinimized(true)}
                             className="flex items-center justify-center transition-colors gap-1.5 mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 text-xs font-medium"
-                            aria-label="Minimize instructions"
+                            aria-label={t(
+                                'fine.header.minimize_instructions',
+                                'Minimize instructions'
+                            )}
                         >
                             <Check size={14} />
                         </button>
@@ -233,12 +236,12 @@ const GridToolbar: React.FC<{
     onZoomIn: () => void;
     onZoomOut: () => void;
     onReset: () => void;
-    labels: { in: string; out: string; fit: string };
+    labels: { in: string; out: string; fit: string; toolbar: string };
 }> = React.memo(({ onZoomIn, onZoomOut, onReset, labels }) => (
     <div
         className="absolute top-4 right-4 z-toolbar flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md"
         role="toolbar"
-        aria-label="Grid controls"
+        aria-label={labels.toolbar}
     >
         <button
             type="button"
@@ -319,7 +322,7 @@ const GridLegend: React.FC<{
             <div
                 className="flex justify-between items-end w-full font-bold opacity-60 px-2 gap-4"
                 role="group"
-                aria-label="Grid legend"
+                aria-label={t('fine.legend.label', 'Grid legend')}
             >
                 {legends.map((key) => (
                     <LegendLabel
@@ -425,6 +428,7 @@ const ValidationFooter: React.FC<{
         place: string;
         initial: string;
         finish: string;
+        cancelSelection: string;
     };
     highlightKey?: string | null;
     compact?: boolean;
@@ -486,7 +490,7 @@ const ValidationFooter: React.FC<{
                                         type="button"
                                         onClick={onCancelSelection}
                                         className="ml-auto flex-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-indigo-100 text-slate-500 hover:text-slate-700 transition-colors"
-                                        aria-label="Cancel selection"
+                                        aria-label={labels.cancelSelection}
                                     >
                                         <X size={16} strokeWidth={2.5} aria-hidden="true" />
                                     </button>
@@ -756,6 +760,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         : uiLabels?.['fine.workbench.initial_instruction'] ||
                           t('fine.workbench.initial_instruction'),
                 finish: uiLabels?.['fine.actions.finish'] || t('fine.actions.finish'),
+                cancelSelection: t('fine.workbench.cancel_selection', 'Cancel selection'),
             }),
             [t, uiLabels, isMobile, isLandscapeMobile]
         );
@@ -765,6 +770,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 in: t('fine.toolbar.zoom_in'),
                 out: t('fine.toolbar.zoom_out'),
                 fit: t('fine.toolbar.fit_screen'),
+                toolbar: t('fine.toolbar.label', 'Grid controls'),
             }),
             [t]
         );

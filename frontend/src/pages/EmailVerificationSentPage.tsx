@@ -35,7 +35,7 @@ export default function EmailVerificationSentPage() {
     };
 
     return (
-        <main className="mx-auto max-w-md p-8 text-center">
+        <div className="mx-auto max-w-md p-8 text-center">
             <h1 className="text-xl font-semibold mb-3">
                 {t('auth.email.verification_sent.title', 'Verify your email')}
             </h1>
@@ -63,6 +63,6 @@ export default function EmailVerificationSentPage() {
                     : t('auth.email.verification_sent.resend', 'Resend the email')}
             </button>
             {error !== null && <p className="mt-3 text-red-600 text-sm">{error}</p>}
-        </main>
+        </div>
     );
 }

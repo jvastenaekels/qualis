@@ -147,7 +147,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 type="button"
                 onClick={prevTip}
                 className="absolute left-1 top-1/2 -translate-y-1/2 p-1.5 text-indigo-300 hover:text-indigo-600 hover:bg-indigo-100/80 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Previous tip"
+                aria-label={t('fine.workbench.previous_tip', 'Previous tip')}
             >
                 <ChevronLeft size={20} />
             </button>
@@ -175,7 +175,9 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                                 setIsPaused(true);
                             }}
                             className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-4 bg-indigo-400' : 'w-1.5 bg-indigo-200 hover:bg-indigo-300'}`}
-                            aria-label={`Go to tip ${i + 1}`}
+                            aria-label={t('fine.workbench.go_to_tip', 'Go to tip {{number}}', {
+                                number: i + 1,
+                            })}
                         />
                     ))}
                 </div>
@@ -185,7 +187,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 type="button"
                 onClick={nextTip}
                 className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-indigo-300 hover:text-indigo-600 hover:bg-indigo-100/80 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Next tip"
+                aria-label={t('fine.workbench.next_tip', 'Next tip')}
             >
                 <ChevronRight size={20} />
             </button>

@@ -188,7 +188,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowTip(false)}
-                                    aria-label="Close tip"
+                                    aria-label={t('rough.tip.close', 'Close tip')}
                                     className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
                                 >
                                     <X size={14} />

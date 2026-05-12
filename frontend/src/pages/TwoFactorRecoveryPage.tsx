@@ -28,19 +28,19 @@ export default function TwoFactorRecoveryPage() {
 
     if (sent) {
         return (
-            <main className="mx-auto max-w-md p-8 text-center">
+            <div className="mx-auto max-w-md p-8 text-center">
                 <p>
                     {t(
                         'auth.twofa.recovery.success',
                         'If the email exists and has 2FA, a disable link is on its way.'
                     )}
                 </p>
-            </main>
+            </div>
         );
     }
 
     return (
-        <main className="mx-auto max-w-md p-8">
+        <div className="mx-auto max-w-md p-8">
             <h1 className="text-xl font-semibold mb-3">
                 {t('auth.twofa.recovery.title', 'Lost access to your two-factor authentication?')}
             </h1>
@@ -68,6 +68,6 @@ export default function TwoFactorRecoveryPage() {
                     {t('auth.twofa.recovery.submit', 'Send disable link')}
                 </button>
             </form>
-        </main>
+        </div>
     );
 }

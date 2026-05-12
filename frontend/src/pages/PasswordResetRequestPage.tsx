@@ -28,19 +28,19 @@ export default function PasswordResetRequestPage() {
 
     if (sent) {
         return (
-            <main className="mx-auto max-w-md p-8 text-center">
+            <div className="mx-auto max-w-md p-8 text-center">
                 <p>
                     {t(
                         'auth.password_reset.request_success',
                         'If the email exists, a reset link is on its way.'
                     )}
                 </p>
-            </main>
+            </div>
         );
     }
 
     return (
-        <main className="mx-auto max-w-md p-8">
+        <div className="mx-auto max-w-md p-8">
             <h1 className="text-xl font-semibold mb-4">
                 {t('auth.password_reset.request_title', 'Reset your password')}
             </h1>
@@ -68,6 +68,6 @@ export default function PasswordResetRequestPage() {
                     {t('auth.password_reset.request_submit', 'Send reset link')}
                 </button>
             </form>
-        </main>
+        </div>
     );
 }

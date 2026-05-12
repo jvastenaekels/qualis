@@ -318,6 +318,9 @@
             "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
             "hint": "Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
         },
+        "tip": {
+            "close": "Sulje vinkki"
+        },
         "complete": {
             "title": "Ensimmäinen vaihe valmis",
             "subtitle": "Nyt tarkennetaan nyansseja.",
@@ -350,7 +353,7 @@
             "disagree": "Täysin eri mieltä",
             "neutral": "Neutraali",
             "agree": "Eniten samaa mieltä",
-            "label": "Spektrin selite"
+            "label": "Ruudukon selite"
         },
         "actions": {
             "validate": "Vahvista lajittelu",
@@ -360,7 +363,9 @@
         },
         "header": {
             "title": "Sijoita väitteet ruudukkoon",
-            "instruction_label": "Ohje"
+            "instruction_label": "Ohje",
+            "expand_instructions": "Näytä ohjeet",
+            "minimize_instructions": "Piilota ohjeet"
         },
         "workbench": {
             "active_card": "Aktiivinen väite",
@@ -368,7 +373,11 @@
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
             "initial_instruction": "Napauta (tai vedä) väitettä",
             "initial_instruction_mobile": "Napauta väitettä",
+            "cancel_selection": "Peruuta valinta",
             "help": "Miten tämä toimii?",
+            "previous_tip": "Edellinen vinkki",
+            "next_tip": "Seuraava vinkki",
+            "go_to_tip": "Siirry vinkkiin {{number}}",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
                 "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
@@ -2598,6 +2607,7 @@
         "go_to_study": "Aloita uusi istunto"
     },
     "landing": {
+        "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
         "study_code_label": "Study Code",
         "study_code_placeholder": "e.g. my-study",

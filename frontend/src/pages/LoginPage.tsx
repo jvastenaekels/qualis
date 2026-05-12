@@ -192,6 +192,7 @@ const LoginPage = () => {
 
     return (
         <div className="flex-1 w-full flex items-center justify-center bg-[#fafafa] p-4">
+            <h1 className="sr-only">{t('auth.login.card_title')}</h1>
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full" />
@@ -199,8 +200,8 @@ const LoginPage = () => {
             </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ y: 20 }}
+                animate={{ y: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="w-full max-w-[400px] z-10"
             >
@@ -210,7 +211,7 @@ const LoginPage = () => {
                     </div>
                 </div>
 
-                <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-md">
+                <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white text-slate-900 backdrop-blur-md">
                     {stage === 'credentials' && (
                         <form onSubmit={handleLogin}>
                             <CardHeader className="pb-4">
@@ -267,14 +268,16 @@ const LoginPage = () => {
                             })()}
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">{t('auth.login.email_label')}</Label>
+                                    <Label htmlFor="email" className="text-slate-800">
+                                        {t('auth.login.email_label')}
+                                    </Label>
                                     <div className="relative">
                                         <AtSign className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                         <Input
                                             id="email"
                                             type="email"
                                             placeholder="name@example.com"
-                                            className="pl-10 bg-slate-50/50 border-slate-200"
+                                            className="pl-10 bg-white border-slate-300 text-slate-900 placeholder:text-slate-600"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             autoComplete="email"
@@ -283,12 +286,12 @@ const LoginPage = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label htmlFor="password">
+                                        <Label htmlFor="password" className="text-slate-800">
                                             {t('auth.login.password_label')}
                                         </Label>
                                         <Link
                                             to="/forgot-password"
-                                            className="text-xs text-slate-500 hover:text-slate-700 underline"
+                                            className="text-xs text-slate-800 hover:text-slate-900 underline"
                                         >
                                             {t(
                                                 'auth.login.forgot_password_link',
@@ -302,7 +305,7 @@ const LoginPage = () => {
                                             id="password"
                                             type="password"
                                             placeholder={t('auth.register.placeholder_password')}
-                                            className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus:bg-white transition-all shadow-sm"
+                                            className="pl-10 h-11 bg-white border-slate-300 text-slate-900 placeholder:text-slate-600 focus:bg-white transition-all shadow-sm"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
@@ -314,7 +317,7 @@ const LoginPage = () => {
                             <CardFooter className="pt-2 flex flex-col gap-4">
                                 <Button
                                     type="submit"
-                                    className="w-full bg-slate-900 hover:bg-slate-800 transition-all font-semibold"
+                                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-900 disabled:opacity-100 transition-all font-semibold"
                                     disabled={isCredentialsPending}
                                 >
                                     {isCredentialsPending ? (
@@ -341,7 +344,7 @@ const LoginPage = () => {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p className="text-sm text-slate-600">
+                                <p className="text-sm text-slate-700">
                                     {channel === 'email'
                                         ? t(
                                               'auth.login.two_factor_email_prompt',
@@ -376,7 +379,7 @@ const LoginPage = () => {
                                         type="button"
                                         onClick={handleResend}
                                         disabled={resendCooldown > 0}
-                                        className="text-xs text-slate-500 hover:text-slate-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="text-xs text-slate-800 hover:text-slate-900 underline disabled:opacity-100 disabled:cursor-not-allowed"
                                     >
                                         {resendCooldown > 0
                                             ? t(
@@ -391,7 +394,7 @@ const LoginPage = () => {
                             <CardFooter className="pt-2 flex flex-col gap-3">
                                 <Button
                                     type="submit"
-                                    className="w-full bg-slate-900 hover:bg-slate-800 transition-all font-semibold"
+                                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-900 disabled:opacity-100 transition-all font-semibold"
                                     disabled={otp.length !== 6 || isOtpPending}
                                 >
                                     {isOtpPending ? (
@@ -407,14 +410,14 @@ const LoginPage = () => {
                                     <button
                                         type="button"
                                         onClick={handleBackToCredentials}
-                                        className="flex items-center gap-1 text-slate-500 hover:text-slate-700"
+                                        className="flex items-center gap-1 text-slate-800 hover:text-slate-900"
                                     >
                                         <ArrowLeft className="h-3 w-3" />
                                         {t('auth.login.cta', 'Sign in')}
                                     </button>
                                     <Link
                                         to="/2fa/recover"
-                                        className="text-slate-500 hover:text-slate-700 underline"
+                                        className="text-slate-800 hover:text-slate-900 underline"
                                     >
                                         {t('auth.login.lost_2fa_link', 'Lost access to your 2FA?')}
                                     </Link>
@@ -424,9 +427,7 @@ const LoginPage = () => {
                     )}
                 </Card>
 
-                <p className="text-center text-2xs text-slate-400 mt-12 font-medium opacity-50">
-                    Qualis
-                </p>
+                <p className="text-center text-2xs text-slate-800 mt-12 font-medium">Qualis</p>
             </motion.div>
         </div>
     );

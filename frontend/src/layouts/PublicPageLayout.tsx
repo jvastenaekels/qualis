@@ -13,7 +13,7 @@ interface PublicPageLayoutProps {
 
 export const PublicPageLayout = ({ children }: PublicPageLayoutProps) => (
     <div className="min-h-screen flex flex-col">
-        <div className="flex-1 flex flex-col">{children}</div>
+        <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
     </div>
 );

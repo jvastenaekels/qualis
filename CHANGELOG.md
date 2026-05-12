@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.4](https://github.com/jvastenaekels/qualis/compare/v0.6.3...v0.6.4) (2026-05-12)
+
+
+### Documentation
+
+* avoid overclaiming concurrent editing ([e242124](https://github.com/jvastenaekels/qualis/commit/e242124205cf85826aba9f5633eed16bab0f3a47))
+* qualify browser support claims ([048c966](https://github.com/jvastenaekels/qualis/commit/048c966c8ebe94a6d8a7e25f974453ba26ce5528))
+
+## [0.6.3](https://github.com/jvastenaekels/qualis/compare/v0.6.2...v0.6.3) (2026-05-04)
+
+
+### Features
+
+* **questions:** add rating-N scale question type for pre/post-sort ([#150](https://github.com/jvastenaekels/qualis/issues/150)) ([ed89d25](https://github.com/jvastenaekels/qualis/commit/ed89d25f25aa463cb4fd7fb5065352cab61bcc47))
+
 ## [0.6.2](https://github.com/jvastenaekels/qualis/compare/v0.6.1...v0.6.2) (2026-05-04)
 
 

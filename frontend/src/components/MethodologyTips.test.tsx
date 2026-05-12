@@ -10,7 +10,8 @@ import MethodologyTips from './MethodologyTips';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) => key,
+        t: (key: string, fallback?: string, options?: { number?: number }) =>
+            (fallback ?? key).replace('{{number}}', String(options?.number)),
     }),
 }));
 
