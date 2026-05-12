@@ -70,9 +70,13 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         await expect(page.locator('table')).toBeVisible({ timeout: 15000 });
         await expect(page.locator('tbody tr')).toHaveCount(2);
 
-        // Click on first participant row to open detail
+        // Click on first participant row to open detail. Participant detail
+        // headings use the first 8 chars of the UUID session token, so the
+        // code can contain A-F as well as digits.
         await page.locator('tbody tr').first().click();
-        await expect(page.getByRole('heading', { name: /participant\s*#?\s*\d+/i })).toBeVisible();
+        await expect(
+            page.getByRole('heading', { name: /^participant\s+[0-9a-f]{8}$/i })
+        ).toBeVisible();
 
         // The card's "Discard"/"Restore" button only opens an AlertDialog;
         // the actual mutation happens when the user clicks the dialog's
@@ -80,9 +84,7 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         // dialog action lives in role="alertdialog", so we scope to that
         // container to disambiguate from the trigger.
         const cardToggle = () =>
-            page
-                .getByRole('button', { name: /^(discard|restore)$/i, exact: false })
-                .first();
+            page.getByRole('button', { name: /^(discard|restore)$/i, exact: false }).first();
 
         const confirmDialogAction = () =>
             page.getByRole('alertdialog').getByRole('button', { name: /^(discard|restore)$/i });
