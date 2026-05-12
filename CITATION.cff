@@ -10,7 +10,7 @@ abstract: >-
   to PQMethod, Ken-Q Analysis, and the R qmethod package. Designed for
   critical Q-methodology practice, with attention to transparency of
   analytical choices and integration of post-sort participant voice.
-version: "0.6.3" # x-release-please-version
+version: "0.6.4" # x-release-please-version
 date-released: "2026-05-02" # update manually when merging the release PR
 url: "https://github.com/jvastenaekels/qualis"
 repository-code: "https://github.com/jvastenaekels/qualis"
