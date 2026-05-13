@@ -1493,8 +1493,8 @@
                 "warnings": {
                     "grid_capacity_mismatch": "Die Anweisungsanzahl ({{count}}) stimmt nicht mit der Netzkapazität ({{capacity}}) überein.",
                     "missing_consent_draft": "Titel oder Beschreibung der Einwilligung fehlen (Studienentwurf)",
-                    "external_branding_logo": "Das Branding-Logo verwendet eine externe URL: {{URL}}",
-                    "external_partner_logo": "Das Partnerlogo für „{{name}}“ verwendet eine externe URL: {{URL}}",
+                    "external_branding_logo": "Das Branding-Logo verwendet eine externe URL: {{url}}",
+                    "external_partner_logo": "Das Partnerlogo für „{{name}}“ verwendet eine externe URL: {{url}}",
                     "external_logo": "Die Logo-URL verweist auf eine externe Ressource – möglicherweise nicht zugänglich"
                 }
             }

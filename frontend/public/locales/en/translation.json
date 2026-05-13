@@ -1493,8 +1493,8 @@
                 "warnings": {
                     "grid_capacity_mismatch": "Statement count ({{count}}) doesn't match grid capacity ({{capacity}})",
                     "missing_consent_draft": "Consent title or description missing (draft study)",
-                    "external_branding_logo": "Branding logo uses an external URL: {{URL}}",
-                    "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{URL}}",
+                    "external_branding_logo": "Branding logo uses an external URL: {{url}}",
+                    "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{url}}",
                     "external_logo": "Logo URL references external resource - may not be accessible"
                 }
             }
