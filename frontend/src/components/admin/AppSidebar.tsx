@@ -46,14 +46,13 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { usePermission } from '@/hooks/usePermission';
 import { useSidebar } from '@/components/ui/sidebar';
-import { SUPPORTED_LANGUAGES } from '@/constants/languages';
+import { getAdminLanguages } from '@/constants/languages';
 
 function NavLanguage() {
     const { i18n, t } = useTranslation();
     const currentLang = i18n.language;
-    const currentCodeUpper = SUPPORTED_LANGUAGES.find(
-        (l) => l.code === currentLang
-    )?.code.toUpperCase();
+    const adminLanguages = getAdminLanguages();
+    const currentCodeUpper = adminLanguages.find((l) => l.code === currentLang)?.code.toUpperCase();
 
     return (
         <SidebarMenu>
@@ -71,7 +70,7 @@ function NavLanguage() {
                             {t('layout.change_lang_title')}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {SUPPORTED_LANGUAGES.map((lang) => (
+                        {adminLanguages.map((lang) => (
                             <DropdownMenuItem
                                 key={lang.code}
                                 onSelect={() => i18n.changeLanguage(lang.code)}
