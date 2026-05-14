@@ -1,461 +1,461 @@
 {
     "common": {
         "placeholders": {
-            "text_response": "Enter your answer..."
+            "text_response": "Typ uw antwoord..."
         },
-        "add": "Add",
-        "confirm": "Confirm",
-        "all": "All",
-        "agree": "Somewhat agree",
-        "disagree": "Somewhat disagree",
-        "neutral": "Neutral",
-        "reset_to_default": "Reset to default",
-        "reset_to_default_success": "Restored to default",
-        "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
-        "undo": "Undo",
-        "next": "Next step",
-        "submit": "Share my perspective",
-        "continue": "Continue",
-        "loading": "Loading...",
-        "lang_code": "en",
-        "attention": "Attention",
-        "error": "Error",
-        "submitting": "Submitting...",
-        "cards": "statements",
-        "close": "Close",
-        "unknown_card": "Unknown Card",
-        "unknown": "Unknown",
+        "add": "Toevoegen",
+        "confirm": "Bevestigen",
+        "all": "Alle",
+        "agree": "Enigszins eens",
+        "disagree": "Enigszins oneens",
+        "neutral": "Neutraal",
+        "reset_to_default": "Standaardwaarde herstellen",
+        "reset_to_default_success": "Standaardwaarde hersteld",
+        "reset_to_default_confirm": "Weet u zeker dat u dit veld wilt terugzetten naar de standaardwaarde? Alle aangepaste wijzigingen gaan verloren.",
+        "undo": "Ongedaan maken",
+        "next": "Volgende stap",
+        "submit": "Mijn perspectief delen",
+        "continue": "Doorgaan",
+        "loading": "Laden...",
+        "lang_code": "nl",
+        "attention": "Opgelet",
+        "error": "Fout",
+        "submitting": "Verzenden...",
+        "cards": "stellingen",
+        "close": "Sluiten",
+        "unknown_card": "Onbekende stelling",
+        "unknown": "Onbekend",
         "duration_short": "{{m}}m {{s}}s",
         "duration_long": "{{h}}h {{m}}m {{s}}s",
-        "optional": "Optional",
-        "processing": "Processing...",
-        "statement": "Statement",
-        "step": "Step",
-        "back": "Back",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "slots": "slots",
+        "optional": "Optioneel",
+        "processing": "Verwerken...",
+        "statement": "Stelling",
+        "step": "Stap",
+        "back": "Terug",
+        "cancel": "Annuleren",
+        "delete": "Verwijderen",
+        "slots": "posities",
         "project_label": "Project",
-        "read_full": "Read full statement",
-        "reduce": "Reduce",
-        "expand": "Expand",
-        "yes": "Yes",
-        "no": "No",
+        "read_full": "Volledige stelling lezen",
+        "reduce": "Verkleinen",
+        "expand": "Uitbreiden",
+        "yes": "Ja",
+        "no": "Nee",
         "score": "Score",
-        "comment": "Comment",
+        "comment": "Opmerking",
         "errors": {
-            "network": "Network connection error. Please check your internet connection.",
-            "not_found": "Study not found.",
-            "validation": "System error: data validation failed.",
-            "unknown": "An unexpected error occurred.",
-            "retry": "Retry",
-            "min": "Value must be at least {{min}}",
-            "max": "Value must be at most {{max}}",
-            "email": "Please enter a valid email address",
-            "min_length": "Minimum {{count}} characters required",
-            "max_length": "Maximum {{count}} characters allowed",
+            "network": "Netwerkverbindingsfout. Controleer uw internetverbinding.",
+            "not_found": "Onderzoek niet gevonden.",
+            "validation": "Systeemfout: gegevensvalidatie mislukt.",
+            "unknown": "Er is een onverwachte fout opgetreden.",
+            "retry": "Opnieuw proberen",
+            "min": "Waarde moet minimaal {{min}} zijn",
+            "max": "Waarde mag maximaal {{max}} zijn",
+            "email": "Voer een geldig e-mailadres in",
+            "min_length": "Minimaal {{count}} tekens vereist",
+            "max_length": "Maximaal {{count}} tekens toegestaan",
             "404": {
-                "title": "Page not found",
-                "message": "The page or study you are looking for does not exist."
+                "title": "Pagina niet gevonden",
+                "message": "De pagina of het onderzoek dat u zoekt bestaat niet."
             },
             "429": {
-                "title": "Too many requests",
-                "message": "You are doing that too fast. Please wait a moment."
+                "title": "Te veel verzoeken",
+                "message": "U gaat te snel. Wacht even."
             },
             "500": {
-                "title": "Server error",
-                "message": "Our servers encountered an issue. Please try again later."
+                "title": "Serverfout",
+                "message": "Onze servers hebben een probleem ondervonden. Probeer het later opnieuw."
             },
-            "network_title": "Connection lost",
-            "home": "Go to home",
-            "reset": "Reset session",
-            "default_title": "Oops! Something went wrong.",
+            "network_title": "Verbinding verbroken",
+            "home": "Naar de startpagina",
+            "reset": "Sessie herstellen",
+            "default_title": "Oeps! Er is iets misgegaan.",
             "study_not_found": {
-                "title": "Study not found",
-                "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
-                "action": "Go to home"
+                "title": "Onderzoek niet gevonden",
+                "message": "We konden geen onderzoek met die naam vinden. Controleer de URL of neem contact op met de onderzoeker.",
+                "action": "Naar de startpagina"
             }
         },
         "status": {
             "draft": {
-                "title": "Study under preparation",
-                "message": "This study is not available for participation yet. Please check back later.",
-                "action": "Back to home"
+                "title": "Onderzoek in voorbereiding",
+                "message": "Dit onderzoek is nog niet beschikbaar voor deelname. Kom later terug.",
+                "action": "Terug naar startpagina"
             },
             "steps": {
                 "draft": {
-                    "label": "Draft",
-                    "description": "Configuration & design"
+                    "label": "Concept",
+                    "description": "Configuratie & ontwerp"
                 },
                 "active": {
-                    "label": "Active",
-                    "description": "Collecting responses"
+                    "label": "Actief",
+                    "description": "Reacties verzamelen"
                 },
                 "paused": {
-                    "label": "Paused",
-                    "description": "On hold"
+                    "label": "Gepauzeerd",
+                    "description": "In de wacht"
                 },
                 "closed": {
-                    "label": "Closed",
-                    "description": "Analysis & export"
+                    "label": "Gesloten",
+                    "description": "Analyse & export"
                 }
             },
             "paused": {
-                "title": "Maintenance in progress",
-                "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
-                "action": "Retry"
+                "title": "Onderhoud bezig",
+                "message": "De gegevensverzameling is tijdelijk gepauzeerd voor onderhoud. We zijn binnenkort terug.",
+                "action": "Opnieuw proberen"
             },
             "closed": {
-                "title": "Data collection closed",
-                "message": "This study is now closed. Participation is no longer possible.",
-                "action": "Back to home"
+                "title": "Gegevensverzameling gesloten",
+                "message": "Dit onderzoek is nu gesloten. Deelname is niet langer mogelijk.",
+                "action": "Terug naar startpagina"
             }
         }
     },
     "layout": {
         "title": "Open-Q",
-        "preparing": "Preparing your study session...",
-        "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
-        "default_study_title": "Q-Method study",
-        "loading_content": "Loading study content...",
-        "change_lang_title": "Change language",
+        "preparing": "Uw onderzoekssessie voorbereiden...",
+        "pilot_mode": "Pilotmodus: wijzigingen zijn tijdelijk en gegevens worden niet opgeslagen",
+        "default_study_title": "Q-methodologie onderzoek",
+        "loading_content": "Onderzoeksinhoud laden...",
+        "change_lang_title": "Taal wijzigen",
         "steps": {
-            "welcome": "Welcome",
-            "consent": "Privacy & Consent",
-            "rough": "First impressions",
-            "fine": "Q-sort",
-            "post": "Final questions"
+            "welcome": "Welkom",
+            "consent": "Privacy & toestemming",
+            "rough": "Eerste indrukken",
+            "fine": "Q-sortering",
+            "post": "Afsluitende vragen"
         },
-        "mobile_step": "Step",
-        "navigation": "Navigation",
-        "language": "English"
+        "mobile_step": "Stap",
+        "navigation": "Navigatie",
+        "language": "Nederlands"
     },
     "study": {
         "help": {
-            "title": "Help & information",
-            "trigger": "Help",
-            "what": "What we ask",
-            "why": "Why it matters",
+            "title": "Hulp & informatie",
+            "trigger": "Hulp",
+            "what": "Wat we vragen",
+            "why": "Waarom het belangrijk is",
             "step_welcome": {
-                "what": "Read the research objectives and the specific instructions for participation.",
-                "why": "Beyond standard ethical consent, you need to grasp the 'condition of instruction': the precise lens or scenario you adopt to evaluate the statements. This matters for data validity."
+                "what": "Lees de onderzoeksdoelstellingen en de specifieke instructies voor deelname.",
+                "why": "Naast de standaard ethische toestemming moet u de 'instructieconditie' begrijpen: de precieze invalshoek of het scenario dat u hanteert bij het beoordelen van de stellingen. Dit is van belang voor de geldigheid van de gegevens."
             },
             "step_presort": {
-                "what": "Provide background information to help characterize your participant profile.",
-                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group."
+                "what": "Geef achtergrondinformatie om uw deelnemersprofiel te helpen omschrijven.",
+                "why": "Deze context stelt het onderzoeksteam in staat te analyseren in hoeverre verschillende standpunten (factoren) al dan niet correleren met specifieke demografische variabelen of professionele achtergronden binnen de deelnemersgroep."
             },
             "step_rough": {
-                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
-                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins."
+                "what": "Verdeel de stellingen in drie eerste stapels op basis van uw onmiddellijke reactie.",
+                "why": "Deze voorbereidende stap is bedoeld om de cognitieve belasting te verminderen; het stelt u in staat vertrouwd te raken met het volledige bereik van het onderwerp (de Q-set) voordat de veeleisendere taak van het comparatief rangschikken begint."
             },
             "step_fine": {
-                "what": "Place the statements on the grid by ranking them relative to one another, from those you most agree with (to the right) to those you most disagree with (to the left). Starting with the extremes might help you in this task.",
-                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system."
+                "what": "Plaats de stellingen op het raster door ze ten opzichte van elkaar te rangschikken, van degene waarmee u het meest eens bent (rechts) tot degene waarmee u het meest oneens bent (links). Beginnen met de uitersten kan u bij deze taak helpen.",
+                "why": "De structuur van het raster legt een 'gedwongen verdeling' op die voorkomt dat u alles even belangrijk beoordeelt; het dwingt u compromissen te maken en modelleert zo het relatieve belang van elk idee in uw specifieke overtuigingssysteem."
             },
             "step_post": {
-                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
-                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices."
+                "what": "Bevestig uw rasterindeling en voeg opmerkingen toe ter toelichting van uw sterkste keuzes.",
+                "why": "Uw kwalitatieve toelichtingen zijn essentieel voor het valideren van de statistische analyse; ze helpen de onderzoekers de gegevens te interpreteren via uw logica in plaats van hun eigen aannames aan uw keuzes op te leggen."
             }
         },
         "steps": {
-            "presort": "Pre-sort survey",
-            "rough": "Preliminary sort",
-            "fine": "Grid placement",
-            "post": "Post-sort stage"
+            "presort": "Voorsorteringsvragenlijst",
+            "rough": "Voorlopige sortering",
+            "fine": "Rasterplaatsing",
+            "post": "Fase na de sortering"
         }
     },
     "welcome": {
-        "start": "Get started",
+        "start": "Beginnen",
         "consent": {
-            "label": "I confirm that i have read the above information and consent to the processing of my data for the purposes of this study.",
-            "error": "Please accept the terms to continue."
+            "label": "Ik bevestig dat ik bovenstaande informatie heb gelezen en toestemming geef voor de verwerking van mijn gegevens voor de doeleinden van dit onderzoek.",
+            "error": "Accepteer de voorwaarden om door te gaan."
         },
-        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
-        "restart": "Start a new session",
-        "preview_title": "Preview",
-        "conducted_by": "Conducted by",
-        "how_it_works": "Process",
-        "objective_label": "Study objective",
-        "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** First, you will be asked a few short, preliminary questions.\n2. **First impressions:** You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them.\n3. **Your perspective:** During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box.\n4. **Why:** Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices.",
+        "reset_confirm": "Weet u zeker dat u een nieuwe sessie wilt starten? Dit wist uw huidige voortgang.",
+        "restart": "Nieuwe sessie starten",
+        "preview_title": "Voorbeeld",
+        "conducted_by": "Uitgevoerd door",
+        "how_it_works": "Verloop",
+        "objective_label": "Onderzoeksdoelstelling",
+        "instructions_label": "Verloop",
+        "default_instructions": "1. **Kennismaking:** Eerst worden u een paar korte, inleidende vragen gesteld.\n2. **Eerste indrukken:** U leest de verschillende stellingen en sorteert ze globaal op basis van uw persoonlijk standpunt: of u het ermee eens bent, er neutraal tegenover staat, of het er oneens mee bent.\n3. **Uw perspectief:** Tijdens de sorteerfase plaatst u de stellingen op een raster om uw standpunt te verfijnen. U sorteert en rangschikt de stellingen van 'meest eens' tot 'meest oneens' door elke stelling in het bijbehorende vakje te plaatsen.\n4. **Waarom:** Voordat de sessie eindigt, worden u een paar verduidelijkende vragen gesteld om ons uw meest significante keuzes beter te helpen begrijpen.",
         "steps": {
             "profile": {
-                "title": "Let's meet",
-                "description": "First, you will be asked a few short, preliminary questions."
+                "title": "Kennismaking",
+                "description": "Eerst worden u een paar korte, inleidende vragen gesteld."
             },
             "rough": {
-                "title": "First impressions",
-                "description": "You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them. It will make the next task easier."
+                "title": "Eerste indrukken",
+                "description": "U leest de verschillende stellingen en sorteert ze globaal op basis van uw persoonlijk standpunt: of u het ermee eens bent, er neutraal tegenover staat, of het er oneens mee bent. Dit maakt de volgende taak gemakkelijker."
             },
             "fine": {
-                "title": "Your perspective",
-                "description": "During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs."
+                "title": "Uw perspectief",
+                "description": "Tijdens de sorteerfase plaatst u de stellingen op een raster om uw standpunt te verfijnen. U sorteert en rangschikt de stellingen van 'meest eens' tot 'meest oneens' door elke stelling in het bijbehorende vakje te plaatsen. Er zijn geen juiste of foute antwoorden. Het beste antwoord is het antwoord dat uw mening of overtuigingen weerspiegelt."
             },
             "post": {
-                "title": "Why",
-                "description": "Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background."
+                "title": "Waarom",
+                "description": "Voordat de sessie eindigt, worden u een paar verduidelijkende vragen gesteld om ons uw meest significante keuzes beter te helpen begrijpen, evenals een paar vragen over uw achtergrond."
             }
         }
     },
     "consent": {
-        "title": "Informed consent and data processing agreement",
-        "subtitle": "Please read the following information carefully.",
-        "record_error": "Could not save consent record. You may continue.",
-        "default_text": "1. Nature of the study and participant understanding. You understand that this exercise employs q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance).\n\nDe-identification and retention:. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: if you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: the final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: if you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: due to the statistical nature of q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights"
+        "title": "Geïnformeerde toestemming en gegevensverwerkingsovereenkomst",
+        "subtitle": "Lees de volgende informatie zorgvuldig door.",
+        "record_error": "Het toestemmingsformulier kon niet worden opgeslagen. U kunt doorgaan.",
+        "default_text": "1. Aard van het onderzoek en begrip van de deelnemer. U begrijpt dat deze oefening gebruik maakt van Q-methodologie, een onderzoekstechniek die ontworpen is om subjectieve standpunten te modelleren. De taak vereist dat u stellingen sorteert op hun betekenis ten opzichte van uw persoonlijk perspectief; bijgevolg bestaan er geen objectief \"juiste\" of \"foute\" antwoorden.\n\n2. Gegevensverwerking en pseudonimisering (GDPR-naleving).\n\nDe-identificatie en bewaring: dit technisch proces garandeert dat uw digitale voetafdruk niet kan worden gebruikt om u te heridentificeren nadat de sessie is beëindigd.\n\nUitzondering voor opvolging: als u vrijwillig uw contactgegevens aan het einde van het onderzoek verstrekt voor een vervolgcontact, wordt de koppeling tussen uw identiteit (e-mail) en uw antwoord strikt gehandhaafd gedurende de looptijd van die specifieke opvolgingsfase.\n\nRapportage: de eindresultaten worden gepresenteerd in een geanonimiseerd formaat. Gegevens worden geaggregeerd om gedeelde sociale perspectieven (factoren) te onthullen. Kwalitatieve opmerkingen kunnen worden geciteerd om deze factoren te contextualiseren, maar worden gescreend om identificerende details te verwijderen.\n\n3. Vrijwillige deelname en recht op terugtrekking. U behoudt het recht om het sorteerproces te staken en uw browser op elk moment vóór indiening te sluiten zonder gevolgen.\n\nVóór indiening: als u zich terugtrekt voordat u uw sortering heeft afgerond, worden er geen gedeeltelijke gegevens bewaard.\n\nNa indiening: vanwege de statistische aard van Q-methodologie (factoranalyse) is individuele terugtrekking mogelijk niet haalbaar zodra uw gegevens zijn ingediend en geaggregeerd in de dataset.\n\n4. Gegevensbewaring en rechten"
     },
     "presort": {
-        "title": "Before we start",
-        "description": "Please answer a few questions to help us situate your viewpoint.",
-        "submit": "Continue to sorting",
-        "select_placeholder": "Select...",
-        "error_required": "Please answer this question."
+        "title": "Voordat we beginnen",
+        "description": "Beantwoord enkele vragen om ons te helpen uw standpunt te situeren.",
+        "submit": "Doorgaan naar de sortering",
+        "select_placeholder": "Selecteer...",
+        "error_required": "Beantwoord deze vraag."
     },
     "rough": {
         "header": {
-            "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
-            "hint": "This is spontaneous. You can change your mind right after."
+            "subtitle": "Veeg naar **links** om het oneens te zijn, naar **rechts** om het eens te zijn, of naar **beneden** om neutraal te zijn.",
+            "hint": "Dit is spontaan. U kunt daarna van gedachten veranderen."
         },
         "tip": {
-            "close": "Close tip"
+            "close": "Tip sluiten"
         },
         "complete": {
-            "title": "First step complete",
-            "subtitle": "We will now refine the nuances.",
-            "button": "Continue to fine sort"
+            "title": "Eerste stap voltooid",
+            "subtitle": "We verfijnen nu de nuances.",
+            "button": "Doorgaan naar fijne sortering"
         },
         "instructions": {
-            "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
+            "desktop_tip": "Sleep, druk of gebruik het toetsenbord ( ← ↓ → ) om te sorteren"
         },
-        "progress_label": "Rough sort progress: {{percent}}% complete"
+        "progress_label": "Voortgang grove sortering: {{percent}}% voltooid"
     },
     "fine": {
         "deck": {
-            "title": "Available statements",
-            "all_placed": "All statements in this pile are sorted"
+            "title": "Beschikbare stellingen",
+            "all_placed": "Alle stellingen in deze stapel zijn gesorteerd"
         },
         "toolbar": {
-            "preview": "Statement",
-            "zoom_in": "Zoom in",
-            "zoom_out": "Zoom out",
-            "fit_screen": "Fit to screen",
-            "label": "Grid controls"
+            "preview": "Stelling",
+            "zoom_in": "Inzoomen",
+            "zoom_out": "Uitzoomen",
+            "fit_screen": "Aanpassen aan scherm",
+            "label": "Rasterbesturing"
         },
         "grid": {
-            "label": "Q-Sort grid",
-            "column": "Column",
-            "slot": "Slot",
-            "in_column": "In column"
+            "label": "Q-sortering raster",
+            "column": "Kolom",
+            "slot": "Positie",
+            "in_column": "In kolom"
         },
         "legend": {
-            "disagree": "Most disagree",
-            "neutral": "Neutral",
-            "agree": "Most agree",
-            "label": "Grid legend"
+            "disagree": "Meest oneens",
+            "neutral": "Neutraal",
+            "agree": "Meest eens",
+            "label": "Rasterlegenda"
         },
         "actions": {
-            "validate": "Confirm sort",
-            "finish": "Finish sorting",
-            "ready": "Review overview",
-            "not_ready": "Place all statements to continue"
+            "validate": "Sortering bevestigen",
+            "finish": "Sortering afronden",
+            "ready": "Overzicht bekijken",
+            "not_ready": "Plaats alle stellingen om door te gaan"
         },
         "header": {
-            "title": "Place statements on the grid",
-            "instruction_label": "Instruction",
-            "expand_instructions": "Expand instructions",
-            "minimize_instructions": "Minimize instructions"
+            "title": "Plaats stellingen op het raster",
+            "instruction_label": "Instructie",
+            "expand_instructions": "Instructies uitvouwen",
+            "minimize_instructions": "Instructies minimaliseren"
         },
         "workbench": {
-            "active_card": "Active statement",
-            "place_on_grid": "Tap grid to place",
-            "drag_or_tap": "Drag to grid or tap slot",
-            "initial_instruction": "Tap (or drag) statement",
-            "initial_instruction_mobile": "Tap statement",
-            "cancel_selection": "Cancel selection",
-            "help": "How does it work?",
-            "previous_tip": "Previous tip",
-            "next_tip": "Next tip",
-            "go_to_tip": "Go to tip {{number}}",
+            "active_card": "Actieve stelling",
+            "place_on_grid": "Tik op raster om te plaatsen",
+            "drag_or_tap": "Sleep naar raster of tik op positie",
+            "initial_instruction": "Tik op (of sleep) stelling",
+            "initial_instruction_mobile": "Tik op stelling",
+            "cancel_selection": "Selectie annuleren",
+            "help": "Hoe werkt het?",
+            "previous_tip": "Vorige tip",
+            "next_tip": "Volgende tip",
+            "go_to_tip": "Ga naar tip {{number}}",
             "methodology": {
-                "extremes": "Tip: start with what is most obvious to you (the extremes).",
-                "vertical": "In the same column, the order from top to bottom doesn't matter.",
-                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
-                "relative": "Reminder: items are sorted relative to each other (relative agreement).",
-                "zoom": "Feel free to zoom in on different parts of the grid for better visibility.",
-                "flexibility": "Nothing is final: you can move cards or put them back in the deck at any time."
+                "extremes": "Tip: begin met wat het meest vanzelfsprekend is voor u (de uitersten).",
+                "vertical": "In dezelfde kolom maakt de volgorde van boven naar beneden niet uit.",
+                "constraint": "Alles moet passen! Het kan een puzzel zijn, maar zo stellen we prioriteiten.",
+                "relative": "Herinnering: items worden ten opzichte van elkaar gesorteerd (relatieve overeenstemming).",
+                "zoom": "Zoom gerust in op verschillende delen van het raster voor een beter zicht.",
+                "flexibility": "Niets is definitief: u kunt kaarten verplaatsen of op elk moment terugleggen in de stapel."
             }
         }
     },
     "post": {
-        "title": "Your perspective & feedback",
-        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
-        "step2_title": "Almost done!",
-        "step2_description": "Please answer these final questions to complete the study.",
+        "title": "Uw perspectief & feedback",
+        "description": "U bent bijna klaar! Uw opmerkingen over de meest significante stellingen zijn cruciaal voor onze analyse.",
+        "step2_title": "Bijna klaar!",
+        "step2_description": "Beantwoord deze laatste vragen om het onderzoek te voltooien.",
         "extreme": {
-            "title": "Key Choices",
-            "why": "Why did you choose to place this statement here? How is it significant to you?",
-            "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
-            "min_chars": "A few words are enough to help us understand the context.",
-            "label_agree": "Strongest agreement",
-            "label_disagree": "Strongest disagreement",
-            "label_neutral": "Neutral",
-            "missing_statement": "Missing Statement",
-            "general_comment": "General Comment"
+            "title": "Belangrijkste keuzes",
+            "why": "Waarom heeft u ervoor gekozen deze stelling hier te plaatsen? Wat betekent ze voor u?",
+            "placeholder": "Bijv. een specifieke gebeurtenis, een sterke overtuiging, of een bepaald woord in de stelling...",
+            "min_chars": "Een paar woorden volstaan om ons de context te helpen begrijpen.",
+            "label_agree": "Sterkste overeenstemming",
+            "label_disagree": "Sterkste onenigheid",
+            "label_neutral": "Neutraal",
+            "missing_statement": "Ontbrekende stelling",
+            "general_comment": "Algemene opmerking"
         },
         "optional": {
-            "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
-            "description": "You are also welcome to add comments to any other statement if you would like to further explain your choices.",
-            "select_placeholder": "Select a statement to comment...",
-            "placeholder": "Your comment here..."
+            "title": "Waren er stellingen die u bijzonder verrassend, onduidelijk of verwarrend vond? Zo ja, waarom?",
+            "description": "U kunt ook opmerkingen toevoegen bij elke andere stelling als u uw keuzes verder wilt toelichten.",
+            "select_placeholder": "Selecteer een stelling om te becommentariëren...",
+            "placeholder": "Uw opmerking hier..."
         },
-        "submit": "Share my perspective",
-        "validation_error": "Please fill in all required fields.",
-        "text_audio_info": "For text + audio questions, you can respond with text, an audio recording, or both.",
-        "text_audio_required": "A few words or an audio recording will help us understand your viewpoint.",
+        "submit": "Mijn perspectief delen",
+        "validation_error": "Vul alle verplichte velden in.",
+        "text_audio_info": "Voor tekst- en audiovragen kunt u antwoorden met tekst, een audio-opname of beide.",
+        "text_audio_required": "Een paar woorden of een audio-opname helpen ons uw standpunt te begrijpen.",
         "success": {
-            "title": "Thank you for your participation!",
-            "message": "Your contribution to the study has been saved.",
-            "id_label": "Confirmation code",
+            "title": "Bedankt voor uw deelname!",
+            "message": "Uw bijdrage aan het onderzoek is opgeslagen.",
+            "id_label": "Bevestigingscode",
             "share": {
-                "title": "Spread the word",
-                "copy_link": "Copy link",
-                "copy_success": "Link copied!",
-                "message": "I just participated in this study: \"{{title}}\". I thought it might interest you. You can access it here:",
-                "email": "Email",
-                "email_subject": "Participate in this study: {{title}}",
-                "native": "Share"
+                "title": "Verspreid het woord",
+                "copy_link": "Link kopiëren",
+                "copy_success": "Link gekopieerd!",
+                "message": "Ik heb zojuist deelgenomen aan dit onderzoek: \"{{title}}\". Ik dacht dat het u zou interesseren. U kunt het hier bekijken:",
+                "email": "E-mail",
+                "email_subject": "Neem deel aan dit onderzoek: {{title}}",
+                "native": "Delen"
             }
         },
         "submit_error": {
-            "title": "Submission failed",
-            "message": "Please check your connection and try again."
+            "title": "Verzending mislukt",
+            "message": "Controleer uw verbinding en probeer het opnieuw."
         },
         "score": "Score",
-        "back": "Back to sort",
+        "back": "Terug naar sortering",
         "contact": {
-            "title": "Results & contact",
-            "email_label": "Your email address (optional)",
-            "email_placeholder": "Example@email.com",
-            "interview_consent": "I agree to be contacted by the researcher for follow-up.",
-            "newsletter_consent": "I wish to be informed about the study results.",
-            "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
-            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up.",
-            "error_invalid_email": "Please enter a valid email address"
+            "title": "Resultaten & contact",
+            "email_label": "Uw e-mailadres (optioneel)",
+            "email_placeholder": "voorbeeld@email.com",
+            "interview_consent": "Ik geef toestemming om gecontacteerd te worden door de onderzoeker voor opvolging.",
+            "newsletter_consent": "Ik wil op de hoogte worden gehouden van de onderzoeksresultaten.",
+            "gdpr_note": "Uw e-mail wordt nooit openbaar gedeeld. Door het op te geven waarborgt u pseudonimisering: uw gegevens blijven alleen identificeerbaar voor onderzoeksdoeleinden door de onderzoeker.",
+            "pseudonymization_note": "Instemmen met contact houdt in dat de onderzoeker uw perspectief aan uw e-mail kan koppelen (pseudonimisering) voor deze specifieke opvolging.",
+            "error_invalid_email": "Voer een geldig e-mailadres in"
         },
         "audio": {
-            "info": "For each question, you can respond with text, an audio recording, or both.",
-            "section_label": "Audio response (optional)"
+            "info": "Voor elke vraag kunt u antwoorden met tekst, een audio-opname of beide.",
+            "section_label": "Audio-antwoord (optioneel)"
         }
     },
     "audio": {
-        "record_prompt": "Record audio response if you prefer",
-        "recording": "Recording...",
-        "recorded": "Recorded",
-        "playing": "Playing...",
-        "uploading": "Uploading...",
-        "ready": "Ready to record",
-        "start_recording": "Start recording",
-        "stop_recording": "Stop",
-        "pause": "Pause",
-        "play": "Play",
-        "delete": "Delete",
-        "deleted": "Audio deleted",
-        "delete_failed": "Could not delete the recording. Try again.",
-        "file_size": "File size",
-        "upload_success": "Audio uploaded successfully",
-        "upload_failed": "Upload failed. Please try again.",
-        "upload_cancelled": "Recording cancelled",
-        "recording_error": "Recording error - please try again",
-        "invalid_recording": "Recording failed - no audio data captured",
-        "permission_denied": "Microphone permission denied",
-        "unsupported": "Audio recording is not supported in this browser.",
-        "permission_revoked": "Microphone access lost - recording stopped",
-        "refresh_failed": "Could not refresh audio. Your recording is still saved.",
-        "refreshing": "Refreshing audio...",
-        "playback_failed": "Could not play audio. Refresh the page and try again.",
+        "record_prompt": "Neem een audio-antwoord op als u dat prefereert",
+        "recording": "Opnemen...",
+        "recorded": "Opgenomen",
+        "playing": "Afspelen...",
+        "uploading": "Uploaden...",
+        "ready": "Klaar om op te nemen",
+        "start_recording": "Opname starten",
+        "stop_recording": "Stoppen",
+        "pause": "Pauzeren",
+        "play": "Afspelen",
+        "delete": "Verwijderen",
+        "deleted": "Audio verwijderd",
+        "delete_failed": "De opname kon niet worden verwijderd. Probeer opnieuw.",
+        "file_size": "Bestandsgrootte",
+        "upload_success": "Audio succesvol geüpload",
+        "upload_failed": "Upload mislukt. Probeer het opnieuw.",
+        "upload_cancelled": "Opname geannuleerd",
+        "recording_error": "Opnamefout - probeer opnieuw",
+        "invalid_recording": "Opname mislukt - geen audiogegevens vastgelegd",
+        "permission_denied": "Microfoontoegang geweigerd",
+        "unsupported": "Audio-opname wordt niet ondersteund in deze browser.",
+        "permission_revoked": "Microfoontoegang verloren - opname gestopt",
+        "refresh_failed": "Audio kon niet worden vernieuwd. Uw opname is nog steeds opgeslagen.",
+        "refreshing": "Audio vernieuwen...",
+        "playback_failed": "Audio kon niet worden afgespeeld. Vernieuw de pagina en probeer opnieuw.",
         "error": {
-            "no_token": "Session token missing",
-            "quota_exceeded": "Storage quota exceeded. Please delete an existing recording or use text instead.",
-            "file_too_large": "Recording file is too large. Try a shorter recording.",
-            "server_error": "Server error. Please try again in a moment.",
-            "upload_in_progress": "Please wait for audio upload to finish.",
-            "security": "Recording blocked by browser security settings",
-            "invalid_state": "Recording encountered an internal error"
+            "no_token": "Sessietoken ontbreekt",
+            "quota_exceeded": "Opslagquotum overschreden. Verwijder een bestaande opname of gebruik tekst.",
+            "file_too_large": "Opnamebestand is te groot. Probeer een kortere opname.",
+            "server_error": "Serverfout. Probeer het over een ogenblik opnieuw.",
+            "upload_in_progress": "Wacht tot de audio-upload is voltooid.",
+            "security": "Opname geblokkeerd door beveiligingsinstellingen van de browser",
+            "invalid_state": "Opname heeft een interne fout ondervonden"
         },
         "fallback": {
-            "toast": "Audio has been disabled due to repeated errors. Please use text.",
-            "banner_title": "Audio unavailable",
-            "banner_description": "Audio recording encountered repeated errors. You can continue with text responses.",
-            "try_again": "Try again",
-            "inline": "Audio temporarily unavailable."
+            "toast": "Audio is uitgeschakeld vanwege herhaalde fouten. Gebruik tekst.",
+            "banner_title": "Audio niet beschikbaar",
+            "banner_description": "Audio-opname heeft herhaalde fouten ondervonden. U kunt doorgaan met tekstantwoorden.",
+            "try_again": "Opnieuw proberen",
+            "inline": "Audio tijdelijk niet beschikbaar."
         },
-        "permission_denied_with_guidance": "Microphone permission denied. Check your browser settings to allow microphone access, then try again.",
-        "retry_upload": "Retry upload",
-        "space_shortcut": "or press Space",
+        "permission_denied_with_guidance": "Microfoontoegang geweigerd. Controleer uw browserinstellingen om microfoontoegang toe te staan en probeer opnieuw.",
+        "retry_upload": "Upload opnieuw proberen",
+        "space_shortcut": "of druk op Spatie",
         "waveform": {
-            "recording": "Audio waveform - recording in progress",
-            "playing": "Audio waveform - playing back recording"
+            "recording": "Audiogolfvorm - opname bezig",
+            "playing": "Audiogolfvorm - opname wordt afgespeeld"
         }
     },
     "resume": {
-        "continue_later": "Continue later",
-        "copy_link": "Copy link",
-        "copy_failed": "Unable to copy. Please select the link manually.",
-        "link_copied": "Link copied!",
-        "instruction": "To continue on a different device, save this link:",
-        "instruction_same_browser": "If you return on this browser, your progress will be saved automatically.",
-        "instruction_detail": "Keep this link private. It gives access to your session.",
-        "resume_url": "Resume URL",
-        "saving": "Saving...",
-        "saved": "Saved",
-        "save_failed": "Not saved",
-        "loading": "Restoring your session...",
-        "restored": "Welcome back! Your progress has been restored.",
-        "welcome_back": "Welcome back! Your progress has been restored.",
-        "not_found": "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link.",
-        "already_completed": "You've already submitted your responses. Thank you for your participation!",
-        "study_closed": "This study is no longer accepting responses. Please contact the researcher if you have questions.",
-        "rate_limited": "Too many attempts. Please wait a moment and try again.",
-        "error": "Something went wrong while restoring your session. Please try again.",
-        "share": "Send to myself",
-        "share_title": "My study session",
-        "go_to_study": "Start a new session"
+        "continue_later": "Later doorgaan",
+        "copy_link": "Link kopiëren",
+        "copy_failed": "Kopiëren mislukt. Selecteer de link handmatig.",
+        "link_copied": "Link gekopieerd!",
+        "instruction": "Sla deze link op om op een ander apparaat door te gaan:",
+        "instruction_same_browser": "Als u terugkeert via deze browser, wordt uw voortgang automatisch opgeslagen.",
+        "instruction_detail": "Houd deze link privé. Hij geeft toegang tot uw sessie.",
+        "resume_url": "Hervattings-URL",
+        "saving": "Opslaan...",
+        "saved": "Opgeslagen",
+        "save_failed": "Niet opgeslagen",
+        "loading": "Uw sessie herstellen...",
+        "restored": "Welkom terug! Uw voortgang is hersteld.",
+        "welcome_back": "Welkom terug! Uw voortgang is hersteld.",
+        "not_found": "Deze link is niet langer geldig. Als u het onderzoek nog niet heeft afgerond, neem dan contact op met de onderzoeker voor een nieuwe link.",
+        "already_completed": "U heeft uw antwoorden al ingediend. Bedankt voor uw deelname!",
+        "study_closed": "Dit onderzoek accepteert geen antwoorden meer. Neem contact op met de onderzoeker als u vragen heeft.",
+        "rate_limited": "Te veel pogingen. Wacht even en probeer opnieuw.",
+        "error": "Er is iets misgegaan bij het herstellen van uw sessie. Probeer het opnieuw.",
+        "share": "Naar mezelf sturen",
+        "share_title": "Mijn onderzoekssessie",
+        "go_to_study": "Nieuwe sessie starten"
     },
     "landing": {
-        "page_title": "Qualis study access",
-        "instruction": "Enter your study code to begin.",
-        "study_code_label": "Study Code",
-        "study_code_placeholder": "e.g. my-study",
-        "go_to_study": "Go to Study",
-        "resetting_session": "Resetting study session…"
+        "page_title": "Toegang tot Qualis onderzoek",
+        "instruction": "Voer uw onderzoekscode in om te beginnen.",
+        "study_code_label": "Onderzoekscode",
+        "study_code_placeholder": "bijv. mijn-onderzoek",
+        "go_to_study": "Naar het onderzoek",
+        "resetting_session": "Onderzoekssessie herstellen…"
     },
     "erasure": {
-        "section_title": "Your right to erasure (GDPR Art. 17)",
-        "section_intro": "You can request the removal of your personal data at any time. Your anonymous statement rankings will be kept as research data; everything that could identify you will be removed.",
-        "button": "Request my data deletion",
-        "confirm_title": "Erase your personal data?",
-        "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
-        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
-        "confirm_irreversible": "This action is immediate and cannot be undone.",
-        "confirm_action": "Yes, erase my data",
-        "confirm_in_progress": "Erasing…",
-        "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
-        "error": "We could not process your request. Please try again or contact the researcher.",
-        "already_erased": "Your personal data has been removed for this session."
+        "section_title": "Uw recht op wissing (GDPR Art. 17)",
+        "section_intro": "U kunt op elk moment verzoeken uw persoonsgegevens te verwijderen. Uw anonieme stellingsrangschikkingen worden bewaard als onderzoeksgegevens; alles waarmee u geïdentificeerd zou kunnen worden, wordt verwijderd.",
+        "button": "Verzoek tot verwijdering van mijn gegevens",
+        "confirm_title": "Uw persoonsgegevens wissen?",
+        "confirm_what_erased": "Het volgende wordt permanent verwijderd: elk IP-adres dat bij uw sessie is geregistreerd, uw browseridentificator, uw schriftelijke antwoorden (voor- en nasortering) en eventuele audio-opnames die u heeft verstrekt.",
+        "confirm_what_kept": "Uw stellingsrangschikkingen worden bewaard als anonieme onderzoeksgegevens. Ze zijn niet langer aan u gekoppeld.",
+        "confirm_irreversible": "Deze actie is onmiddellijk en kan niet ongedaan worden gemaakt.",
+        "confirm_action": "Ja, wis mijn gegevens",
+        "confirm_in_progress": "Wissen…",
+        "success": "Uw persoonsgegevens zijn verwijderd. Uw anonieme Q-sorteringsrangschikkingen blijven in het onderzoek.",
+        "error": "We konden uw verzoek niet verwerken. Probeer het opnieuw of neem contact op met de onderzoeker.",
+        "already_erased": "Uw persoonsgegevens zijn verwijderd voor deze sessie."
     },
     "footer": {
-        "powered_by": "Powered by Qualis",
+        "powered_by": "Aangedreven door Qualis",
         "license": "AGPLv3",
-        "github_aria": "View source on GitHub"
+        "github_aria": "Broncode bekijken op GitHub"
     },
     "errors": {
-        "member_limit_reached": "Project member limit reached.",
-        "owner_project_limit_reached": "You can't own any more projects.",
-        "owner_role_immutable": "The Owner role can only be assigned at project creation.",
-        "access_denied_title": "Access denied",
-        "access_denied_description": "You do not have permission to perform this action.",
-        "rate_limited_title": "Too many requests",
-        "rate_limited_description": "Please wait a moment before trying again.",
+        "member_limit_reached": "Limiet voor projectleden bereikt.",
+        "owner_project_limit_reached": "U kunt geen eigenaar zijn van nog meer projecten.",
+        "owner_role_immutable": "De eigenaaarsrol kan alleen worden toegewezen bij het aanmaken van het project.",
+        "access_denied_title": "Toegang geweigerd",
+        "access_denied_description": "U heeft geen toestemming om deze actie uit te voeren.",
+        "rate_limited_title": "Te veel verzoeken",
+        "rate_limited_description": "Wacht even voordat u het opnieuw probeert.",
         "conflict_title": "Conflict",
-        "conflict_description": "The resource has been modified or already exists."
+        "conflict_description": "De resource is gewijzigd of bestaat al."
     }
 }
