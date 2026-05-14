@@ -24,7 +24,7 @@ vi.mock('./i18n', async () => {
     // This runs lazily when ./i18n is first imported
     const testI18n = await import('./test-utils/i18n-test');
     return {
-        SUPPORTED_I18N_LANGUAGES: ['en', 'fr', 'fi', 'de', 'es', 'it'],
+        SUPPORTED_I18N_LANGUAGES: ['en', 'fr', 'fi', 'de', 'es', 'it', 'nl'],
         default: testI18n.default,
     };
 });
@@ -32,7 +32,7 @@ vi.mock('./i18n', async () => {
 vi.mock('@/i18n', async () => {
     const testI18n = await import('./test-utils/i18n-test');
     return {
-        SUPPORTED_I18N_LANGUAGES: ['en', 'fr', 'fi', 'de', 'es', 'it'],
+        SUPPORTED_I18N_LANGUAGES: ['en', 'fr', 'fi', 'de', 'es', 'it', 'nl'],
         default: testI18n.default,
     };
 });

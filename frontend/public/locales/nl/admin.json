@@ -1,0 +1,2188 @@
+{
+    "auth": {
+        "login": {
+            "email_label": "E-mailadres",
+            "password_label": "Wachtwoord",
+            "submit": "Doorgaan",
+            "cta": "Aanmelden",
+            "forgot_password": "Vergeten?",
+            "loading": "Authenticeren...",
+            "card_title": "Aanmelden",
+            "welcome_back": "Welkom terug!",
+            "error_401": "Ongeldig e-mailadres of wachtwoord",
+            "error_generic": "Er is iets misgegaan. Probeer het opnieuw.",
+            "reason_session_expired": "Uw sessie is verlopen. Meld u opnieuw aan.",
+            "reason_auth_required": "Meld u aan om door te gaan.",
+            "forgot_password_link": "Wachtwoord vergeten?",
+            "reset_success_banner": "Wachtwoord bijgewerkt. U kunt nu inloggen met uw nieuwe wachtwoord.",
+            "two_factor_title": "Tweestapsverificatie",
+            "two_factor_app_prompt": "Voer de 6-cijferige code in uit uw authenticator-app.",
+            "two_factor_email_prompt": "We hebben een 6-cijferige code naar uw e-mail gestuurd. Voer deze hieronder in.",
+            "two_factor_submit": "Verifiëren",
+            "two_factor_resend": "Code opnieuw sturen",
+            "two_factor_resend_cooldown": "Opnieuw sturen beschikbaar over {{seconds}}s",
+            "two_factor_invalid": "Ongeldige code. Probeer opnieuw.",
+            "lost_2fa_link": "Geen toegang meer tot uw 2FA?"
+        },
+        "twofa": {
+            "recovery": {
+                "title": "Geen toegang meer tot uw tweestapsverificatie?",
+                "body": "Voer uw accounte-mailadres in. Als tweestapsverificatie is ingeschakeld voor dit account, sturen we u een link om het uit te schakelen.",
+                "submit": "Uitschakellink sturen",
+                "success": "Als het e-mailadres bestaat en 2FA heeft, is er een uitschakellink onderweg."
+            },
+            "disable": {
+                "title": "Tweestapsverificatie uitschakelen",
+                "warning": "Door op de onderstaande knop te klikken verwijdert u de tweede factor permanent van dit account. U kunt dan inloggen met alleen uw wachtwoord totdat u 2FA opnieuw inschakelt.",
+                "warning_attacker": "Als u dit NIET hebt aangevraagd, sluit dan deze pagina en wijzig uw wachtwoord onmiddellijk.",
+                "confirm_button": "Ja, tweestapsverificatie uitschakelen",
+                "loading": "Uitschakelen…",
+                "success": "Tweestapsverificatie is nu uitgeschakeld. U kunt zich aanmelden.",
+                "error_consumed": "Deze link is al gebruikt.",
+                "error_expired": "Deze link is verlopen of ongeldig.",
+                "missing_token": "Geen token in de URL."
+            }
+        },
+        "password_reset": {
+            "request_title": "Wachtwoord opnieuw instellen",
+            "request_body": "Voer uw e-mailadres in en we sturen u een resetlink.",
+            "request_submit": "Resetlink sturen",
+            "request_success": "Als het e-mailadres bestaat, is er een resetlink onderweg.",
+            "confirm_title": "Kies een nieuw wachtwoord",
+            "confirm_submit": "Wachtwoord opnieuw instellen",
+            "success_redirect": "Wachtwoord bijgewerkt. U kunt nu inloggen met uw nieuwe wachtwoord.",
+            "link_expired": "Deze link is verlopen of al gebruikt.",
+            "too_short": "Wachtwoord moet minimaal 8 tekens bevatten.",
+            "mismatch": "Wachtwoorden komen niet overeen.",
+            "missing_token": "Geen resettoken in de URL.",
+            "new_password_placeholder": "Nieuw wachtwoord",
+            "confirm_placeholder": "Wachtwoord bevestigen"
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Verifieer uw e-mailadres",
+                "body": "We hebben een verificatielink gestuurd naar {{email}}. Klik op de link om uw account te activeren.",
+                "resend": "E-mail opnieuw sturen",
+                "cooldown": "Opnieuw sturen beschikbaar over {{seconds}}s",
+                "error": "Opnieuw sturen mislukt. Probeer het later opnieuw."
+            },
+            "verify": {
+                "verifying": "E-mailadres verifiëren…",
+                "success": "E-mailadres geverifieerd. U kunt zich nu aanmelden.",
+                "expired": "Deze link is verlopen of ongeldig.",
+                "resend_link": "Nieuwe verificatie-e-mail aanvragen"
+            }
+        },
+        "register": {
+            "title": "Account aanmaken",
+            "subtitle": "Deelnemen aan het onderzoeksproject",
+            "secure_invitation": "Beveiligde uitnodiging",
+            "invitation_to": "Uitnodiging voor:",
+            "study_label": "Onderzoek",
+            "role_label": "Rol",
+            "email_label": "E-mailadres",
+            "password_label": "Wachtwoord kiezen",
+            "confirm_password_label": "Wachtwoord bevestigen",
+            "placeholder_password": "••••••••",
+            "submit": "Registratie voltooien",
+            "loading": "Account aanmaken...",
+            "success_title": "Welkom!",
+            "success_desc": "Uw account is aangemaakt en gekoppeld aan het onderzoek.",
+            "success_cta": "Naar dashboard",
+            "success_hint": "U kunt nu inloggen op het beheerdashboard om samen te werken.",
+            "invalid_title": "Ongeldige uitnodiging",
+            "invalid_desc": "Deze uitnodigingslink is ongeldig of verlopen.",
+            "missing_token_title": "Ontbrekend token",
+            "missing_token_desc": "Deze pagina vereist een geldig uitnodigingstoken. Controleer de link die u heeft ontvangen.",
+            "verifying": "Uitnodiging verifiëren...",
+            "privacy_hint": "Door u te registreren, stemt u ermee in de onderzoeksethische richtlijnen te volgen die voor dit onderzoek zijn geconfigureerd.",
+            "errors": {
+                "password_mismatch": "Wachtwoorden komen niet overeen",
+                "generic_fail": "Registratie mislukt"
+            }
+        }
+    },
+    "admin": {
+        "hub": {
+            "title": "Onderzoekershub",
+            "welcome": "Welkom terug,",
+            "new_project": "Nieuw project",
+            "your_projects": "Uw projecten",
+            "studies_count": "onderzoeken",
+            "recent_studies": "Recente onderzoeken",
+            "n_studies_one": "{{count}} onderzoek",
+            "n_studies_other": "{{count}} onderzoeken",
+            "n_active_one": "{{count}} actief",
+            "n_active_other": "{{count}} actief",
+            "collecting": "Data verzamelen",
+            "no_studies": "Nog geen onderzoeken",
+            "no_projects": "Nog geen projecten. Maak uw eerste project aan om te beginnen.",
+            "no_projects_title": "Start uw eerste onderzoeksproject",
+            "no_projects_body": "Maak een project aan voordat u concoursen, Q-sets of onderzoeken toevoegt."
+        },
+        "memo": {
+            "title_concourse": "Selectienotities",
+            "title_study": "Methodologische notitie",
+            "summary_empty_concourse": "Hoe en waarom u dit concours heeft opgebouwd",
+            "summary_empty_study": "Optioneel · voor replicatie en pre-registratie",
+            "summary_filled_one": "{{n}} item · klik om te bekijken",
+            "summary_filled_other": "{{n}} items · klik om te bekijken",
+            "summary_unread": "{{n}} ongelezen",
+            "add_entry": "Item toevoegen",
+            "insert_template": "Uit sjabloon invoegen",
+            "entry_title_placeholder": "Sectietitel…",
+            "entry_body_placeholder": "Documenteer uw redenering…",
+            "comments_count_one": "{{n}} opmerking",
+            "comments_count_other": "{{n}} opmerkingen",
+            "show_resolved": "Opgeloste tonen ({{n}})",
+            "hide_resolved": "Opgeloste verbergen",
+            "comment_placeholder": "Schrijf een opmerking. Gebruik @ om te vermelden.",
+            "post_comment": "Plaatsen",
+            "edit": "Bewerken",
+            "delete": "Verwijderen",
+            "deleted_body": "[verwijderde opmerking]",
+            "resolve": "Oplossen",
+            "unresolve": "Heropen",
+            "resolved_label": "[opgelost]",
+            "save": "Opslaan",
+            "cancel": "Annuleren",
+            "saved": "Opgeslagen",
+            "save_error": "Notitie kon niet worden opgeslagen. Probeer opnieuw.",
+            "load_error": "Notitie kon niet worden geladen. Vernieuw de pagina om opnieuw te proberen.",
+            "mentions_for_you": "Vermeldingen voor u",
+            "mention_user_not_found": "Onbekende gebruiker",
+            "delete_entry_confirm": "Dit item en alle bijbehorende opmerkingen verwijderen?",
+            "include_discussion_in_export": "Notitiediscussiedraden opnemen",
+            "templates": {
+                "concourse": {
+                    "sources_canvassed": {
+                        "title": "Geraadpleegde bronnen"
+                    },
+                    "voices_retained": {
+                        "title": "Opgenomen stemmen"
+                    },
+                    "voices_excluded": {
+                        "title": "Uitgesloten stemmen"
+                    },
+                    "sampling_rationale": {
+                        "title": "Steekproefverantwoording"
+                    },
+                    "version_notes": {
+                        "title": "Versienotities"
+                    }
+                },
+                "study": {
+                    "distribution_rationale": {
+                        "title": "Verdelingsverantwoording"
+                    },
+                    "conditions_of_instruction": {
+                        "title": "Instructieomstandigheden"
+                    },
+                    "qset_size": {
+                        "title": "Q-set-grootte"
+                    },
+                    "pre_post_design": {
+                        "title": "Voor-/nasorteringsopzetkeuzes"
+                    },
+                    "limitations": {
+                        "title": "Beperkingen"
+                    }
+                }
+            }
+        },
+        "study_design": {
+            "distribution_mode": {
+                "title": "Verdelingsmodus",
+                "helper": "Kies hoe strikt het Q-sorteringsraster wordt afgedwongen. Geforceerd: elke kolom moet gevuld zijn tot de opgegeven capaciteit (de meest voorkomende keuze). Vrij: elk aantal kaarten per kolom, totaal = Q-setgrootte. Flexibel: totaal wordt afgedwongen, kolomcapaciteiten zijn zachte richtlijnen.",
+                "forced": {
+                    "label": "Geforceerd",
+                    "tooltip": "Elke kolom moet precies de opgegeven capaciteit bevatten."
+                },
+                "free": {
+                    "label": "Vrij",
+                    "tooltip": "Totaal kaarten = Q-setgrootte; aantal per kolom is onbeperkt."
+                },
+                "flexible": {
+                    "label": "Flexibel",
+                    "tooltip": "Totaal kaarten = Q-setgrootte; kolomcapaciteiten zijn zachte richtlijnen (alleen waarschuwingen)."
+                }
+            },
+            "rough_sort": {
+                "toggle_label": "Voorsortering inschakelen (indeling in 3 stapels)",
+                "lock_banner": "Schakelaar vergrendeld. {{count}} deelnemer(s) zijn begonnen met de enquête; archiveer of verwijder die sessies voordat u deze instelling wijzigt.",
+                "deck_mode_note": "Uitgeschakeld. Deelnemers zien de volledige Q-set als een horizontaal scrollbare reeks."
+            }
+        },
+        "study": {
+            "activate_error": "Onderzoek kon niet worden geactiveerd. Controleer of de opzet geldig is en probeer het opnieuw.",
+            "save": {
+                "success": "Wijzigingen succesvol opgeslagen",
+                "save_success": "Succesvol opgeslagen",
+                "synced_warnings": "Gesynchroniseerd met server. Uw wijzigingen bewaard in: {{fields}}",
+                "synced_concurrent": "Gesynchroniseerd met gelijktijdige wijzigingen van een andere gebruiker",
+                "conflict": "Conflict gedetecteerd. Sommige wijzigingen konden niet worden samengevoegd.",
+                "error": "Opslaan van wijzigingen mislukt"
+            },
+            "postsort": {
+                "missing": {
+                    "title": "Ontbrekende stellingen",
+                    "desc": "Zijn er ideeën of perspectieven die u miste in het geheel van stellingen?"
+                }
+            },
+            "state": {
+                "manage": "Onderzoeksverloop beheren"
+            }
+        },
+        "components": {
+            "markdown": {
+                "label": "Markdown",
+                "tooltip": "Ondersteunt Markdown voor rijke opmaak",
+                "bold": "Vet",
+                "italic": "Cursief",
+                "list": "Lijst",
+                "link": "Link",
+                "edit": "Bewerken",
+                "preview": "Voorbeeld",
+                "empty": "Niets te bekijken"
+            },
+            "click_to_edit": "Klik om te bewerken"
+        },
+        "layout": {
+            "title": "Beheer",
+            "back_home": "Terug naar startpagina",
+            "beta": "Onderzoeksbèta",
+            "logout": "Uitloggen",
+            "account": "Accountinstellingen",
+            "admin_user": "Beheerder"
+        },
+        "account": {
+            "title": "Accountinstellingen",
+            "description": "Beheer uw persoonlijke informatie en accountbeveiliging.",
+            "personal": {
+                "title": "Persoonlijke informatie",
+                "email": "E-mailadres",
+                "email_locked": "E-mailwijzigingen via de API komen binnenkort naar deze pagina; backendondersteuning is actief.",
+                "name": "Volledige naam",
+                "save": "Opslaan",
+                "saving": "Opslaan...",
+                "success": "Profiel succesvol bijgewerkt",
+                "error": "Profiel bijwerken mislukt",
+                "cannot_remove_self": "U kunt uzelf niet verwijderen",
+                "name_required": "Volledige naam is verplicht"
+            },
+            "security": {
+                "title": "Beveiliging",
+                "description": "Beheer tweestapsverificatie en uw wachtwoord.",
+                "tfa_subtitle": "Tweestapsverificatie",
+                "password_subtitle": "Wachtwoord",
+                "enabled": "Ingeschakeld",
+                "setup_cta": "2FA nu instellen",
+                "configure_title": "Authenticator-app configureren",
+                "scan_desc": "Scan deze QR-code met uw authenticator-app (Google Authenticator, Authy, enz.)",
+                "enter_code": "6-cijferige code invoeren",
+                "enable_btn": "2FA inschakelen",
+                "disable_btn": "2FA uitschakelen",
+                "confirm_disable": "Uitschakelen bevestigen",
+                "confirm_password_label": "Bevestigen met uw wachtwoord",
+                "verifying": "Verifiëren...",
+                "cancel": "Annuleren",
+                "enabled_success": "Tweestapsverificatie ingeschakeld",
+                "disabled_success": "Tweestapsverificatie uitgeschakeld",
+                "secret_copied": "Geheim gekopieerd",
+                "invalid_token": "Ongeldige verificatiecode",
+                "disable_error": "2FA uitschakelen mislukt",
+                "channel_select_label": "Hoe wilt u uw 2FA-codes ontvangen?",
+                "channel_app": "Authenticator-app (aanbevolen)",
+                "channel_email": "E-mail",
+                "channel_email_desc": "We sturen u elke keer dat u inlogt een 6-cijferige code per e-mail. Handig als u geen authenticator-app kunt installeren.",
+                "enable_email_btn": "E-mailgebaseerde 2FA inschakelen",
+                "enable_email_pending": "Inschakelen…"
+            },
+            "password": {
+                "title": "Wachtwoordbeheer",
+                "current": "Huidig wachtwoord",
+                "new": "Nieuw wachtwoord",
+                "change_btn": "Wachtwoord wijzigen",
+                "updating": "Bijwerken...",
+                "success": "Wachtwoord succesvol gewijzigd",
+                "error": "Wachtwoord wijzigen mislukt. Controleer het huidige wachtwoord.",
+                "validation": {
+                    "required": "Verplicht",
+                    "min_length": "Min. 8 tekens"
+                }
+            }
+        },
+        "sidebar": {
+            "home": "Dashboard",
+            "add_study": "Onderzoek toevoegen",
+            "create_project": "NIEUW PROJECT AANMAKEN",
+            "dashboard": "Dashboard",
+            "overview": "Overzicht",
+            "design": "Opzet",
+            "recruit": "Toegang",
+            "data": "Data",
+            "analysis": "Analyse",
+            "privacy": "Gegevensprivacy",
+            "team": "Team",
+            "settings": "Onderzoeksinstellingen",
+            "project_settings": "Projectinstellingen",
+            "study_tools": "Onderzoekshulpmiddelen",
+            "project": "Project",
+            "documentation": "Documentatie",
+            "support": "Ondersteuning",
+            "study_management": "Onderzoeksbeheer",
+            "search": "Zoeken...",
+            "studies": "Onderzoeken",
+            "select_study": "Onderzoek selecteren",
+            "select_study_msg": "Selecteer of maak een onderzoek aan om te beginnen.",
+            "view_all_studies": "Alle onderzoeken",
+            "study": "Onderzoek",
+            "select_project": "Project selecteren",
+            "concourses": "Concoursen",
+            "concourse": "Concours",
+            "members": "Teamleden"
+        },
+        "concourse": {
+            "title": "Concours",
+            "description": "Beheer kandidaatstellingen voor uw Q-methodologieonderzoek",
+            "default_title": "Concours",
+            "default_title_for_project": "{{project}} concours",
+            "create": "Nieuw concours",
+            "create_success": "Concours aangemaakt",
+            "create_error": "Concours aanmaken mislukt",
+            "create_dialog_title": "Concours aanmaken",
+            "create_dialog_desc": "Een concours is een verzameling kandidaatstellingen waaruit u uw Q-set samenstelt.",
+            "field_title": "Titel",
+            "field_title_placeholder": "bijv. Attitudes over klimaatverandering",
+            "field_description": "Beschrijving",
+            "field_description_placeholder": "Korte beschrijving van dit concours...",
+            "field_code": "Code",
+            "field_text": "Stellingstekst",
+            "field_text_placeholder": "Voer de stellingstekst in...",
+            "field_source": "Bron",
+            "items_label": "items",
+            "updated": "Bijgewerkt",
+            "empty_title": "Nog geen concoursen",
+            "empty_desc": "Maak een concours aan om kandidaatstellingen voor uw Q-methodologieonderzoek te verzamelen en te organiseren.",
+            "add_item": "Item toevoegen",
+            "bulk_import": "Bulkimport",
+            "import_desc": "Plak stellingen gescheiden door regeleinden. Elke regel wordt één item.",
+            "import_prefix": "Codeprefix",
+            "import_statements": "Stellingen",
+            "import_placeholder": "Één stelling per regel...",
+            "items_to_import": "te importeren stellingen",
+            "import_button": "Importeren",
+            "import_success": "{{count}} items geïmporteerd",
+            "import_error": "Importeren mislukt",
+            "item_created": "Item toegevoegd",
+            "item_create_error": "Item toevoegen mislukt",
+            "item_updated": "Item bijgewerkt",
+            "item_update_error": "Item bijwerken mislukt",
+            "item_deleted": "Item verwijderd",
+            "item_delete_error": "Item verwijderen mislukt",
+            "status_error": "Status wijzigen mislukt",
+            "search_placeholder": "Items zoeken...",
+            "source_placeholder": "bijv. Interview #3, Literatuuronderzoek",
+            "no_items": "Nog geen items. Voeg uw eerste stelling toe.",
+            "no_matches": "Geen items komen overeen met uw filters.",
+            "danger_zone": "Gevarenzone",
+            "delete": "Concours verwijderen",
+            "delete_confirm": "Weet u zeker dat u dit concours en alle bijbehorende items wilt verwijderen?",
+            "deleted": "Concours verwijderd",
+            "delete_error": "Concours verwijderen mislukt",
+            "delete_item_title": "Item verwijderen",
+            "delete_item_confirm": "Dit item verwijderen? Kan niet ongedaan worden gemaakt.",
+            "status": {
+                "proposed": "Voorgesteld",
+                "accepted": "Geaccepteerd",
+                "rejected": "Afgewezen"
+            },
+            "change_note_placeholder": "Wijzigingsopmerking (optioneel)",
+            "history": "Geschiedenis",
+            "comments": "Opmerkingen",
+            "no_history": "Nog geen bewerkingsgeschiedenis.",
+            "no_comments": "Nog geen opmerkingen.",
+            "add_comment": "Schrijf een opmerking...",
+            "send_comment": "Versturen",
+            "comment_added": "Opmerking toegevoegd",
+            "comment_error": "Opmerking kon niet worden toegevoegd. Probeer opnieuw.",
+            "version_label": "v{{n}}",
+            "item_detail_desc": "Geschiedenis en opmerkingen voor dit item",
+            "manage_tags": "Labels",
+            "tag_name_placeholder": "Labelnaam",
+            "tag_color": "Labelkleur",
+            "tag_created": "Label aangemaakt",
+            "tag_create_error": "Label aanmaken mislukt",
+            "tag_deleted": "Label verwijderd",
+            "tag_delete_error": "Label verwijderen mislukt",
+            "no_tags": "Nog geen labels. Maak uw eerste label hierboven aan.",
+            "field_tags": "Labels",
+            "export_csv": "CSV exporteren",
+            "select_language": "Taal",
+            "add_language": "Taal toevoegen",
+            "add_language_desc": "Voer een taalcode in (bijv. en, fr, fi).",
+            "add_language_desc_v2": "Selecteer een taal voor stellingsvertalingen.",
+            "add_language_tooltip": "Vertaaltaal toevoegen",
+            "field_language": "Taal",
+            "import_language": "Taal",
+            "select_all": "Alles selecteren",
+            "bulk_selected": "{{count}} geselecteerd",
+            "bulk_set_status": "Status instellen:",
+            "bulk_clear": "Wissen",
+            "bulk_status_success": "{{count}} items bijgewerkt",
+            "bulk_status_error": "Sommige items bijwerken mislukt",
+            "qset_title": "Curatie",
+            "qset_pending": "{{count}} items nog te beoordelen",
+            "qset_complete": "Alle items beoordeeld",
+            "show_pending": "Te beoordelen",
+            "bulk_confirm_title": "Statuswijziging bevestigen",
+            "bulk_confirm_desc": "{{count}} items instellen op \"{{status}}\"?",
+            "no_translation": "Geen tekst",
+            "language_tooltip": "Taal van de stellingsteksten",
+            "loading": "Concours instellen...",
+            "diff_code": "code",
+            "diff_status": "status",
+            "diff_text": "tekst",
+            "diff_tags": "labels",
+            "diff_changed": "Gewijzigd:",
+            "methodological_context": {
+                "title": "Methodologische context",
+                "subtitle": "Optionele documentatievelden. Vul in wat relevant is voor uw opzet; laat andere leeg."
+            },
+            "import_from_csv": "CSV/TSV importeren…",
+            "import_csv_hint": "CSV/TSV heeft kolommen nodig: code, language, text.",
+            "import_csv_no_match": "Geen rijen komen overeen met de geselecteerde taal ({{lang}}).",
+            "import_csv_skipped": "{{count}} rij(en) in andere talen overgeslagen: {{langs}}.",
+            "import_csv_more_errors": "{{count}} meer problemen"
+        },
+        "concourse_import": {
+            "title": "Importeren uit concours",
+            "desc": "Selecteer items uit een concours om te importeren als onderzoeksstellingen. Items worden gekopieerd; wijzigingen in het concours hebben geen invloed op het onderzoek.",
+            "button_label": "Importeren uit concours",
+            "select_concourse": "Concours",
+            "select_placeholder": "Kies een concours...",
+            "code_prefix": "Codeprefix",
+            "code_prefix_placeholder": "bijv. S",
+            "only_accepted": "Alleen geaccepteerd",
+            "replace_existing": "Bestaande stellingen vervangen",
+            "replace_warning": "Alle bestaande stellingen worden permanent verwijderd en vervangen door de geselecteerde items.",
+            "selected": "{{count}} geselecteerd",
+            "select_all": "Alles selecteren",
+            "import_button": "{{count}} stellingen importeren",
+            "success": "{{count}} stellingen geïmporteerd",
+            "error": "Items uit het concours konden niet worden geïmporteerd. Probeer het opnieuw.",
+            "no_accepted": "Geen geaccepteerde items in dit concours. Schakel \"Alleen geaccepteerd\" uit om alles te zien.",
+            "no_items": "Dit concours heeft geen items.",
+            "no_concourses": "Geen concoursen in dit project. Maak er eerst een aan."
+        },
+        "concourse_sync": {
+            "update_available": "Update",
+            "source_deleted": "Bron verwijderd",
+            "source_deleted_tip": "Het bronitem in het concours is verwijderd.",
+            "new_version": "Nieuwe versie in concours:",
+            "synced": "Stelling bijgewerkt vanuit concours",
+            "error": "Synchronisatie vanuit het concours mislukt. Probeer het opnieuw.",
+            "stale_banner": "{{count}} stelling(en) hebben updates beschikbaar vanuit het concours."
+        },
+        "analysis": {
+            "title": "Analyse",
+            "description": "Factoranalyse van Q-sorteergegevens: standpunten extraheren uit deelnemersreacties",
+            "configuration": "Configuratie",
+            "configuration_description": "Selecteer extractiemethode, aantal factoren en rotatie",
+            "extraction_method": "Extractie",
+            "centroid": "Centroïde",
+            "n_factors": "Factoren",
+            "rotation_method": "Rotatie",
+            "none": "Geen",
+            "run": "Analyse uitvoeren",
+            "run_will_replace": "Opnieuw uitvoeren vervangt de huidige resultatenweergave. Gebruik het geschiedenispaneel om runs te vergelijken.",
+            "running": "Analyseren...",
+            "reanalyzing": "Opnieuw analyseren...",
+            "success": "Analyse voltooid. {{n}} factoren geëxtraheerd.",
+            "error": "Analyse mislukt: {{message}}",
+            "scree_hint": "Elke balk toont hoeveel variantie een factor verklaart (de eigenwaarde). De stippellijn markeert eigenwaarde = 1 (Kaiser-criterium). Klik op een balk om het aantal te extraheren factoren te selecteren.",
+            "kaiser_suggestion": "{{n}} factor(en) heeft/hebben eigenwaardes boven 1 (Kaiser-criterium)",
+            "factor": "Factor",
+            "factor_n": "Factor {{n}}",
+            "eigenvalue": "Eigenwaarde",
+            "too_few_participants": "Minimaal 2 voltooide deelnemers vereist om analyse uit te voeren.",
+            "eigenvalue_error": "Laden van analysegegevens mislukt. Probeer het opnieuw.",
+            "scree_plot_label": "Scree-plot met eigenwaardes voor {{n}} factoren",
+            "loading_eigenvalues": "Eigenwaardes laden...",
+            "empty_state": "Stel parameters in en voer de analyse uit.",
+            "empty": {
+                "contract_title": "Nog onvoldoende Q-sorteergegevens",
+                "contract_body": "Q-methodologie factoranalyse vereist minimaal 2 deelnemers die de sortering hebben voltooid. Configuratiekeuzes (extractie, factoren, rotatie, markering) krijgen betekenis zodra gegevens beschikbaar zijn. Deel de onderzoekslink vanuit het overzicht om reacties te verzamelen.",
+                "contract_cta": "Onderzoeksoverzicht openen"
+            },
+            "advanced": {
+                "title": "Geavanceerde instellingen",
+                "summary": "Rotatie: {{rotation}} · Markering: {{flagging}} · Bootstrap: {{bootstrap}}",
+                "bootstrap_off": "uit",
+                "bootstrap_on": "{{n}} iteraties"
+            },
+            "tab_loadings": "Ladingen",
+            "tab_factor_arrays": "Factorarrays",
+            "tab_statements": "Stellingen",
+            "tab_summary": "Samenvatting",
+            "participant": "Deelnemer",
+            "flagged": "Gemarkeerd",
+            "significance_threshold": "Significantiedrempel (p<0,05): ±{{threshold}}",
+            "sorts": "sorteringen",
+            "distinguishing_legend": "Onderscheidende stelling",
+            "code": "Code",
+            "statement": "Stelling",
+            "type": "Type",
+            "distinguishing": "Onderscheidend",
+            "consensus": "Consensus",
+            "variance_explained": "Verklaarde variantie (%)",
+            "cumulative_variance": "Cumulatieve variantie (%)",
+            "n_flagged": "Aantal gemarkeerde sorteringen",
+            "composite_reliability": "Samengestelde betrouwbaarheid",
+            "se_factor_scores": "SE van factorscores",
+            "factor_correlations": "Factorcorrelaties",
+            "high_correlation": "Hoge correlatie",
+            "total_variance": "Totaal verklaarde variantie",
+            "method_used": "Methode",
+            "statements_label": "stellingen",
+            "pca": "PCA",
+            "varimax": "Varimax",
+            "metric": "Metriek",
+            "caption_loadings": "Factorladingen per deelnemer",
+            "caption_statements": "Z-scores en factorarrays per stelling per factor",
+            "caption_characteristics": "Factorkenmerken en betrouwbaarheidsstatistieken",
+            "caption_correlations": "Factor-naar-factor correlatematrix",
+            "retry": "Opnieuw proberen",
+            "flagging_method": "Markering",
+            "auto": "Automatisch",
+            "manual": "Handmatig",
+            "manual_flag_hint": "Klik op een ladingscel om een deelnemer voor die factor te markeren of de markering te verwijderen. Voer de analyse opnieuw uit om resultaten bij te werken.",
+            "no_flagged_participants": "Geen deelnemers gemarkeerd voor een factor. Pas het aantal factoren of de markeringsmethode aan.",
+            "no_statement_scores": "Geen stellingscores beschikbaar. Zorg dat deelnemers gemarkeerd zijn voor minimaal één factor.",
+            "no_characteristics": "Geen factorkenmerken beschikbaar.",
+            "export": "Exporteren",
+            "export_loadings": "Factorladingen (CSV)",
+            "export_scores": "Stellingscores (CSV)",
+            "export_xlsx": "Volledige analyse (XLSX)",
+            "export_error": "XLSX-export genereren mislukt.",
+            "select_factors": "Aantal factoren selecteren",
+            "loadings_help": "Factorladingen tonen hoe sterk de sortering van elke deelnemer correleert met elke factor. Gemarkeerde cellen overschrijden de significantiedrempel hierboven.",
+            "factor_array_help": "Samengestelde Q-sortering die het ideale sorteerpatroon voor deze factor toont. Stellingen worden in de verdeling geplaatst op basis van hun gewogen z-scores.",
+            "factor_array_label": "Factor {{n}} samengestelde sortering",
+            "factor_arrays": {
+                "toggle_narratives": "Factornarratieven tonen",
+                "toggle_narratives_aria": "Interpretatieve narratieven per factor in-/uitschakelen"
+            },
+            "statements_help": "Z-scores tonen de gestandaardiseerde positie van elke factor op elke stelling. O = onderscheidend (significant verschillend tussen factoren), C = consensus (geen significante verschillen).",
+            "z_scores_description": "Z-scores en factorarray-posities per stelling",
+            "factor_statistics": "Factorstatistieken",
+            "characteristics_help": "Eigenwaardes weerspiegelen de hoeveelheid verklaarde variantie. Samengestelde betrouwbaarheid weerspiegelt de interne consistentie van gemarkeerde sorteringen. SE van factorscores weerspiegelt de precisie van de samengestelde schatting.",
+            "help_extraction": "PCA maximaliseert de verklaarde variantie. Centroïde is minder wiskundig gebonden.",
+            "help_n_factors": "Elke factor vertegenwoordigt een afzonderlijk standpunt.",
+            "help_rotation": "Varimax scheidt factoren voor een eenvoudigere structuur.",
+            "help_flagging": "Automatisch: deelnemers markeren die op precies één factor laden. Handmatig: per deelnemer overschrijven.",
+            "guide_loadings_title": "Factorladingen lezen",
+            "guide_loadings_1": "Elke lading is een correlatie (-1 tot +1) tussen een deelnemer en een factor (gedeeld standpunt).",
+            "guide_loadings_2": "Gemarkeerde waarden overschrijden de significantiedrempel boven de tabel.",
+            "guide_arrays_title": "Factorarrays interpreteren",
+            "guide_arrays_1": "Elke factorarray is de samengestelde Q-sortering die één gedeeld standpunt vertegenwoordigt.",
+            "guide_arrays_2": "Lees van links naar rechts als meest oneens naar meest eens. Extreme posities geven het sterkste signaal voor interpretatie.",
+            "guide_statements_title": "Stellingscores begrijpen",
+            "guide_statements_1": "Z-scores tonen hoe sterk elke factor het eens of oneens is met elke stelling (0 = neutraal).",
+            "guide_statements_2": "O = onderscheidend (significant anders geplaatst tussen factoren). Sterren geven significantieniveau aan.",
+            "guide_summary_title": "Uw oplossing evalueren",
+            "guide_summary_1": "Eigenwaardes meten hoeveel variantie een factor verklaart. Het Kaiser-criterium (eigenwaarde > 1) is een veelgebruikte heuristiek om te bepalen hoeveel factoren te behouden.",
+            "guide_summary_2": "Samengestelde betrouwbaarheid weerspiegelt hoe consistent de gemarkeerde sorteringen elke factor definiëren. Hogere waarden betekenen dat de factorschatting gebaseerd is op meer overeenstemming tussen de definiërende sorteringen.",
+            "benchmark_above": "Boven drempelwaarde",
+            "benchmark_below": "Onder drempelwaarde",
+            "history": {
+                "title": "Analysegeschiedenis",
+                "loading": "Geschiedenis laden…",
+                "fetch_error": "Analysegeschiedenis kon niet worden geladen.",
+                "empty": "Nog geen eerdere analyses voor dit onderzoek. Voer er een uit om het audittraject te starten.",
+                "empty_explainer": "Elke run wordt hier geregistreerd zodat u elke beslissing kunt documenteren en opnieuw bekijken.",
+                "load_error": "Deze analyserun kon niet worden geladen. Vernieuw de pagina om opnieuw te proberen.",
+                "load_run_aria": "Analyserun laden van {{date}}",
+                "loading_run": "Laden…",
+                "current_tag": "huidig",
+                "n_factors_label": "{{n}}F",
+                "edit_notes": "Notities bewerken",
+                "edit_notes_aria": "Notities voor deze run bewerken",
+                "notes_placeholder": "Voeg een notitie toe over deze run…",
+                "notes_aria": "Notities voor deze run bewerken",
+                "save_notes_aria": "Notities opslaan",
+                "cancel_edit_aria": "Bewerken annuleren",
+                "notes_saved": "Notities opgeslagen.",
+                "notes_error": "Notities konden niet worden opgeslagen. Controleer uw verbinding en probeer opnieuw.",
+                "delete_run": "Run verwijderen",
+                "delete_run_aria": "Deze analyserun verwijderen",
+                "delete_dialog_title": "Analyserun verwijderen?",
+                "delete_dialog_description": "Het verwijderen van een analyserun verwijdert het bewijs van een analytische keuze uit het audittraject. Weet u het zeker?",
+                "cancel": "Annuleren",
+                "delete_confirm": "Verwijderen",
+                "deleted": "Analyserun verwijderd.",
+                "delete_error": "Run verwijderen mislukt.",
+                "viewing_banner": "Run bekijken van {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
+                "back_to_current": "Terug naar huidig"
+            },
+            "factor_voices": {
+                "title": "Stemmen op factor {{n}}",
+                "no_audio": "Geen nasortering audio-opnames van deelnemers die gemarkeerd zijn voor deze factor.",
+                "no_material": "Geen nasortering audio-opnames of schriftelijke opmerkingen van deelnemers die gemarkeerd zijn voor deze factor.",
+                "loading": "Opnames laden…",
+                "error": "Audio-opnames konden niet worden geladen. Probeer het opnieuw.",
+                "context": "Veranker factorinterprétatie in de eigen woorden van deelnemers: hun audio-motivaties en schriftelijke kaartcommentaren.",
+                "context_aria": "Over dit paneel",
+                "audio_label": "Opname: {{key}} door {{participant}}",
+                "url_unavailable": "Audio-URL niet beschikbaar.",
+                "comments_label": "Kaartcommentaren"
+            },
+            "factor_note": {
+                "label": "Factornarratief",
+                "placeholder": "Schrijf het interpretatief narratief voor deze factor: het discours, de stemmen en de spanningen die het naar voren brengt.",
+                "empty_hint": "Voeg een interpretatief narratief toe voor deze factor",
+                "char_count": "{{n}}/{{max}}",
+                "edit_aria": "Narratief van factor {{n}} bewerken",
+                "save_aria": "Factornarratief opslaan",
+                "cancel_aria": "Bewerken annuleren",
+                "aria": "Narratief van factor {{n}} bewerken",
+                "saved": "Factornarratief opgeslagen.",
+                "error": "Factornarratief opslaan mislukt."
+            },
+            "rotation": {
+                "judgmental": {
+                    "label": "Oordeelkundig (handmatig)",
+                    "short": "Oordeelkundig",
+                    "tooltip": "Rotateer factorparen handmatig met gekozen hoeken om factoren uit te lijnen met inhoudelijk betekenisvolle posities."
+                }
+            },
+            "manual_rotations": {
+                "title": "Handmatige rotaties",
+                "helper": "Geef rotaties op als 'rotateer factor F met Δ° rond factor G'. Rotaties worden in volgorde toegepast.",
+                "add": "Rotatie toevoegen",
+                "remove_aria": "Rotatie verwijderen",
+                "empty": "Voeg minimaal één rotatie toe om de analyse uit te voeren.",
+                "factor_a_label": "Rotateer factor",
+                "angle_label": "met",
+                "factor_b_label": "rond factor"
+            },
+            "bootstrap": {
+                "toggle_label": "Bootstrap-stabiliteit uitvoeren",
+                "iterations_label": "Iteraties (B)",
+                "helper": "Optioneel. Steekproeft Q-sorteringen B keer opnieuw om betrouwbaarheidsintervallen voor factorscores te schatten.",
+                "running": "Bootstrap uitvoeren…",
+                "se_column": "Gemiddelde SE (z)",
+                "tooltip": "Niet-parametrische bootstrap van Q-sorteringen (met teruglegging; analyse B maal herhaald om 95%-BI's voor z-scores te schatten."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostiek",
+                "kaiser": "Kaiser",
+                "parallel": "Parallelle analyse",
+                "map": "Velicer's MAP",
+                "advisory": "Uitsluitend adviserend. Q-methode retentie hangt ook af van interpreteerbaarheid en stabiliteit (Watts & Stenner 2012).",
+                "preview_range_title": "Voorbeeldbereik",
+                "preview_range_disabled": "Voorbeeldbereik ondersteunt alleen PCA + varimax. Centroïde-extractie en oordeelkundige rotatie zijn padafhankelijk; voer een echte run uit om te inspecteren.",
+                "select_k": "{{k}} factoren",
+                "empty_factor": "Lege factor (over-factorisatie)",
+                "cumvar": "cumvar %",
+                "pct_flagged": "% gemarkeerd",
+                "n_distinguishing": "# onderscheidend",
+                "n_cross_loaders": "# cross-loaders",
+                "min_def_sorts": "min. definiërende sorteringen",
+                "advanced_title": "Geavanceerde configuratie",
+                "commit_cta": "Vastleggen en interpreteren"
+            },
+            "interpret": {
+                "def_sorts": "Definiërende sorteringen: {{n}}",
+                "statements_title": "Stellingen",
+                "narrative_title": "F{{n}}-narratief",
+                "insert_comment_quote": "Opmerking als citaat invoegen",
+                "focus_mode": "Per-factor focus",
+                "overview_mode": "Overzicht",
+                "mode_toggle": "Weergavemodus"
+            },
+            "compare": {
+                "pin_cta": "Vastpinnen voor vergelijking",
+                "no_other_runs": "Geen andere runs beschikbaar",
+                "run_label": "Run #{{id}} ({{n}} factoren)",
+                "pinned": "Vergelijken met run #{{id}}",
+                "phi": "φ = {{phi}}",
+                "ambiguous": "ambigue overeenkomst (interpreteer delta's met voorzichtigheid)",
+                "unpin": "Losmaken",
+                "delta_z_aria": "Δz {{delta}} vs vergelijkingsrun",
+                "delta_loading_aria": "Δlading {{delta}} vs vergelijkingsrun"
+            },
+            "quote_insert_format": "> {{text}}\n> {{p}}, on statement {{code}}: \"{{stmt}}\""
+        },
+        "project": {
+            "remove_member": "Lid verwijderen",
+            "table_caption": "Projectleden",
+            "switcher": {
+                "settings": "Projectinstellingen",
+                "settings_desc": "Leden & profielen",
+                "new_project": "Nieuw project",
+                "new_project_desc": "Een nieuw project aanmaken"
+            },
+            "roles": {
+                "owner": "Eigenaar",
+                "admin": "Beheerder",
+                "viewer": "Kijker",
+                "member": "Lid"
+            },
+            "study_states": {
+                "active": "Actief",
+                "draft": "Concept",
+                "paused": "Gepauzeerd",
+                "closed": "Gesloten"
+            },
+            "create": {
+                "title": "Project aanmaken",
+                "card_title": "Projectgegevens",
+                "name_label": "Projectnaam",
+                "name_placeholder": "Q-onderzoek klimaatattitudes",
+                "url_label": "Project-URL",
+                "url_placeholder": "klimaat-attitudes-q-onderzoek",
+                "url_description": "Dit wordt het projectpad onder /app/.",
+                "cancel": "Annuleren",
+                "create_button": "Project aanmaken",
+                "creating": "Aanmaken...",
+                "success": "Project succesvol aangemaakt",
+                "error": "Project aanmaken mislukt"
+            }
+        },
+        "recruitment": {
+            "title": "Toegang",
+            "description": "Configureer de onderzoeks-URL, beheer deelnemerstoegang en volg de wervingsefficiëntie.",
+            "study_url": {
+                "title": "Onderzoeks-URL",
+                "description": "Het openbare adres waar deelnemers uw onderzoek bereiken.",
+                "full_url_label": "Volledige URL",
+                "slug_label": "URL-slug",
+                "slug_description": "De unieke identificator in de onderzoeks-URL. Alleen kleine letters, cijfers en koppeltekens.",
+                "slug_locked": "De URL-slug kan alleen worden gewijzigd terwijl het onderzoek in conceptmodus staat."
+            },
+            "state_draft": "Conceptmodus. Links werken zodra u het onderzoek activeert.",
+            "state_closed": "Dit onderzoek is gesloten. Bestaande links blijven zichtbaar, maar nieuwe deelnemers kunnen niet meer starten.",
+            "state_archived": "Dit onderzoek is gearchiveerd. Alle wervingsgegevens zijn alleen-lezen.",
+            "empty_title": "Nog geen wervingslinks",
+            "empty_description": "Maak uw eerste link om deelnemers uit te nodigen.",
+            "empty_cta": "Toegangslink aanmaken",
+            "stats_summary": {
+                "links": "links",
+                "started": "gestart",
+                "submitted": "ingediend"
+            },
+            "access_rules": {
+                "title": "Toegangsregels",
+                "description": "Bepaal wanneer en hoe deelnemers het onderzoek kunnen openen.",
+                "password_toggle": "Wachtwoord vereisen",
+                "password_toggle_desc": "Deelnemers moeten een wachtwoord invoeren voordat ze het onderzoek starten.",
+                "password_label": "Toegangswachtwoord",
+                "password_placeholder": "Voer toegangswachtwoord in",
+                "password_locked": "Wachtwoordbeveiliging kan alleen worden gewijzigd terwijl het onderzoek in conceptmodus staat.",
+                "password_set": "Er is momenteel een wachtwoord ingesteld. Voer een nieuwe waarde in om het te wijzigen, of schakel uit om het te verwijderen.",
+                "collection_window": "Verzamelvenster",
+                "window_toggle": "Verzamelvenster beperken",
+                "window_toggle_help": "Beperk deelnemerstoegang tot een specifiek tijdvenster.",
+                "start_date_label": "Opent om",
+                "end_date_label": "Sluit om",
+                "date_hint": "Leeglaten voor geen tijdbeperking.",
+                "clear_date": "Datum wissen",
+                "save_button": "Toegangsregels opslaan",
+                "save_success": "Toegangsregels bijgewerkt",
+                "save_error": "Bijwerken van toegangsregels mislukt",
+                "non_draft_notice": "Buiten conceptmodus kan alleen het verzamelvenster worden bewerkt. Zet het onderzoek terug naar concept om andere toegangsregels te wijzigen.",
+                "archived_notice": "Dit onderzoek is gearchiveerd. Toegangsregels zijn alleen-lezen."
+            },
+            "new_link": "Nieuwe toegangslink",
+            "create_title": "Toegangslinks aanmaken",
+            "link_type": "Toegangsstrategie",
+            "select_type": "Kies een wervingstype...",
+            "campaign_name": "Kanaal- / campagnenaam",
+            "name_placeholder": "Bijv. LinkedIn, e-mailbatch a, studentenlijst...",
+            "link_count": "Batchgrootte",
+            "capacity_label": "Max. inzendingen",
+            "generate_links": "Links aanmaken",
+            "no_links": "Nog geen wervingslinks aangemaakt.",
+            "unnamed": "Naamloos kanaal",
+            "revoked": "Toegang ingetrokken",
+            "qr_title": "Delen via QR",
+            "copy_link": "URL kopiëren",
+            "table_title": "Wervingslinks",
+            "share_title": "Onderzoek delen",
+            "share_desc": "Verspreid uw onderzoeks-URL om deelnemers uit te nodigen.",
+            "public_url_label": "Openbare deelname-URL",
+            "hide_qr": "QR verbergen",
+            "show_qr": "QR-code tonen",
+            "delete_link": "Link verwijderen",
+            "qr_alt": "QR-code voor {{url}}",
+            "table_caption": "Wervingslinks",
+            "progress_label": "{{count}} van {{max}} antwoorden",
+            "usage": {
+                "started": "gestart",
+                "submitted": "ingediend",
+                "completed": "Voltooid",
+                "in_progress": "Bezig",
+                "unused": "Ongebruikt"
+            },
+            "live_study": "Live onderzoek",
+            "download_qr": "Afbeelding downloaden",
+            "qr_print_hint": "Scan of druk deze code af voor fysiek wervingsmateriaal (flyers, posters).",
+            "analytics_title": "Campagne-analyse",
+            "analytics_desc": "Directe links en QR-scans worden automatisch bijgehouden in het dashboard hierboven.",
+            "copy_success": "Onderzoekslink gekopieerd naar klembord",
+            "types": {
+                "public": "Open toegang (openbaar)",
+                "individual": "Eenmalige toegangscode",
+                "limited": "Beperkte deelname"
+            },
+            "guidance": {
+                "public": "Ideaal voor grootschalige werving. Één URL voor alle deelnemers.",
+                "individual": "Maximale beveiliging. Genereert unieke links die verlopen na één succesvolle voltooiing.",
+                "limited": "Gecontroleerde toegang. Één link die stopt na een vast aantal inzendingen."
+            },
+            "stats": {
+                "total_links": "Totaal kanalen",
+                "active_channels": "Actieve wervingslots",
+                "started": "Totaal sessies",
+                "engagements": "Gestarte deelnemers",
+                "submitted": "Geldige data",
+                "completions": "Voltooide inzendingen",
+                "conversion": "Vastleggingspercentage",
+                "efficiency": "Uiteindelijke dataopbrengst"
+            },
+            "table": {
+                "name": "Campagne / lot",
+                "type": "Toegangstype",
+                "token": "Beveiligingstoken",
+                "usage": "Capaciteit",
+                "status": "Status",
+                "actions": "Beheren",
+                "type_help": "Openbaar, Eenmalig of Capaciteitsbeperkt. Zie strategiebeschrijvingen in het dialoogvenster \"Nieuwe toegangslink\"."
+            },
+            "status": {
+                "public": "Openbaar",
+                "individual": "Individueel",
+                "limited": "Beperkt"
+            },
+            "toasts": {
+                "created": "Wervingslinks succesvol aangemaakt",
+                "failed": "Wervingslinks konden niet worden aangemaakt. Controleer de invoer en probeer opnieuw.",
+                "revoked": "Link ingetrokken",
+                "revoke_failed": "Deze link kon niet worden ingetrokken. Mogelijk is hij al in gebruik.",
+                "copied": "Gekopieerd naar klembord"
+            }
+        },
+        "analytics": {
+            "charts": {
+                "recruitment_funnel": {
+                    "title": "Wervingstrechter",
+                    "subtitle": "Geaggregeerde conversieprestatie",
+                    "initial_contact": "Eerste contact",
+                    "completion": "Voltooiing",
+                    "started_study": "Onderzoek gestart",
+                    "submitted": "Ingediend",
+                    "yield": "Opbrengst",
+                    "success_rate": "Slagingspercentage",
+                    "completion_rate": "{{rate}}% van de starters voltooid"
+                },
+                "link_performance": {
+                    "title": "Linkprestaties bijhouden",
+                    "subtitle": "Effectiviteit van afzonderlijke wervingskanalen bewaken",
+                    "volume": "Volume",
+                    "yield": "Opbrengst",
+                    "conversion_rate": "Conversiepercentage",
+                    "total_responses": "antwoorden"
+                }
+            }
+        },
+        "breadcrumbs": {
+            "admin": "Beheer",
+            "dashboard": "Dashboard",
+            "study_dashboard": "Overzicht",
+            "design": "Opzet",
+            "participants": "Deelnemers",
+            "team": "Team",
+            "recruitment": "Toegang",
+            "exports": "Data",
+            "data": "Data",
+            "privacy": "Gegevensprivacy",
+            "account": "Accountinstellingen",
+            "participant_n": "Deelnemer {{code}}",
+            "analysis": "Analyse",
+            "settings": "Instellingen",
+            "concourse": "Concours",
+            "members": "Teamleden"
+        },
+        "command_menu": {
+            "title": "Globaal opdrachtenmenu",
+            "placeholder": "Typ een opdracht of zoek...",
+            "no_results": "Geen resultaten gevonden.",
+            "switch_project": "Project wisselen",
+            "switch_study": "Onderzoek wisselen",
+            "study_actions": "Onderzoeksacties",
+            "system": "Systeem",
+            "no_studies": "Geen onderzoeken in dit project.",
+            "open_dashboard": "Dashboard openen",
+            "design_study": "Onderzoeksopzet",
+            "collaborators": "Medewerkers",
+            "copy_link": "Openbare link kopiëren",
+            "toggle_theme": "Thema wisselen",
+            "logout": "Uitloggen",
+            "search_label": "Zoeken of opdrachten uitvoeren",
+            "to_open": "Om te openen",
+            "active": "Actief",
+            "link_copied": "Onderzoekslink gekopieerd!",
+            "logged_out": "Succesvol uitgelogd",
+            "switched_project": "Overgeschakeld naar {{name}}"
+        },
+        "dashboard": {
+            "title": "Projectdashboard",
+            "welcome": "Welkom terug,",
+            "snapshot": "Een overzicht van uw onderzoeksactiviteit.",
+            "create_study": "Onderzoek aanmaken",
+            "total_studies": "Totaal onderzoeken",
+            "across_statuses": "Over alle statussen",
+            "active_data_collection": "Actieve dataverzameling",
+            "receiving_responses": "Onderzoeken die antwoorden ontvangen",
+            "total_participants": "Totaal deelnemers",
+            "all_studies": "Alle onderzoeken",
+            "all_studies_description": "Alle onderzoeken in dit project.",
+            "languages_count_one": "{{count}} taal",
+            "languages_count_other": "{{count}} talen",
+            "n_participants_one": "{{count}} deelnemer",
+            "n_participants_other": "{{count}} deelnemers",
+            "n_studies_one": "{{count}} onderzoek",
+            "n_studies_other": "{{count}} onderzoeken",
+            "n_active_one": "{{count}} actief",
+            "n_active_other": "{{count}} actief",
+            "n_participants_total_one": "{{count}} deelnemer",
+            "n_participants_total_other": "{{count}} deelnemers",
+            "concourse_n_items_one": "{{count}} stelling",
+            "concourse_n_items_other": "{{count}} stellingen",
+            "concourse_open_hint": "Kandidaatstellingen cureren",
+            "created": "Aangemaakt",
+            "no_studies": "Geen onderzoeken gevonden. Maak uw eerste onderzoek aan om te beginnen!",
+            "import_study": "Onderzoek importeren",
+            "get_started": "Begin met uw onderzoeksproject",
+            "onboarding_title": "Eerste stappen",
+            "step_create_project": "Maak uw project aan",
+            "step_create_project_desc": "Uw project is gereed.",
+            "step_concourse": "Stellingen verzamelen in het concours",
+            "step_concourse_desc": "Voeg de kandidaatstellingen uit uw literatuuronderzoek toe.",
+            "step_qset": "De Q-set samenstellen",
+            "step_qset_desc": "Beoordeel en accepteer de items die uw Q-set vormen.",
+            "step_study": "Onderzoek aanmaken",
+            "step_study_desc": "Definieer het sorteergrid voor uw Q-sortering.",
+            "step_import": "De Q-set in uw onderzoek importeren",
+            "step_import_desc": "Importeer de geaccepteerde concours-items als onderzoeksstellingen.",
+            "step_configure": "De deelnemersstroom configureren",
+            "step_configure_desc": "Stel instructies, voorsortering en nasorteringsvragen in.",
+            "step_launch": "Werving starten",
+            "step_launch_desc": "Genereer deelnamelinks en deel ze.",
+            "go_to_concourse": "Concours openen",
+            "go_to_qset": "Q-set openen",
+            "concourse": "Concours",
+            "concourse_empty": "Nog geen items. Begin met het opbouwen van uw stellingenverzameling.",
+            "team": "Team",
+            "team_loading": "Laden...",
+            "studies": "Onderzoeken",
+            "active_studies": "Actief",
+            "paused_studies": "Gepauzeerd",
+            "draft_studies": "Concepten",
+            "closed_studies": "Voltooid",
+            "attention": "Vereist aandacht",
+            "alert_deadline": "{{study}}: sluit over {{days}} dagen met {{count}} deelnemers",
+            "view": "Bekijken",
+            "open_study": "Onderzoek openen",
+            "add_study": "Onderzoek toevoegen",
+            "closes": "Sluit",
+            "timeline": {
+                "title": "Inzendingtijdlijn",
+                "subtitle": "Dagelijkse deelnametrends",
+                "started": "Gestart",
+                "completed": "Voltooid"
+            },
+            "devices": {
+                "title": "Apparaatverdeling",
+                "subtitle": "Hoe deelnemers uw onderzoek bereiken",
+                "types": {
+                    "desktop": "Desktop",
+                    "mobile": "Mobiel",
+                    "tablet": "Tablet",
+                    "unknown": "Onbekend"
+                }
+            },
+            "n_studies_help": "Totaal aantal onderzoeken in dit project, inclusief concepten en gesloten.",
+            "n_active_help": "Onderzoeken die momenteel deelnemersinzendingen accepteren (status = actief).",
+            "n_participants_total_help": "Som van voltooide deelnemers over alle onderzoeken in dit project.",
+            "tool_help": {
+                "design": "Configureer het onderzoek: verdeelgrid, instructieomstandigheden, stellingen, toestemming.",
+                "recruit": "Wervingslinks, toegangsregels en URL-instellingen.",
+                "data": "Deelnemersantwoorden en exports (CSV, Q-sorteringsdumps).",
+                "analysis": "Factoranalyseconfiguratie en historische runs."
+            }
+        },
+        "export": {
+            "config": "Configuratie exporteren",
+            "exporting": "Exporteren...",
+            "config_success": "Configuratie succesvol geëxporteerd",
+            "config_error": "Configuratie exporteren mislukt. Probeer het opnieuw.",
+            "label": "Data exporteren",
+            "success": "Export geslaagd",
+            "error": "Export mislukt. Probeer het opnieuw.",
+            "csv": "CSV exporteren",
+            "json": "JSON exporteren",
+            "audio": "Audio exporteren (ZIP)",
+            "formats": {
+                "csv": "CSV",
+                "pqmethod": "PQMethod (ZIP)",
+                "rkit": "R-Kit (ZIP)",
+                "package": "Onderzoekspakket (ZIP)",
+                "json": "JSON-dump"
+            },
+            "download": "Downloaden",
+            "package_dialog": {
+                "title": "Onderzoekspakket downloaden",
+                "description": "Bundelt alle onderzoeksdata in één ZIP voor OSF / pre-registratie.",
+                "discussion_hint": "Voegt memo/memo-discussion.md toe met alle commentaardraden (ondertekend en gedateerd). Standaard uitgeschakeld; houd uw export overzichtelijk tenzij u het beraadspoor wilt bewaren."
+            }
+        },
+        "import": {
+            "title": "Onderzoeksconfiguratie importeren",
+            "config": "Configuratie importeren",
+            "upload_desc": "Upload een eerder geëxporteerd configuratiebestand",
+            "validate_desc": "Configuratie beoordelen en unieke slug opgeven",
+            "creating_desc": "Onderzoek aanmaken...",
+            "file_upload": "Bestand uploaden",
+            "paste_json": "JSON plakken",
+            "drop_here": "Bestand hier neerzetten",
+            "drag_drop": "Slepen & neerzetten of klikken om te bladeren",
+            "supported": "Ondersteund formaat: .json",
+            "paste_label": "JSON-configuratie plakken",
+            "validate": "Valideren en doorgaan",
+            "valid": "Configuratie is geldig",
+            "invalid": "Configuratie bevat fouten",
+            "errors": "Fouten",
+            "warnings": "Waarschuwingen",
+            "summary": "Onderzoeksoverzicht",
+            "title_field": "Titel",
+            "languages": "Talen",
+            "statements": "Stellingen",
+            "grid": "Gridbereik",
+            "new_slug": "Nieuwe onderzoeksslug",
+            "slug_help": "Moet uniek zijn, 3-100 tekens, alleen kleine letters, cijfers en koppeltekens",
+            "creating": "Onderzoek aanmaken vanuit configuratie...",
+            "create_study": "Onderzoek aanmaken",
+            "invalid_json": "Ongeldig JSON-bestand",
+            "validation_failed": "Configuratie is ongeldig",
+            "success": "Onderzoek succesvol geïmporteerd",
+            "redirecting": "Onderzoeksontwerper openen...",
+            "failed": "Onderzoek kon niet worden geïmporteerd. Zie details hieronder en probeer opnieuw.",
+            "validation": {
+                "errors": {
+                    "missing_version": "Versieveld ontbreekt",
+                    "unsupported_version": "Niet-ondersteunde versie: {{version}}",
+                    "missing_field": "Verplicht veld ontbreekt: {{field}}",
+                    "no_translations": "Minimaal één vertaling vereist",
+                    "missing_translation_field": "Vertaling {{index}} mist verplicht veld: {{field}}",
+                    "invalid_lang_code": "Ongeldige taalcode: {{lang}}",
+                    "no_statements": "Minimaal één stelling vereist",
+                    "duplicate_codes": "Dubbele stellingcodes: {{codes}}",
+                    "missing_stmt_translations": "Stelling {{index}} mist vertalingen",
+                    "invalid_grid_config": "Ongeldige grid_config: moet een lijst zijn",
+                    "invalid_grid_structure": "Ongeldige grid_config-structuur: {{error}}"
+                },
+                "warnings": {
+                    "grid_capacity_mismatch": "Aantal stellingen ({{count}}) komt niet overeen met gridcapaciteit ({{capacity}})",
+                    "missing_consent_draft": "Toestemmingstitel of -beschrijving ontbreekt (conceptonderzoek)",
+                    "external_branding_logo": "Merklogo gebruikt externe URL: {{url}}",
+                    "external_partner_logo": "Partnerlogo voor '{{name}}' gebruikt externe URL: {{url}}",
+                    "external_logo": "Logo-URL verwijst naar externe bron - mogelijk niet toegankelijk"
+                }
+            }
+        },
+        "dialogs": {
+            "create_study": {
+                "title": "Nieuw onderzoek aanmaken",
+                "description": "Start een nieuw Q-methodologieonderzoek. U kunt stellingen en instellingen later configureren.",
+                "study_title": "Onderzoekstitel",
+                "study_title_placeholder": "Bijv. Perspectieven op AI",
+                "url_slug": "URL-slug",
+                "url_slug_placeholder": "bijv. ai-perspectieven-2025",
+                "cancel": "Annuleren",
+                "create": "Onderzoek aanmaken",
+                "success": "Onderzoek succesvol aangemaakt",
+                "error": "Onderzoek aanmaken mislukt",
+                "languages": "Talen",
+                "languages_desc": "Selecteer de in te schakelen talen. Inhoud wordt geïnitialiseerd met gelokaliseerde standaardwaarden."
+            }
+        },
+        "validation": {
+            "required": "Verplicht",
+            "slug_min": "Slug moet minimaal 3 tekens bevatten",
+            "slug_regex": "Slug mag alleen kleine letters, cijfers en koppeltekens bevatten"
+        },
+        "study_overview": {
+            "title": "Overzicht",
+            "back_to_overview": "Terug naar overzicht",
+            "sample_size": "Aantal deelnemers (P-Set)",
+            "valid": "geldig",
+            "completion_rate": "Voltooiingspercentage",
+            "active": "actief",
+            "mobile": "mobiel",
+            "median_duration": "Mediaan duur",
+            "suspect": "Verdacht",
+            "recent_activity": "Recente activiteit",
+            "latest_participants": "Meest recente deelnemers (laatste {{count}} van {{total}})",
+            "recently_completed": "Onlangs voltooid",
+            "in_progress": "Bezig",
+            "discarded": "Verwijderd",
+            "started": "Gestart",
+            "view_all": "Alle deelnemers en datadetails bekijken",
+            "no_participants": "Nog geen deelnemers.",
+            "view_data": "Bekijken",
+            "submitted": "Ingediend",
+            "edit_design": "Opzet bewerken",
+            "export_csv": "CSV downloaden",
+            "export_json": "JSON downloaden",
+            "steps": {
+                "welcome": "Welkom",
+                "consent": "Toestemming",
+                "rough_sort": "Grove sortering",
+                "fine_sort": "Q-sortering",
+                "final": "Laatste stappen"
+            }
+        },
+        "overview": {
+            "copy_id": "Deelnemer-ID kopiëren"
+        },
+        "study_status": {
+            "dialog": {
+                "draft": {
+                    "title": "Terugzetten naar concept?",
+                    "desc": "Dit stopt de dataverzameling maar laat u de onderzoeksopzet aanpassen. Bestaande data blijft bewaard.",
+                    "action": "Terugzetten naar concept"
+                },
+                "active": {
+                    "title": "Onderzoek starten?",
+                    "desc": "Door het onderzoek te activeren wordt het opengesteld voor deelnemers.",
+                    "action": "Activeren"
+                },
+                "paused": {
+                    "title": "Onderzoek pauzeren?",
+                    "desc": "Deelnemers kunnen het onderzoek niet betreden zolang het gepauzeerd is. U kunt het later hervatten.",
+                    "action": "Onderzoek pauzeren"
+                },
+                "closed": {
+                    "title": "Onderzoek sluiten?",
+                    "desc": "Dit voorkomt dat nieuwe deelnemers binnenkomen. Bestaande sessies kunnen nog worden afgerond. U kunt het later heropenen.",
+                    "action": "Onderzoek sluiten"
+                }
+            },
+            "steps": {
+                "draft": {
+                    "label": "Concept",
+                    "description": "Configuratie & opzet"
+                },
+                "active": {
+                    "label": "Actief",
+                    "description": "Antwoorden verzamelen"
+                },
+                "paused": {
+                    "label": "Gepauzeerd",
+                    "description": "In de wacht"
+                },
+                "closed": {
+                    "label": "Gesloten",
+                    "description": "Analyse & export"
+                }
+            },
+            "state": {
+                "activate": "Onderzoek activeren",
+                "switch_to_draft": "Conceptmodus",
+                "manage": "Status beheren"
+            },
+            "notifications": {
+                "success": {
+                    "draft": "Onderzoek succesvol teruggezet naar concept",
+                    "active": "Onderzoek succesvol gestart",
+                    "paused": "Onderzoek succesvol gepauzeerd",
+                    "closed": "Onderzoek succesvol gesloten"
+                },
+                "error": "Onderzoeksstatus kon niet worden gewijzigd. Controleer uw rechten en probeer het opnieuw.",
+                "state_changed_active": "Onderzoek is nu actief!"
+            }
+        },
+        "design": {
+            "title": "Onderzoeksopzet",
+            "translation_needed": "Controle vereist (kopie)",
+            "reset_defaults": "Standaardinstellingen herstellen",
+            "editing_language_banner": "U bewerkt de {{language}}-versie. Gebruik de taalkiezer in de werkbalk om te wisselen.",
+            "multilang": {
+                "view_others": "Bekijken in andere talen",
+                "other_formulations": "Andere formuleringen"
+            },
+            "guidance": {
+                "title": "Ontwerphulp",
+                "intro_title": "Welkom in de studio",
+                "intro_desc": "Begin met het vastleggen van het doel van uw onderzoek. Deze informatie wordt aan deelnemers getoond voordat zij met het sorteerproces beginnen.",
+                "qsort_title": "Stellingen & rasterbalans",
+                "qsort_desc": "Zorg ervoor dat de rastercapaciteit exact overeenkomt met het aantal stellingen. Een gebalanceerde Q-set volgt doorgaans een quasi-normale (klokvormige) verdeling."
+            },
+            "checklist": {
+                "title": "Checklist",
+                "statements": "Stellingen",
+                "grid_balance": "Raster gebalanceerd",
+                "branding": "Logo & kleuren",
+                "instructions": "Instructies",
+                "ready": "Alle essentiële onderdelen zijn gereed. U kunt uw onderzoek nu activeren!",
+                "pending": "Voltooi de vereiste stappen hierboven om het onderzoek te kunnen activeren.",
+                "study_title": "Onderzoekstitel",
+                "consent_defined": "Toestemmingsformulier",
+                "progress": "Voortgang",
+                "languages": "Talen",
+                "status_ready": "Gereed",
+                "status_pending": "In behandeling",
+                "required": "Vereist",
+                "reset_defaults": "Standaardinstellingen herstellen"
+            },
+            "unsaved_changes": {
+                "title": "Niet-opgeslagen wijzigingen",
+                "description": "U heeft niet-opgeslagen wijzigingen in uw onderzoeksopzet. Als u nu de pagina verlaat, gaan deze wijzigingen verloren.",
+                "confirm": "Verlaten zonder opslaan",
+                "cancel": "Blijven bewerken"
+            },
+            "tips": {
+                "title": "Snelle tip",
+                "pilot": "Voer altijd zelf een testsortering uit voordat u de link deelt met deelnemers."
+            },
+            "toolbar": {
+                "title": "Ontwerp",
+                "back": "Terug",
+                "preview": "Voorbeeld tonen",
+                "hide_preview": "Voorbeeld verbergen",
+                "popout": "Voorbeeld uitklappen",
+                "discard": "Niet-opgeslagen wijzigingen verwijderen",
+                "test_run": "Testrun",
+                "save": "Opslaan",
+                "saved": "Opgeslagen",
+                "closed": "Gesloten",
+                "back_to_study": "Terug naar onderzoek",
+                "editing_language": "Bewerkingstaal",
+                "manage_langs": "Talen beheren",
+                "select_lang": "Taal kiezen",
+                "test_run_help": "Voorbeeld als deelnemer. Deze runs worden niet meegenomen in uw gegevens.",
+                "more_actions": "Meer acties"
+            },
+            "sync": {
+                "saving": "Opslaan...",
+                "error": "Opslagfout",
+                "modified": "Niet-opgeslagen wijzigingen",
+                "synced": "Wijzigingen opgeslagen",
+                "wait_save": "Opslaan bezig... Even geduld.",
+                "recovered": "Concept hersteld vanuit lokale back-up!",
+                "recovery_title": "Niet-opgeslagen wijzigingen gevonden",
+                "recovery_desc": "Er is een lokale versie van dit onderzoek gevonden die recenter is dan de versie op de server. Wilt u deze herstellen?",
+                "recovery_restore": "Lokale versie herstellen",
+                "recovery_discard": "Lokale versie verwijderen"
+            },
+            "validation": {
+                "failed_title": "Configuratie onvolledig",
+                "failed_desc": "Herstel de volgende problemen om te activeren:",
+                "errors": {
+                    "no_statements": "Het onderzoek moet minimaal één stelling bevatten.",
+                    "no_grid": "Rasterconfiguratie ontbreekt.",
+                    "capacity_mismatch": "Rastercapaciteit ({{total}}) komt niet overeen met het aantal stellingen ({{count}}).",
+                    "no_translations": "Het onderzoek moet minimaal één taalvertaling bevatten.",
+                    "missing_default_lang": "Vertaling voor de standaardtaal ({{lang}}) ontbreekt.",
+                    "missing_title": "Titel ontbreekt voor taal '{{lang}}'.",
+                    "missing_consent_title": "Toestemmingstitel ontbreekt voor taal '{{lang}}'.",
+                    "missing_consent_description": "Toestemmingsbeschrijving ontbreekt voor taal '{{lang}}'.",
+                    "missing_grid_instructions": "Q-sorteerinstructies ontbreken voor taal '{{lang}}'.",
+                    "missing_step_title": "Staptitel {{index}} ontbreekt voor taal '{{lang}}'.",
+                    "missing_statement_translation": "Stelling '{{code}}' mist vertalingen voor: {{missing}}.",
+                    "empty_statement_text": "Stelling '{{code}}' heeft lege tekst voor taal '{{lang}}'.",
+                    "missing_question_label": "Vraag '{{id}}' mist een label voor taal '{{lang}}' ({{section}}).",
+                    "missing_option_label": "Optie {{index}} van vraag '{{id}}' mist een label voor taal '{{lang}}' ({{section}})."
+                }
+            },
+            "languages": {
+                "manage_title": "Talen beheren",
+                "manage_desc": "Schakel talen in of uit die deelnemers kunnen zien in dit onderzoek.",
+                "auto_translate": "Automatische vertaling",
+                "auto_translate_desc": "Binnenkort kunt u AI gebruiken om uw onderzoek automatisch te vertalen in 30+ talen.",
+                "activate_title": "Taal activeren",
+                "activate_desc": "Kies een brontaal om vertalingen van te kopiëren. Hiermee voorkomt u lege velden voor deelnemers.",
+                "source_label": "Brontaal",
+                "copy_notice": "Alle velden worden gekopieerd. U ziet een visuele indicator bij velden die nog vertaald moeten worden.",
+                "confirm_activate": "Activeren & kopiëren"
+            },
+            "tabs": {
+                "welcome": "Algemeen",
+                "presort": "Voorsortering",
+                "condition": "Instructie",
+                "qsort": "Q-sortering",
+                "postsort": "Nasortering",
+                "interface": "Interface",
+                "theme": "Thema",
+                "general": "Algemeen",
+                "statements": "Stellingen",
+                "grid": "Raster",
+                "survey": "Vragenlijst",
+                "branding": "Huisstijl"
+            },
+            "view_mode": {
+                "mobile": "Mobiele weergave",
+                "desktop": "Desktopweergave"
+            },
+            "intro": {
+                "general_settings": "Algemene instellingen",
+                "welcome_title": "Welkomstbericht",
+                "process_title": "Overzicht onderzoeksstappen",
+                "process_steps": {
+                    "title": "Overzicht onderzoeksstappen",
+                    "desc": "Definieer de fasen die deelnemers zien op de welkomstpagina. Als u niets invult, worden de standaardstappen gebruikt.",
+                    "add_step": "Stap toevoegen",
+                    "empty": {
+                        "title": "Geen aangepaste stappen gedefinieerd",
+                        "desc": "Het onderzoek gebruikt de standaard Q-methodologie-workflow (kennismaking, eerste indrukken, perspectief, waarom)."
+                    },
+                    "fields": {
+                        "title": "Staptitel",
+                        "description": "Korte beschrijving",
+                        "icon": "Pictogram",
+                        "toggle": "Schakelaar"
+                    },
+                    "defaults": {
+                        "new_step": "Nieuwe onderzoeksstap",
+                        "new_desc": "Leg uit wat de deelnemer in deze fase zal doen."
+                    },
+                    "reset": {
+                        "instructions": "Instructies herstellen",
+                        "consent_title": "Toestemmingstitel herstellen",
+                        "consent_description": "Toestemmingsbeschrijving herstellen",
+                        "process_steps": "Processtappen herstellen",
+                        "process_steps_confirm": "Weet u zeker dat u alle processtappen wilt terugzetten naar de standaardwaarden? Dit vervangt uw aangepaste stappen."
+                    },
+                    "inconsistent": {
+                        "banner_title": "Inconsistente processtappen",
+                        "rough_disabled": "De stap 'Eerste indrukken' (grove sortering) staat in deze lijst, maar de grove sortering is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
+                        "presort_disabled": "De stap 'Laten we kennismaken' (voorsorteringsvragenlijst) staat in deze lijst, maar de voorsorteringsvragenlijst is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
+                        "remove_action": "Verwijderen"
+                    }
+                },
+                "consent_title": "Toestemmingsformulier",
+                "reset": "Instructie herstellen",
+                "consent_details": "Details toestemmingsformulier",
+                "fields": {
+                    "default_lang": "Standaardtaal",
+                    "default_lang_help": "Deze taal wordt standaard aan deelnemers getoond als hun browsertaal niet wordt ondersteund.",
+                    "title": "Onderzoekstitel",
+                    "title_placeholder": "Voer een publieke titel in...",
+                    "subtitle": "Ondertitel (optioneel)",
+                    "subtitle_placeholder": "Een korte slagzin...",
+                    "objective": "Onderzoeksdoel",
+                    "objective_placeholder": "Wat is de onderzoeksvraag of het doel van dit onderzoek?",
+                    "task_overview": "Introductie",
+                    "task_placeholder": "Beschrijf het onderzoeksproces hier (aantal stappen, geschatte duur, enz.). Dit veld is optioneel als u de aangepaste stappen hierboven gebruikt.",
+                    "consent_title_label": "Toestemmingstitel",
+                    "legal_text": "Juridische tekst / overeenkomst",
+                    "legal_placeholder": "Voer de volledige juridische overeenkomsttekst in..."
+                },
+                "consent_desc": "Deelnemers moeten akkoord gaan met deze voorwaarden voordat ze beginnen."
+            },
+            "condition": {
+                "title": "Instructieconditie",
+                "label": "Instructieconditie definiëren",
+                "desc": "Dit is de kernprompt die deelnemers begeleidt gedurende het hele sorteerproces.",
+                "field_label": "Instructietekst",
+                "placeholder": "Bijv. Rangschik de volgende stellingen van meest eens tot meest oneens",
+                "grid_title": "Q-sorteerinstructie",
+                "grid_desc": "Dit is de kerninstructie die deelnemers begeleidt tijdens het Q-sorteerproces.",
+                "pre_title": "Voorlopige sorteerinstructie",
+                "pre_desc": "Instructie die aan deelnemers wordt gegeven tijdens de eerste grove sortering.",
+                "pre_field_label": "Instructietekst",
+                "pre_placeholder": "Bijv. Verdeel de kaarten vanuit uw persoonlijk standpunt in drie stapels...",
+                "enable_pre": "Pre-instructiestap inschakelen",
+                "pre_label": "Inhoud pre-instructie",
+                "tips": {
+                    "title": "Waarom is dit belangrijk?",
+                    "desc": "In Q-methodologie bepaalt de 'instructieconditie' het standpunt van waaruit de deelnemer de items sorteert. Ze moet helder en consistent zijn in alle sorteerfasen."
+                }
+            },
+            "questions": {
+                "enable_presort": "Voorsorteringsvragenlijst inschakelen",
+                "enable_presort_desc": "Verzamel demografische informatie of andere gegevens vóór de sorteertaak.",
+                "add_field": "Nieuw veld toevoegen",
+                "basic_fields": "Basisvelden",
+                "choice_fields": "Keuzevelden",
+                "scale_fields": "Schaalvelden",
+                "labels": {
+                    "question": "Vraaglabel",
+                    "required": "Verplicht veld",
+                    "options": "Opties",
+                    "multiple": "(Meerdere keuzes mogelijk)",
+                    "single": "(Enkelvoudige keuze)",
+                    "placeholder": "Voer uw vraag in...",
+                    "scale": "Beoordelingsschaal",
+                    "scale_points": "Aantal punten",
+                    "scale_left": "Label linkereindpunt",
+                    "scale_right": "Label rechtereindpunt"
+                },
+                "types": {
+                    "text": "Tekst",
+                    "long_text": "Lange tekst",
+                    "number": "Getal",
+                    "date": "Datum",
+                    "email": "E-mail",
+                    "dropdown": "Uitklaplijst",
+                    "radio": "Keuzeknop",
+                    "checkboxes": "Selectievakjes",
+                    "text_audio": "Tekst + audio",
+                    "rating": "Beoordelingsschaal"
+                },
+                "empty": {
+                    "title": "Nog geen vragen",
+                    "desc": "Klik hierboven om uw eerste vraag toe te voegen"
+                },
+                "defaults": {
+                    "new_question": "Nieuwe vraag",
+                    "option": "Optie",
+                    "enter_answer": "Voer uw antwoord in...",
+                    "untitled": "Vraag zonder titel",
+                    "scale_left": "Helemaal oneens",
+                    "scale_right": "Helemaal eens"
+                },
+                "actions": {
+                    "add_option": "Optie toevoegen",
+                    "copy_from": "Importeren vanuit taal",
+                    "copy_success": "Geïmporteerd"
+                },
+                "logic": {
+                    "title": "Zichtbaarheidslogica",
+                    "enable": "Zichtbaarheidsvoorwaarde toevoegen",
+                    "depends_on": "Toon deze vraag alleen als...",
+                    "select_placeholder": "Selecteer een bovenliggende vraag",
+                    "operator": "Operator",
+                    "value": "Vergelijkingswaarde",
+                    "operators": {
+                        "equals": "Is gelijk aan",
+                        "not_equals": "Is niet gelijk aan",
+                        "contains": "Bevat",
+                        "greater_than": "Groter dan",
+                        "less_than": "Kleiner dan"
+                    }
+                }
+            },
+            "qsort": {
+                "tabs": {
+                    "statements": "Stellingen",
+                    "distribution": "Verdeling"
+                },
+                "bulk": {
+                    "title": "Bulk-editor (snel plakken)",
+                    "desc": "Één stelling per regel. Ondersteunt \"code: tekst\" en Excel kopiëren-plakken (meertalig).",
+                    "replace_all": "Alles vervangen",
+                    "append": "Toevoegen aan lijst",
+                    "sync_by_code": "Synchroniseren/samenvoegen op code",
+                    "placeholder": "Eenvoudig: Mijn stelling",
+                    "detected": "{{count}} stellingen gedetecteerd",
+                    "process_replace": "Verwerken & stellingen vervangen",
+                    "process_append": "Verwerken & stellingen toevoegen",
+                    "process_sync": "Verwerken & vertalingen synchroniseren",
+                    "detected_format": {
+                        "excel": "Excel-indeling gedetecteerd (tabs)",
+                        "list": "Lijstindeling gedetecteerd (code: tekst)",
+                        "simple": "Eenvoudige lijst gedetecteerd (één per regel)",
+                        "multi_lang": "Meertalig: {{langs}}",
+                        "with_codes": "Met aangepaste codes"
+                    }
+                },
+                "set": {
+                    "title": "Q-set",
+                    "clear": "Alles wissen",
+                    "confirm_clear": "Weet u zeker dat u ALLE stellingen wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+                    "updated": "Stelling bijgewerkt",
+                    "cleared": "Alle stellingen gewist",
+                    "imported": "{{count}} stellingen succesvol geïmporteerd",
+                    "reset_codes": "Codes herstellen",
+                    "confirm_reset_codes": "Weet u zeker dat u alle stellingcodes opnieuw wilt nummeren (s1, s2, s3...)?",
+                    "codes_reset": "Stellingcodes opnieuw genummerd"
+                },
+                "settings": {
+                    "title": "Onderzoeksinstellingen",
+                    "desc": "Configureer hoe stellingen aan deelnemers worden gepresenteerd",
+                    "show_codes": "Stellingcodes tonen",
+                    "show_codes_desc": "Stellingcodes (bijv. \"S1\", \"S2\") naast de tekst weergeven.",
+                    "randomize": "Volgorde stellingen willekeurig maken",
+                    "randomize_desc": "Stellingen in willekeurige volgorde aan elke deelnemer presenteren (consistent binnen sessie)"
+                },
+                "grid": {
+                    "title": "Q-sorteerverdelingsraster",
+                    "desc": "De rastervorm dwingt deelnemers onderscheid te maken tussen stellingen, waarmee een normale verdeling wordt benaderd.",
+                    "slot_count": "{{count}} posities toegewezen",
+                    "stat_count": "{{count}} stellingen",
+                    "perfect": "Perfecte balans",
+                    "too_many": "{{count}} stellingen te veel",
+                    "too_few": "{{count}} stellingen te weinig",
+                    "min_reached": "Minimumbereik bereikt (±2)",
+                    "max_reached": "Maximumbereik bereikt (±6)",
+                    "remove_extreme_columns": "Extreme kolommen verwijderen",
+                    "add_extreme_columns": "Extreme kolommen toevoegen",
+                    "symmetry_lock": "Symmetrieblokkering",
+                    "symmetry_lock_desc": "Wijzigingen automatisch toepassen op tegenoverliggende kolommen om een evenwichtige verdeling te handhaven.",
+                    "auto_balance": "Automatisch balanceren",
+                    "auto_balance_desc": "Raster hervormen naar een gebalanceerde half-normale verdeling",
+                    "reshaped": "Raster hervormd naar een gebalanceerde verdeling",
+                    "balanced": "Raster gebalanceerd naar standaardverdeling",
+                    "no_statements": "Voeg eerst stellingen toe om het raster automatisch vorm te geven",
+                    "statements": "stellingen",
+                    "ideal_shape": "Ideale vorm",
+                    "symmetric": "Symmetrisch",
+                    "asymmetric": "Asymmetrisch",
+                    "tooltip_title": "Waarom een verplichte verdeling?",
+                    "tooltip_desc": "Q-methodologie gebruikt een quasi-normale verdeling (kurtosis > 0) om deelnemers betekenisvolle onderscheiden te laten maken. De piramidevorm voorkomt centrale tendensbias.",
+                    "locked": "Ontwerp vergrendeld",
+                    "locked_desc": "Structurele wijzigingen (stellingcodes, raster) zijn uitgeschakeld omdat het onderzoek gegevens heeft verzameld of niet meer in conceptmodus is. U kunt nog wel tekstvertalingen bewerken.",
+                    "locked_active": "Dit onderzoek is actief. Schakel over naar conceptmodus om te bewerken.",
+                    "locked_paused": "Dit onderzoek is gepauzeerd. Schakel over naar conceptmodus om te bewerken.",
+                    "locked_closed": "Dit onderzoek is gesloten. Het ontwerp is gearchiveerd.",
+                    "mismatch_title": "Rastercapaciteit komt niet overeen",
+                    "mismatch_desc": "U heeft {{statements}} stellingen, maar het raster heeft slechts posities voor {{slots}} items. Pas de kolommen hieronder aan.",
+                    "unlock_hint": "Ga naar de data-verkenner om sessies te wissen en de structuur te ontgrendelen"
+                }
+            },
+            "postsort": {
+                "extreme": {
+                    "title": "Doelgerichte kolommen",
+                    "desc": "Selecteer kolommen die vervolgvragen activeren.",
+                    "no_columns": "Geen kolommen geselecteerd.",
+                    "add_label": "Kolom toevoegen:",
+                    "prompt_label": "Prompt voor stellingen",
+                    "prompt_placeholder": "Waarom heeft u deze stelling hier geplaatst?",
+                    "add": "Toevoegen",
+                    "add_defaults": "Standaard extremen toevoegen",
+                    "select_placeholder": "Selecteren..."
+                },
+                "random_comments": {
+                    "title": "Willekeurige opmerkingen toestaan",
+                    "desc": "Deelnemers toestaan opmerkingen toe te voegen bij elke stelling in het raster."
+                },
+                "custom": {
+                    "title": "Aangepaste vragen",
+                    "desc": "Voeg aangepaste vragen toe aan de nasorteringsvragenlijst."
+                },
+                "missing": {
+                    "title": "Vragen naar ontbrekende stellingen",
+                    "desc": "Indien ja, beschrijf ze kort.",
+                    "prompt_label": "Prompttekst",
+                    "prompt_placeholder": "Voel u vrij om suggesties te doen en toe te lichten."
+                },
+                "steps": {
+                    "step1": "Stap 1: feedback",
+                    "step2": "Stap 2: vragen"
+                },
+                "email": {
+                    "title": "Opvolging deelnemers",
+                    "desc": "Verzamel e-mailadressen voor opvolging of onderzoeksresultaten.",
+                    "interview": "Opvolging aanbieden",
+                    "results": "Abonnement aanbieden op een mailinglijst over onderzoeksresultaten",
+                    "interview_warning": "Let op: instemmen met contact opheft de anonimiteit ten opzichte van de onderzoeker.",
+                    "results_hint": "E-mail uitsluitend voor resultaten, anonimiteit blijft gewaarborgd."
+                },
+                "audio": {
+                    "title": "Audio-opname",
+                    "desc": "Deelnemers toestaan audio-antwoorden op te nemen in plaats van tekst.",
+                    "max_duration": "Maximale duur",
+                    "seconds": "seconden",
+                    "max_duration_help": "Maximale opnameduur per vraag (30–600 seconden).",
+                    "participant_choice_info": "Deelnemers kunnen per vraag antwoorden met tekst, audio of beide."
+                }
+            },
+            "interface": {
+                "title": "Interface-aanpassing",
+                "desc": "Pas de knoppen en labels van de interface aan op de toon van uw onderzoek (bijv. \"eens/oneens\" wijzigen naar \"leuk/niet leuk\").",
+                "nav": {
+                    "title": "Navigatieknoppen",
+                    "start": "Startknop",
+                    "next": "Knop volgende stap",
+                    "submit": "Verzendknop",
+                    "confirm": "Knop sortering bevestigen",
+                    "tooltips": {
+                        "start": "Knop waarmee het onderzoek wordt gestart",
+                        "next": "Naar de volgende stap gaan",
+                        "submit": "Resultaten verzenden aan het einde",
+                        "confirm": "Algemene validatieknop"
+                    }
+                },
+                "terms": {
+                    "title": "Sorteringsterminologie",
+                    "desc": "Definieer de labels voor de spontane sortering en het rasterspectrum.",
+                    "rough": "Labels grove sortering",
+                    "agree": "Eens",
+                    "neutral": "Neutraal",
+                    "disagree": "Oneens",
+                    "grid": "Rasterlegenda (extremen)",
+                    "most_agree": "Meest eens",
+                    "most_disagree": "Meest oneens"
+                },
+                "hints": {
+                    "title": "Methodologietips",
+                    "desc": "Voeg zwevende hints toe of pas ze aan om deelnemers te helpen tijdens de rasterdsorteringsfase.",
+                    "placeholder": "Voer een methodologietip in...",
+                    "add": "Tip toevoegen",
+                    "reset": "Standaardinstellingen herstellen"
+                },
+                "help": {
+                    "title": "Stapbegeleiding (wat/waarom)",
+                    "desc": "Pas de contextgevoelige hulp aan die beschikbaar is voor deelnemers bij elke stap via de '?'-overlay.",
+                    "step_disabled": "(stap uitgeschakeld)"
+                }
+            },
+            "theme": {
+                "title": "Visuele huisstijl",
+                "accent": {
+                    "title": "Accentkleur",
+                    "desc": "Deze kleur wordt gebruikt voor knoppen, links en markeringen in het hele onderzoek.",
+                    "pick": "Kleur kiezen",
+                    "reset": "Standaardkleur herstellen"
+                },
+                "logo": {
+                    "title": "Onderzoekslogo",
+                    "desc": "Upload een aangepast logo ter vervanging van de standaard Open-Q-huisstijl.",
+                    "label": "Logo-URL",
+                    "hint": "Aanbevolen formaat: 200x50px. Ondersteunt PNG, SVG, JPG.",
+                    "preview": "Logovoorbeeld",
+                    "help_title": "Waar verschijnt dit logo?",
+                    "help_desc": "Het logo wordt bovenaan elke onderzoekspagina (navigatiebalk) en op de welkomstpagina weergegeven. Het versterkt de visuele identiteit van uw project."
+                },
+                "partners": {
+                    "title": "Institutionele partners",
+                    "desc": "Voeg logo's toe van ondersteunende instellingen of partners.",
+                    "add": "Partner toevoegen",
+                    "name_label": "Partnernaam",
+                    "name_placeholder": "Naam instelling",
+                    "logo_label": "Logo-URL",
+                    "url_label": "Website (optioneel)",
+                    "url_placeholder": "Https://...",
+                    "help_title": "Weergave van logo's",
+                    "help_desc": "Partnerlogo's worden weergegeven op de landingspagina en in de onderzoeksheader, naast het hoofdlogo."
+                },
+                "upload": {
+                    "upload": "Uploaden",
+                    "recommended": "Aanbevolen",
+                    "invalid_type": "Ongeldig bestandstype. Gebruik PNG, JPG of SVG.",
+                    "file_too_large": "Bestand te groot. Maximale grootte: {{size}}kb.",
+                    "conversion_error": "Verwerking van afbeelding mislukt.",
+                    "processing": "Afbeelding verwerken...",
+                    "drag_drop": "Slepen & neerzetten of klikken om te uploaden",
+                    "max": "Max"
+                }
+            },
+            "activate_dialog": {
+                "title": "Dit onderzoek activeren?",
+                "description": "Activering opent werving en ontgrendelt publieke links. Echte deelnemers kunnen beginnen met indienen.",
+                "checklist_title": "Pre-vluchtcontroles",
+                "languages_title": "Talen",
+                "lang_ready": "Gereed",
+                "lang_incomplete": "Onvolledig",
+                "required": "(vereist)",
+                "attestation": "Ik heb de toestemmingstekst en het bewaarbeleid doorgenomen en bevestig dat dit onderzoek klaar is om echte deelnemers te ontvangen.",
+                "confirm": "Onderzoek activeren"
+            }
+        },
+        "data": {
+            "title": "Data",
+            "description": "Bewaak deelname in real time, analyseer gegevenskwaliteit en beheer onderzoekssessies.",
+            "sections": {
+                "key_indicators": "Kernindicatoren",
+                "responses": "Antwoorden",
+                "key_statistics": "Kernstatistieken"
+            },
+            "stats": {
+                "email_collection": "E-mailadressen",
+                "participants": "totaal",
+                "newsletter": "Wil resultaten",
+                "opt_in": "Responspercentage",
+                "follow_up": "Vervolgpotentieel",
+                "interested": "geïnteresseerd",
+                "click_to_filter": "Klik om te filteren",
+                "click_to_export": "Klik om lijst te exporteren",
+                "completed": "Voltooid",
+                "in_progress": "Bezig",
+                "abandoned_count": "{{count}} afgebroken",
+                "interview_interested": "Accepteert vervolg",
+                "interview": "Accepteert vervolg",
+                "email": "E-mails"
+            },
+            "tabs": {
+                "live": "Live deelnemers",
+                "test": "Testsessies",
+                "browse": "Interactieve weergave",
+                "export": "Exportcentrum"
+            },
+            "status": {
+                "started": "gestart",
+                "completed": "Voltooid",
+                "in_progress": "Bezig",
+                "abandoned": "Afgebroken",
+                "discarded": "verwijderd"
+            },
+            "step": {
+                "consent": "Toestemming",
+                "presort": "Voorsorteringsvragenlijst",
+                "rough": "Grove sortering",
+                "fine": "Q-sortering",
+                "post": "Nasorteringsvragenlijst"
+            },
+            "actions": {
+                "discard": "Verwijderen",
+                "restore": "Herstellen",
+                "export": "Exporteren",
+                "clear_all": "Alle gegevens wissen",
+                "clear_all_confirm": "GEVAAR: Hiermee worden ALLE deelnemersgegevens voor dit onderzoek permanent verwijderd. Dit kan niet ongedaan worden gemaakt.",
+                "clear_all_success": "Alle gegevens gewist",
+                "clear_all_error": "Gegevens konden niet worden gewist. Controleer uw rechten en probeer opnieuw."
+            },
+            "confirm_discard": {
+                "title": "Deelnemer verwijderen?",
+                "description": "Deze deelnemer wordt uitgesloten van exports en analyses. U kunt hem later herstellen.",
+                "reason_label": "Reden (optioneel)",
+                "reason_placeholder": "Waarom wordt deze deelnemer verwijderd?"
+            },
+            "confirm_restore": {
+                "title": "Deelnemer herstellen?",
+                "description": "Deze deelnemer wordt opnieuw opgenomen in exports en analyses."
+            },
+            "guide": {
+                "title": "Formaatgids",
+                "csv": {
+                    "title": "Universele CSV",
+                    "desc": "Ruwe rechthoekige data. Ideaal voor R, Python, SPSS of Excel-analyse. Bevat alle metadata."
+                },
+                "json": {
+                    "title": "KenQ JSON",
+                    "desc": "Geoptimaliseerd voor de web-kenq-analysetool. Bevat onderzoeksdefinitie en sorteringen."
+                },
+                "zip": {
+                    "title": "PQMethod-bundel (ZIP)",
+                    "desc": "Bevat verouderde .DAT- en .STA-bestanden voor DOS PQMethod-analyse."
+                }
+            },
+            "table": {
+                "participant": "Deelnemer",
+                "lang": "Taal",
+                "status": "Status",
+                "consent": "Toestemming",
+                "flags": "Vlaggen",
+                "duration": "Duur",
+                "submitted": "Ingediend",
+                "last_step": "Laatste stap",
+                "current_step": "Huidige stap",
+                "view": "Bekijken",
+                "actions": "Details",
+                "duplicate_ip": "Dubbel IP",
+                "duplicate_ip_hint": "Deelt IP-hash met andere deelnemers"
+            },
+            "tooltips": {
+                "suspect": "Mogelijk verdacht: sessieduur < 2 minuten",
+                "has_comments": "Bevat opmerkingen van deelnemer bij kaarten",
+                "has_audio": "Heeft audio-antwoorden",
+                "email_provided": "E-mailadres opgegeven",
+                "newsletter_consent": "Wil resultaten",
+                "interview_consent": "Accepteert vervolg"
+            },
+            "toast": {
+                "discarded": "Deelnemer verwijderd",
+                "restored": "Deelnemer hersteld",
+                "error": "Deelnemer kon niet worden bijgewerkt. Controleer uw verbinding en probeer opnieuw."
+            },
+            "detail": {
+                "participant": "Deelnemer",
+                "participant_n": "Deelnemer {{code}}",
+                "not_found": "Deelnemer niet gevonden",
+                "title": "Deelnemersprofiel",
+                "session": "Sessie",
+                "discarded_badge": "Verwijderd",
+                "description": "Uitgebreide Q-sorteringsresultaten en metadata.",
+                "stats": {
+                    "duration": "Totale duur",
+                    "language": "Gebruikte taal"
+                },
+                "actions": {
+                    "discard": "Deelnemer verwijderen",
+                    "restore": "Deelnemer herstellen"
+                },
+                "sort_config": "Sorteringsconfiguratie",
+                "survey": {
+                    "title": "Vragenlijstantwoorden",
+                    "csv_note": "Volledige antwoorden beschikbaar in CSV-export."
+                }
+            },
+            "filter": {
+                "show_discarded": "Verwijderde records opnemen",
+                "all_states": "Alle statussen",
+                "only_active": "Alleen actief",
+                "only_flagged": "Gemarkeerde kwaliteit"
+            },
+            "filters": {
+                "active": "Actieve filters",
+                "has_email": "E-mailadres opgegeven",
+                "newsletter": "Wil resultaten",
+                "interview": "Accepteert vervolg",
+                "flagged": "Alleen gemarkeerd",
+                "clear_all": "Filters wissen",
+                "remove_filter": "Filter verwijderen",
+                "all_statuses": "Alle statussen",
+                "all_consents": "Alle",
+                "all_indicators": "Alle",
+                "all_steps": "Alle stappen",
+                "has_comments": "Heeft opmerkingen",
+                "has_audio": "Heeft audio",
+                "has_recruitment": "Heeft wervingslink"
+            },
+            "charts": {
+                "section_title": "Antwoordverdelingen",
+                "distribution_label": "Verdeling voor {{question}}",
+                "multi_select_note": "Meerdere selecties toegestaan",
+                "responses_count": "{{count}} antwoorden",
+                "no_answer": "Geen antwoord",
+                "option": "Optie",
+                "count": "Aantal"
+            },
+            "search": {
+                "placeholder": "Zoeken op ID of wervingstoken...",
+                "records_found": "Records gevonden",
+                "no_results": "Geen records komen overeen met uw zoekopdracht"
+            },
+            "errors": {
+                "load_failed": "Cloudsynchronisatie onderbroken. Controleer uw verbinding."
+            },
+            "export_emails_success": "E-mails succesvol geëxporteerd",
+            "empty": {
+                "no_participants_title": "Nog geen deelnemers",
+                "no_participants_desc": "Deel uw onderzoekslink om te beginnen met het verzamelen van antwoorden.",
+                "contract_title": "Nog geen inzendingen",
+                "contract_body": "Inzendingen en exports verschijnen hier. Deel de onderzoekslink om te beginnen met verzamelen.",
+                "contract_cta": "Onderzoeksoverzicht openen"
+            },
+            "pagination": {
+                "showing": "{{from}}–{{to}} van {{total}} weergegeven"
+            }
+        },
+        "team": {
+            "title": "Onderzoeksteam",
+            "description": "Beheer medewerkers en toegangsrechten op onderzoeksniveau.",
+            "invite_title": "Medewerker uitnodigen",
+            "invite_description": "Genereer een beveiligde link om een nieuw lid uit te nodigen voor dit onderzoek.",
+            "email_label": "E-mailadres",
+            "role_label": "Rol",
+            "select_role": "Selecteer een rol",
+            "generate_link": "Link genereren",
+            "invite_success": "Uitnodigingslink gegenereerd!",
+            "invite_error": "Uitnodiging genereren mislukt",
+            "copy_success": "Link gekopieerd naar klembord",
+            "share_label": "Deel deze link met de genodigde:",
+            "collab_overview": "Samenwerkingsoverzicht",
+            "active_members": "Actieve leden",
+            "permissions_info": "Rechtenoverzicht",
+            "list_title": "Onderzoeksteam",
+            "list_description": "Beheer toegang voor bestaande medewerkers.",
+            "added_on": "Toegevoegd op",
+            "headers": {
+                "collaborator": "Medewerker",
+                "role": "Rol",
+                "actions": "Acties"
+            },
+            "roles": {
+                "owner": "Eigenaar (volledige controle)",
+                "editor": "Redacteur (opzet & analyse)",
+                "viewer": "Kijker (alleen-lezen)",
+                "owner_badge": "EIGENAAR",
+                "editor_badge": "REDACTEUR",
+                "viewer_badge": "KIJKER"
+            },
+            "permissions": {
+                "owner": "Kan het onderzoek verwijderen en het team beheren.",
+                "editor": "Kan de opzet aanpassen en resultaten bekijken.",
+                "viewer": "Alleen-lezentoegang tot alle modules."
+            }
+        },
+        "empty_states": {
+            "participants": {
+                "title": "Klaar om te starten?",
+                "desc": "Deel uw onderzoekslink om antwoorden te beginnen verzamelen. Uw eerste deelnemer is slechts één klik verwijderd.",
+                "action": "Onderzoekslink kopiëren",
+                "hint": "Of scan de QR-code",
+                "copy_success": "Onderzoekslink gekopieerd naar klembord!"
+            },
+            "team": {
+                "title": "U werkt alleen",
+                "desc": "Nodig medewerkers uit om dit onderzoek te helpen beheren. Zij kunnen data bekijken, de opzet bewerken of gewoon meekijken.",
+                "action": "Uw eerste medewerker uitnodigen"
+            },
+            "designer": {
+                "title": "Tabula rasa",
+                "desc": "Dit onderzoek heeft nog geen stellingen. Voeg uw Q-set items toe om uw sortering te ontwerpen.",
+                "action": "Voorbeeld-Q-set laden"
+            }
+        },
+        "status": {
+            "active": "Actief",
+            "paused": "Gepauzeerd",
+            "closed": "Gesloten",
+            "draft": "Concept"
+        },
+        "settings": {
+            "title": "Instellingen",
+            "description": "Gegevensbewaring, archivering en verwijdering van onderzoeken.",
+            "lifecycle": {
+                "title": "Archivering",
+                "description": "Archiveer het onderzoek om het voor iedereen alleen-lezen te maken.",
+                "notice": "Om een onderzoek te archiveren moet het eerst worden gesloten. Eenmaal gearchiveerd kunnen er geen verdere wijzigingen worden aangebracht.",
+                "archived_status": "Onderzoek is gearchiveerd",
+                "archive_button": "Onderzoek archiveren",
+                "current_state": "Huidige status"
+            },
+            "danger": {
+                "title": "Gevarenzone",
+                "description": "Acties hier zijn onomkeerbaar.",
+                "notice": "Het verwijderen van een onderzoek verwijdert ALLE gegevens (deelnemers, antwoorden, configuratie) permanent. Het onderzoek moet worden gearchiveerd vóór verwijdering.",
+                "delete_button": "Onderzoek verwijderen",
+                "delete_confirm": "Weet u het zeker? Deze actie is ONOMKEERBAAR.",
+                "delete_dialog_title": "Dit onderzoek verwijderen?",
+                "delete_dialog_intro": "Verwijdert sorteringen, audio en analyseruns permanent.",
+                "delete_dialog_typed_label": "Typ de onderzoeksslug om te bevestigen",
+                "delete_dialog_action": "Permanent verwijderen"
+            },
+            "save_button": "Opslaan",
+            "save_success": "Instellingen bijgewerkt",
+            "save_success_desc": "Onderzoeksinstellingen zijn opgeslagen.",
+            "save_error": "Instellingen konden niet worden opgeslagen. Controleer de waarden en probeer opnieuw.",
+            "save_error_desc": "Instellingen bijwerken mislukt. Slug is mogelijk al in gebruik.",
+            "archive_success": "Onderzoek gearchiveerd",
+            "archive_success_desc": "Het onderzoek is nu gearchiveerd en alleen-lezen.",
+            "archive_error": "Fout bij archiveren van onderzoek",
+            "archive_error_desc": "Archiveren van onderzoek mislukt. Is het gesloten?",
+            "delete_success": "Onderzoek verwijderd",
+            "delete_success_desc": "Het onderzoek is permanent verwijderd.",
+            "delete_error": "Onderzoek kon niet worden verwijderd. Zorg ervoor dat alle gegevens eerst zijn gewist.",
+            "delete_error_desc": "Verwijderen van onderzoek mislukt.",
+            "storage": {
+                "title": "Audio-opslaggebruik",
+                "used": "Opslag gebruikt",
+                "quota": "Quota",
+                "quota_label": "Opslagquotum",
+                "quota_help": "Maximale totale audio-opslag voor dit onderzoek (10–1000 MB).",
+                "error": "Opslaggebruik laden mislukt.",
+                "warning_high_usage": "Opslaggebruik is hoog. Overweeg het quotum te verhogen of oude opnames te verwijderen.",
+                "save_success": "Opslagquotum bijgewerkt",
+                "save_error": "Opslagquotum kon niet worden bijgewerkt. Probeer opnieuw."
+            },
+            "retention": {
+                "title": "Gegevensbewaring",
+                "months_label": "Bewaring (maanden)",
+                "help": "Veelgebruikte waarden: 6, 12, 24, 60 maanden. Leeg laten voor systeemstandaard (12).",
+                "save_success": "Bewaringsbeleid bijgewerkt",
+                "save_error": "Bewaringsbeleid bijwerken mislukt",
+                "range_error": "Bewaring moet een geheel getal zijn tussen 1 en 240 maanden."
+            }
+        },
+        "privacy": {
+            "title": "Gegevensprivacy",
+            "header_desc": "Toestemming, inventaris & anonimisering",
+            "load_error": "Gegevensinventaris laden mislukt.",
+            "participants_title": "Deelnemersoverzicht",
+            "stat_started": "Gestart",
+            "stat_completed": "Voltooid",
+            "stat_discarded": "Verwijderd",
+            "stat_anonymised": "Geanonimiseerd",
+            "older_1y": "Ouder dan 1 jaar (niet geanonimiseerd)",
+            "older_2y": "Ouder dan 2 jaar (niet geanonimiseerd)",
+            "audio_title": "Audio-opslag",
+            "audio_count": "Opnames",
+            "audio_mb": "Totale grootte",
+            "locale_title": "Taaloverzicht",
+            "locale_col": "Taal",
+            "locale_count_col": "Deelnemers",
+            "locale_empty": "Nog geen taaldata.",
+            "timeline_title": "Tijdlijn",
+            "tl_first": "Eerste inzending",
+            "tl_last": "Laatste inzending",
+            "tl_anon": "Laatste anonimisering",
+            "bulk_title": "Bulkanonimisering",
+            "bulk_desc": "Verwijder persoonsgegevens van voltooide deelnemers die vóór een afkapdatum hebben ingediend. Q-sorteringsrangschikkingen blijven bewaard.",
+            "cutoff_label": "Afkapdatum",
+            "cutoff_help": "Alleen voltooide deelnemers die strikt vóór deze datum hebben ingediend, worden geanonimiseerd.",
+            "preview_label": "Kandidaten:",
+            "preview_zero": "Geen deelnemers komen in aanmerking voor deze afkapdatum. Probeer een eerdere datum.",
+            "anonymise_button": "Anonimiseren",
+            "anonymise_success": "Anonimisering voltooid",
+            "anonymise_success_desc": "{{n}} deelnemer(s) geanonimiseerd, {{s}} al anoniem.",
+            "anonymise_error": "Anonimisering mislukt",
+            "confirm_title": "Deelnemersgegevens anonimiseren?",
+            "confirm_candidates": "{{count}} voltooide deelnemer(s) die vóór {{date}} hebben ingediend, worden geanonimiseerd.",
+            "confirm_preserved": "Q-sorteringsrangschikkingen blijven bewaard; identiteit wordt verwijderd.",
+            "confirm_irreversible": "Deze actie is onmiddellijk en kan niet ongedaan worden gemaakt.",
+            "confirm_in_progress": "Anonimiseren…",
+            "confirm_action": "Ja, anonimiseren",
+            "cutoff_from_policy": "Standaard afgeleid van bewaringsbeleid ({{months}} maanden).",
+            "empty": {
+                "title": "Nog geen deelnemersgegevens",
+                "body": "Deze pagina wordt actief zodra deelnemers indienen. Deel de onderzoekslink eerst.",
+                "cta": "Onderzoeksoverzicht openen"
+            },
+            "consent": {
+                "title": "Toestemmingsformulier",
+                "description": "Wat deelnemers zien voordat ze het onderzoek betreden. Te bewerken in Onderzoeksopzet.",
+                "no_text": "Nog geen toestemmingstekst ingesteld.",
+                "no_title": "(geen titel)",
+                "no_body": "(leeg)",
+                "edit_in_design": "Bewerken in Onderzoeksopzet",
+                "view": "Bekijken"
+            }
+        },
+        "projects": {
+            "title": "Projecten",
+            "settings": {
+                "title": "Projectinstellingen",
+                "identity_desc": "Projectidentiteit beheren.",
+                "general": {
+                    "title": "Algemene instellingen",
+                    "desc": "Identiteit en primaire identificatie van uw project.",
+                    "label_title": "Projecttitel",
+                    "placeholder_title": "Mijn geweldige lab",
+                    "label_slug": "URL-slug",
+                    "placeholder_slug": "Mijn-lab",
+                    "slug_hint": "Door de slug te wijzigen worden alle links op uw onderzoeksdashboard bijgewerkt.",
+                    "save": "Opslaan",
+                    "save_success": "Project succesvol bijgewerkt",
+                    "save_error": "Project bijwerken mislukt."
+                },
+                "team_growth_title": "Teambeheer",
+                "team_growth_desc": "Meer onderzoekers nodig? U kunt medewerkers uitnodigen voor uw project. Zij kunnen alle onderzoeken in dit project beheren.",
+                "team": {
+                    "title": "Teamleden",
+                    "desc": "Lijst van gebruikers met toegang tot dit project.",
+                    "col_user": "Gebruiker",
+                    "col_role": "Rol",
+                    "col_joined": "Lid geworden",
+                    "col_actions": "Acties",
+                    "remove_confirm": "Weet u zeker dat u dit lid wilt verwijderen?",
+                    "remove_dialog_title": "Teamlid verwijderen?",
+                    "remove_dialog_body": "{{name}} verliest toegang tot dit project. Zij kunnen later opnieuw worden uitgenodigd.",
+                    "remove_dialog_action": "Verwijderen",
+                    "remove_member_aria": "{{name}} verwijderen",
+                    "remove_success": "Lid succesvol verwijderd",
+                    "remove_error": "Lid verwijderen mislukt",
+                    "growth_title": "Teamgroei",
+                    "growth_desc": "Meer onderzoekers nodig? U kunt medewerkers uitnodigen voor uw project. Zij kunnen alle onderzoeken in dit project beheren.",
+                    "invite_button": "Medewerker uitnodigen",
+                    "permissions_matrix": {
+                        "title": "Rechtenoverzicht",
+                        "admin": {
+                            "label": "Beheerder",
+                            "desc": "Kan projectinstellingen, leden en alle onderzoeken beheren."
+                        },
+                        "owner": {
+                            "label": "Eigenaar",
+                            "desc": "Volledige controle over project, leden en onderzoeken."
+                        },
+                        "member": {
+                            "label": "Lid",
+                            "desc": "Kan alle onderzoeken aanmaken en beheren. Geen toegang tot projectinstellingen."
+                        },
+                        "viewer": {
+                            "label": "Kijker",
+                            "desc": "Alleen-lezentoegang tot alle onderzoeken en data in het project."
+                        }
+                    },
+                    "coming_soon": "Binnenkort beschikbaar",
+                    "invite_modal": {
+                        "title": "Medewerker uitnodigen",
+                        "email_label": "E-mailadres medewerker",
+                        "role_label": "Toegewezen rol",
+                        "success": "Uitnodigingslink gegenereerd!",
+                        "error": "Uitnodiging aanmaken mislukt.",
+                        "send": "Uitnodiging aanmaken en versturen",
+                        "copy_success": "Link gekopieerd naar klembord!"
+                    }
+                }
+            },
+            "members": {
+                "quota": "{{count}}/{{limit}} plaatsen in gebruik",
+                "quota_full_tooltip": "Ledenlimiet bereikt. Verhoog MAX_MEMBERS_PER_PROJECT of verwijder een lid."
+            },
+            "create": {
+                "quota": "{{count}}/{{limit}} eigen projecten",
+                "quota_full_tooltip": "U heeft uw limiet voor eigen projecten bereikt."
+            }
+        },
+        "members": {
+            "title": "Teamleden",
+            "description": "Beheer wie toegang heeft tot dit project en wat zij kunnen doen."
+        },
+        "participants": {
+            "title": "Deelnemers",
+            "description": "Beheer deelnemers en verken ingediende data.",
+            "table": {
+                "id": "ID",
+                "status": "Status",
+                "started": "Gestart om",
+                "completed": "Voltooid om",
+                "duration": "Duur",
+                "actions": "Acties"
+            }
+        },
+        "participant": {
+            "tabs": {
+                "session": "Metadata",
+                "presort": "Voorsortering",
+                "grid": "Q-sorteringsraster",
+                "postsort": "Nasortering"
+            },
+            "grid": {
+                "detail_view": "Kaartdetails",
+                "no_comment": "Geen opmerking opgegeven.",
+                "select_instruction": "Selecteer een kaart op het raster om details te bekijken.",
+                "read_only_mode": "Kijkersmodus",
+                "score": "Score"
+            },
+            "metadata": {
+                "title": "Sessiemetadata",
+                "technology": "Technologie",
+                "browser": "Browser",
+                "session": "Sessiedetails",
+                "duration": "Totale duur",
+                "started": "Gestart",
+                "submitted": "Ingediend",
+                "id": "Intern ID",
+                "ip_hash": "IP-hash",
+                "recruitment_token": "Wervingstoken",
+                "device": {
+                    "mobile": "Mobiel",
+                    "tablet": "Tablet",
+                    "desktop": "Desktop"
+                }
+            },
+            "status": {
+                "started": "Gestart",
+                "completed": "Voltooid",
+                "discarded": "Verwijderd",
+                "in_progress": "Bezig"
+            },
+            "survey": {
+                "presort": "Voorsorteringsvragen",
+                "postsort": "Nasorteringsvragen",
+                "no_answers": "Geen antwoorden geregistreerd voor dit gedeelte.",
+                "categories": {
+                    "identity": "Identiteit & contact",
+                    "questions": "Vragenlijstantwoorden",
+                    "comments": "Kaartopmerkingen",
+                    "feedback": "Algemene feedback"
+                }
+            }
+        }
+    }
+}
