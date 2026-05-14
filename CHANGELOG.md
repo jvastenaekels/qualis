@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.6](https://github.com/jvastenaekels/qualis/compare/v0.6.5...v0.6.6) (2026-05-14)
+
+
+### Features
+
+* **i18n:** add Dutch locale (participant + admin) ([#163](https://github.com/jvastenaekels/qualis/issues/163)) ([4f1e438](https://github.com/jvastenaekels/qualis/commit/4f1e43845bf96a5acb06f0a970bbed9dd49f347a))
+
 ## [0.6.5](https://github.com/jvastenaekels/qualis/compare/v0.6.4...v0.6.5) (2026-05-14)
 
 
