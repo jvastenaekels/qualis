@@ -1,0 +1,54 @@
+# Q-methodology and product terminology for Dutch (nl).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+language: nl
+language_name: Nederlands
+
+terms:
+  concourse: concours
+  Q-methodology: Q-methodologie
+  Q-sort: Q-sortering
+  Q-set: Q-set
+  statement: stelling
+  factor: factor
+  factor analysis: factoranalyse
+  presort: voorsortering
+  rough sort: grove sortering
+  fine sort: fijne sortering
+  postsort: nasortering
+  study: onderzoek
+  study design: onderzoeksopzet
+  recruitment: werving
+  participant: deelnemer
+  member: lid
+  owner: eigenaar
+  consent: toestemming
+  consent form: toestemmingsformulier
+  audio recording: audio-opname
+  memo: notitie
+  draft: concept
+  resume code: hervattingscode
+  invitation: uitnodiging
+  project: project
+
+notes: |
+  - Tone: formal "u" form for participants and administrators (matches Dutch
+    academic/professional norms). Avoid the informal "jij/je" except in
+    clearly intimate UI contexts (none present here).
+  - Imperative form for buttons ("Opslaan", "Annuleren", "Doorgaan",
+    "Terug", "Volgende").
+  - Dutch is prone to LONG COMPOUND WORDS (`onderzoeksopzet`,
+    `toestemmingsformulier`, `werkruimtebeheerder`). When the UI is dense
+    (study designer toolbar, admin sidebar, status badges, button labels),
+    prefer a shorter form OR an open compound with hyphen when both are
+    acceptable. Example: "Onderzoeksopzet" → "Opzet" if the context makes
+    "study" clear; "Toestemmingsformulier" can stay since it's a section
+    title with space.
+  - "Cancel" = "Annuleren" (cancel an action) — distinct from "Cancelled"
+    state which may need contextual rendering. "Wissen" = clear/erase.
+  - Q-methodology terms: "Q-methodologie", "Q-sortering", "Q-set" — keep
+    the "Q-" prefix verbatim (label of art).
+  - "GDPR" verbatim (Dutch legal practice uses the English acronym, though
+    "AVG" — Algemene Verordening Gegevensbescherming — is also seen in
+    Dutch-context official texts; prefer "GDPR" for consistency with the
+    other locales in this codebase).
+  - Numbers: keep decimal points; Intl handles per-locale formatting.

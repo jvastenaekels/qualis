@@ -1,0 +1,461 @@
+{
+    "common": {
+        "placeholders": {
+            "text_response": "Enter your answer..."
+        },
+        "add": "Add",
+        "confirm": "Confirm",
+        "all": "All",
+        "agree": "Somewhat agree",
+        "disagree": "Somewhat disagree",
+        "neutral": "Neutral",
+        "reset_to_default": "Reset to default",
+        "reset_to_default_success": "Restored to default",
+        "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
+        "undo": "Undo",
+        "next": "Next step",
+        "submit": "Share my perspective",
+        "continue": "Continue",
+        "loading": "Loading...",
+        "lang_code": "en",
+        "attention": "Attention",
+        "error": "Error",
+        "submitting": "Submitting...",
+        "cards": "statements",
+        "close": "Close",
+        "unknown_card": "Unknown Card",
+        "unknown": "Unknown",
+        "duration_short": "{{m}}m {{s}}s",
+        "duration_long": "{{h}}h {{m}}m {{s}}s",
+        "optional": "Optional",
+        "processing": "Processing...",
+        "statement": "Statement",
+        "step": "Step",
+        "back": "Back",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "slots": "slots",
+        "project_label": "Project",
+        "read_full": "Read full statement",
+        "reduce": "Reduce",
+        "expand": "Expand",
+        "yes": "Yes",
+        "no": "No",
+        "score": "Score",
+        "comment": "Comment",
+        "errors": {
+            "network": "Network connection error. Please check your internet connection.",
+            "not_found": "Study not found.",
+            "validation": "System error: data validation failed.",
+            "unknown": "An unexpected error occurred.",
+            "retry": "Retry",
+            "min": "Value must be at least {{min}}",
+            "max": "Value must be at most {{max}}",
+            "email": "Please enter a valid email address",
+            "min_length": "Minimum {{count}} characters required",
+            "max_length": "Maximum {{count}} characters allowed",
+            "404": {
+                "title": "Page not found",
+                "message": "The page or study you are looking for does not exist."
+            },
+            "429": {
+                "title": "Too many requests",
+                "message": "You are doing that too fast. Please wait a moment."
+            },
+            "500": {
+                "title": "Server error",
+                "message": "Our servers encountered an issue. Please try again later."
+            },
+            "network_title": "Connection lost",
+            "home": "Go to home",
+            "reset": "Reset session",
+            "default_title": "Oops! Something went wrong.",
+            "study_not_found": {
+                "title": "Study not found",
+                "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
+                "action": "Go to home"
+            }
+        },
+        "status": {
+            "draft": {
+                "title": "Study under preparation",
+                "message": "This study is not available for participation yet. Please check back later.",
+                "action": "Back to home"
+            },
+            "steps": {
+                "draft": {
+                    "label": "Draft",
+                    "description": "Configuration & design"
+                },
+                "active": {
+                    "label": "Active",
+                    "description": "Collecting responses"
+                },
+                "paused": {
+                    "label": "Paused",
+                    "description": "On hold"
+                },
+                "closed": {
+                    "label": "Closed",
+                    "description": "Analysis & export"
+                }
+            },
+            "paused": {
+                "title": "Maintenance in progress",
+                "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
+                "action": "Retry"
+            },
+            "closed": {
+                "title": "Data collection closed",
+                "message": "This study is now closed. Participation is no longer possible.",
+                "action": "Back to home"
+            }
+        }
+    },
+    "layout": {
+        "title": "Open-Q",
+        "preparing": "Preparing your study session...",
+        "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
+        "default_study_title": "Q-Method study",
+        "loading_content": "Loading study content...",
+        "change_lang_title": "Change language",
+        "steps": {
+            "welcome": "Welcome",
+            "consent": "Privacy & Consent",
+            "rough": "First impressions",
+            "fine": "Q-sort",
+            "post": "Final questions"
+        },
+        "mobile_step": "Step",
+        "navigation": "Navigation",
+        "language": "English"
+    },
+    "study": {
+        "help": {
+            "title": "Help & information",
+            "trigger": "Help",
+            "what": "What we ask",
+            "why": "Why it matters",
+            "step_welcome": {
+                "what": "Read the research objectives and the specific instructions for participation.",
+                "why": "Beyond standard ethical consent, you need to grasp the 'condition of instruction': the precise lens or scenario you adopt to evaluate the statements. This matters for data validity."
+            },
+            "step_presort": {
+                "what": "Provide background information to help characterize your participant profile.",
+                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group."
+            },
+            "step_rough": {
+                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
+                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins."
+            },
+            "step_fine": {
+                "what": "Place the statements on the grid by ranking them relative to one another, from those you most agree with (to the right) to those you most disagree with (to the left). Starting with the extremes might help you in this task.",
+                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system."
+            },
+            "step_post": {
+                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
+                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices."
+            }
+        },
+        "steps": {
+            "presort": "Pre-sort survey",
+            "rough": "Preliminary sort",
+            "fine": "Grid placement",
+            "post": "Post-sort stage"
+        }
+    },
+    "welcome": {
+        "start": "Get started",
+        "consent": {
+            "label": "I confirm that i have read the above information and consent to the processing of my data for the purposes of this study.",
+            "error": "Please accept the terms to continue."
+        },
+        "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
+        "restart": "Start a new session",
+        "preview_title": "Preview",
+        "conducted_by": "Conducted by",
+        "how_it_works": "Process",
+        "objective_label": "Study objective",
+        "instructions_label": "Process",
+        "default_instructions": "1. **Let's meet:** First, you will be asked a few short, preliminary questions.\n2. **First impressions:** You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them.\n3. **Your perspective:** During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box.\n4. **Why:** Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices.",
+        "steps": {
+            "profile": {
+                "title": "Let's meet",
+                "description": "First, you will be asked a few short, preliminary questions."
+            },
+            "rough": {
+                "title": "First impressions",
+                "description": "You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them. It will make the next task easier."
+            },
+            "fine": {
+                "title": "Your perspective",
+                "description": "During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs."
+            },
+            "post": {
+                "title": "Why",
+                "description": "Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background."
+            }
+        }
+    },
+    "consent": {
+        "title": "Informed consent and data processing agreement",
+        "subtitle": "Please read the following information carefully.",
+        "record_error": "Could not save consent record. You may continue.",
+        "default_text": "1. Nature of the study and participant understanding. You understand that this exercise employs q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance).\n\nDe-identification and retention:. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: if you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: the final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: if you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: due to the statistical nature of q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights"
+    },
+    "presort": {
+        "title": "Before we start",
+        "description": "Please answer a few questions to help us situate your viewpoint.",
+        "submit": "Continue to sorting",
+        "select_placeholder": "Select...",
+        "error_required": "Please answer this question."
+    },
+    "rough": {
+        "header": {
+            "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
+            "hint": "This is spontaneous. You can change your mind right after."
+        },
+        "tip": {
+            "close": "Close tip"
+        },
+        "complete": {
+            "title": "First step complete",
+            "subtitle": "We will now refine the nuances.",
+            "button": "Continue to fine sort"
+        },
+        "instructions": {
+            "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
+        },
+        "progress_label": "Rough sort progress: {{percent}}% complete"
+    },
+    "fine": {
+        "deck": {
+            "title": "Available statements",
+            "all_placed": "All statements in this pile are sorted"
+        },
+        "toolbar": {
+            "preview": "Statement",
+            "zoom_in": "Zoom in",
+            "zoom_out": "Zoom out",
+            "fit_screen": "Fit to screen",
+            "label": "Grid controls"
+        },
+        "grid": {
+            "label": "Q-Sort grid",
+            "column": "Column",
+            "slot": "Slot",
+            "in_column": "In column"
+        },
+        "legend": {
+            "disagree": "Most disagree",
+            "neutral": "Neutral",
+            "agree": "Most agree",
+            "label": "Grid legend"
+        },
+        "actions": {
+            "validate": "Confirm sort",
+            "finish": "Finish sorting",
+            "ready": "Review overview",
+            "not_ready": "Place all statements to continue"
+        },
+        "header": {
+            "title": "Place statements on the grid",
+            "instruction_label": "Instruction",
+            "expand_instructions": "Expand instructions",
+            "minimize_instructions": "Minimize instructions"
+        },
+        "workbench": {
+            "active_card": "Active statement",
+            "place_on_grid": "Tap grid to place",
+            "drag_or_tap": "Drag to grid or tap slot",
+            "initial_instruction": "Tap (or drag) statement",
+            "initial_instruction_mobile": "Tap statement",
+            "cancel_selection": "Cancel selection",
+            "help": "How does it work?",
+            "previous_tip": "Previous tip",
+            "next_tip": "Next tip",
+            "go_to_tip": "Go to tip {{number}}",
+            "methodology": {
+                "extremes": "Tip: start with what is most obvious to you (the extremes).",
+                "vertical": "In the same column, the order from top to bottom doesn't matter.",
+                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
+                "relative": "Reminder: items are sorted relative to each other (relative agreement).",
+                "zoom": "Feel free to zoom in on different parts of the grid for better visibility.",
+                "flexibility": "Nothing is final: you can move cards or put them back in the deck at any time."
+            }
+        }
+    },
+    "post": {
+        "title": "Your perspective & feedback",
+        "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
+        "step2_title": "Almost done!",
+        "step2_description": "Please answer these final questions to complete the study.",
+        "extreme": {
+            "title": "Key Choices",
+            "why": "Why did you choose to place this statement here? How is it significant to you?",
+            "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
+            "min_chars": "A few words are enough to help us understand the context.",
+            "label_agree": "Strongest agreement",
+            "label_disagree": "Strongest disagreement",
+            "label_neutral": "Neutral",
+            "missing_statement": "Missing Statement",
+            "general_comment": "General Comment"
+        },
+        "optional": {
+            "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
+            "description": "You are also welcome to add comments to any other statement if you would like to further explain your choices.",
+            "select_placeholder": "Select a statement to comment...",
+            "placeholder": "Your comment here..."
+        },
+        "submit": "Share my perspective",
+        "validation_error": "Please fill in all required fields.",
+        "text_audio_info": "For text + audio questions, you can respond with text, an audio recording, or both.",
+        "text_audio_required": "A few words or an audio recording will help us understand your viewpoint.",
+        "success": {
+            "title": "Thank you for your participation!",
+            "message": "Your contribution to the study has been saved.",
+            "id_label": "Confirmation code",
+            "share": {
+                "title": "Spread the word",
+                "copy_link": "Copy link",
+                "copy_success": "Link copied!",
+                "message": "I just participated in this study: \"{{title}}\". I thought it might interest you. You can access it here:",
+                "email": "Email",
+                "email_subject": "Participate in this study: {{title}}",
+                "native": "Share"
+            }
+        },
+        "submit_error": {
+            "title": "Submission failed",
+            "message": "Please check your connection and try again."
+        },
+        "score": "Score",
+        "back": "Back to sort",
+        "contact": {
+            "title": "Results & contact",
+            "email_label": "Your email address (optional)",
+            "email_placeholder": "Example@email.com",
+            "interview_consent": "I agree to be contacted by the researcher for follow-up.",
+            "newsletter_consent": "I wish to be informed about the study results.",
+            "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
+            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up.",
+            "error_invalid_email": "Please enter a valid email address"
+        },
+        "audio": {
+            "info": "For each question, you can respond with text, an audio recording, or both.",
+            "section_label": "Audio response (optional)"
+        }
+    },
+    "audio": {
+        "record_prompt": "Record audio response if you prefer",
+        "recording": "Recording...",
+        "recorded": "Recorded",
+        "playing": "Playing...",
+        "uploading": "Uploading...",
+        "ready": "Ready to record",
+        "start_recording": "Start recording",
+        "stop_recording": "Stop",
+        "pause": "Pause",
+        "play": "Play",
+        "delete": "Delete",
+        "deleted": "Audio deleted",
+        "delete_failed": "Could not delete the recording. Try again.",
+        "file_size": "File size",
+        "upload_success": "Audio uploaded successfully",
+        "upload_failed": "Upload failed. Please try again.",
+        "upload_cancelled": "Recording cancelled",
+        "recording_error": "Recording error - please try again",
+        "invalid_recording": "Recording failed - no audio data captured",
+        "permission_denied": "Microphone permission denied",
+        "unsupported": "Audio recording is not supported in this browser.",
+        "permission_revoked": "Microphone access lost - recording stopped",
+        "refresh_failed": "Could not refresh audio. Your recording is still saved.",
+        "refreshing": "Refreshing audio...",
+        "playback_failed": "Could not play audio. Refresh the page and try again.",
+        "error": {
+            "no_token": "Session token missing",
+            "quota_exceeded": "Storage quota exceeded. Please delete an existing recording or use text instead.",
+            "file_too_large": "Recording file is too large. Try a shorter recording.",
+            "server_error": "Server error. Please try again in a moment.",
+            "upload_in_progress": "Please wait for audio upload to finish.",
+            "security": "Recording blocked by browser security settings",
+            "invalid_state": "Recording encountered an internal error"
+        },
+        "fallback": {
+            "toast": "Audio has been disabled due to repeated errors. Please use text.",
+            "banner_title": "Audio unavailable",
+            "banner_description": "Audio recording encountered repeated errors. You can continue with text responses.",
+            "try_again": "Try again",
+            "inline": "Audio temporarily unavailable."
+        },
+        "permission_denied_with_guidance": "Microphone permission denied. Check your browser settings to allow microphone access, then try again.",
+        "retry_upload": "Retry upload",
+        "space_shortcut": "or press Space",
+        "waveform": {
+            "recording": "Audio waveform - recording in progress",
+            "playing": "Audio waveform - playing back recording"
+        }
+    },
+    "resume": {
+        "continue_later": "Continue later",
+        "copy_link": "Copy link",
+        "copy_failed": "Unable to copy. Please select the link manually.",
+        "link_copied": "Link copied!",
+        "instruction": "To continue on a different device, save this link:",
+        "instruction_same_browser": "If you return on this browser, your progress will be saved automatically.",
+        "instruction_detail": "Keep this link private. It gives access to your session.",
+        "resume_url": "Resume URL",
+        "saving": "Saving...",
+        "saved": "Saved",
+        "save_failed": "Not saved",
+        "loading": "Restoring your session...",
+        "restored": "Welcome back! Your progress has been restored.",
+        "welcome_back": "Welcome back! Your progress has been restored.",
+        "not_found": "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link.",
+        "already_completed": "You've already submitted your responses. Thank you for your participation!",
+        "study_closed": "This study is no longer accepting responses. Please contact the researcher if you have questions.",
+        "rate_limited": "Too many attempts. Please wait a moment and try again.",
+        "error": "Something went wrong while restoring your session. Please try again.",
+        "share": "Send to myself",
+        "share_title": "My study session",
+        "go_to_study": "Start a new session"
+    },
+    "landing": {
+        "page_title": "Qualis study access",
+        "instruction": "Enter your study code to begin.",
+        "study_code_label": "Study Code",
+        "study_code_placeholder": "e.g. my-study",
+        "go_to_study": "Go to Study",
+        "resetting_session": "Resetting study session…"
+    },
+    "erasure": {
+        "section_title": "Your right to erasure (GDPR Art. 17)",
+        "section_intro": "You can request the removal of your personal data at any time. Your anonymous statement rankings will be kept as research data; everything that could identify you will be removed.",
+        "button": "Request my data deletion",
+        "confirm_title": "Erase your personal data?",
+        "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
+        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
+        "confirm_irreversible": "This action is immediate and cannot be undone.",
+        "confirm_action": "Yes, erase my data",
+        "confirm_in_progress": "Erasing…",
+        "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
+        "error": "We could not process your request. Please try again or contact the researcher.",
+        "already_erased": "Your personal data has been removed for this session."
+    },
+    "footer": {
+        "powered_by": "Powered by Qualis",
+        "license": "AGPLv3",
+        "github_aria": "View source on GitHub"
+    },
+    "errors": {
+        "member_limit_reached": "Project member limit reached.",
+        "owner_project_limit_reached": "You can't own any more projects.",
+        "owner_role_immutable": "The Owner role can only be assigned at project creation.",
+        "access_denied_title": "Access denied",
+        "access_denied_description": "You do not have permission to perform this action.",
+        "rate_limited_title": "Too many requests",
+        "rate_limited_description": "Please wait a moment before trying again.",
+        "conflict_title": "Conflict",
+        "conflict_description": "The resource has been modified or already exists."
+    }
+}
