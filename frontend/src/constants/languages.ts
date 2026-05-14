@@ -20,6 +20,7 @@ export const SUPPORTED_LANGUAGES: Language[] = [
     { code: 'es', label: 'Español', flag: '🇪🇸', hasAdmin: true },
     { code: 'it', label: 'Italiano', flag: '🇮🇹', hasAdmin: true },
     { code: 'nl', label: 'Nederlands', flag: '🇳🇱', hasAdmin: true },
+    { code: 'pt', label: 'Português', flag: '🇵🇹', hasAdmin: true },
 ];
 
 /**

@@ -1,0 +1,138 @@
+# Q-methodology and product terminology for Portuguese (pt).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+language: pt
+language_name: Português
+
+terms:
+  # Q-methodology
+  concourse: concurso
+  Q-methodology: metodologia Q
+  Q-sort: classificação Q
+  Q-set: conjunto Q
+  statement: afirmação
+  factor: fator
+  factor analysis: análise fatorial
+  factor loading: saturação fatorial
+  factor array: array fatorial
+  eigenvalue: valor próprio
+  presort: pré-classificação
+  rough sort: classificação inicial
+  fine sort: classificação fina
+  postsort: pós-classificação
+
+  # Product entities
+  study: estudo
+  study design: desenho do estudo
+  recruitment: recrutamento
+  participant: participante
+  member: membro
+  owner: proprietário
+  viewer: visualizador
+  editor: editor
+  consent: consentimento
+  consent form: formulário de consentimento
+  audio recording: gravação áudio
+  memo: nota
+  draft: rascunho
+  resume code: código de retoma
+  invitation: convite
+  project: projeto
+
+  # UI primitives
+  grid: grelha
+  cancel: Cancelar
+  save: Guardar
+  saving: A guardar...
+  delete: Eliminar
+  view (verb / button): Ver
+  view (noun): Vista
+  loading: A carregar
+  dashboard: Painel
+  slug: slug
+  share (verb / button): Partilhar
+  flag (verb): assinalar
+  flag (noun): assinalação
+  narrative (factor): interpretação
+
+  # State labels
+  draft (state): Rascunho
+  active: Ativo
+  paused: Pausado
+  closed: Fechado
+  archived: Arquivado
+  completed: Concluído
+  discarded: Descartado
+  in_progress: Em curso
+  abandoned: Abandonado
+
+notes: |
+  # === VARIANT ===
+  - This locale targets **European Portuguese (Portugal)**, not Brazilian.
+    Differences relevant here:
+    - "Guardar" (PT) vs "Salvar" (BR) for save
+    - "Eliminar" (PT) vs "Excluir" (BR) for delete
+    - "Ficheiro" (PT) vs "Arquivo" (BR) for file
+    - "Ecrã" (PT) vs "Tela" (BR) for screen
+    - "Utilizador" (PT) vs "Usuário" (BR) for user
+    - "Telemóvel" (PT) vs "Celular" (BR) for mobile phone
+    - "Programa" (PT) vs "Software" sometimes (PT also accepts software loanword)
+  - If Brazilian Portuguese is needed in future, fork as a new `pt-BR` locale
+    rather than dual-targeting this one.
+
+  # === REGISTER ===
+  - Tone: formal "você" form when addressing participants AND researchers.
+    European Portuguese uses "você" or 3rd person verb forms with implied
+    subject for formal direct address. Avoid the informal "tu/teu".
+    Especially critical in: consent forms, GDPR text, destructive admin
+    actions ("Tem a certeza?"), system errors, legal disclaimers.
+  - Imperative forms for buttons: "Guardar", "Cancelar", "Continuar",
+    "Voltar", "Avançar". Capitalized first letter (button convention).
+
+  # === COMPOUND / TYPOGRAPHIC RULES ===
+  - Portuguese is generally NOT prone to long compounds like German/Dutch.
+    Standard space-separated noun phrases are the norm.
+  - Use Portuguese typographic quotation marks "..." (or « ... ») for
+    quoted text in prose, not English “...”.
+  - Decimal separator: comma (123,45) — but DON'T edit numeric placeholder
+    tokens; Intl handles per-locale formatting.
+
+  # === Q-METHODOLOGY VOCABULARY ===
+  - Standard Portuguese Q-method literature uses:
+    - "classificação Q" / "Q-sort" (both seen; prefer "classificação Q")
+    - "conjunto Q" / "Q-set" (prefer "conjunto Q")
+    - "afirmação" or "frase" for statement (prefer "afirmação")
+    - "saturação" or "carga" for loading (prefer "saturação fatorial")
+    - "valor próprio" for eigenvalue (standard)
+    - "concurso" for concourse (loanword from Latin via English Q-method
+      literature; sometimes "discurso universo")
+
+  # === GDPR / LEGAL ===
+  - GDPR → "RGPD" (Regulamento Geral sobre a Proteção de Dados — Portuguese
+    official term). Used in Portuguese legal contexts. EN's "GDPR" can be
+    rendered as "RGPD" in body text.
+  - "right to erasure" (Art. 17) → "direito à eliminação" (or
+    "direito ao apagamento" — both seen; prefer "eliminação")
+  - "pseudonymisation" → "pseudonimização"
+  - "data processing" → "tratamento de dados" (PT) — note: "processamento
+    de dados" is more BR; prefer "tratamento"
+
+  # === FALSE-FRIEND CHECKS (preemptive, modeled on the DE rework) ===
+  - "study" (research study) → "estudo", NOT "curso" (= academic course)
+    or "estudar" (verb).
+  - "close" (verb to close a study) → "fechar", NOT "perto" (= near).
+  - "statement" (Q-item) → "afirmação", NOT "declaração" (which leans
+    legal/official) or "extrato" (= statement of account).
+  - "grid" → "grelha", NOT "rede" (= network) or "grade" (= prison bars).
+  - "share" (button) → "Partilhar" (PT) NOT "Acção" (= action/stock) or
+    "Compartilhar" (BR variant; use only if explicitly BR locale).
+  - "resume" (verb) → "retomar", NOT "currículo" (= CV).
+  - "slug" → "slug" (kept English).
+  - "mobile" (device) → "móvel".
+  - "tablet" → "tablet".
+
+  # === GENDER ===
+  - Portuguese has grammatical gender. Use gender-neutral phrasings where
+    natural ("a pessoa participante" is alternative to "o participante",
+    but the masculine generic is still widely accepted in academic PT).
+    Stay consistent with masculine-generic to match the rest of the
+    codebase (es/it/de all use masculine-generic).
