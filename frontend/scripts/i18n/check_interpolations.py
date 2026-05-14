@@ -59,6 +59,13 @@ def check_locale(en_data: dict, target_data: dict) -> list[dict]:
     return errors
 
 
+# Per-namespace parity policy. Mirrors check_i18n.py.
+NAMESPACE_POLICY: dict[str, dict[str, bool]] = {
+    "participant": {"required": True, "strict": True},
+    "admin":       {"required": False, "strict": False},
+}
+
+
 def main() -> int:
     from namespace_partition import NAMESPACES
 
@@ -75,6 +82,7 @@ def main() -> int:
 
     overall_ok = True
     for namespace in NAMESPACES:
+        policy = NAMESPACE_POLICY[namespace]
         en_path = locales_dir / "en" / f"{namespace}.json"
         if not en_path.exists():
             print(f"❌ Missing master file: {en_path}")
@@ -87,15 +95,20 @@ def main() -> int:
         for code in targets:
             target_path = locales_dir / code / f"{namespace}.json"
             if not target_path.exists():
-                print(f"❌ {code}/{namespace}.json not found")
-                overall_ok = False
+                if policy["required"]:
+                    print(f"❌ {code}/{namespace}.json not found (required)")
+                    overall_ok = False
+                else:
+                    print(f"⚠️  {code}/{namespace}.json not found (best-effort, EN fallback)")
                 continue
             with open(target_path, encoding="utf-8") as f:
                 target_data = json.load(f)
             errors = check_locale(en_data, target_data)
             if errors:
-                overall_ok = False
-                print(f"❌ {code}/{namespace}.json: {len(errors)} interpolation mismatch(es)")
+                severity = "❌" if policy["strict"] else "⚠️ "
+                if policy["strict"]:
+                    overall_ok = False
+                print(f"{severity} {code}/{namespace}.json: {len(errors)} interpolation mismatch(es)")
                 for e in errors:
                     print(f"   {e['key']}: expected {e['expected']}, got {e['found']}")
             else:
