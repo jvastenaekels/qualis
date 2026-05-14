@@ -422,11 +422,12 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
         return counts;
     }, [languages, concourse?.items]);
 
-    // Concourse statement languages are restricted to the same set as the
-    // study UI (en/fr/fi). A statement language outside the UI set would not
-    // be selectable when creating a study, so allowing wider codes here is a
-    // dead-end. Existing items in other codes remain visible (`languages` is
-    // derived from data) — the picker simply does not offer to add more.
+    // Concourse statement languages are restricted to the same set as
+    // SUPPORTED_LANGUAGES (the participant-domain locales). A statement
+    // language outside that set would not be selectable when creating a
+    // study, so allowing wider codes here is a dead-end. Existing items in
+    // other codes remain visible (`languages` is derived from data) — the
+    // picker simply does not offer to add more.
     const commonLanguages = useMemo(
         () =>
             SUPPORTED_LANGUAGES.filter((l) => !languages.includes(l.code))
