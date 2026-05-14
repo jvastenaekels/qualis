@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.6.5](https://github.com/jvastenaekels/qualis/compare/v0.6.4...v0.6.5) (2026-05-14)
+
+
+### Features
+
+* **i18n:** add German locale ([5c202da](https://github.com/jvastenaekels/qualis/commit/5c202da7e9993a55fc04bb446b2281d352e3d6fa))
+* **i18n:** add Italian locale (participant + admin) ([#162](https://github.com/jvastenaekels/qualis/issues/162)) ([41cb4e9](https://github.com/jvastenaekels/qualis/commit/41cb4e97245717466bdf8aa3c149ab331a7e82c7))
+* **i18n:** add Spanish locale (participant + admin) ([#161](https://github.com/jvastenaekels/qualis/issues/161)) ([12b66fa](https://github.com/jvastenaekels/qualis/commit/12b66fabb310a16b25185d7051e439c8c3a2fc0b))
+* **i18n:** differentiated parity policy (admin best-effort) ([#159](https://github.com/jvastenaekels/qualis/issues/159)) ([26470c6](https://github.com/jvastenaekels/qualis/commit/26470c68668f0ed97b342fe4c58359a2772c0bcd))
+* **i18n:** tooling for adding new locales ([#157](https://github.com/jvastenaekels/qualis/issues/157)) ([41e1ff7](https://github.com/jvastenaekels/qualis/commit/41e1ff7ead3a5b232106287fd3d10595e62dec07))
+
+
+### Bug fixes
+
+* **analysis:** harden factor scoring edge cases ([d4e218f](https://github.com/jvastenaekels/qualis/commit/d4e218fcf5d4ac4a0d6a619aa810a5dcb210a2bd))
+* **frontend:** refresh fast-uri transitive audit floor ([0a3c61b](https://github.com/jvastenaekels/qualis/commit/0a3c61b5d292aedcd4f83e00f2398668dc864edb))
+
+
+### Refactor
+
+* **audio:** reduce recorder cleanup complexity ([190e790](https://github.com/jvastenaekels/qualis/commit/190e790ead3b4b54d59989950b2fc79aa6545deb))
+* **i18n:** split locales into participant + admin namespaces ([#158](https://github.com/jvastenaekels/qualis/issues/158)) ([5ddc53e](https://github.com/jvastenaekels/qualis/commit/5ddc53ebfa6545d10f22c362f68d38857ad892c9))
+
+
+### Documentation
+
+* add ci warnings fix plan ([68bafcb](https://github.com/jvastenaekels/qualis/commit/68bafcbe172b79955cf745f3951c2e424dc55922))
+* fix documentation inconsistencies ([#156](https://github.com/jvastenaekels/qualis/issues/156)) ([2c5caa1](https://github.com/jvastenaekels/qualis/commit/2c5caa19142c20971457c8aaf6b106477b67f1c5))
+* **i18n:** align languages plan + runbook with namespace split ([#160](https://github.com/jvastenaekels/qualis/issues/160)) ([c2eadbd](https://github.com/jvastenaekels/qualis/commit/c2eadbdfb0bcf0667f3e564eb12f83855a29d6f6))
+
 ## [0.6.4](https://github.com/jvastenaekels/qualis/compare/v0.6.3...v0.6.4) (2026-05-12)
 
 
