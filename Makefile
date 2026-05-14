@@ -74,6 +74,7 @@ check:
 	$(MAKE) check-api
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
+	cd frontend && npm run check-interpolations
 
 test:
 	cd backend && uv run pytest tests/

@@ -1,0 +1,41 @@
+# Q-methodology and product terminology for Spanish (es).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+language: es
+language_name: Español
+
+terms:
+  concourse: concurso
+  Q-methodology: metodología Q
+  Q-sort: clasificación Q
+  Q-set: conjunto Q
+  statement: enunciado
+  factor: factor
+  factor analysis: análisis factorial
+  presort: pre-clasificación
+  rough sort: clasificación inicial
+  fine sort: clasificación fina
+  postsort: post-clasificación
+  study: estudio
+  study design: diseño del estudio
+  recruitment: reclutamiento
+  participant: participante
+  member: miembro
+  owner: propietario
+  consent: consentimiento
+  consent form: formulario de consentimiento
+  audio recording: grabación de audio
+  memo: memo
+  draft: borrador
+  resume code: código de reanudación
+  invitation: invitación
+  project: proyecto
+
+notes: |
+  - Tone: formal but accessible. Use the "usted" form for participants and
+    administrators alike (matches Spain + Latin America academic norms).
+  - Prefer endonymic methodological terms (clasificación Q rather than Q-sort)
+    except inside section titles where "Q" is a label of art.
+  - Numbers: keep decimal points unless a per-locale formatter handles it
+    elsewhere (Qualis uses Intl, so do not edit numeric tokens).
+  - Buttons (Save, Cancel, Continue): prefer the imperative impersonal form
+    ("Guardar", "Cancelar", "Continuar").
