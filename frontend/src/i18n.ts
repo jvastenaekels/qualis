@@ -9,7 +9,7 @@ import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-export const SUPPORTED_I18N_LANGUAGES = ['en', 'fr', 'fi', 'de', 'es', 'it', 'nl', 'pt'];
+export const SUPPORTED_I18N_LANGUAGES = ['en', 'fr', 'fi', 'de', 'es', 'it', 'nl', 'pt', 'pl'];
 
 i18n
     // load translation using http -> see /public/locales

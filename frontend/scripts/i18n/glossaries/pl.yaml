@@ -1,0 +1,154 @@
+# Q-methodology and product terminology for Polish (pl).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+language: pl
+language_name: Polski
+
+terms:
+  # Q-methodology
+  concourse: konkurs
+  Q-methodology: metodologia Q
+  Q-sort: sortowanie Q
+  Q-set: zbiór Q
+  statement: stwierdzenie
+  factor: czynnik
+  factor analysis: analiza czynnikowa
+  factor loading: ładunek czynnikowy
+  factor array: tablica czynnikowa
+  eigenvalue: wartość własna
+  presort: wstępne sortowanie
+  rough sort: sortowanie zgrubne
+  fine sort: sortowanie szczegółowe
+  postsort: sortowanie końcowe
+
+  # Product entities
+  study: badanie
+  study design: projekt badania
+  recruitment: rekrutacja
+  participant: uczestnik
+  member: członek
+  owner: właściciel
+  viewer: obserwator
+  editor: redaktor
+  consent: zgoda
+  consent form: formularz zgody
+  audio recording: nagranie audio
+  memo: notatka
+  draft: szkic
+  resume code: kod wznowienia
+  invitation: zaproszenie
+  project: projekt
+
+  # UI primitives
+  grid: siatka
+  cancel: Anuluj
+  save: Zapisz
+  saving: Zapisywanie...
+  delete: Usuń
+  view (verb / button): Pokaż
+  view (noun): Widok
+  loading: Ładowanie
+  dashboard: Panel
+  slug: slug
+  share (verb / button): Udostępnij
+  flag (verb): oznacz
+  flag (noun): oznaczenie
+  narrative (factor): interpretacja
+
+  # State labels
+  draft (state): Szkic
+  active: Aktywne
+  paused: Wstrzymane
+  closed: Zamknięte
+  archived: Zarchiwizowane
+  completed: Ukończone
+  discarded: Odrzucone
+  in_progress: W toku
+  abandoned: Porzucone
+
+notes: |
+  # === REGISTER ===
+  - Tone: formal **"Pan/Pani"** form when addressing participants AND
+    researchers directly (e.g. consent forms, destructive admin actions:
+    "Czy na pewno?"). For impersonal UI labels (most of the codebase),
+    use the infinitive imperative or impersonal phrasings rather than
+    direct address — this is the most idiomatic Polish UI register.
+  - Avoid "ty/twój" (informal direct address) entirely.
+  - Imperative for buttons: "Zapisz", "Anuluj", "Kontynuuj", "Wstecz".
+    Capitalized first letter.
+
+  # === PLURALIZATION (CRITICAL FOR POLISH) ===
+  - Polish has FOUR plural categories driven by the number itself:
+    - `one`   → 1
+    - `few`   → 2-4, 22-24, 32-34, ... (numbers ending in 2/3/4 except 12-14)
+    - `many`  → 0, 5-21, 25-31, ... (everything else)
+    - `other` → fractions (1.5, etc.)
+  - i18next supports this via key suffixes: `key_one`, `key_few`,
+    `key_many`, `key_other`.
+  - The EN source currently has only `_one`/`_other` pairs. For most
+    count-bearing keys, this is a quality problem in Polish — e.g.
+    "{{count}} uczestników" (genitive plural, used for many) reads
+    wrong for "2 uczestników" (should be "2 uczestnicy", nominative
+    plural after 2-4).
+  - **HANDLING STRATEGY for this PR**: translate the existing
+    `_one`/`_other` keys with Polish forms that read acceptably across
+    the count range. Use the GENITIVE PLURAL form (used after numbers
+    5+) for `_other` since it's the most common case at the scale
+    Qualis works at (participant counts, statement counts typically > 4).
+    Example: `{{count}} uczestnik` (1) / `{{count}} uczestników` (5+).
+    For numbers 2-4, this reads slightly off but is widely tolerated.
+  - If a key reads catastrophically wrong, propose adding the full
+    4-form keyset to en.json (and all locales) as a follow-up PR per
+    the languages plan (Task 10, Step 8). Don't unilaterally add new
+    keys to en.json in this PR.
+
+  # === COMPOUND WORDS ===
+  - Polish doesn't agglutinate like German/Dutch but builds long
+    multi-word phrases. For DENSE UI slots (sidebar, badges, chips),
+    prefer single-word options or accepted English loanwords (e.g.
+    "Dashboard", "Slug").
+
+  # === CASES (declension) ===
+  - Polish has 7 grammatical cases. Common pitfalls:
+    - After "dla" → genitive ("dla uczestnika" not "dla uczestnik")
+    - After "z" → instrumental or genitive (context-dependent)
+    - Direct objects → accusative ("Usuń badanie" not "Usuń badania" if
+      single object intended)
+    - Subjects → nominative
+  - For UI labels (single nouns), default to NOMINATIVE unless the
+    context demands otherwise.
+
+  # === FALSE-FRIEND CHECKS ===
+  - "study" (research study) → "badanie", NOT "studium" (= academic
+    discipline / a course of studies).
+  - "close" (verb to close a study) → "zamknij", NOT a positional sense.
+  - "statement" (Q-item) → "stwierdzenie", NOT "oświadczenie" (legal
+    declaration) or "wypowiedź" (utterance/speech act, too informal).
+  - "grid" → "siatka", NOT "sieć" (= network).
+  - "share" (button) → "Udostępnij", NOT "Akcja" (= action/share certificate).
+  - "resume" (verb / URL) → "wznów" / "kod wznowienia", NOT "życiorys"
+    (= CV).
+  - "slug" → "slug" (kept English).
+  - "manual" (mode) → "ręczny", NOT "podręcznik" (= instruction booklet).
+  - "concourse" → "konkurs" (cognate, accepted). Polish Q-methodology
+    literature also uses "korpus", but "konkurs" matches the spirit of
+    other Romance locales.
+
+  # === GDPR / LEGAL ===
+  - GDPR → "RODO" (Rozporządzenie o Ochronie Danych Osobowych — Polish
+    official term). Use "RODO" in body text addressing Polish users.
+    EN's "GDPR" can also be kept verbatim if context demands.
+  - "right to erasure" (Art. 17) → "prawo do usunięcia"
+  - "pseudonymisation" → "pseudonimizacja"
+  - "data processing" → "przetwarzanie danych"
+
+  # === GENDER ===
+  - Polish has grammatical gender (masculine/feminine/neuter, with
+    masculine personal/non-personal subtypes for plurals). The codebase
+    uses generic masculine throughout other locales (es/it/de/pt); stay
+    consistent: "uczestnik" (m.) not "uczestnik/uczestniczka" splits.
+
+  # === NUMBERS / TYPOGRAPHY ===
+  - Decimal separator: comma (123,45). But don't edit numeric placeholder
+    tokens; Intl handles per-locale formatting.
+  - Polish quotation marks: „..." (low-9 open + high-9 close). Use for
+    quoted text in prose.
