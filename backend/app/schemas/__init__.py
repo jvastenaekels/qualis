@@ -93,10 +93,12 @@ from .studies import (
 from .users import (
     PasswordChange,
     PasswordConfirm,
+    UserAdminUpdate,
     UserBase,
     UserCreate,
     UserCreateResponse,
     UserRead,
+    UserReadAdmin,
     UserUpdate,
 )
 from .concourses import (
@@ -232,10 +234,12 @@ __all__ = [
     # users
     "PasswordChange",
     "PasswordConfirm",
+    "UserAdminUpdate",
     "UserBase",
     "UserCreate",
     "UserCreateResponse",
     "UserRead",
+    "UserReadAdmin",
     "UserUpdate",
     # projects
     "ProjectBrief",

@@ -1,5 +1,7 @@
 """User schemas."""
 
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .common import QuotaInfo, validate_non_empty_string
@@ -41,6 +43,38 @@ class UserRead(UserBase):
     # objects (e.g. inside ProjectMemberRead.user) don't need to carry it.
     owned_project_quota: QuotaInfo | None = None
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserReadAdmin(UserRead):
+    """Extended user read schema for superuser-only admin endpoints.
+
+    Carries audit fields that we do NOT expose on the public /api/me path:
+    superusers see them so they can audit account hygiene
+    (last login, password age, email verification status).
+    """
+
+    email_verified_at: datetime | None = None
+    password_changed_at: datetime
+    last_login_at: datetime | None = None
+
+
+class UserAdminUpdate(BaseModel):
+    """PATCH payload for /api/admin/users/{id}.
+
+    Each field is optional so superusers can change one flag at a time
+    (e.g. demote without touching activation status). Email and password
+    are deliberately absent: email goes through the user-driven
+    /me email-change flow; password goes through force-password-reset.
+    """
+
+    is_active: bool | None = None
+    is_superuser: bool | None = None
+    full_name: str | None = Field(None, max_length=100)
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name_(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class UserUpdate(BaseModel):
