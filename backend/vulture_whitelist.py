@@ -335,6 +335,8 @@ get_concourse_memo
 get_study_memo
 get_concourse_memo_unread
 get_study_memo_unread
+export_concourse_memo
+export_study_memo
 create_concourse_entry
 create_study_entry
 post_comment
