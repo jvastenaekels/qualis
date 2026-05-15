@@ -23,7 +23,8 @@ async def test_last_login_at_set_on_successful_login(
 
     await db.refresh(regular_user)
     assert regular_user.last_login_at is not None
-    assert regular_user.last_login_at <= datetime.now(timezone.utc)
+    delta = (datetime.now(timezone.utc) - regular_user.last_login_at).total_seconds()
+    assert 0 <= delta < 5, f"last_login_at not recent: delta={delta}s"
 
 
 @pytest.mark.asyncio

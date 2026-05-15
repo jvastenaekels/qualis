@@ -331,7 +331,10 @@ async def study_factory(db: AsyncSession):
 
 @pytest_asyncio.fixture
 async def regular_user(db: AsyncSession) -> User:
-    """A plain user for last_login_at / login-flow tests (password: 'regular-pw')."""
+    """Lightweight user for auth-flow tests that don't need project context.
+    Uses a distinct email/password so it never conflicts with ``test_user``,
+    which anchors the heavier ``test_project`` / ``seed_study`` fixture chain.
+    Use ``test_user`` instead when the test needs project membership."""
     hashed = get_password_hash("regular-pw")
     user = User(
         email="regular@example.com",
