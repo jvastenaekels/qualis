@@ -77,6 +77,14 @@ async def get_current_user(
     if token_iat < pwa_epoch:
         raise credentials_exception
 
+    # Deactivated users are locked out at the dependency level, not just at
+    # ``get_current_active_user``: a flipped ``is_active=False`` must
+    # invalidate in-flight access tokens against EVERY bearer-token endpoint,
+    # not only the ones that opt into the active-user dep. Same 401 as the
+    # iat-vs-pwa branch above, so there is no enumeration channel.
+    if not user.is_active:
+        raise credentials_exception
+
     return user
 
 
@@ -84,6 +92,9 @@ async def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
     """Validate that the user is active."""
+    # Defense-in-depth: unreachable for token-bearing deactivated users
+    # since get_current_user already 401s on is_active=False. Kept as a
+    # belt-and-braces guard; do not rely on this 400 as a contract.
     if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"

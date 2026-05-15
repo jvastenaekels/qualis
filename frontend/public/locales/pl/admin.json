@@ -340,7 +340,9 @@
       "select_project": "Wybierz projekt",
       "concourses": "Konkursy",
       "concourse": "Konkurs",
-      "members": "Członkowie zespołu"
+      "members": "Członkowie zespołu",
+      "platform": "Platforma",
+      "users": "Użytkownicy"
     },
     "concourse": {
       "title": "Konkurs",
@@ -2182,6 +2184,63 @@
           "comments": "Komentarze do kart",
           "feedback": "Opinie ogólne"
         }
+      }
+    },
+    "users": {
+      "title": "Użytkownicy",
+      "subtitle": "Zarządzaj kontami platformy i sprawdzaj higienę dostępów.",
+      "error_title": "Akcja nie powiodła się",
+      "generic_error": "Coś poszło nie tak. Spróbuj ponownie.",
+      "search_placeholder": "Szukaj według e-mail lub nazwy",
+      "empty": "Brak pasujących użytkowników.",
+      "inactive": "Nieaktywny",
+      "no_name": "Brak nazwy",
+      "last_seen": "Ostatnio widziany {{when}}",
+      "never_logged_in": "Nigdy się nie logował",
+      "actions_aria": "Akcje dla {{email}}",
+      "menu_label": "Zarządzaj kontem",
+      "filter": {
+        "all": "Wszyscy użytkownicy",
+        "superusers": "Superużytkownicy",
+        "no_2fa": "Bez 2FA",
+        "unverified": "E-mail niezweryfikowany",
+        "dormant": "Nieaktywny"
+      },
+      "risk": {
+        "superuser_no_2fa": "Superużytkownik bez 2FA",
+        "email_unverified": "E-mail niezweryfikowany",
+        "password_stale": "Hasło starsze niż rok",
+        "email_change_pending": "Zmiana e-mail w toku",
+        "dormant": "Nieaktywny (90+ dni)"
+      },
+      "role": {
+        "superuser": "Superużytkownik",
+        "user": "Użytkownik"
+      },
+      "action": {
+        "demote": "Odbierz uprawnienia superużytkownika",
+        "promote": "Nadaj uprawnienia superużytkownika",
+        "deactivate": "Dezaktywuj konto",
+        "reactivate": "Reaktywuj konto",
+        "force_password_reset": "Wymuś reset hasła",
+        "reset_totp": "Zresetuj 2FA",
+        "delete": "Usuń użytkownika"
+      },
+      "confirm": {
+        "cancel": "Anuluj",
+        "confirm": "Potwierdź",
+        "delete_title": "Usunąć tego użytkownika?",
+        "delete_body": "Trwale usuń {{email}}. Tej operacji nie można cofnąć.",
+        "reset-totp_title": "Zresetować uwierzytelnianie dwuskładnikowe?",
+        "reset-totp_body": "Wyłącz 2FA dla {{email}}. Użytkownik będzie musiał je skonfigurować ponownie.",
+        "force-password-reset_title": "Wymusić reset hasła?",
+        "force-password-reset_body": "Unieważnij hasło {{email}} i zażądaj jego zmiany przy następnym logowaniu.",
+        "deactivate_title": "Dezaktywować to konto?",
+        "deactivate_body": "Natychmiast wyloguj {{email}} i zablokuj logowanie do czasu reaktywacji.",
+        "demote_title": "Odebrać dostęp superużytkownika?",
+        "demote_body": "Usuń uprawnienia superużytkownika od {{email}}.",
+        "promote_title": "Przyznać dostęp superużytkownika?",
+        "promote_body": "Przyznaj {{email}} pełne uprawnienia superużytkownika na platformie."
       }
     }
   }

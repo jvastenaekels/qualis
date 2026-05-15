@@ -253,7 +253,9 @@
             "concourses": "Lausekokoelmat",
             "concourse": "Lausekokoelma",
             "privacy": "Tietosuoja",
-            "members": "Tiimin jäsenet"
+            "members": "Tiimin jäsenet",
+            "platform": "Alusta",
+            "users": "Käyttäjät"
         },
         "concourse": {
             "title": "Lausekokoelma",
@@ -2182,6 +2184,63 @@
                 "no_body": "(tyhjä)",
                 "edit_in_design": "Muokkaa Suunnittelussa",
                 "view": "Näytä"
+            }
+        },
+        "users": {
+            "title": "Käyttäjät",
+            "subtitle": "Hallitse alustan käyttäjätilejä ja tarkasta tietoturvan tila.",
+            "error_title": "Toiminto epäonnistui",
+            "generic_error": "Jokin meni pieleen. Yritä uudelleen.",
+            "search_placeholder": "Hae sähköpostilla tai nimellä",
+            "empty": "Ei käyttäjiä hakuehdoilla.",
+            "inactive": "Ei aktiivinen",
+            "no_name": "Ei nimeä",
+            "last_seen": "Nähty viimeksi {{when}}",
+            "never_logged_in": "Ei ole koskaan kirjautunut",
+            "actions_aria": "Toiminnot käyttäjälle {{email}}",
+            "menu_label": "Hallitse tiliä",
+            "filter": {
+                "all": "Kaikki käyttäjät",
+                "superusers": "Pääkäyttäjät",
+                "no_2fa": "Ei kaksivaiheista tunnistautumista",
+                "unverified": "Sähköposti vahvistamatta",
+                "dormant": "Lepotilassa"
+            },
+            "risk": {
+                "superuser_no_2fa": "Pääkäyttäjä ilman kaksivaiheista tunnistautumista",
+                "email_unverified": "Sähköposti vahvistamatta",
+                "password_stale": "Salasana yli vuoden vanha",
+                "email_change_pending": "Sähköpostin vaihto odottaa",
+                "dormant": "Lepotilassa (90+ päivää)"
+            },
+            "role": {
+                "superuser": "Pääkäyttäjä",
+                "user": "Käyttäjä"
+            },
+            "action": {
+                "demote": "Poista pääkäyttäjäoikeudet",
+                "promote": "Tee pääkäyttäjäksi",
+                "deactivate": "Poista käytöstä",
+                "reactivate": "Ota uudelleen käyttöön",
+                "force_password_reset": "Pakota salasanan nollaus",
+                "reset_totp": "Nollaa kaksivaiheinen tunnistautuminen",
+                "delete": "Poista käyttäjä"
+            },
+            "confirm": {
+                "cancel": "Peruuta",
+                "confirm": "Vahvista",
+                "delete_title": "Poistetaanko tämä käyttäjä?",
+                "delete_body": "Poistetaan pysyvästi {{email}}. Toimintoa ei voi kumota.",
+                "reset-totp_title": "Nollataan kaksivaiheinen tunnistautuminen?",
+                "reset-totp_body": "Poistetaan kaksivaiheinen tunnistautuminen käyttäjältä {{email}}. Hänen on määritettävä se uudelleen.",
+                "force-password-reset_title": "Pakotetaanko salasanan nollaus?",
+                "force-password-reset_body": "Mitätöidään käyttäjän {{email}} salasana ja vaaditaan nollaus seuraavalla kirjautumisella.",
+                "deactivate_title": "Poistetaanko tämä tili käytöstä?",
+                "deactivate_body": "Kirjataan käyttäjä {{email}} välittömästi ulos ja estetään kirjautuminen, kunnes tili aktivoidaan uudelleen.",
+                "demote_title": "Peruutetaanko pääkäyttäjäoikeudet?",
+                "demote_body": "Poistetaan pääkäyttäjäoikeudet käyttäjältä {{email}}.",
+                "promote_title": "Myönnetäänkö pääkäyttäjäoikeudet?",
+                "promote_body": "Myönnetään käyttäjälle {{email}} täydet pääkäyttäjäoikeudet alustalla."
             }
         }
     }

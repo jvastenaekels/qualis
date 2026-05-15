@@ -14,7 +14,7 @@ Routes that don't fit the cross-tenant model are skipped explicitly:
 
 - Top-level **enumeration** routes (``GET /api/admin/projects``,
   ``POST /api/admin/projects``, ``GET /api/admin/users``,
-  ``POST /api/admin/users``, ``GET /api/admin/invitations/verify``,
+  ``GET /api/admin/invitations/verify``,
   ``POST /api/admin/invitations/accept``, ``GET /api/admin/memo/templates``)
   have no cross-tenant target id; their isolation is asserted by other
   test classes (filter by membership / superuser gate).
@@ -769,7 +769,6 @@ SKIPPED_ROUTES: list[tuple[str, str, str]] = [
         "auth-only token consumption; cross-tenant N/A",
     ),
     ("GET", "/api/admin/users", "superuser-gated; cross-project N/A"),
-    ("POST", "/api/admin/users", "superuser-gated; cross-project N/A"),
     ("GET", "/api/admin/memo/templates", "static templates; no project scope"),
 ]
 
@@ -993,7 +992,7 @@ def test_harness_coverage_matches_inventory() -> None:
     """The harness must cover (encoded + skipped) routes ≥ inventory size."""
     encoded = len(ROUTES)
     skipped = len(SKIPPED_ROUTES)
-    assert encoded + skipped >= 89, (
+    assert encoded + skipped >= 88, (
         f"Harness covers {encoded} routes + {skipped} skipped = "
-        f"{encoded + skipped}; inventory is 89. Update ROUTES or SKIPPED_ROUTES."
+        f"{encoded + skipped}; inventory is 88. Update ROUTES or SKIPPED_ROUTES."
     )

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const RequireAdmin = () => {
     const { t } = useTranslation();
-    const { isLoading, isAuthenticated, isAdmin } = useAuth();
+    const { isLoading, isAuthenticated, isSuperuser } = useAuth();
     const { data: projectsData, isLoading: projectsLoading } = useListProjectsApiAdminProjectsGet(
         undefined,
         {
@@ -41,8 +41,11 @@ const RequireAdmin = () => {
     // Check if user has project access
     const hasProjectAccess = projects && projects.length > 0;
 
-    // Allow access if user is superuser OR has at least one project
-    if (!isAdmin && !hasProjectAccess) {
+    // Admin area is open to superusers and to any user with at least
+    // one project membership. The /admin/users page within does its
+    // own superuser-only gate.
+    const canAccessAdminArea = isSuperuser || hasProjectAccess;
+    if (!canAccessAdminArea) {
         return (
             <div className="flex h-screen w-full items-center justify-center p-4">
                 <Alert variant="destructive" className="max-w-md">

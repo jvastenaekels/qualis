@@ -167,7 +167,7 @@ import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { currentProject } = useAuthStore();
-    const { user } = useAuth();
+    const { user, isSuperuser } = useAuth();
     const location = useLocation();
     const { t } = useTranslation();
     const params = useParams<{ projectSlug?: string; studySlug?: string }>();
@@ -377,6 +377,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
+                        </SidebarMenu>
+                    </SidebarGroup>
+                )}
+                {isSuperuser && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
+                            {t('admin.sidebar.platform', 'Platform')}
+                        </SidebarGroupLabel>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={location.pathname === '/app/users'}
+                                >
+                                    <Link to="/app/users">
+                                        <Users />
+                                        <span>{t('admin.sidebar.users', 'Users')}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroup>
                 )}

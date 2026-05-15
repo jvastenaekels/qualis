@@ -340,7 +340,9 @@
             "select_project": "Seleccionar proyecto",
             "concourses": "Concursos",
             "concourse": "Concurso",
-            "members": "Miembros del equipo"
+            "members": "Miembros del equipo",
+            "platform": "Plataforma",
+            "users": "Usuarios"
         },
         "concourse": {
             "title": "Concurso",
@@ -2182,6 +2184,63 @@
                     "comments": "Comentarios de tarjetas",
                     "feedback": "Comentarios generales"
                 }
+            }
+        },
+        "users": {
+            "title": "Usuarios",
+            "subtitle": "Gestionar cuentas de la plataforma y auditar la higiene de accesos.",
+            "error_title": "Acción fallida",
+            "generic_error": "Algo salió mal. Por favor, inténtelo de nuevo.",
+            "search_placeholder": "Buscar por correo electrónico o nombre",
+            "empty": "No hay usuarios que coincidan.",
+            "inactive": "Inactivo",
+            "no_name": "Sin nombre",
+            "last_seen": "Visto por última vez {{when}}",
+            "never_logged_in": "Nunca ha iniciado sesión",
+            "actions_aria": "Acciones para {{email}}",
+            "menu_label": "Gestionar cuenta",
+            "filter": {
+                "all": "Todos los usuarios",
+                "superusers": "Superusuarios",
+                "no_2fa": "Sin 2FA",
+                "unverified": "Correo no verificado",
+                "dormant": "Inactivo"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superusuario sin 2FA",
+                "email_unverified": "Correo no verificado",
+                "password_stale": "Contraseña con más de un año",
+                "email_change_pending": "Cambio de correo pendiente",
+                "dormant": "Inactivo (90+ días)"
+            },
+            "role": {
+                "superuser": "Superusuario",
+                "user": "Usuario"
+            },
+            "action": {
+                "demote": "Revocar acceso de superusuario",
+                "promote": "Convertir en superusuario",
+                "deactivate": "Desactivar cuenta",
+                "reactivate": "Reactivar cuenta",
+                "force_password_reset": "Forzar restablecimiento de contraseña",
+                "reset_totp": "Restablecer 2FA",
+                "delete": "Eliminar usuario"
+            },
+            "confirm": {
+                "cancel": "Cancelar",
+                "confirm": "Confirmar",
+                "delete_title": "¿Eliminar este usuario?",
+                "delete_body": "Eliminar permanentemente {{email}}. Esta acción no se puede deshacer.",
+                "reset-totp_title": "¿Restablecer la autenticación de dos factores?",
+                "reset-totp_body": "Deshabilitar 2FA para {{email}}. Deberá configurarla de nuevo.",
+                "force-password-reset_title": "¿Forzar un restablecimiento de contraseña?",
+                "force-password-reset_body": "Invalidar la contraseña de {{email}} y exigir un restablecimiento en el próximo inicio de sesión.",
+                "deactivate_title": "¿Desactivar esta cuenta?",
+                "deactivate_body": "Cerrar sesión de {{email}} inmediatamente y bloquear el acceso hasta que se reactive.",
+                "demote_title": "¿Revocar el acceso de superusuario?",
+                "demote_body": "Eliminar los privilegios de superusuario de {{email}}.",
+                "promote_title": "¿Conceder acceso de superusuario?",
+                "promote_body": "Conceder a {{email}} plenos privilegios de superusuario sobre la plataforma."
             }
         }
     }

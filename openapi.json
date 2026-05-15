@@ -3185,53 +3185,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_UserRead_"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "admin-users",
-          "Admin Users"
-        ],
-        "summary": "Create User",
-        "description": "Create a new user.",
-        "operationId": "create_user_api_admin_users_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserRead"
+                  "$ref": "#/components/schemas/PaginatedResponse_UserReadAdmin_"
                 }
               }
             }
@@ -3250,6 +3204,63 @@
       }
     },
     "/api/admin/users/{user_id}": {
+      "patch": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Patch User",
+        "description": "Superuser-only flag update. One field at a time is fine.\n\n- is_active: toggle. Deactivating immediately invalidates the\n  target's bearer tokens (Task 3).\n- is_superuser: toggle. Promotion requires the target to have 2FA\n  enabled. Demotion is refused if it would leave the platform\n  without an active superuser, or if you're demoting yourself.\n- full_name: free text, 1-100 chars.\n\nCONCURRENCY: the ``assert_can_*`` guards, the flag mutation, and the\nsingle ``db.commit()`` all run against the one request-scoped session\nwith NO intervening commit/rollback. ``_count_active_superusers``\ntakes ``FOR UPDATE`` row locks that must be held until this commit,\nso demote/deactivate requests serialize and the \"at least one active\nsuperuser\" floor cannot be raced to zero. Do not introduce an early\ncommit/rollback between the asserts and the final commit.",
+        "operationId": "patch_user_api_admin_users__user_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAdminUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserReadAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "admin-users",
@@ -3258,6 +3269,90 @@
         "summary": "Delete User",
         "description": "Delete a user. Cannot delete self.",
         "operationId": "delete_user_api_admin_users__user_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{user_id}/force-password-reset": {
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Force Password Reset Endpoint",
+        "description": "Superuser-only: force-rotate the target's password and invalidate\nevery existing access token (F-03-010 via ``password_changed_at``).\n\nThe heavy lifting lives in ``admin_user_service.force_password_reset``,\nwhich commits the session itself (fail-locked: the rotation persists\neven if SMTP is down \u2014 the email send follows the commit by design).",
+        "operationId": "force_password_reset_endpoint_api_admin_users__user_id__force_password_reset_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{user_id}/reset-totp": {
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Reset Totp Endpoint",
+        "description": "Superuser-only: clear a user's TOTP (lost-authenticator recovery).\n\nThe heavy lifting lives in ``admin_user_service.reset_totp``, which\ncommits the session itself. By design it removes ONLY the second\nfactor \u2014 it does NOT bump ``password_changed_at`` nor invalidate\nexisting sessions; it is not a session-revocation tool.\n\nAllowed on superuser targets; this can transiently leave a superuser\nwithout 2FA (the 2FA-for-superuser rule is checked at promotion time,\nnot continuously). The action is audit-logged.",
+        "operationId": "reset_totp_endpoint_api_admin_users__user_id__reset_totp_post",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -9256,11 +9351,11 @@
         ],
         "title": "PaginatedResponse[StudyRead]"
       },
-      "PaginatedResponse_UserRead_": {
+      "PaginatedResponse_UserReadAdmin_": {
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/UserRead"
+              "$ref": "#/components/schemas/UserReadAdmin"
             },
             "type": "array",
             "title": "Items"
@@ -9285,7 +9380,7 @@
           "limit",
           "offset"
         ],
-        "title": "PaginatedResponse[UserRead]"
+        "title": "PaginatedResponse[UserReadAdmin]"
       },
       "ParticipantAudioRecording": {
         "properties": {
@@ -12283,6 +12378,47 @@
         "title": "TwoFAEnableRequest",
         "description": "Body of POST /me/2fa/enable.\n\nThe `token` field is required only for channel='app' (the existing\nTOTP flow). channel='email' enrolls the user without a TOTP token;\nthe email-OTP delivery is exercised at first login."
       },
+      "UserAdminUpdate": {
+        "properties": {
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "is_superuser": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Superuser"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "title": "UserAdminUpdate",
+        "description": "PATCH payload for /api/admin/users/{id}.\n\nEach field is optional so superusers can change one flag at a time\n(e.g. demote without touching activation status). Email and password\nare deliberately absent: email goes through the user-driven\n/me email-change flow; password goes through force-password-reset."
+      },
       "UserCreate": {
         "properties": {
           "email": {
@@ -12420,6 +12556,103 @@
         ],
         "title": "UserRead",
         "description": "Schema for reading user details."
+      },
+      "UserReadAdmin": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "is_superuser": {
+            "type": "boolean",
+            "title": "Is Superuser"
+          },
+          "is_totp_enabled": {
+            "type": "boolean",
+            "title": "Is Totp Enabled"
+          },
+          "pending_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Email"
+          },
+          "owned_project_quota": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuotaInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email_verified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Verified At"
+          },
+          "password_changed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Password Changed At"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "id",
+          "is_active",
+          "is_superuser",
+          "is_totp_enabled",
+          "password_changed_at"
+        ],
+        "title": "UserReadAdmin",
+        "description": "Extended user read schema for superuser-only admin endpoints.\n\nCarries audit fields that we do NOT expose on the public /api/me path:\nsuperusers see them so they can audit account hygiene\n(last login, password age, email verification status)."
       },
       "UserUpdate": {
         "properties": {

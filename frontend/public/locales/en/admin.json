@@ -340,7 +340,9 @@
             "select_project": "Select project",
             "concourses": "Concourses",
             "concourse": "Concourse",
-            "members": "Team members"
+            "members": "Team members",
+            "platform": "Platform",
+            "users": "Users"
         },
         "concourse": {
             "title": "Concourse",
@@ -2182,6 +2184,63 @@
                     "comments": "Card Comments",
                     "feedback": "General Feedback"
                 }
+            }
+        },
+        "users": {
+            "title": "Users",
+            "subtitle": "Manage platform accounts and audit hygiene.",
+            "error_title": "Action failed",
+            "generic_error": "Something went wrong. Please try again.",
+            "search_placeholder": "Search by email or name",
+            "empty": "No users match.",
+            "inactive": "Inactive",
+            "no_name": "No name",
+            "last_seen": "Last seen {{when}}",
+            "never_logged_in": "Never logged in",
+            "actions_aria": "Actions for {{email}}",
+            "menu_label": "Manage account",
+            "filter": {
+                "all": "All users",
+                "superusers": "Superusers",
+                "no_2fa": "No 2FA",
+                "unverified": "Unverified email",
+                "dormant": "Dormant"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superuser without 2FA",
+                "email_unverified": "Email unverified",
+                "password_stale": "Password over a year old",
+                "email_change_pending": "Email change pending",
+                "dormant": "Dormant (90+ days)"
+            },
+            "role": {
+                "superuser": "Superuser",
+                "user": "User"
+            },
+            "action": {
+                "demote": "Revoke superuser",
+                "promote": "Make superuser",
+                "deactivate": "Deactivate account",
+                "reactivate": "Reactivate account",
+                "force_password_reset": "Force password reset",
+                "reset_totp": "Reset 2FA",
+                "delete": "Delete user"
+            },
+            "confirm": {
+                "cancel": "Cancel",
+                "confirm": "Confirm",
+                "delete_title": "Delete this user?",
+                "delete_body": "Permanently delete {{email}}. This cannot be undone.",
+                "reset-totp_title": "Reset two-factor authentication?",
+                "reset-totp_body": "Disable 2FA for {{email}}. They will need to set it up again.",
+                "force-password-reset_title": "Force a password reset?",
+                "force-password-reset_body": "Invalidate the password for {{email}} and require a reset on next login.",
+                "deactivate_title": "Deactivate this account?",
+                "deactivate_body": "Immediately log {{email}} out and block sign-in until reactivated.",
+                "demote_title": "Revoke superuser access?",
+                "demote_body": "Remove superuser privileges from {{email}}.",
+                "promote_title": "Grant superuser access?",
+                "promote_body": "Grant {{email}} full superuser privileges over the platform."
             }
         }
     }

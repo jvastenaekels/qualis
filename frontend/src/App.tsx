@@ -41,6 +41,7 @@ import LoginPage from './pages/LoginPage';
 
 // Admin imports
 import RequireAdmin from './components/auth/RequireAdmin';
+import RequireSuperuser from './components/auth/RequireSuperuser';
 import AdminLayout from './layouts/AdminLayout';
 import ProjectLayout from './layouts/ProjectLayout';
 import StudyFocusLayout from './layouts/StudyFocusLayout';
@@ -60,6 +61,7 @@ const ProjectMembersPage = lazy(() => import('./pages/admin/ProjectMembersPage')
 const ConcourseListPage = lazy(() => import('./pages/admin/ConcourseListPage'));
 const ConcourseDetailPage = lazy(() => import('./pages/admin/ConcourseDetailPage'));
 const CreateProjectPage = lazy(() => import('./pages/admin/CreateProjectPage'));
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
 const ResearcherHub = lazy(() => import('./pages/ResearcherHub'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 
@@ -298,6 +300,21 @@ const router = createBrowserRouter([
                     {
                         path: 'workspaces/new',
                         element: <Navigate to="../projects/new" replace />,
+                    },
+                ],
+            },
+            // Superuser-only platform routes
+            {
+                element: <RequireSuperuser />,
+                children: [
+                    {
+                        element: <AdminLayout />,
+                        children: [
+                            {
+                                path: 'users',
+                                element: <AdminUsersPage />,
+                            },
+                        ],
                     },
                 ],
             },

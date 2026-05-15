@@ -14,14 +14,14 @@ export const useAuth = () => {
     });
 
     const isAuthenticated = !!user;
-    const isAdmin = user?.is_superuser || false; // Or check specific role if added to UserRead
+    const isSuperuser = user?.is_superuser ?? false;
 
     return {
         user,
         isLoading,
         error,
         isAuthenticated,
-        isAdmin,
+        isSuperuser,
         refetch,
     };
 };

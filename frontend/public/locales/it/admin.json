@@ -340,7 +340,9 @@
             "select_project": "Seleziona progetto",
             "concourses": "Concorsi",
             "concourse": "Concorso",
-            "members": "Membri del team"
+            "members": "Membri del team",
+            "platform": "Piattaforma",
+            "users": "Utenti"
         },
         "concourse": {
             "title": "Concorso",
@@ -2182,6 +2184,63 @@
                     "comments": "Commenti alle affermazioni",
                     "feedback": "Feedback generale"
                 }
+            }
+        },
+        "users": {
+            "title": "Utenti",
+            "subtitle": "Gestire gli account della piattaforma e verificare la sicurezza.",
+            "error_title": "Azione non riuscita",
+            "generic_error": "Qualcosa è andato storto. Riprova.",
+            "search_placeholder": "Cerca per e-mail o nome",
+            "empty": "Nessun utente corrisponde.",
+            "inactive": "Inattivo",
+            "no_name": "Nessun nome",
+            "last_seen": "Visto l'ultima volta {{when}}",
+            "never_logged_in": "Non ha mai effettuato l'accesso",
+            "actions_aria": "Azioni per {{email}}",
+            "menu_label": "Gestisci account",
+            "filter": {
+                "all": "Tutti gli utenti",
+                "superusers": "Superutenti",
+                "no_2fa": "Senza 2FA",
+                "unverified": "E-mail non verificata",
+                "dormant": "Dormiente"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superutente senza 2FA",
+                "email_unverified": "E-mail non verificata",
+                "password_stale": "Password con più di un anno",
+                "email_change_pending": "Cambio e-mail in attesa",
+                "dormant": "Dormiente (90+ giorni)"
+            },
+            "role": {
+                "superuser": "Superutente",
+                "user": "Utente"
+            },
+            "action": {
+                "demote": "Revoca accesso superutente",
+                "promote": "Rendi superutente",
+                "deactivate": "Disattiva account",
+                "reactivate": "Riattiva account",
+                "force_password_reset": "Forza il reset della password",
+                "reset_totp": "Reimposta 2FA",
+                "delete": "Elimina utente"
+            },
+            "confirm": {
+                "cancel": "Annulla",
+                "confirm": "Conferma",
+                "delete_title": "Eliminare questo utente?",
+                "delete_body": "Eliminare definitivamente {{email}}. Questa azione non può essere annullata.",
+                "reset-totp_title": "Reimpostare l'autenticazione a due fattori?",
+                "reset-totp_body": "Disabilita 2FA per {{email}}. Dovrà riconfigurarlo.",
+                "force-password-reset_title": "Forzare il reset della password?",
+                "force-password-reset_body": "Invalidare la password di {{email}} e richiedere il reset al prossimo accesso.",
+                "deactivate_title": "Disattivare questo account?",
+                "deactivate_body": "Disconnettere immediatamente {{email}} e bloccare l'accesso fino alla riattivazione.",
+                "demote_title": "Revocare l'accesso superutente?",
+                "demote_body": "Rimuovere i privilegi di superutente da {{email}}.",
+                "promote_title": "Concedere l'accesso superutente?",
+                "promote_body": "Concedere a {{email}} i pieni privilegi di superutente sulla piattaforma."
             }
         }
     }

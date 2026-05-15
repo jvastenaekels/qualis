@@ -253,7 +253,9 @@
             "study_tools": "Outils d'étude",
             "concourses": "Concours",
             "concourse": "Concours",
-            "members": "Membres de l'équipe"
+            "members": "Membres de l'équipe",
+            "platform": "Plateforme",
+            "users": "Utilisateurs"
         },
         "concourse": {
             "title": "Concours",
@@ -2182,6 +2184,63 @@
                     "comments": "Commentaires sur les cartes",
                     "feedback": "Remarques générales"
                 }
+            }
+        },
+        "users": {
+            "title": "Utilisateurs",
+            "subtitle": "Gérer les comptes de la plateforme et assurer l'hygiène des accès.",
+            "error_title": "Échec de l'action",
+            "generic_error": "Une erreur est survenue. Veuillez réessayer.",
+            "search_placeholder": "Rechercher par e-mail ou nom",
+            "empty": "Aucun utilisateur ne correspond.",
+            "inactive": "Inactif",
+            "no_name": "Sans nom",
+            "last_seen": "Vu pour la dernière fois {{when}}",
+            "never_logged_in": "Jamais connecté",
+            "actions_aria": "Actions pour {{email}}",
+            "menu_label": "Gérer le compte",
+            "filter": {
+                "all": "Tous les utilisateurs",
+                "superusers": "Superutilisateurs",
+                "no_2fa": "Sans 2FA",
+                "unverified": "E-mail non vérifié",
+                "dormant": "Dormant"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superutilisateur sans 2FA",
+                "email_unverified": "E-mail non vérifié",
+                "password_stale": "Mot de passe de plus d'un an",
+                "email_change_pending": "Changement d'e-mail en attente",
+                "dormant": "Dormant (90+ jours)"
+            },
+            "role": {
+                "superuser": "Superutilisateur",
+                "user": "Utilisateur"
+            },
+            "action": {
+                "demote": "Révoquer le statut superutilisateur",
+                "promote": "Rendre superutilisateur",
+                "deactivate": "Désactiver le compte",
+                "reactivate": "Réactiver le compte",
+                "force_password_reset": "Forcer la réinitialisation du mot de passe",
+                "reset_totp": "Réinitialiser la 2FA",
+                "delete": "Supprimer l'utilisateur"
+            },
+            "confirm": {
+                "cancel": "Annuler",
+                "confirm": "Confirmer",
+                "delete_title": "Supprimer cet utilisateur ?",
+                "delete_body": "Supprimer définitivement {{email}}. Cette action est irréversible.",
+                "reset-totp_title": "Réinitialiser l'authentification à deux facteurs ?",
+                "reset-totp_body": "Désactiver la 2FA pour {{email}}. L'utilisateur devra la reconfigurer.",
+                "force-password-reset_title": "Forcer une réinitialisation du mot de passe ?",
+                "force-password-reset_body": "Invalider le mot de passe de {{email}} et imposer une réinitialisation à la prochaine connexion.",
+                "deactivate_title": "Désactiver ce compte ?",
+                "deactivate_body": "Déconnecter immédiatement {{email}} et bloquer toute connexion jusqu'à réactivation.",
+                "demote_title": "Révoquer les droits superutilisateur ?",
+                "demote_body": "Retirer les privilèges superutilisateur de {{email}}.",
+                "promote_title": "Accorder les droits superutilisateur ?",
+                "promote_body": "Accorder à {{email}} les pleins privilèges superutilisateur sur la plateforme."
             }
         }
     }

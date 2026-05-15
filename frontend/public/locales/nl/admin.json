@@ -340,7 +340,9 @@
             "select_project": "Project selecteren",
             "concourses": "Concoursen",
             "concourse": "Concours",
-            "members": "Teamleden"
+            "members": "Teamleden",
+            "platform": "Platform",
+            "users": "Gebruikers"
         },
         "concourse": {
             "title": "Concours",
@@ -2182,6 +2184,63 @@
                     "comments": "Kaartopmerkingen",
                     "feedback": "Algemene feedback"
                 }
+            }
+        },
+        "users": {
+            "title": "Gebruikers",
+            "subtitle": "Platformaccounts beheren en beveiliging controleren.",
+            "error_title": "Actie mislukt",
+            "generic_error": "Er is iets misgegaan. Probeer het opnieuw.",
+            "search_placeholder": "Zoeken op e-mail of naam",
+            "empty": "Geen gebruikers gevonden.",
+            "inactive": "Inactief",
+            "no_name": "Geen naam",
+            "last_seen": "Laatst gezien {{when}}",
+            "never_logged_in": "Nog nooit ingelogd",
+            "actions_aria": "Acties voor {{email}}",
+            "menu_label": "Account beheren",
+            "filter": {
+                "all": "Alle gebruikers",
+                "superusers": "Superbeheerders",
+                "no_2fa": "Zonder 2FA",
+                "unverified": "E-mail niet geverifieerd",
+                "dormant": "Inactief"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superbeheerder zonder 2FA",
+                "email_unverified": "E-mail niet geverifieerd",
+                "password_stale": "Wachtwoord ouder dan een jaar",
+                "email_change_pending": "E-mailwijziging in behandeling",
+                "dormant": "Inactief (90+ dagen)"
+            },
+            "role": {
+                "superuser": "Superbeheerder",
+                "user": "Gebruiker"
+            },
+            "action": {
+                "demote": "Superbeheerder-rechten intrekken",
+                "promote": "Superbeheerder maken",
+                "deactivate": "Account deactiveren",
+                "reactivate": "Account reactiveren",
+                "force_password_reset": "Wachtwoordreset afdwingen",
+                "reset_totp": "2FA resetten",
+                "delete": "Gebruiker verwijderen"
+            },
+            "confirm": {
+                "cancel": "Annuleren",
+                "confirm": "Bevestigen",
+                "delete_title": "Deze gebruiker verwijderen?",
+                "delete_body": "{{email}} permanent verwijderen. Dit kan niet ongedaan worden gemaakt.",
+                "reset-totp_title": "Tweefactorauthenticatie resetten?",
+                "reset-totp_body": "2FA uitschakelen voor {{email}}. De gebruiker moet het opnieuw instellen.",
+                "force-password-reset_title": "Wachtwoordreset afdwingen?",
+                "force-password-reset_body": "Het wachtwoord van {{email}} ongeldig maken en een reset vereisen bij de volgende aanmelding.",
+                "deactivate_title": "Dit account deactiveren?",
+                "deactivate_body": "{{email}} onmiddellijk uitloggen en aanmelding blokkeren tot het account is gereactiveerd.",
+                "demote_title": "Superbeheerder-toegang intrekken?",
+                "demote_body": "Superbeheerder-rechten verwijderen van {{email}}.",
+                "promote_title": "Superbeheerder-toegang verlenen?",
+                "promote_body": "{{email}} volledige superbeheerder-rechten verlenen over het platform."
             }
         }
     }

@@ -340,7 +340,9 @@
             "select_project": "Projekt auswählen",
             "concourses": "Aussagenpools",
             "concourse": "Aussagenpool",
-            "members": "Teammitglieder"
+            "members": "Teammitglieder",
+            "platform": "Plattform",
+            "users": "Benutzer"
         },
         "concourse": {
             "title": "Aussagenpool",
@@ -2182,6 +2184,63 @@
                     "comments": "Kartenkommentare",
                     "feedback": "Allgemeines Feedback"
                 }
+            }
+        },
+        "users": {
+            "title": "Benutzer",
+            "subtitle": "Plattformkonten verwalten und Sicherheitshygiene prüfen.",
+            "error_title": "Aktion fehlgeschlagen",
+            "generic_error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+            "search_placeholder": "Nach E-Mail oder Name suchen",
+            "empty": "Keine Benutzer gefunden.",
+            "inactive": "Inaktiv",
+            "no_name": "Kein Name",
+            "last_seen": "Zuletzt gesehen {{when}}",
+            "never_logged_in": "Noch nie angemeldet",
+            "actions_aria": "Aktionen für {{email}}",
+            "menu_label": "Konto verwalten",
+            "filter": {
+                "all": "Alle Benutzer",
+                "superusers": "Superbenutzer",
+                "no_2fa": "Ohne 2FA",
+                "unverified": "E-Mail nicht verifiziert",
+                "dormant": "Inaktiv"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superbenutzer ohne 2FA",
+                "email_unverified": "E-Mail nicht verifiziert",
+                "password_stale": "Passwort älter als ein Jahr",
+                "email_change_pending": "E-Mail-Änderung ausstehend",
+                "dormant": "Inaktiv (90+ Tage)"
+            },
+            "role": {
+                "superuser": "Superbenutzer",
+                "user": "Benutzer"
+            },
+            "action": {
+                "demote": "Superbenutzer-Rechte entziehen",
+                "promote": "Zum Superbenutzer machen",
+                "deactivate": "Konto deaktivieren",
+                "reactivate": "Konto reaktivieren",
+                "force_password_reset": "Passwortzurücksetzung erzwingen",
+                "reset_totp": "2FA zurücksetzen",
+                "delete": "Benutzer löschen"
+            },
+            "confirm": {
+                "cancel": "Abbrechen",
+                "confirm": "Bestätigen",
+                "delete_title": "Diesen Benutzer löschen?",
+                "delete_body": "{{email}} dauerhaft löschen. Dies kann nicht rückgängig gemacht werden.",
+                "reset-totp_title": "Zwei-Faktor-Authentifizierung zurücksetzen?",
+                "reset-totp_body": "2FA für {{email}} deaktivieren. Der Benutzer muss sie neu einrichten.",
+                "force-password-reset_title": "Passwortzurücksetzung erzwingen?",
+                "force-password-reset_body": "Das Passwort von {{email}} ungültig machen und beim nächsten Login eine Zurücksetzung verlangen.",
+                "deactivate_title": "Dieses Konto deaktivieren?",
+                "deactivate_body": "{{email}} sofort abmelden und die Anmeldung bis zur Reaktivierung sperren.",
+                "demote_title": "Superbenutzer-Zugang entziehen?",
+                "demote_body": "Superbenutzer-Rechte von {{email}} entfernen.",
+                "promote_title": "Superbenutzer-Zugang gewähren?",
+                "promote_body": "{{email}} vollständige Superbenutzer-Rechte auf der Plattform gewähren."
             }
         }
     }

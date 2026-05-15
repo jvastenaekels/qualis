@@ -340,7 +340,9 @@
             "select_project": "Selecionar projeto",
             "concourses": "Concursos",
             "concourse": "Concurso",
-            "members": "Membros da equipa"
+            "members": "Membros da equipa",
+            "platform": "Plataforma",
+            "users": "Utilizadores"
         },
         "concourse": {
             "title": "Concurso",
@@ -2182,6 +2184,63 @@
                     "comments": "Comentários às fichas",
                     "feedback": "Feedback geral"
                 }
+            }
+        },
+        "users": {
+            "title": "Utilizadores",
+            "subtitle": "Gerir contas da plataforma e auditar a higiene de acessos.",
+            "error_title": "Ação falhou",
+            "generic_error": "Algo correu mal. Por favor, tente novamente.",
+            "search_placeholder": "Pesquisar por e-mail ou nome",
+            "empty": "Nenhum utilizador corresponde.",
+            "inactive": "Inativo",
+            "no_name": "Sem nome",
+            "last_seen": "Visto pela última vez {{when}}",
+            "never_logged_in": "Nunca iniciou sessão",
+            "actions_aria": "Ações para {{email}}",
+            "menu_label": "Gerir conta",
+            "filter": {
+                "all": "Todos os utilizadores",
+                "superusers": "Superutilizadores",
+                "no_2fa": "Sem 2FA",
+                "unverified": "E-mail não verificado",
+                "dormant": "Inativo"
+            },
+            "risk": {
+                "superuser_no_2fa": "Superutilizador sem 2FA",
+                "email_unverified": "E-mail não verificado",
+                "password_stale": "Palavra-passe com mais de um ano",
+                "email_change_pending": "Alteração de e-mail pendente",
+                "dormant": "Inativo (90+ dias)"
+            },
+            "role": {
+                "superuser": "Superutilizador",
+                "user": "Utilizador"
+            },
+            "action": {
+                "demote": "Revogar acesso de superutilizador",
+                "promote": "Tornar superutilizador",
+                "deactivate": "Desativar conta",
+                "reactivate": "Reativar conta",
+                "force_password_reset": "Forçar redefinição de palavra-passe",
+                "reset_totp": "Repor 2FA",
+                "delete": "Eliminar utilizador"
+            },
+            "confirm": {
+                "cancel": "Cancelar",
+                "confirm": "Confirmar",
+                "delete_title": "Eliminar este utilizador?",
+                "delete_body": "Eliminar permanentemente {{email}}. Esta ação não pode ser revertida.",
+                "reset-totp_title": "Repor a autenticação de dois fatores?",
+                "reset-totp_body": "Desativar 2FA para {{email}}. Terá de a configurar novamente.",
+                "force-password-reset_title": "Forçar uma redefinição de palavra-passe?",
+                "force-password-reset_body": "Invalidar a palavra-passe de {{email}} e exigir uma redefinição no próximo início de sessão.",
+                "deactivate_title": "Desativar esta conta?",
+                "deactivate_body": "Terminar imediatamente a sessão de {{email}} e bloquear o acesso até ser reativada.",
+                "demote_title": "Revogar o acesso de superutilizador?",
+                "demote_body": "Remover os privilégios de superutilizador de {{email}}.",
+                "promote_title": "Conceder acesso de superutilizador?",
+                "promote_body": "Conceder a {{email}} plenos privilégios de superutilizador sobre a plataforma."
             }
         }
     }

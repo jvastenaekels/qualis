@@ -384,3 +384,13 @@ iat
 pwa
 new_email
 pending_email
+
+# --- admin-users feature ---
+# FastAPI route endpoints registered via @router decorators and the
+# User.last_login_at ORM column / UserReadAdmin schema field are read at
+# the JSON wire boundary and the login hook; vulture cannot see those
+# dynamic dispatch sites.
+last_login_at
+patch_user
+force_password_reset_endpoint
+reset_totp_endpoint

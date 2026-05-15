@@ -221,6 +221,12 @@ async def login_for_access_token(
         subject=user.email, expires_delta=access_token_expires
     )
 
+    # Record successful login for operator visibility and dormant-account
+    # detection. Only on the full-success path: not on requires_2fa
+    # responses (no session issued), not on wrong-password/wrong-2FA.
+    user.last_login_at = datetime.now(timezone.utc)
+    await db.commit()
+
     # token_type "bearer" is the OAuth2 literal, not a credential.
     return Token(access_token=access_token, token_type="bearer")  # nosec B106
 

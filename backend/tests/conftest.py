@@ -330,6 +330,134 @@ async def study_factory(db: AsyncSession):
 
 
 @pytest_asyncio.fixture
+async def regular_user(db: AsyncSession) -> User:
+    """Lightweight user for auth-flow tests that don't need project context.
+    Uses a distinct email/password so it never conflicts with ``test_user``,
+    which anchors the heavier ``test_project`` / ``seed_study`` fixture chain.
+    Use ``test_user`` instead when the test needs project membership."""
+    hashed = get_password_hash("regular-pw")
+    user = User(
+        email="regular@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def regular_user_token(regular_user: User) -> str:
+    """Bearer token (string, no header dict) for ``regular_user``.
+    Generated via the production ``create_access_token`` helper so ``iat`` is
+    populated correctly and the token behaves exactly like one minted by the
+    live /api/token login path."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=regular_user.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
+async def totp_user(db: AsyncSession) -> User:
+    """A user with app-channel TOTP enabled (password: 'totp-pw')."""
+    hashed = get_password_hash("totp-pw")
+    user = User(
+        email="totp@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified in this test
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def superuser(db: AsyncSession) -> User:
+    """An active superuser with TOTP enabled (password: 'super-pw').
+
+    Distinct email from ``regular_user``/``totp_user`` so it never collides.
+    2FA is enabled so this user can itself be a promotion target if needed
+    and so it satisfies any future "superuser must have 2FA" invariant."""
+    hashed = get_password_hash("super-pw")
+    user = User(
+        email="super@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_active=True,
+        is_superuser=True,
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified here
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def superuser_token(superuser: User) -> str:
+    """Bearer token (string, no header dict) for ``superuser``.
+    Generated via the production ``create_access_token`` helper so ``iat`` is
+    populated correctly and the token behaves exactly like one minted by the
+    live /api/token login path."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=superuser.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
+async def second_superuser(db: AsyncSession) -> User:
+    """A second active superuser with TOTP enabled (password: 'super2-pw').
+
+    Distinct email from ``superuser`` (super@example.com) so both can coexist
+    in the same test transaction. Used by tests that need ≥2 active superusers
+    to verify the at-least-one-active-superuser floor allows a demotion when
+    a spare remains."""
+    hashed = get_password_hash("super2-pw")
+    user = User(
+        email="super2@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_active=True,
+        is_superuser=True,
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified here
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def second_superuser_token(second_superuser: User) -> str:
+    """Bearer token (string, no header dict) for ``second_superuser``.
+    Mirrors the ``superuser_token`` pattern exactly."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=second_superuser.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
 def auth_token_factory():
     """Create JWT token for a user."""
     from datetime import timedelta

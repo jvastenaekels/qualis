@@ -350,6 +350,15 @@ disallow_any_explicit = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Admin-users feature — admin_user_service guard rails (full strict).
+# Pure guard-rail logic + verb actions; SQLAlchemy func.count(); no Any.
+module = ["app.services.admin_user_service"]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 # Security-floor pins (Wave 6): pygments, python-dotenv, requests, mako, and urllib3 are transitive
 # deps promoted to direct entries to prevent future downgrade past the
