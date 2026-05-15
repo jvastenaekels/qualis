@@ -12,8 +12,11 @@ abstract: >-
   participant voice.
 version: "0.6.7" # x-release-please-version
 date-released: "2026-05-15" # update manually when merging the release PR
-doi: "10.5281/zenodo.20199750"
+doi: "10.5281/zenodo.19985835"
 identifiers:
+  - type: doi
+    value: "10.5281/zenodo.19985835"
+    description: "Concept DOI (all versions of Qualis)"
   - type: doi
     value: "10.5281/zenodo.20199750"
     description: "Zenodo archive of Qualis v0.6.7"
