@@ -84,6 +84,7 @@ import type {
     SubmissionInput,
     TwoFAEnableRequest,
     UnlockStudyApiStudySlugUnlockPostParams,
+    UserAdminUpdate,
     UserCreate,
     UserUpdate,
     ValidateStudyImportApiAdminStudiesValidateImportPostBody,
@@ -134,7 +135,7 @@ import type {
     PaginatedResponseProjectMemberRead,
     PaginatedResponseProjectWithRole,
     PaginatedResponseStudyRead,
-    PaginatedResponseUserRead,
+    PaginatedResponseUserReadAdmin,
     ParticipantAudioRecording,
     ParticipantCardComment,
     ParticipantDetailRead,
@@ -161,6 +162,7 @@ import type {
     Token,
     UserCreateResponse,
     UserRead,
+    UserReadAdmin,
     ValidationResult,
     VerifyInvitationApiAdminInvitationsVerifyGet200,
 } from './model';
@@ -7860,7 +7862,7 @@ export const listUsersApiAdminUsersGet = (
     params?: ListUsersApiAdminUsersGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<PaginatedResponseUserRead>({
+    return customInstance<PaginatedResponseUserReadAdmin>({
         url: `/api/admin/users`,
         method: 'GET',
         params,
@@ -7983,36 +7985,53 @@ export function useListUsersApiAdminUsersGet<
 }
 
 /**
- * Create a new user.
- * @summary Create User
+ * Superuser-only flag update. One field at a time is fine.
+
+- is_active: toggle. Deactivating immediately invalidates the
+  target's bearer tokens (Task 3).
+- is_superuser: toggle. Promotion requires the target to have 2FA
+  enabled. Demotion is refused if it would leave the platform
+  without an active superuser, or if you're demoting yourself.
+- full_name: free text, 1-100 chars.
+
+CONCURRENCY: the ``assert_can_*`` guards, the flag mutation, and the
+single ``db.commit()`` all run against the one request-scoped session
+with NO intervening commit/rollback. ``_count_active_superusers``
+takes ``FOR UPDATE`` row locks that must be held until this commit,
+so demote/deactivate requests serialize and the "at least one active
+superuser" floor cannot be raced to zero. Do not introduce an early
+commit/rollback between the asserts and the final commit.
+ * @summary Patch User
  */
-export const createUserApiAdminUsersPost = (userCreate: UserCreate, signal?: AbortSignal) => {
-    return customInstance<UserRead>({
-        url: `/api/admin/users`,
-        method: 'POST',
+export const patchUserApiAdminUsersUserIdPatch = (
+    userId: number,
+    userAdminUpdate: UserAdminUpdate
+) => {
+    return customInstance<UserReadAdmin>({
+        url: `/api/admin/users/${userId}`,
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        data: userCreate,
-        signal,
+        data: userAdminUpdate,
     });
 };
 
-export const getCreateUserApiAdminUsersPostMutationOptions = <
+export const getPatchUserApiAdminUsersUserIdPatchMutationOptions = <
     TError = HTTPValidationError,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
+        Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>,
         TError,
-        { data: UserCreate },
+        { userId: number; data: UserAdminUpdate },
         TContext
     >;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
+    Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>,
     TError,
-    { data: UserCreate },
+    { userId: number; data: UserAdminUpdate },
     TContext
 > => {
-    const mutationKey = ['createUserApiAdminUsersPost'];
+    const mutationKey = ['patchUserApiAdminUsersUserIdPatch'];
     const { mutation: mutationOptions } = options
         ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
             ? options
@@ -8020,43 +8039,46 @@ export const getCreateUserApiAdminUsersPostMutationOptions = <
         : { mutation: { mutationKey } };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-        { data: UserCreate }
+        Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>,
+        { userId: number; data: UserAdminUpdate }
     > = (props) => {
-        const { data } = props ?? {};
+        const { userId, data } = props ?? {};
 
-        return createUserApiAdminUsersPost(data);
+        return patchUserApiAdminUsersUserIdPatch(userId, data);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type CreateUserApiAdminUsersPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>
+export type PatchUserApiAdminUsersUserIdPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>
 >;
-export type CreateUserApiAdminUsersPostMutationBody = UserCreate;
-export type CreateUserApiAdminUsersPostMutationError = HTTPValidationError;
+export type PatchUserApiAdminUsersUserIdPatchMutationBody = UserAdminUpdate;
+export type PatchUserApiAdminUsersUserIdPatchMutationError = HTTPValidationError;
 
 /**
- * @summary Create User
+ * @summary Patch User
  */
-export const useCreateUserApiAdminUsersPost = <TError = HTTPValidationError, TContext = unknown>(
+export const usePatchUserApiAdminUsersUserIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
+            Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>,
             TError,
-            { data: UserCreate },
+            { userId: number; data: UserAdminUpdate },
             TContext
         >;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
+    Awaited<ReturnType<typeof patchUserApiAdminUsersUserIdPatch>>,
     TError,
-    { data: UserCreate },
+    { userId: number; data: UserAdminUpdate },
     TContext
 > => {
-    const mutationOptions = getCreateUserApiAdminUsersPostMutationOptions(options);
+    const mutationOptions = getPatchUserApiAdminUsersUserIdPatchMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -8133,6 +8155,206 @@ export const useDeleteUserApiAdminUsersUserIdDelete = <
     TContext
 > => {
     const mutationOptions = getDeleteUserApiAdminUsersUserIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Superuser-only: force-rotate the target's password and invalidate
+every existing access token (F-03-010 via ``password_changed_at``).
+
+The heavy lifting lives in ``admin_user_service.force_password_reset``,
+which commits the session itself (fail-locked: the rotation persists
+even if SMTP is down — the email send follows the commit by design).
+ * @summary Force Password Reset Endpoint
+ */
+export const forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost = (
+    userId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<void>({
+        url: `/api/admin/users/${userId}/force-password-reset`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMutationOptions =
+    <TError = HTTPValidationError, TContext = unknown>(options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost
+                >
+            >,
+            TError,
+            { userId: number },
+            TContext
+        >;
+    }): UseMutationOptions<
+        Awaited<
+            ReturnType<typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost>
+        >,
+        TError,
+        { userId: number },
+        TContext
+    > => {
+        const mutationKey = ['forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost'];
+        const { mutation: mutationOptions } = options
+            ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+                ? options
+                : { ...options, mutation: { ...options.mutation, mutationKey } }
+            : { mutation: { mutationKey } };
+
+        const mutationFn: MutationFunction<
+            Awaited<
+                ReturnType<
+                    typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost
+                >
+            >,
+            { userId: number }
+        > = (props) => {
+            const { userId } = props ?? {};
+
+            return forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost(userId);
+        };
+
+        return { mutationFn, ...mutationOptions };
+    };
+
+export type ForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMutationResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost>
+        >
+    >;
+
+export type ForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Force Password Reset Endpoint
+ */
+export const useForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost
+                >
+            >,
+            TError,
+            { userId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof forcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost>>,
+    TError,
+    { userId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMutationOptions(
+            options
+        );
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Superuser-only: clear a user's TOTP (lost-authenticator recovery).
+
+The heavy lifting lives in ``admin_user_service.reset_totp``, which
+commits the session itself. By design it removes ONLY the second
+factor — it does NOT bump ``password_changed_at`` nor invalidate
+existing sessions; it is not a session-revocation tool.
+
+Allowed on superuser targets; this can transiently leave a superuser
+without 2FA (the 2FA-for-superuser rule is checked at promotion time,
+not continuously). The action is audit-logged.
+ * @summary Reset Totp Endpoint
+ */
+export const resetTotpEndpointApiAdminUsersUserIdResetTotpPost = (
+    userId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<void>({
+        url: `/api/admin/users/${userId}/reset-totp`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>,
+        TError,
+        { userId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>,
+    TError,
+    { userId: number },
+    TContext
+> => {
+    const mutationKey = ['resetTotpEndpointApiAdminUsersUserIdResetTotpPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>,
+        { userId: number }
+    > = (props) => {
+        const { userId } = props ?? {};
+
+        return resetTotpEndpointApiAdminUsersUserIdResetTotpPost(userId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ResetTotpEndpointApiAdminUsersUserIdResetTotpPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>
+>;
+
+export type ResetTotpEndpointApiAdminUsersUserIdResetTotpPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Reset Totp Endpoint
+ */
+export const useResetTotpEndpointApiAdminUsersUserIdResetTotpPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>,
+            TError,
+            { userId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof resetTotpEndpointApiAdminUsersUserIdResetTotpPost>>,
+    TError,
+    { userId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -17738,8 +17960,8 @@ export const getAcceptInvitationApiAdminInvitationsAcceptPostResponseMock =
     (): AcceptInvitationApiAdminInvitationsAcceptPost200 => ({});
 
 export const getListUsersApiAdminUsersGetResponseMock = (
-    overrideResponse: Partial<PaginatedResponseUserRead> = {}
-): PaginatedResponseUserRead => ({
+    overrideResponse: Partial<PaginatedResponseUserReadAdmin> = {}
+): PaginatedResponseUserReadAdmin => ({
     items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
             email: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -17774,6 +17996,21 @@ export const getListUsersApiAdminUsersGetResponseMock = (
                 ]),
                 undefined,
             ]),
+            email_verified_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            password_changed_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            last_login_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
         })
     ),
     total: faker.number.int({ min: undefined, max: undefined }),
@@ -17782,9 +18019,9 @@ export const getListUsersApiAdminUsersGetResponseMock = (
     ...overrideResponse,
 });
 
-export const getCreateUserApiAdminUsersPostResponseMock = (
-    overrideResponse: Partial<UserRead> = {}
-): UserRead => ({
+export const getPatchUserApiAdminUsersUserIdPatchResponseMock = (
+    overrideResponse: Partial<UserReadAdmin> = {}
+): UserReadAdmin => ({
     email: faker.string.alpha({ length: { min: 10, max: 20 } }),
     full_name: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
@@ -17809,6 +18046,15 @@ export const getCreateUserApiAdminUsersPostResponseMock = (
             },
             null,
         ]),
+        undefined,
+    ]),
+    email_verified_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    password_changed_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    last_login_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
     ...overrideResponse,
@@ -20730,10 +20976,10 @@ export const getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler = (
 
 export const getListUsersApiAdminUsersGetMockHandler = (
     overrideResponse?:
-        | PaginatedResponseUserRead
+        | PaginatedResponseUserReadAdmin
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<PaginatedResponseUserRead> | PaginatedResponseUserRead),
+          ) => Promise<PaginatedResponseUserReadAdmin> | PaginatedResponseUserReadAdmin),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -20754,14 +21000,16 @@ export const getListUsersApiAdminUsersGetMockHandler = (
     );
 };
 
-export const getCreateUserApiAdminUsersPostMockHandler = (
+export const getPatchUserApiAdminUsersUserIdPatchMockHandler = (
     overrideResponse?:
-        | UserRead
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UserRead> | UserRead),
+        | UserReadAdmin
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<UserReadAdmin> | UserReadAdmin),
     options?: RequestHandlerOptions
 ) => {
-    return http.post(
-        '*/api/admin/users',
+    return http.patch(
+        '*/api/admin/users/:userId',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -20769,9 +21017,9 @@ export const getCreateUserApiAdminUsersPostMockHandler = (
                         ? typeof overrideResponse === 'function'
                             ? await overrideResponse(info)
                             : overrideResponse
-                        : getCreateUserApiAdminUsersPostResponseMock()
+                        : getPatchUserApiAdminUsersUserIdPatchResponseMock()
                 ),
-                { status: 201, headers: { 'Content-Type': 'application/json' } }
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
         },
         options
@@ -20786,6 +21034,42 @@ export const getDeleteUserApiAdminUsersUserIdDeleteMockHandler = (
 ) => {
     return http.delete(
         '*/api/admin/users/:userId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users/:userId/force-password-reset',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users/:userId/reset-totp',
         async (info) => {
             if (typeof overrideResponse === 'function') {
                 await overrideResponse(info);
@@ -22237,8 +22521,10 @@ export const getQualisAPIMock = () => [
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
     getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
     getListUsersApiAdminUsersGetMockHandler(),
-    getCreateUserApiAdminUsersPostMockHandler(),
+    getPatchUserApiAdminUsersUserIdPatchMockHandler(),
     getDeleteUserApiAdminUsersUserIdDeleteMockHandler(),
+    getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMockHandler(),
+    getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMockHandler(),
     getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler(),
     getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandler(),
     getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler(),
