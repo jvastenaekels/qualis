@@ -18,6 +18,7 @@ from ...services.admin_user_service import (
     assert_can_deactivate,
     assert_can_demote_superuser,
     assert_can_promote_superuser,
+    force_password_reset,
 )
 from ...utils.audit import log_admin_action
 from ...utils.security import get_password_hash
@@ -154,6 +155,38 @@ async def patch_user(
             **changes,
         )
     return target
+
+
+@router.post(
+    "/{user_id}/force-password-reset", status_code=status.HTTP_204_NO_CONTENT
+)
+@limiter.limit("30/minute")
+async def force_password_reset_endpoint(
+    request: Request,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(check_superuser),
+) -> None:
+    """Superuser-only: force-rotate the target's password and invalidate
+    every existing access token (F-03-010 via ``password_changed_at``).
+
+    The heavy lifting lives in ``admin_user_service.force_password_reset``,
+    which commits the session itself (fail-locked: the rotation persists
+    even if SMTP is down — the email send follows the commit by design).
+    """
+    result = await db.execute(select(User).where(User.id == user_id))
+    target = result.scalar_one_or_none()
+    if target is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await force_password_reset(db=db, target=target)
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="force_password_reset",
+        resource="user",
+        resource_id=target.id,
+    )
+    return None
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

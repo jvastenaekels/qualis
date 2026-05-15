@@ -22,6 +22,7 @@ structurally unreachable and would be a wrong test.
 """
 
 import logging
+import time
 
 import pytest
 from httpx import AsyncClient
@@ -218,3 +219,66 @@ async def test_patch_noop_writes_no_audit_log(
         rendered = audit_records[0].getMessage()
         assert "action=patch" in rendered
         assert "resource=user" in rendered
+
+
+@pytest.mark.asyncio
+async def test_force_password_reset_invalidates_existing_tokens(
+    client: AsyncClient,
+    superuser_token: str,
+    regular_user: User,
+    regular_user_token: str,
+) -> None:
+    pre = await client.get(
+        "/api/me", headers={"Authorization": f"Bearer {regular_user_token}"}
+    )
+    assert pre.status_code == 200
+
+    # F-03-010 compares iat vs password_changed_at at epoch-SECOND
+    # resolution and allows equality (false-rejection guard,
+    # dependencies.py:71-73). The fixture token's iat and the reset's
+    # password_changed_at would otherwise land in the same wall-clock
+    # second → token survives. Sleep one second so password_changed_at
+    # strictly exceeds the token's iat. Mirrors the canonical F-03-010
+    # precedent in test_session_invalidation.py:108-110.
+    time.sleep(1)
+
+    resp = await client.post(
+        f"/api/admin/users/{regular_user.id}/force-password-reset",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 204
+
+    post = await client.get(
+        "/api/me", headers={"Authorization": f"Bearer {regular_user_token}"}
+    )
+    assert post.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_force_password_reset_kills_old_password(
+    client: AsyncClient,
+    superuser_token: str,
+    regular_user: User,
+) -> None:
+    resp = await client.post(
+        f"/api/admin/users/{regular_user.id}/force-password-reset",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 204
+
+    login = await client.post(
+        "/api/token",
+        data={"username": regular_user.email, "password": "regular-pw"},
+    )
+    assert login.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_force_password_reset_403_for_non_superuser(
+    client: AsyncClient, regular_user_token: str, regular_user: User
+) -> None:
+    resp = await client.post(
+        f"/api/admin/users/{regular_user.id}/force-password-reset",
+        headers={"Authorization": f"Bearer {regular_user_token}"},
+    )
+    assert resp.status_code == 403
