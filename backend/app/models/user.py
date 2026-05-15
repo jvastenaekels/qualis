@@ -51,6 +51,10 @@ class User(Base):
     # /email-change/cancel (without a swap). See migration
     # a3f1c2e9b4d7_add_pending_email_column.py.
     pending_email: Mapped[str | None] = mapped_column(String(254), nullable=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     # Relationships
     memberships: Mapped[list["ProjectMember"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
