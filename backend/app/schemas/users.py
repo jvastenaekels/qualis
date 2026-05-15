@@ -73,7 +73,7 @@ class UserAdminUpdate(BaseModel):
 
     @field_validator("full_name")
     @classmethod
-    def validate_full_name_(cls, v: str | None) -> str | None:
+    def validate_full_name(cls, v: str | None) -> str | None:
         return validate_non_empty_string(v)
 
 
