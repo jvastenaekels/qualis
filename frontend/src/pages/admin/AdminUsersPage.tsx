@@ -85,7 +85,12 @@ const RISK_ICON: Record<RiskBadge, typeof ShieldAlert> = {
     dormant: Clock,
 };
 
-type ActionKind = 'delete' | 'reset-totp' | 'force-password-reset' | 'toggle-superuser';
+type ActionKind =
+    | 'delete'
+    | 'reset-totp'
+    | 'force-password-reset'
+    | 'toggle-superuser'
+    | 'deactivate';
 
 // ────────────────────────────────────────────────────────────────
 // Pure presentational helpers (no business logic — formatting only)
@@ -96,6 +101,11 @@ function formatLastSeen(value: string | null | undefined): string | null {
     return new Date(value).toLocaleDateString();
 }
 
+// Deliberately surfaces the server's human-readable message and ignores the
+// resolved i18n key (unlike ProjectMembersPage, which prefers a mapped key):
+// backend guard-rail messages ("You cannot demote yourself.", "...must keep at
+// least one active superuser.") are not in ERROR_KEY, so mapping would swallow
+// the actionable reason. Do not reintroduce key-mapping here.
 function readMutationError(err: unknown, fallback: string): string {
     if (err && typeof err === 'object') {
         const { fallback: serverMessage } = resolveApiErrorKey(
@@ -132,6 +142,7 @@ export default function AdminUsersPage() {
         if (!pendingAction) return;
         const { kind, user } = pendingAction;
         if (kind === 'delete') await actions.delete(user);
+        else if (kind === 'deactivate') await actions.deactivate(user);
         else if (kind === 'reset-totp') await actions.resetTotp(user);
         else if (kind === 'force-password-reset') await actions.forcePasswordReset(user);
         else if (kind === 'toggle-superuser')
@@ -157,7 +168,10 @@ export default function AdminUsersPage() {
                     <AlertDescription>
                         {readMutationError(
                             mutationError,
-                            t('admin.users.generic_error', 'Action failed')
+                            t(
+                                'admin.users.generic_error',
+                                'Something went wrong. Please try again.'
+                            )
                         )}
                     </AlertDescription>
                 </Alert>
@@ -211,11 +225,7 @@ export default function AdminUsersPage() {
                                     now={now}
                                     isMutating={isMutating}
                                     onAction={(kind) => setPendingAction({ kind, user: u })}
-                                    onActivationToggle={(target) =>
-                                        target.is_active
-                                            ? actions.deactivate(target)
-                                            : actions.activate(target)
-                                    }
+                                    onReactivate={(target) => actions.activate(target)}
                                 />
                             ))}
                         </ul>
@@ -272,6 +282,8 @@ function confirmTitle(t: TFn, kind: ActionKind, user: AdminUser): string {
             return t('admin.users.confirm.reset-totp_title', 'Reset two-factor authentication?');
         case 'force-password-reset':
             return t('admin.users.confirm.force-password-reset_title', 'Force a password reset?');
+        case 'deactivate':
+            return t('admin.users.confirm.deactivate_title', 'Deactivate this account?');
         default:
             return user.is_superuser
                 ? t('admin.users.confirm.demote_title', 'Revoke superuser access?')
@@ -300,6 +312,12 @@ function confirmBody(t: TFn, kind: ActionKind, user: AdminUser): string {
                 'Invalidate the password for {{email}} and require a reset on next login.',
                 { email }
             );
+        case 'deactivate':
+            return t(
+                'admin.users.confirm.deactivate_body',
+                'Immediately log {{email}} out and block sign-in until reactivated.',
+                { email }
+            );
         default:
             return user.is_superuser
                 ? t(
@@ -324,13 +342,13 @@ function UserRow({
     now,
     isMutating,
     onAction,
-    onActivationToggle,
+    onReactivate,
 }: {
     user: AdminUser;
     now: Date;
     isMutating: boolean;
     onAction: (kind: ActionKind) => void;
-    onActivationToggle: (user: AdminUser) => void;
+    onReactivate: (user: AdminUser) => void;
 }) {
     const { t } = useTranslation();
     const badges = deriveRiskBadges(user, now);
@@ -422,14 +440,18 @@ function UserRow({
                             ? t('admin.users.action.demote', 'Revoke superuser')
                             : t('admin.users.action.promote', 'Make superuser')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                        disabled={isMutating}
-                        onSelect={() => onActivationToggle(user)}
-                    >
-                        {user.is_active
-                            ? t('admin.users.action.deactivate', 'Deactivate account')
-                            : t('admin.users.action.reactivate', 'Reactivate account')}
-                    </DropdownMenuItem>
+                    {user.is_active ? (
+                        <DropdownMenuItem
+                            disabled={isMutating}
+                            onSelect={() => onAction('deactivate')}
+                        >
+                            {t('admin.users.action.deactivate', 'Deactivate account')}
+                        </DropdownMenuItem>
+                    ) : (
+                        <DropdownMenuItem disabled={isMutating} onSelect={() => onReactivate(user)}>
+                            {t('admin.users.action.reactivate', 'Reactivate account')}
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                         disabled={isMutating}
                         onSelect={() => onAction('force-password-reset')}

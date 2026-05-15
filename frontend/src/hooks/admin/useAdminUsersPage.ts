@@ -16,7 +16,8 @@
  * - Pure risk-badge derivation (superuser_no_2fa, email_unverified,
  *   password_stale, email_change_pending, dormant)
  * - Risk-sorted filtered user list (memoized)
- * - Pending-action confirmation state (delete / reset-totp / force-password-reset / toggle-superuser)
+ * - Pending-action confirmation state (delete / reset-totp / force-password-reset /
+ *   toggle-superuser / deactivate)
  * - All admin mutations (deactivate, activate, promote, demote, forcePasswordReset, resetTotp, delete)
  *   with query invalidation on success
  *
@@ -100,7 +101,7 @@ export function useAdminUsersPage() {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<FilterMode>('all');
     const [pendingAction, setPendingAction] = useState<{
-        kind: 'delete' | 'reset-totp' | 'force-password-reset' | 'toggle-superuser';
+        kind: 'delete' | 'reset-totp' | 'force-password-reset' | 'toggle-superuser' | 'deactivate';
         user: AdminUser;
     } | null>(null);
 

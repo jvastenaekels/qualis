@@ -168,6 +168,49 @@ describe('AdminUsersPage', () => {
         expect(actions.forcePasswordReset).toHaveBeenCalledWith(target);
     });
 
+    it('Deactivate account requires confirmation: menu sets pendingAction, confirm calls deactivate', async () => {
+        const user = userEvent.setup();
+        const target = makeUser({ id: 9, email: 'active@example.org', is_active: true });
+        useAdminUsersPageMock.mockReturnValue(hookValue({ users: [target] }));
+        const { rerender } = renderWithProviders(<AdminUsersPage />);
+
+        // Clicking the menu item must NOT deactivate directly — it opens the confirm.
+        await user.click(screen.getByText(/deactivate account/i));
+        expect(setPendingAction).toHaveBeenCalledWith({ kind: 'deactivate', user: target });
+        expect(actions.deactivate).not.toHaveBeenCalled();
+
+        useAdminUsersPageMock.mockReturnValue(
+            hookValue({
+                users: [target],
+                pendingAction: { kind: 'deactivate', user: target },
+            })
+        );
+        rerender(<AdminUsersPage />);
+
+        // Confirm dialog shows the deactivate copy.
+        expect(screen.getByText(/deactivate this account\?/i)).toBeInTheDocument();
+        expect(
+            screen.getByText(/immediately log active@example\.org out and block sign-in/i)
+        ).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: /^confirm$/i }));
+        expect(actions.deactivate).toHaveBeenCalledTimes(1);
+        expect(actions.deactivate).toHaveBeenCalledWith(target);
+    });
+
+    it('Reactivate account is a direct call with no confirm dialog', async () => {
+        const user = userEvent.setup();
+        const target = makeUser({ id: 8, email: 'inactive@example.org', is_active: false });
+        useAdminUsersPageMock.mockReturnValue(hookValue({ users: [target] }));
+        renderWithProviders(<AdminUsersPage />);
+
+        await user.click(screen.getByText(/reactivate account/i));
+        expect(actions.activate).toHaveBeenCalledTimes(1);
+        expect(actions.activate).toHaveBeenCalledWith(target);
+        expect(setPendingAction).not.toHaveBeenCalled();
+        expect(screen.queryByText(/deactivate this account\?/i)).not.toBeInTheDocument();
+    });
+
     it('shows a destructive alert with the backend message when mutationError is set', () => {
         const err = Object.assign(new Error('You cannot demote yourself.'), {
             code: 'error',

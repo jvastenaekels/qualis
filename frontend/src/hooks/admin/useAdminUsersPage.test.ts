@@ -212,6 +212,22 @@ describe('useAdminUsersPage — filtered list integration', () => {
         expect(result.current.users[0].id).toBe(10);
     });
 
+    it("accepts a 'deactivate' pending action kind (union includes deactivate)", () => {
+        mockListUsersHook.mockReturnValue({
+            data: { items: [userA] },
+            isLoading: false,
+            error: null,
+        });
+
+        const { result } = renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
+
+        act(() => {
+            result.current.setPendingAction({ kind: 'deactivate', user: userA });
+        });
+
+        expect(result.current.pendingAction).toEqual({ kind: 'deactivate', user: userA });
+    });
+
     it('results are sorted by descending badge count (risky user appears first)', () => {
         mockListUsersHook.mockReturnValue({
             data: { items: [userB, userA] }, // B first in source, A is riskier
