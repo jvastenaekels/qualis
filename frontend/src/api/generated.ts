@@ -11850,6 +11850,319 @@ export function useGetStudyMemoApiAdminStudiesSidMemoGet<
 }
 
 /**
+ * @summary Export Concourse Memo
+ */
+export const exportConcourseMemoApiAdminConcoursesCidMemoExportGet = (
+    cid: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/concourses/${cid}/memo/export`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryKey = (cid?: number) => {
+    return [`/api/admin/concourses/${cid}/memo/export`] as const;
+};
+
+export const getExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryKey(cid);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>
+    > = ({ signal }) => exportConcourseMemoApiAdminConcoursesCidMemoExportGet(cid, signal);
+
+    return { queryKey, queryFn, enabled: !!cid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>
+>;
+export type ExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryError = HTTPValidationError;
+
+export function useExportConcourseMemoApiAdminConcoursesCidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportConcourseMemoApiAdminConcoursesCidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportConcourseMemoApiAdminConcoursesCidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Concourse Memo
+ */
+
+export function useExportConcourseMemoApiAdminConcoursesCidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportConcourseMemoApiAdminConcoursesCidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getExportConcourseMemoApiAdminConcoursesCidMemoExportGetQueryOptions(
+        cid,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Export Study Memo
+ */
+export const exportStudyMemoApiAdminStudiesSidMemoExportGet = (
+    sid: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${sid}/memo/export`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportStudyMemoApiAdminStudiesSidMemoExportGetQueryKey = (sid?: number) => {
+    return [`/api/admin/studies/${sid}/memo/export`] as const;
+};
+
+export const getExportStudyMemoApiAdminStudiesSidMemoExportGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getExportStudyMemoApiAdminStudiesSidMemoExportGetQueryKey(sid);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>
+    > = ({ signal }) => exportStudyMemoApiAdminStudiesSidMemoExportGet(sid, signal);
+
+    return { queryKey, queryFn, enabled: !!sid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ExportStudyMemoApiAdminStudiesSidMemoExportGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>
+>;
+export type ExportStudyMemoApiAdminStudiesSidMemoExportGetQueryError = HTTPValidationError;
+
+export function useExportStudyMemoApiAdminStudiesSidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportStudyMemoApiAdminStudiesSidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportStudyMemoApiAdminStudiesSidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Study Memo
+ */
+
+export function useExportStudyMemoApiAdminStudiesSidMemoExportGet<
+    TData = Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyMemoApiAdminStudiesSidMemoExportGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getExportStudyMemoApiAdminStudiesSidMemoExportGetQueryOptions(
+        sid,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * @summary Get Concourse Memo Unread
  */
 export const getConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGet = (
@@ -21818,6 +22131,42 @@ export const getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler = (
     );
 };
 
+export const getExportConcourseMemoApiAdminConcoursesCidMemoExportGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:cid/memo/export',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getExportStudyMemoApiAdminStudiesSidMemoExportGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:sid/memo/export',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
 export const getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetMockHandler = (
     overrideResponse?:
         | number
@@ -22555,6 +22904,8 @@ export const getQualisAPIMock = () => [
     getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMockHandler(),
     getGetConcourseMemoApiAdminConcoursesCidMemoGetMockHandler(),
     getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler(),
+    getExportConcourseMemoApiAdminConcoursesCidMemoExportGetMockHandler(),
+    getExportStudyMemoApiAdminStudiesSidMemoExportGetMockHandler(),
     getGetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetMockHandler(),
     getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetMockHandler(),
     getGetTemplatesApiAdminMemoTemplatesGetMockHandler(),

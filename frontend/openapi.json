@@ -5324,6 +5324,98 @@
         }
       }
     },
+    "/api/admin/concourses/{cid}/memo/export": {
+      "get": {
+        "tags": [
+          "admin-memos",
+          "memos"
+        ],
+        "summary": "Export Concourse Memo",
+        "operationId": "export_concourse_memo_api_admin_concourses__cid__memo_export_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{sid}/memo/export": {
+      "get": {
+        "tags": [
+          "admin-memos",
+          "memos"
+        ],
+        "summary": "Export Study Memo",
+        "operationId": "export_study_memo_api_admin_studies__sid__memo_export_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Sid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/concourses/{cid}/memo/unread": {
       "get": {
         "tags": [
