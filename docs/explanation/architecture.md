@@ -355,7 +355,12 @@ Qualis uses a two-tier RBAC system to balance global maintenance and fine-graine
 
 ### 1. Global Hierarchy
 
-- **Superuser**: Can manage all users in the system and perform global maintenance. Designated by `is_superuser: true` on the `User` model.
+- **Superuser**: a small, named set of platform operators. Holds exactly three platform-level powers, none of which bypass project tenancy:
+  - **User administration** — list all accounts with audit fields (`last_login_at`, `password_changed_at`, `email_verified_at`), deactivate, delete, promote/demote (promotion requires the target to have 2FA enabled), force a password reset, and reset 2FA. Exposed at the superuser-only page `/app/users` (frontend) and the `/api/admin/users` endpoints (`GET`, `PATCH /{id}`, `POST /{id}/force-password-reset`, `POST /{id}/reset-totp`, `DELETE /{id}`); guard rails live in `backend/app/services/admin_user_service.py`. There is no admin "create user" endpoint — onboarding is via `/register` + invitations.
+  - **Hard-delete an archived study** — a last resort beyond the project-owner ladder; the study must be `ARCHIVED` first.
+  - **Quota bypass** — exempt from `MAX_MEMBERS_PER_PROJECT` and `MAX_PROJECTS_AS_OWNER`.
+
+  A superuser does **not** automatically gain access to projects they aren't a member of: project-level RBAC (owner/member/viewer) is enforced independently. Designated by `is_superuser: true` on the `User` model. The first user created by `init_db.py` is bootstrapped as superuser; subsequent promotions are explicit, audit-logged, and refused unless the target has 2FA enabled. Two guard rails protect the platform: a superuser cannot demote or deactivate **themselves**, and the system refuses any change that would leave **zero active superusers** (lockout-proof; enforced under row locks to prevent a concurrent-demotion race). Deactivating an account immediately invalidates its bearer tokens; force-password-reset rotates the password and kills all existing sessions.
 - **User**: Standard account. Can be a member of one or more projects.
 
 ### 2. Project-Level Roles
