@@ -20,7 +20,7 @@ demo-up:
 	docker compose up --build -d
 
 demo-seed:
-	docker compose exec backend uv run python seed.py data/example-study.json
+	docker compose exec backend uv run python seed.py data/example-study.json --activate
 
 demo-smoke:
 	curl -fsS http://localhost:3000/ >/dev/null
