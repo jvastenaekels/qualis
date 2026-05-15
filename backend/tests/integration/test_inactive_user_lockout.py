@@ -27,3 +27,9 @@ async def test_inactive_user_token_rejected(
     # Same token, now refused.
     locked = await client.get("/api/me", headers=headers)
     assert locked.status_code == 401
+    # Security invariant: a deactivated user's token must be
+    # response-indistinguishable from an invalid/stale token — same 401,
+    # same generic message. If this ever returns the get_current_active_user
+    # 400 "Inactive user" body, that is an account-enumeration channel.
+    # Note: the error middleware wraps HTTPException.detail into {"message": ...}.
+    assert locked.json()["message"] == "Could not validate credentials"

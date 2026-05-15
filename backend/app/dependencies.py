@@ -92,6 +92,9 @@ async def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
     """Validate that the user is active."""
+    # Defense-in-depth: unreachable for token-bearing deactivated users
+    # since get_current_user already 401s on is_active=False. Kept as a
+    # belt-and-braces guard; do not rely on this 400 as a contract.
     if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
