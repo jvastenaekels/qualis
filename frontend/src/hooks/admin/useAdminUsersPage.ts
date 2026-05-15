@@ -81,6 +81,7 @@ export function deriveRiskBadges(u: AdminUser, now: Date): RiskBadge[] {
     }
     if (u.pending_email !== null && u.pending_email !== undefined)
         badges.push('email_change_pending');
+    if (isDormant(u, now)) badges.push('dormant');
     return badges;
 }
 
@@ -125,7 +126,7 @@ export function useAdminUsersPage() {
         mutation: { onSuccess: invalidate },
     });
 
-    const now = useMemo(() => new Date(), []);
+    const now = useMemo(() => new Date(), []); // intentional: page-lifetime clock (admin page is short-lived)
 
     const filtered = useMemo(() => {
         const items = data?.items ?? [];
@@ -164,6 +165,9 @@ export function useAdminUsersPage() {
         pendingAction,
         setPendingAction,
         now,
+        isMutating:
+            patch.isPending || del.isPending || forcePwReset.isPending || resetTotp.isPending,
+        mutationError: patch.error ?? del.error ?? forcePwReset.error ?? resetTotp.error ?? null,
         actions: {
             deactivate: (u: AdminUser) =>
                 patch.mutateAsync({ userId: u.id, data: { is_active: false } }),
