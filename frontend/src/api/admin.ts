@@ -201,4 +201,34 @@ export const AdminService = {
         if (!response.ok) throw new Error('Failed to export research package');
         return response.blob();
     },
+
+    /**
+     * Export a concourse memo (entries + comment audit trail) as Markdown.
+     * Uses raw fetch + blob: the orval customInstance forces .json() and
+     * cannot return a text/markdown body.
+     */
+    exportConcourseMemo: async (concourseId: number, signal?: AbortSignal) => {
+        const response = await fetch(`/api/admin/concourses/${concourseId}/memo/export`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+            signal,
+        });
+        if (!response.ok) throw new Error('Failed to export concourse memo');
+        return response.blob();
+    },
+
+    /**
+     * Export a study memo (entries + comment audit trail) as Markdown.
+     */
+    exportStudyMemo: async (studyId: number, signal?: AbortSignal) => {
+        const response = await fetch(`/api/admin/studies/${studyId}/memo/export`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+            signal,
+        });
+        if (!response.ok) throw new Error('Failed to export study memo');
+        return response.blob();
+    },
 };
