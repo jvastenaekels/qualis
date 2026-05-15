@@ -63,31 +63,36 @@ async def db_engine():
     await engine.dispose()
 
 
-_ENUM_TYPES = (
-    "studystate",
-    "participantstatus",
-    "recruitmentlinktype",
-    "concourseitemstatus",
-    "distributionmode",
-    "projectrole",
-    "memoparenttype",
-)
+async def _drop_schema(conn: AsyncConnection) -> None:
+    """Drop and recreate an empty ``public`` schema — leftover-proof.
+
+    The previous implementation called ``Base.metadata.drop_all`` plus an
+    explicit ``DROP TYPE`` of a *hardcoded* enum list.  That is not
+    leftover-proof: anything the current models no longer know about
+    survives — a stale ``alembic_version``, an enum not in the list, a
+    table left by an interrupted Alembic-driven integration run (those
+    drive Alembic via a subprocess against this *same* persistent
+    ``qualis_test`` DB).  A surviving ``projectrole`` enum then makes the
+    next ``create_all`` fail intermittently with ``duplicate key value
+    violates unique constraint "pg_type_typname_nsp_index"`` on whichever
+    test's reset first meets the unhandled leftover.
+
+    Dropping and recreating the whole ``public`` schema removes *every*
+    table, type, sequence and ``alembic_version`` unconditionally,
+    regardless of how a prior run left the database.  PostgreSQL DDL is
+    transactional, so this is atomic within the caller's transaction.
+    Leaving the schema *empty* (no ``create_all``) is the slate the
+    Alembic-driven integration tests assume on teardown.
+    """
+    await conn.execute(text("DROP SCHEMA public CASCADE"))
+    await conn.execute(text("CREATE SCHEMA public"))
+    await conn.execute(text("GRANT ALL ON SCHEMA public TO public"))
 
 
 async def _reset_schema(conn: AsyncConnection) -> None:
-    """Drop all tables then all custom ENUM types, then recreate.
-
-    SQLAlchemy's ``drop_all`` drops tables but silently skips PostgreSQL ENUM
-    types when those types are not referenced by any surviving table (e.g.
-    after a previous test left a dirty DB).  The stale ENUMs then make the
-    next ``create_all`` fail with ``duplicate key value violates unique
-    constraint "pg_type_typname_nsp_index"``.  We drop them explicitly with
-    ``IF EXISTS … CASCADE`` between the two DDL phases.
-    """
-    await conn.run_sync(Base.metadata.drop_all)
-    for type_name in _ENUM_TYPES:
-        await conn.execute(text(f"DROP TYPE IF EXISTS {type_name} CASCADE"))
-    await conn.run_sync(lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True))
+    """Empty the ``public`` schema, then create the current model schema."""
+    await _drop_schema(conn)
+    await conn.run_sync(Base.metadata.create_all)
 
 
 @pytest_asyncio.fixture
@@ -114,12 +119,11 @@ async def db(db_engine):
     async with TestingSessionLocal() as session:
         yield session
 
-    # Drop tables and ENUM types — symmetric with setup so the next test
-    # starts from a truly clean slate.
+    # Leave an empty schema (no tables, no enums, no alembic_version) so the
+    # next test — and any Alembic-driven integration test that bypasses this
+    # fixture — starts from a truly clean slate.
     async with db_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        for type_name in _ENUM_TYPES:
-            await conn.execute(text(f"DROP TYPE IF EXISTS {type_name} CASCADE"))
+        await _drop_schema(conn)
 
 
 @pytest_asyncio.fixture
