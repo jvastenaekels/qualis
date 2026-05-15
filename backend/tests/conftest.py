@@ -420,6 +420,44 @@ async def superuser_token(superuser: User) -> str:
 
 
 @pytest_asyncio.fixture
+async def second_superuser(db: AsyncSession) -> User:
+    """A second active superuser with TOTP enabled (password: 'super2-pw').
+
+    Distinct email from ``superuser`` (super@example.com) so both can coexist
+    in the same test transaction. Used by tests that need ≥2 active superusers
+    to verify the at-least-one-active-superuser floor allows a demotion when
+    a spare remains."""
+    hashed = get_password_hash("super2-pw")
+    user = User(
+        email="super2@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),
+        is_active=True,
+        is_superuser=True,
+        is_totp_enabled=True,
+        totp_channel="app",
+        totp_secret="JBSWY3DPEHPK3PXP",  # valid base32 dummy — never verified here
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def second_superuser_token(second_superuser: User) -> str:
+    """Bearer token (string, no header dict) for ``second_superuser``.
+    Mirrors the ``superuser_token`` pattern exactly."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    return create_access_token(
+        subject=second_superuser.email, expires_delta=timedelta(minutes=30)
+    )
+
+
+@pytest_asyncio.fixture
 def auth_token_factory():
     """Create JWT token for a user."""
     from datetime import timedelta

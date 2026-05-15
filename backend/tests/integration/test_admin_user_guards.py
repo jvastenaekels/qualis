@@ -5,7 +5,23 @@ string ``HTTPException.detail`` into the StandardError envelope
 ``{"code", "message", "details"}`` — so the human-readable message lives at
 ``resp.json()["message"]``, NOT ``["detail"]``. This mirrors the proven
 pattern in ``test_inactive_user_lockout.py``.
+
+NOTE — non-constructibility of the distinct-actor floor refusal at integration
+level: the at-least-one-active-superuser floor (refusing demote/deactivate
+when only one active superuser remains) cannot be triggered by two *distinct*
+actors via sequential HTTP calls. ``check_superuser`` requires the caller to
+be an active superuser, so whenever the target is a *different* active
+superuser, the count is already ≥ 2 and the floor (``<= 1``) cannot fire.
+The only reachable path to count == 1 is through self-action (blocked by the
+self-demote guard) or concurrency (serialised by ``FOR UPDATE`` row locks in
+``_count_active_superusers``). That concurrency invariant is covered by the
+T5 unit tests (``test_admin_user_service.py``, mutation-tested) and the
+contract comment in ``admin_user_service.py``. Do not add an integration test
+that demotes a distinct last-active superuser and expects 400 — it is
+structurally unreachable and would be a wrong test.
 """
+
+import logging
 
 import pytest
 from httpx import AsyncClient
@@ -112,3 +128,93 @@ async def test_patch_user_403_when_caller_not_superuser(
         headers={"Authorization": f"Bearer {regular_user_token}"},
     )
     assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_patch_demote_one_of_two_superusers_succeeds(
+    client: AsyncClient,
+    superuser: User,
+    superuser_token: str,
+    second_superuser: User,
+    db: AsyncSession,
+) -> None:
+    """Positive control: the floor ALLOWS demotion when a second active superuser
+    remains after the change. Two active superusers exist; removing one leaves
+    one → count stays >= 1 → 200."""
+    resp = await client.patch(
+        f"/api/admin/users/{second_superuser.id}",
+        json={"is_superuser": False},
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 200
+    await db.refresh(second_superuser)
+    assert second_superuser.is_superuser is False
+
+
+@pytest.mark.asyncio
+async def test_patch_self_deactivate_and_demote_combined_refused(
+    client: AsyncClient,
+    superuser: User,
+    superuser_token: str,
+) -> None:
+    """The combined-field self path. When a superuser PATCHes themselves with
+    both is_superuser=False and is_active=False, the self-deactivate guard fires
+    first (assert_can_deactivate runs before assert_can_demote_superuser in the
+    router) and returns 400 with 'yourself' in the message."""
+    resp = await client.patch(
+        f"/api/admin/users/{superuser.id}",
+        json={"is_superuser": False, "is_active": False},
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 400
+    assert "yourself" in resp.json()["message"]
+
+
+@pytest.mark.asyncio
+async def test_patch_noop_writes_no_audit_log(
+    client: AsyncClient,
+    superuser: User,
+    superuser_token: str,
+    regular_user: User,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A no-op PATCH (body sets a field to its current value) must not emit
+    an audit log entry — spamming the audit trail with identity mutations
+    obscures real changes. Conversely, a real mutation MUST emit exactly one
+    entry. Both directions are pinned here so the test proves the guard works
+    both ways, not merely that the mock never fires.
+
+    Uses ``caplog`` on logger ``app.audit`` — the same pattern as
+    ``tests/security/wave_4/test_subject_rights.py::test_article_17_audit_trail``.
+    """
+    # --- no-op path: is_active=True when regular_user.is_active is already True ---
+    assert regular_user.is_active is True  # guard: fixture must be active
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        resp = await client.patch(
+            f"/api/admin/users/{regular_user.id}",
+            json={"is_active": True},
+            headers={"Authorization": f"Bearer {superuser_token}"},
+        )
+        assert resp.status_code == 200
+        audit_records = [r for r in caplog.records if r.name == "app.audit"]
+        assert audit_records == [], (
+            f"No-op PATCH must not emit audit entries; got: {audit_records}"
+        )
+
+    # --- real-change path: mutate full_name → audit entry is emitted ---
+    with caplog.at_level(logging.INFO, logger="app.audit"):
+        caplog.clear()
+        resp = await client.patch(
+            f"/api/admin/users/{regular_user.id}",
+            json={"full_name": "Audit Canary"},
+            headers={"Authorization": f"Bearer {superuser_token}"},
+        )
+        assert resp.status_code == 200
+        audit_records = [r for r in caplog.records if r.name == "app.audit"]
+        assert len(audit_records) == 1, (
+            f"Real-change PATCH must emit exactly one audit entry; got: {audit_records}"
+        )
+        rendered = audit_records[0].getMessage()
+        assert "action=patch" in rendered
+        assert "resource=user" in rendered
