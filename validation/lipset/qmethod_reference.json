@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "description": "Frozen qmethod reference solution for the Lipset (1963) Q dataset.",
+    "package": "qmethod",
+    "version": "1.8.4",
+    "dataset": "lipset",
+    "call": "qmethod(lipset[[1]], nfactors=3, rotation='varimax', forced=TRUE)",
+    "extraction": "PCA",
+    "rotation": "varimax",
+    "flagging": "automatic",
+    "provenance": "Lipset (1963), 'The Value Patterns of Democracy'; dataset distributed with the qmethod R package (Zabala 2014) under GPL-2-or-later.",
+    "regenerate": "validation/lipset/qmethod_reference.R"
+  },
+  "qsorts": [
+    "US1",
+    "US2",
+    "US3",
+    "US4",
+    "JP5",
+    "CA6",
+    "UK7",
+    "US8",
+    "FR9"
+  ],
+  "loadings": {
+    "US1": [
+      0.1909,
+      0.765831,
+      -0.168299
+    ],
+    "US2": [
+      -0.065524,
+      0.825785,
+      0.106744
+    ],
+    "US3": [
+      0.810739,
+      -0.016421,
+      -0.092943
+    ],
+    "US4": [
+      0.775649,
+      0.229836,
+      0.271155
+    ],
+    "JP5": [
+      -0.833453,
+      0.154382,
+      0.025541
+    ],
+    "CA6": [
+      0.146058,
+      -0.184522,
+      0.884875
+    ],
+    "UK7": [
+      0.141311,
+      -0.348622,
+      0.739003
+    ],
+    "US8": [
+      -0.089066,
+      0.662526,
+      -0.170488
+    ],
+    "FR9": [
+      0.203772,
+      -0.182841,
+      -0.448139
+    ]
+  },
+  "flagged": {
+    "US1": [
+      false,
+      true,
+      false
+    ],
+    "US2": [
+      false,
+      true,
+      false
+    ],
+    "US3": [
+      true,
+      false,
+      false
+    ],
+    "US4": [
+      true,
+      false,
+      false
+    ],
+    "JP5": [
+      true,
+      false,
+      false
+    ],
+    "CA6": [
+      false,
+      false,
+      true
+    ],
+    "UK7": [
+      false,
+      false,
+      true
+    ],
+    "US8": [
+      false,
+      true,
+      false
+    ],
+    "FR9": [
+      false,
+      false,
+      true
+    ]
+  }
+}

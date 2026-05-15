@@ -10,6 +10,7 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19985835.svg)](https://doi.org/10.5281/zenodo.19985835)
 
 <p align="center">
   <img src="participant-landing.png" alt="Participant landing page" width="31%" />

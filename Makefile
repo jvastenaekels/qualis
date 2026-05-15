@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: install run-backend run-frontend seed demo-up demo-seed demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
+.PHONY: install run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
 
 install:
 	cd backend && uv sync
@@ -20,7 +20,13 @@ demo-up:
 	docker compose up --build -d
 
 demo-seed:
-	docker compose exec backend uv run python seed.py data/example-study.json
+	docker compose exec backend uv run python seed.py data/example-study.json --activate
+
+demo-lipset:
+	docker compose exec backend uv run python seed_lipset.py
+
+validate-lipset:
+	python3 validation/lipset/compare.py
 
 demo-smoke:
 	curl -fsS http://localhost:3000/ >/dev/null

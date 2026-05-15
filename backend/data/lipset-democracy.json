@@ -1,0 +1,259 @@
+{
+  "slug": "lipset-democracy",
+  "translations": {
+    "en": {
+      "title": "Lipset: Value Patterns of Democracy",
+      "description": "Real published Q dataset (Lipset 1963, 'The Value Patterns of Democracy'), distributed with the qmethod R package (Zabala 2014, GPL-2-or-later). 33 statements, 9 Q-sorts, forced distribution -4..+4. Used in Qualis as an analytical validation example: Qualis should reproduce the qmethod factor solution.",
+      "instruction": "Sort each statement by how strongly it reflects the value pattern, from least to most characteristic.",
+      "consent_text": "This study reuses the openly published Lipset (1963) Q dataset distributed with the qmethod R package (GPL-2-or-later). No new participant data is collected.",
+      "thank_you_text": "This is a published-data validation example; no new data is collected."
+    }
+  },
+  "default_language_code": "en",
+  "grid_config": [
+    {
+      "score": -4,
+      "capacity": 2
+    },
+    {
+      "score": -3,
+      "capacity": 3
+    },
+    {
+      "score": -2,
+      "capacity": 4
+    },
+    {
+      "score": -1,
+      "capacity": 5
+    },
+    {
+      "score": 0,
+      "capacity": 5
+    },
+    {
+      "score": 1,
+      "capacity": 5
+    },
+    {
+      "score": 2,
+      "capacity": 4
+    },
+    {
+      "score": 3,
+      "capacity": 3
+    },
+    {
+      "score": 4,
+      "capacity": 2
+    }
+  ],
+  "statements": [
+    {
+      "code": "S01",
+      "translations": {
+        "en": "We accept improvements in the status and power of the lower classes without feeling morally offended."
+      }
+    },
+    {
+      "code": "S02",
+      "translations": {
+        "en": "All men are expected to try to improve their position vis-a-vis others. "
+      }
+    },
+    {
+      "code": "S03",
+      "translations": {
+        "en": "Success in life by a previously deprived person is resented."
+      }
+    },
+    {
+      "code": "S04",
+      "translations": {
+        "en": "Men can expect, and within limits receive, fair treatment according to their merits."
+      }
+    },
+    {
+      "code": "S05",
+      "translations": {
+        "en": "Lower-class individuals and groups do not have revolutionary inclinations."
+      }
+    },
+    {
+      "code": "S06",
+      "translations": {
+        "en": "Political goals and methods are relatively moderate in this country -- and even conservative."
+      }
+    },
+    {
+      "code": "S07",
+      "translations": {
+        "en": "We believe that those born to high place in society should retain it, more or less automatically."
+      }
+    },
+    {
+      "code": "S08",
+      "translations": {
+        "en": "We take the view that anyone with wealth deserves a place in any high society if he wishes it."
+      }
+    },
+    {
+      "code": "S09",
+      "translations": {
+        "en": "We try to eliminate the privileged classes in this country -- socially and economically."
+      }
+    },
+    {
+      "code": "S10",
+      "translations": {
+        "en": "We accept aristocratic-type titles and other honors."
+      }
+    },
+    {
+      "code": "S11",
+      "translations": {
+        "en": "The government has its secrets, and this is generally accepted without much resentment."
+      }
+    },
+    {
+      "code": "S12",
+      "translations": {
+        "en": "We place great emphasis on publicity in political matters: there should be no secrets."
+      }
+    },
+    {
+      "code": "S13",
+      "translations": {
+        "en": "We are encouraged to think of ourselves as competing for success -- on our own merits."
+      }
+    },
+    {
+      "code": "S14",
+      "translations": {
+        "en": "You can tell the social status of a person the moment he opens his mouth -- his manner of speech gives him away."
+      }
+    },
+    {
+      "code": "S15",
+      "translations": {
+        "en": "We tend to take the law into our own hands, through mob action and the organization of vigilantes."
+      }
+    },
+    {
+      "code": "S16",
+      "translations": {
+        "en": "We like to think of close ties to the Mother Country -- as Britain still is for many."
+      }
+    },
+    {
+      "code": "S17",
+      "translations": {
+        "en": "We prefer companionship and a helping hand as required, freely given."
+      }
+    },
+    {
+      "code": "S18",
+      "translations": {
+        "en": "There is some disdain for acquiring wealth for its own sake."
+      }
+    },
+    {
+      "code": "S19",
+      "translations": {
+        "en": "High value is placed on activities aimed at protecting and promoting the standing of the \"underdog\" in this country."
+      }
+    },
+    {
+      "code": "S20",
+      "translations": {
+        "en": "We like the idea of a welfare state: each of us looks after his own best interests this way."
+      }
+    },
+    {
+      "code": "S21",
+      "translations": {
+        "en": "We value the \"race for success.\""
+      }
+    },
+    {
+      "code": "S22",
+      "translations": {
+        "en": "Corrupt means of achieving success are accepted: for example, we put up with boss rule, and corruption in trade unions."
+      }
+    },
+    {
+      "code": "S23",
+      "translations": {
+        "en": "It is an axiom that there is one law for the rich and another for the poor: the rich man can usually get his way in court."
+      }
+    },
+    {
+      "code": "S24",
+      "translations": {
+        "en": "Lack of respect for the police, and law enforcement is evident."
+      }
+    },
+    {
+      "code": "S25",
+      "translations": {
+        "en": "Trust in the police has sunk deeply into our national character: basically we like and trust the police."
+      }
+    },
+    {
+      "code": "S26",
+      "translations": {
+        "en": "The worth of a man is judged by what he is -- not by whether he has gone to a private college, a state university, or to neither."
+      }
+    },
+    {
+      "code": "S27",
+      "translations": {
+        "en": "We have deep respect, when all is said and done, for the elite -- the rich, the educated, the social elite."
+      }
+    },
+    {
+      "code": "S28",
+      "translations": {
+        "en": "We are tolerant of popular opinion: we are essentially middle-of-the-roaders in politics. Extremes don't go down well with us."
+      }
+    },
+    {
+      "code": "S29",
+      "translations": {
+        "en": "We still believe that the poor on earth will enjoy higher status in after-life."
+      }
+    },
+    {
+      "code": "S30",
+      "translations": {
+        "en": "There is considerable respect for civil liberties and minority rights in this country."
+      }
+    },
+    {
+      "code": "S31",
+      "translations": {
+        "en": "Virtue tends to be its own reward in this country, for one's self and one's children."
+      }
+    },
+    {
+      "code": "S32",
+      "translations": {
+        "en": "We believe that the position of depressed classes must be raised, that they are morally as good as any others."
+      }
+    },
+    {
+      "code": "S33",
+      "translations": {
+        "en": "Here, the emphasis is on \"getting ahead.\""
+      }
+    }
+  ],
+  "presort_config": {},
+  "rough_sort_enabled": false,
+  "postsort_config": {
+    "email_collection_enabled": false,
+    "interview_consent_enabled": false,
+    "newsletter_consent_enabled": false,
+    "questions": {}
+  }
+}

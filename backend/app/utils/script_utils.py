@@ -139,11 +139,17 @@ class APIClient:
         return data
 
 
-async def sync_study_from_file(json_path: str) -> None:
+async def sync_study_from_file(json_path: str, activate: bool = False) -> None:
     """Idempotent sync of study data from JSON file.
 
     Handles creation if missing, or update if existing.
     If updating, handles 'Safe Update' by temporarily switching to Draft.
+
+    When ``activate`` is True, the study is transitioned to the ``active``
+    state after sync (idempotent) so it is submission-ready — used by the
+    demo seed so ``make demo-seed`` yields a study a reviewer can replay
+    end to end. The generic seeder default (``activate=False``) is
+    unchanged.
     """
     if not os.path.exists(json_path):
         print(f"Error: File {json_path} not found.")
@@ -198,6 +204,16 @@ async def sync_study_from_file(json_path: str) -> None:
                 if needs_state_restoration:
                     print(f"Restoring study state to '{original_state}'...")
                     await api.set_study_state(str(slug), str(original_state))
+
+        # 3. Optionally make the study submission-ready (demo seed).
+        if activate:
+            current = await api.get_study(str(slug))
+            if current is not None and str(current["state"]) != "active":
+                print(f"Activating study '{slug}' (submission-ready)...")
+                await api.set_study_state(str(slug), "active")
+                print(f"Study '{slug}' is now active.")
+            else:
+                print(f"Study '{slug}' already active.")
 
     finally:
         await api.close()

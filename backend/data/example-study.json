@@ -131,7 +131,60 @@
     }}
   ],
   "presort_config": {},
+  "rough_sort_enabled": true,
   "postsort_config": {
-    "fields": []
+    "email_collection_enabled": false,
+    "interview_consent_enabled": false,
+    "newsletter_consent_enabled": false,
+    "questions": {
+      "q_rationale": {
+        "type": "textarea",
+        "label": {
+          "en": "Briefly explain why you placed the statements at the two extremes (+4 and -4).",
+          "fr": "Expliquez brièvement pourquoi vous avez placé les énoncés aux deux extrêmes (+4 et -4)."
+        },
+        "required": true,
+        "rows": 4
+      },
+      "q_perspective": {
+        "type": "select",
+        "label": {
+          "en": "Which perspective best describes your relationship to the coastal wetland?",
+          "fr": "Quelle perspective décrit le mieux votre lien avec la zone humide côtière ?"
+        },
+        "required": true,
+        "options": [
+          {
+            "value": "resident",
+            "label": { "en": "Local resident", "fr": "Habitant·e local·e" }
+          },
+          {
+            "value": "tourism",
+            "label": { "en": "Tourism operator", "fr": "Acteur·rice du tourisme" }
+          },
+          {
+            "value": "conservation",
+            "label": { "en": "Conservation manager", "fr": "Gestionnaire de conservation" }
+          },
+          {
+            "value": "fisher",
+            "label": { "en": "Fisher", "fr": "Pêcheur·euse" }
+          }
+        ]
+      },
+      "q_confidence": {
+        "type": "rating",
+        "label": {
+          "en": "How confident are you that your sort reflects your view?",
+          "fr": "Dans quelle mesure êtes-vous confiant·e que votre tri reflète votre point de vue ?"
+        },
+        "required": false,
+        "scale_points": 5,
+        "scale_labels": {
+          "left": { "en": "Not confident", "fr": "Peu confiant·e" },
+          "right": { "en": "Very confident", "fr": "Très confiant·e" }
+        }
+      }
+    }
   }
 }

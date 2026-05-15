@@ -132,7 +132,7 @@ The Condition of Instruction tells participants the mental frame through which t
 > - **Avoid moral framings** (*"good vs bad"*, *"right vs wrong"*) unless that is exactly the question — they collapse subjectivity onto a single axis.
 > - **Pilot the CoI on three or four colleagues** and ask them to paraphrase it back. If three of them paraphrase differently, the CoI is ambiguous.
 >
-> Critical Q-methodologists treat CoI design as a reflexive moment in itself: the choice of frame is a research decision worth documenting. The Condition tab is also where the **rough-sort toggle** and the post-sort defaults live — see Step 8 for a discussion of when to enable rough-sort.
+> Treat CoI design as a research decision worth documenting: the choice of frame shapes what you can discover, so record why you phrased it as you did. The Condition tab is also where the **rough-sort toggle** and the post-sort defaults live — see Step 8 for a discussion of when to enable rough-sort.
 
 ---
 

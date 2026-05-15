@@ -7,11 +7,19 @@ abstract: >-
   the complete Q-methodology workflow — study design, recruitment,
   online data collection, factor analysis, and export — into a single
   platform. It supports any device, multilingual studies, and exports
-  to PQMethod, Ken-Q Analysis, and the R qmethod package. Designed for
-  critical Q-methodology practice, with attention to transparency of
-  analytical choices and integration of post-sort participant voice.
+  to PQMethod, Ken-Q Analysis, and the R qmethod package. It supports
+  transparency of analytical choices and integration of post-sort
+  participant voice.
 version: "0.6.7" # x-release-please-version
-date-released: "2026-05-02" # update manually when merging the release PR
+date-released: "2026-05-15" # update manually when merging the release PR
+doi: "10.5281/zenodo.19985835"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.19985835"
+    description: "Concept DOI (all versions of Qualis)"
+  - type: doi
+    value: "10.5281/zenodo.20199750"
+    description: "Zenodo archive of Qualis v0.6.7"
 url: "https://github.com/jvastenaekels/qualis"
 repository-code: "https://github.com/jvastenaekels/qualis"
 license: "AGPL-3.0-or-later"
@@ -34,7 +42,6 @@ authors:
 # This distinction is documented in the README ## Acknowledgments section.
 keywords:
   - "Q methodology"
-  - "critical Q methodology"
   - "factor analysis"
   - "subjectivity research"
   - "online data collection"
