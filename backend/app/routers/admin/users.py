@@ -84,13 +84,9 @@ async def patch_user(
         if patch.is_active is False:
             await assert_can_deactivate(db=db, actor=current_user, target=target)
         if patch.is_superuser is True:
-            await assert_can_promote_superuser(
-                db=db, actor=current_user, target=target
-            )
+            await assert_can_promote_superuser(db=db, actor=current_user, target=target)
         if patch.is_superuser is False:
-            await assert_can_demote_superuser(
-                db=db, actor=current_user, target=target
-            )
+            await assert_can_demote_superuser(db=db, actor=current_user, target=target)
     except AdminUserError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -119,9 +115,7 @@ async def patch_user(
     return target
 
 
-@router.post(
-    "/{user_id}/force-password-reset", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.post("/{user_id}/force-password-reset", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
 async def force_password_reset_endpoint(
     request: Request,
