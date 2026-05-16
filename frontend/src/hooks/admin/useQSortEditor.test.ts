@@ -10,10 +10,12 @@
  * (existing 17 + W4 characterization tests = the oracle).
  */
 
-import { renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { StudyUpdate } from '@/api/model';
+import type { StudyRead, StudyUpdate } from '@/api/model';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { arrayMove } from '@dnd-kit/sortable';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (_k: string, d?: string) => d ?? _k }),
@@ -65,6 +67,21 @@ const seedDraft: StudyUpdate = {
     translations: [{ language_code: 'en' }],
 } as unknown as StudyUpdate;
 
+/** Three-statement draft used in reorder + import tests */
+const multiDraft: StudyUpdate = {
+    statements: [
+        { code: 'a', translations: [{ language_code: 'en', text: 'Alpha' }] },
+        { code: 'b', translations: [{ language_code: 'en', text: 'Beta' }] },
+        { code: 'c', translations: [{ language_code: 'en', text: 'Gamma' }] },
+    ],
+    grid_config: [
+        { score: -1, capacity: 1 },
+        { score: 0, capacity: 1 },
+        { score: 1, capacity: 1 },
+    ],
+    translations: [{ language_code: 'en' }],
+} as unknown as StudyUpdate;
+
 beforeEach(() => {
     vi.clearAllMocks();
     mockStaleQuery.mockReturnValue({ data: undefined });
@@ -88,5 +105,238 @@ describe('useQSortEditor — initial shape', () => {
         expect(result.current.dnd.sensors).toBeDefined();
         expect(typeof result.current.bulk.setBulkText).toBe('function');
         expect(result.current.dialogs.importDialogOpen).toBe(false);
+    });
+});
+
+// ── 1. Import-format detection ────────────────────────────────────────────────
+// Drives `setBulkText` with a CSV-like "list" line and then a TSV header line;
+// asserts that `detectedFormat` updates as the useEffect derives it from the
+// text content (pure derived state — no mock tautology).
+describe('useQSortEditor — import-format detection', () => {
+    it('detects "list" format from code:text pattern, then "excel" from TSV header', async () => {
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        // Initially format is null
+        expect(result.current.bulk.detectedFormat.type).toBeNull();
+
+        // Set a "list" sample — matches /^([a-zA-Z0-9_-]{1,15})\s*[:,-]\s+/
+        act(() => {
+            result.current?.bulk.setBulkText('s1: This is a statement\ns2: Another statement');
+        });
+        await waitFor(() => {
+            expect(result.current?.bulk.detectedFormat.type).toBe('list');
+        });
+        expect(result.current.bulk.detectedFormat.hasCode).toBe(true);
+
+        // Now set a TSV header sample — first line contains tab + 'code' + 'en'
+        act(() => {
+            result.current?.bulk.setBulkText('code\ten\ns1\tFirst statement');
+        });
+        await waitFor(() => {
+            expect(result.current?.bulk.detectedFormat.type).toBe('excel');
+        });
+        expect(result.current.bulk.detectedFormat.hasCode).toBe(true);
+        // 'en' matches draft.translations language_code → found in langs
+        expect(result.current.bulk.detectedFormat.langs).toContain('en');
+    });
+
+    it('clears detectedFormat when bulkText is emptied', async () => {
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        act(() => {
+            result.current?.bulk.setBulkText('s1: A statement');
+        });
+        await waitFor(() => expect(result.current?.bulk.detectedFormat.type).toBe('list'));
+
+        act(() => {
+            result.current?.bulk.setBulkText('');
+        });
+        await waitFor(() => {
+            expect(result.current?.bulk.detectedFormat.type).toBeNull();
+        });
+    });
+});
+
+// ── 2. Reorder index math ─────────────────────────────────────────────────────
+// Drives `handleStatementDragEnd` with known active/over codes; asserts that
+// the resulting draft.statements order equals the real `arrayMove` output.
+// (The hook uses `localizedStatements.findIndex(s => s.code === ...)` to map
+// codes to indices — pure index math, asserted against the same arrayMove.)
+describe('useQSortEditor — reorder index math', () => {
+    it('moves the dragged statement to the correct position via arrayMove', () => {
+        useStudyDesigner.setState({ draft: multiDraft });
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        // Drag 'a' (index 0) over 'c' (index 2) → expected order: b, c, a
+        const expected = arrayMove(['a', 'b', 'c'], 0, 2);
+
+        const fakeEvent = {
+            active: { id: 'a' },
+            over: { id: 'c' },
+        } as unknown as DragEndEvent;
+
+        act(() => {
+            result.current?.dnd.handleStatementDragEnd(fakeEvent);
+        });
+
+        const newCodes = useStudyDesigner
+            .getState()
+            .draft?.statements?.map((s) => (s as { code: string }).code);
+        expect(newCodes).toEqual(expected);
+    });
+});
+
+// ── 3. Stale-map derivation ───────────────────────────────────────────────────
+// Mocks the stale query to return a known entry; asserts that `staleByStatementId`
+// maps exactly that statement_id to the correct StaleInfo object.
+describe('useQSortEditor — stale-map derivation', () => {
+    it('maps stale query data into staleByStatementId keyed by statement_id', () => {
+        // Seed original with a slug + a statement that has source_concourse_item_id
+        // so the hook enables the stale query.
+        const mockOriginal = {
+            id: 1,
+            slug: 'test-study',
+            statements: [{ id: 42, code: 's1', source_concourse_item_id: 7 }],
+        } as unknown as StudyRead;
+        useStudyDesigner.setState({ original: mockOriginal });
+
+        // Mock the stale query to return one stale entry
+        mockStaleQuery.mockReturnValue({
+            data: [
+                {
+                    statement_id: 42,
+                    statement_code: 's1',
+                    source_concourse_item_id: 7,
+                    source_deleted: false,
+                    concourse_translations: [{ language_code: 'en', text: 'Concourse text' }],
+                    current_translations: [{ language_code: 'en', text: 'Local text' }],
+                },
+            ],
+        });
+
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        const staleMap = result.current.data.staleByStatementId;
+        expect(staleMap.has(42)).toBe(true);
+        const entry = staleMap.get(42);
+        expect(entry?.source_deleted).toBe(false);
+        expect(entry?.concourse_translations[0]?.text).toBe('Concourse text');
+        // Only the one entry — no phantom ids
+        expect(staleMap.size).toBe(1);
+    });
+});
+
+// ── 4. Edit-state machine ─────────────────────────────────────────────────────
+// (a) begin edit → commit → draft mutated;
+// (b) begin edit → cancel (setEditingIndex(null)) → draft unchanged.
+describe('useQSortEditor — edit-state machine', () => {
+    it('commit path: setEditingIndex+Text+Code then handleSaveStatement updates draft', () => {
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        // Begin editing statement at index 0
+        act(() => {
+            result.current?.editing.setEditingIndex(0);
+            result.current?.editing.setEditingText('Updated text');
+            result.current?.editing.setEditingCode('s1-updated');
+        });
+
+        expect(result.current.editing.editingIndex).toBe(0);
+        expect(result.current.editing.editingText).toBe('Updated text');
+        expect(result.current.editing.editingCode).toBe('s1-updated');
+
+        // Commit
+        act(() => {
+            result.current?.editing.handleSaveStatement();
+        });
+
+        // editingIndex reset to null after save
+        expect(result.current.editing.editingIndex).toBeNull();
+
+        // Draft statement mutated
+        const saved = useStudyDesigner.getState().draft?.statements?.[0] as {
+            code: string;
+            translations: { language_code: string; text: string }[];
+        };
+        expect(saved.code).toBe('s1-updated');
+        expect(saved.translations[0]?.text).toBe('Updated text');
+    });
+
+    it('cancel path: setEditingIndex then setEditingIndex(null) leaves draft unchanged', () => {
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        const originalCode = useStudyDesigner.getState().draft?.statements?.[0] as {
+            code: string;
+        };
+
+        act(() => {
+            result.current?.editing.setEditingIndex(0);
+            result.current?.editing.setEditingText('Abandoned edit');
+            result.current?.editing.setEditingCode('abandoned');
+        });
+
+        // Cancel by resetting index without calling handleSaveStatement
+        act(() => {
+            result.current?.editing.setEditingIndex(null);
+        });
+
+        expect(result.current.editing.editingIndex).toBeNull();
+
+        // Draft is unchanged — code is still the original
+        const afterCancel = useStudyDesigner.getState().draft?.statements?.[0] as {
+            code: string;
+        };
+        expect(afterCancel.code).toBe(originalCode.code);
+    });
+});
+
+// ── 5. Import-mode selection — append ────────────────────────────────────────
+// Faithfully reflects the W4-oracle-locked quirk: in 'append' mode the hook
+// calls `mergeParsedItemIntoStatements` with importMode='append', which always
+// pushes a new entry (de-dup is sync-only). If the draft already has code 's1'
+// and we append a new statement without an explicit code, a new entry is pushed
+// (code auto-assigned as `s${n+1}`). We assert the count increased and the
+// original entry is still present — NOT ideal de-dup.
+describe('useQSortEditor — import-mode selection (append)', () => {
+    it('append mode pushes new statements without replacing existing ones', async () => {
+        const { result } = renderHook(() => useQSortEditor({}));
+        if (!result.current) throw new Error('hook returned null with a seeded draft');
+
+        // Confirm baseline: 1 statement with code 's1'
+        expect(result.current.data.statements).toHaveLength(1);
+
+        act(() => {
+            result.current?.bulk.setImportMode('append');
+        });
+        expect(result.current.bulk.importMode).toBe('append');
+
+        // Set simple-list bulk text (2 new statements)
+        act(() => {
+            result.current?.bulk.setBulkText('New statement one\nNew statement two');
+        });
+
+        // Wait for format detection to settle (simple)
+        await waitFor(() => expect(result.current?.bulk.detectedFormat.type).toBe('simple'));
+
+        // Run bulk save
+        act(() => {
+            result.current?.bulk.handleBulkSave();
+        });
+
+        // After append: original 1 + 2 new = 3 statements
+        const afterStatements = useStudyDesigner.getState().draft?.statements;
+        expect(afterStatements).toHaveLength(3);
+
+        // Original 's1' entry still present (append did not replace)
+        const codes = afterStatements?.map((s) => (s as { code: string }).code);
+        expect(codes).toContain('s1');
+
+        // bulkText cleared after save
+        expect(result.current.bulk.bulkText).toBe('');
     });
 });
