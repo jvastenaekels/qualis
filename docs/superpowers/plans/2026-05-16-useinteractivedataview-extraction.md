@@ -196,7 +196,6 @@ import {
     getCoreRowModel,
     getSortedRowModel,
     getPaginationRowModel,
-    createColumnHelper,
     type SortingState,
 } from '@tanstack/react-table';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -232,8 +231,6 @@ import {
     PAGE_SIZE,
 } from '@/components/admin/dashboard/InteractiveDataView.columns';
 
-const columnHelper = createColumnHelper<DumpParticipant>();
-
 export interface UseInteractiveDataViewParams {
     slug: string;
     initialParticipants?: ParticipantRead[];
@@ -243,6 +240,10 @@ export interface UseInteractiveDataViewResult {
     status: { isLoading: boolean; error: unknown; hasData: boolean };
     data: DumpResponse;
     table: ReturnType<typeof useReactTable<DumpParticipant>>;
+    columns: ReturnType<typeof buildColumns>;
+    pagination: { pageIndex: number; pageSize: number };
+    liveParticipants: DumpParticipant[];
+    submittedParticipants: DumpParticipant[];
     stepLabels: ReturnType<typeof getStepLabels>;
     currentLocale: Locale;
     metrics: {
@@ -278,6 +279,7 @@ export interface UseInteractiveDataViewResult {
         handleViewParticipant: (participant: DumpParticipant) => void;
         runExport: (exportFn: () => Promise<void>) => Promise<void>;
         exportNewsletterList: () => void;
+        downloadBlob: (blob: Blob, filename: string) => void;
         isExportLoading: boolean;
     };
 }
@@ -296,6 +298,10 @@ export function useInteractiveDataView({
         status: { isLoading, error, hasData: Boolean(rawData) },
         data,
         table,
+        columns,
+        pagination,
+        liveParticipants,
+        submittedParticipants,
         stepLabels,
         currentLocale,
         metrics: {
@@ -331,17 +337,18 @@ export function useInteractiveDataView({
             handleViewParticipant,
             runExport,
             exportNewsletterList,
+            downloadBlob,
             isExportLoading,
         },
     };
 }
 ```
 
-Note on `buildColumns` / `getDisplayStatus` / constants: they currently live inside `InteractiveDataView.tsx` at module level. Step 4 below extracts them to a new sibling `InteractiveDataView.columns.ts` so both the hook and (if ever needed) the component import from one place — this avoids a circular import (hook → component) and keeps the "no behaviour change" guarantee. Their bodies move **verbatim**.
+Note on `buildColumns` / `getDisplayStatus` / constants: they currently live inside `InteractiveDataView.tsx` at module level. Step 4 below extracts them to a new sibling `InteractiveDataView.columns.tsx` (`.tsx`, not `.ts` — the moved `buildColumns`/`ParticipantCell` bodies contain JSX, which TS will not compile in a `.ts` file). The import is extensionless (`@/components/admin/dashboard/InteractiveDataView.columns`) so resolution is unaffected. Moving them out of the component avoids a hook → component import cycle and keeps the "no behaviour change" guarantee. Their bodies move **verbatim** (only `export` prepended to each top-level name). The new module owns the single `columnHelper = createColumnHelper<DumpParticipant>()`; the hook no longer declares one.
 
 - [ ] **Step 4: Extract columns/helpers to a sibling module and apply the typing fix**
 
-Create `frontend/src/components/admin/dashboard/InteractiveDataView.columns.ts`. Move **verbatim** from `InteractiveDataView.tsx`:
+Create `frontend/src/components/admin/dashboard/InteractiveDataView.columns.tsx`. Move **verbatim** from `InteractiveDataView.tsx`:
 - `DEVICE_ICONS`, `OS_ICONS`, `BROWSER_ICONS` (lines 138–153)
 - `SUSPECT_DURATION_THRESHOLD`, `ABANDONED_THRESHOLD_MS` (155–156)
 - `getDisplayStatus` (158–167)
@@ -372,14 +379,14 @@ Expected: PASS (1 test green).
 - [ ] **Step 6: Typecheck the hook in isolation**
 
 Run: `cd frontend && npx tsc --noEmit`
-Expected: exits 0. (`InteractiveDataView.tsx` still has its own copy of the logic at this point — that is fine; it is removed in Task 2. Duplicate module-level `columnHelper` is local to each file, no conflict.)
+Expected: exits 0. (`InteractiveDataView.tsx` still has its own copy of the logic at this point — that is fine; it is removed in Task 2. The component and the new columns module each keep their own module-level `columnHelper`; the hook declares none.)
 
 - [ ] **Step 7: Commit**
 
 ```bash
 git add frontend/src/hooks/admin/useInteractiveDataView.ts \
         frontend/src/hooks/admin/useInteractiveDataView.test.ts \
-        frontend/src/components/admin/dashboard/InteractiveDataView.columns.ts
+        frontend/src/components/admin/dashboard/InteractiveDataView.columns.tsx
 git commit -m "feat(admin): extract useInteractiveDataView hook + columns module
 
 Phase 5 G extraction wave 1. Hook + columns sibling created with logic
@@ -401,11 +408,15 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 In `InteractiveDataView.tsx`, replace the entire span from `const { t, i18n } = useTranslation();` (877) through the `const table = useReactTable({…});` block (1146) with:
 
 ```ts
-const { t } = useTranslation();
+const { t, i18n } = useTranslation();
 const {
     status: { isLoading, error, hasData },
     data,
     table,
+    columns,
+    pagination,
+    liveParticipants,
+    submittedParticipants,
     stepLabels,
     currentLocale,
     metrics: {
@@ -441,17 +452,18 @@ const {
         handleViewParticipant,
         runExport,
         exportNewsletterList,
+        downloadBlob,
         isExportLoading,
     },
 } = useInteractiveDataView({ slug, initialParticipants });
 ```
 
-Keep `const { t } = useTranslation();` — the JSX still calls `t(...)` directly. (The hook has its own internal `t`; this is intentional duplication, the documented pattern in `useConcourseDetailPage`'s consumer.)
+Keep `const { t, i18n } = useTranslation();` — the JSX still calls `t(...)` directly and reads `i18n.language` (e.g. `InteractiveDataView.tsx:1921` `language={i18n.language}`). (The hook has its own internal `t`/`i18n`; this is intentional duplication, the documented pattern in `useConcourseDetailPage`'s consumer.) `columns` is consumed by the JSX only as `columns.length` (empty-state `colSpan`); `pagination` by the page-indicator UI; `liveParticipants`/`submittedParticipants` by the chart panels.
 
 - [ ] **Step 2: Delete the now-orphaned module-level code and fix imports**
 
 In `InteractiveDataView.tsx`:
-- Delete the module-level `DEVICE_ICONS/OS_ICONS/BROWSER_ICONS`, thresholds, `getDisplayStatus`, `FILTERABLE_STEP_KEYS`, `PAGE_SIZE`, `columnHelper`, `ParticipantCell`, `buildColumns` (now in `InteractiveDataView.columns.ts`).
+- Delete the module-level `DEVICE_ICONS/OS_ICONS/BROWSER_ICONS`, thresholds, `getDisplayStatus`, `FILTERABLE_STEP_KEYS`, `PAGE_SIZE`, `columnHelper`, `ParticipantCell`, `buildColumns` (now in `InteractiveDataView.columns.tsx`).
 - Add: `import { useInteractiveDataView } from '@/hooks/admin/useInteractiveDataView';`
 - If the JSX still references `getDisplayStatus`, `ParticipantCell`, `DEVICE_ICONS`, etc., import them from `'./InteractiveDataView.columns'`.
 - Remove imports now unused by the trimmed file (react-table builders, `useNavigate`, `useParams`, `useQueryClient`, `customInstance`, `getStepLabels`, `date-fns/locale`, `parseUA`, `createColumnHelper`, filter-helper imports if no longer referenced in JSX). Let `tsc` and Biome drive this — do not guess.
@@ -663,7 +675,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 **Spec coverage:**
 - Architecture & boundary (move 877–1146, keep JSX) → Tasks 1–2. ✓
-- Out-of-scope sub-components NOT moved to siblings → **Deviation:** the plan *does* move `buildColumns`/`ParticipantCell`/helpers into `InteractiveDataView.columns.ts`. Rationale: leaving them in `InteractiveDataView.tsx` while the hook needs `buildColumns` creates a hook→component import cycle. This is a forced, minimal structural move (verbatim, no behaviour change), strictly narrower than the spec's "moving in-file sub-components to sibling files" non-goal which targeted *gratuitous* restructuring. Flagged for the spec reviewer; if rejected, the alternative is to keep `buildColumns` in the component and pass `columns` into the hook as an argument — uglier, but cycle-free. **Decision deferred to user at handoff.**
+- Sub-components moved to a sibling `InteractiveDataView.columns.tsx` (cycle-breaking) → **Resolved:** user approved the `.columns` module approach at handoff; the spec records it as the accepted exception. Verbatim move, no behaviour change.
+- **Plan defect found during Task 1 execution (now fixed in this plan):** the original `UseInteractiveDataViewResult` omitted five symbols the JSX shell provably consumes (`columns.length` colSpan, `pagination` page-indicator, `liveParticipants`/`submittedParticipants` chart panels, `downloadBlob` ×5 export buttons) and the original hook scaffold declared a dead `columnHelper`/`createColumnHelper` (Biome `noUnusedVariables`, would fail `make ci` at Task 4). The interface, return object, hook imports, and Task 2 destructuring above have been corrected. The Task 1 implementer correctly surfaced this rather than improvising the contract change. Filename corrected `.ts` → `.tsx` (JSX in moved bodies).
 - Hook API role-grouped object → Task 1 Step 3 interface. ✓
 - Testing ≥5 pure-logic paths → Task 1 (1) + Task 3 (5) = 6. ✓
 - Single typing win (dateLocales) → Task 1 Step 4. ✓
