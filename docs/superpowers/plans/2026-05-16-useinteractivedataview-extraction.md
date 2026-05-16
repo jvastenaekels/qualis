@@ -23,7 +23,7 @@ Expected output: exactly `frontend/src/pages/admin/DataExportsPage.tsx` (plus `I
 
 - [ ] **Step 2: Record the green baseline**
 
-Run: `cd frontend && npx vitest run src/components/admin/dashboard/InteractiveDataView.helpers.test.ts && npx tsc --noEmit`
+Run: `cd frontend && npx vitest run src/components/admin/dashboard/InteractiveDataView.helpers.test.ts && npm run type-check`
 Expected: helpers test file PASSES (all `describe` blocks green); `tsc --noEmit` exits 0 with no errors.
 
 - [ ] **Step 3: Record the current noExplicitAny count**
@@ -190,7 +190,7 @@ Create `frontend/src/hooks/admin/useInteractiveDataView.ts` with this exact scaf
  * this component); the JSX shell and skeleton/error early-returns stay.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -239,6 +239,7 @@ export interface UseInteractiveDataViewParams {
 export interface UseInteractiveDataViewResult {
     status: { isLoading: boolean; error: unknown; hasData: boolean };
     data: DumpResponse;
+    rawData: unknown;
     table: ReturnType<typeof useReactTable<DumpParticipant>>;
     columns: ReturnType<typeof buildColumns>;
     pagination: { pageIndex: number; pageSize: number };
@@ -256,13 +257,13 @@ export interface UseInteractiveDataViewResult {
     };
     filters: {
         globalFilter: string;
-        setGlobalFilter: (v: string) => void;
+        setGlobalFilter: Dispatch<SetStateAction<string>>;
         qualityFilter: QualityFilter;
-        setQualityFilter: (v: QualityFilter) => void;
+        setQualityFilter: Dispatch<SetStateAction<QualityFilter>>;
         statusFilter: StatusFilter;
-        setStatusFilter: (v: StatusFilter) => void;
+        setStatusFilter: Dispatch<SetStateAction<StatusFilter>>;
         stepFilter: StepFilter;
-        setStepFilter: (v: StepFilter) => void;
+        setStepFilter: Dispatch<SetStateAction<StepFilter>>;
         consentFilters: Set<ConsentType>;
         toggleConsent: (type: ConsentType) => void;
         clearAllFilters: () => void;
@@ -270,9 +271,9 @@ export interface UseInteractiveDataViewResult {
     };
     dialogs: {
         packageDialogOpen: boolean;
-        setPackageDialogOpen: (v: boolean) => void;
+        setPackageDialogOpen: Dispatch<SetStateAction<boolean>>;
         clearAllDialogOpen: boolean;
-        setClearAllDialogOpen: (v: boolean) => void;
+        setClearAllDialogOpen: Dispatch<SetStateAction<boolean>>;
     };
     actions: {
         handleClearAllParticipants: () => Promise<void>;
@@ -297,6 +298,7 @@ export function useInteractiveDataView({
     return {
         status: { isLoading, error, hasData: Boolean(rawData) },
         data,
+        rawData,
         table,
         columns,
         pagination,
@@ -378,7 +380,7 @@ Expected: PASS (1 test green).
 
 - [ ] **Step 6: Typecheck the hook in isolation**
 
-Run: `cd frontend && npx tsc --noEmit`
+Run: `cd frontend && npm run type-check`
 Expected: exits 0. (`InteractiveDataView.tsx` still has its own copy of the logic at this point — that is fine; it is removed in Task 2. The component and the new columns module each keep their own module-level `columnHelper`; the hook declares none.)
 
 - [ ] **Step 7: Commit**
@@ -412,6 +414,7 @@ const { t, i18n } = useTranslation();
 const {
     status: { isLoading, error, hasData },
     data,
+    rawData,
     table,
     columns,
     pagination,
@@ -470,7 +473,7 @@ In `InteractiveDataView.tsx`:
 
 - [ ] **Step 3: Typecheck**
 
-Run: `cd frontend && npx tsc --noEmit`
+Run: `cd frontend && npm run type-check`
 Expected: exits 0. Fix any reported unused import / missing import until clean. No `any` introduced.
 
 - [ ] **Step 4: Lint**
@@ -648,7 +651,8 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 - [ ] **Step 1: Full local CI**
 
 Run: `make ci`
-Expected: green (lint + check + test + build). If anything fails, fix inline and re-run before committing — never proceed past a red `make ci`.
+Expected: green (lint + check + test + build) **except** one pre-existing, unrelated `make check` failure that exists on `main` too and is NOT in this branch's diff:
+`check_installation_docs.py: frontend/package-lock.json version '0.6.7' does not match frontend/package.json '0.6.8'` (stale release-please lockfile). This wave does not touch `package.json`/`package-lock.json`; fixing the lockfile is out of scope for the code-quality wave (separate chore). Therefore the operative gate for THIS wave is: `npm run lint` clean, `cd frontend && npm run type-check` (= `tsc -b`, the real strict check — `tsc --noEmit` on the root config is a false-green and must NOT be used), full `npx vitest run` green, `npm run build` succeeds, backend `make test` green. If any of THOSE fail, fix inline and re-run before committing — never proceed past a red operative gate.
 
 - [ ] **Step 2: Confirm noExplicitAny net −1**
 
