@@ -137,8 +137,8 @@ describe('useQSortEditor — import-format detection', () => {
             expect(result.current?.bulk.detectedFormat.type).toBe('excel');
         });
         expect(result.current.bulk.detectedFormat.hasCode).toBe(true);
-        // 'en' matches draft.translations language_code → found in langs
-        expect(result.current.bulk.detectedFormat.langs).toContain('en');
+        // seedDraft has only 'en' in translations → langs is exactly ['en']
+        expect(result.current.bulk.detectedFormat.langs).toEqual(['en']);
     });
 
     it('clears detectedFormat when bulkText is emptied', async () => {
@@ -296,14 +296,15 @@ describe('useQSortEditor — edit-state machine', () => {
 });
 
 // ── 5. Import-mode selection — append ────────────────────────────────────────
-// Faithfully reflects the W4-oracle-locked quirk: in 'append' mode the hook
-// calls `mergeParsedItemIntoStatements` with importMode='append', which always
-// pushes a new entry (de-dup is sync-only). If the draft already has code 's1'
-// and we append a new statement without an explicit code, a new entry is pushed
-// (code auto-assigned as `s${n+1}`). We assert the count increased and the
-// original entry is still present — NOT ideal de-dup.
+// Reproduces the W4-oracle-locked duplicate-code quirk at hook level (mirrors
+// QSortEditor.test.tsx characterization case). In 'append' mode the hook calls
+// `mergeParsedItemIntoStatements` with importMode='append', which always pushes
+// a new entry (de-dup is sync-only). Feeding an explicitly-coded input whose
+// code ('s1') matches the existing statement yields a duplicate 's1' entry.
+// The oracle (QSortEditor.test.tsx) snapshots ['s1','s1','s5'] for this input;
+// we assert the same result at hook level.
 describe('useQSortEditor — import-mode selection (append)', () => {
-    it('append mode pushes new statements without replacing existing ones', async () => {
+    it('append mode with explicit existing code produces duplicate code (oracle-locked quirk)', async () => {
         const { result } = renderHook(() => useQSortEditor({}));
         if (!result.current) throw new Error('hook returned null with a seeded draft');
 
@@ -315,26 +316,25 @@ describe('useQSortEditor — import-mode selection (append)', () => {
         });
         expect(result.current.bulk.importMode).toBe('append');
 
-        // Set simple-list bulk text (2 new statements)
+        // List-format input with explicit codes: 's1' duplicates the existing entry,
+        // 's5' is new. This mirrors the exact oracle input in QSortEditor.test.tsx.
         act(() => {
-            result.current?.bulk.setBulkText('New statement one\nNew statement two');
+            result.current?.bulk.setBulkText('s1: Synced One\ns5: Fresh One');
         });
 
-        // Wait for format detection to settle (simple)
-        await waitFor(() => expect(result.current?.bulk.detectedFormat.type).toBe('simple'));
+        // Wait for format detection to settle (list)
+        await waitFor(() => expect(result.current?.bulk.detectedFormat.type).toBe('list'));
 
         // Run bulk save
         act(() => {
             result.current?.bulk.handleBulkSave();
         });
 
-        // After append: original 1 + 2 new = 3 statements
+        // Oracle-locked quirk: append pushes both parsed items regardless of code
+        // collision — de-dup is sync-only. Result: original s1 + appended s1 + s5.
         const afterStatements = useStudyDesigner.getState().draft?.statements;
-        expect(afterStatements).toHaveLength(3);
-
-        // Original 's1' entry still present (append did not replace)
         const codes = afterStatements?.map((s) => (s as { code: string }).code);
-        expect(codes).toContain('s1');
+        expect(codes).toEqual(['s1', 's1', 's5']);
 
         // bulkText cleared after save
         expect(result.current.bulk.bulkText).toBe('');
