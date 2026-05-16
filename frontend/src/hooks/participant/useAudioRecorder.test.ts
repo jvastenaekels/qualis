@@ -93,6 +93,22 @@ function setupWebApiMocks() {
 
     global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
     global.URL.revokeObjectURL = vi.fn();
+
+    // Audio constructor for playback — must use function (not arrow) to be
+    // constructable with `new`. Mirrors oracle's global.Audio factory pattern.
+    // biome-ignore lint/complexity/useArrowFunction: must be constructable for `new Audio()`
+    global.Audio = vi.fn(function () {
+        return {
+            play: vi.fn().mockResolvedValue(undefined),
+            pause: vi.fn(),
+            onended: null,
+            onerror: null,
+            ontimeupdate: null,
+            playbackRate: 1.0,
+            currentTime: 0,
+            src: '',
+        };
+    }) as unknown as typeof Audio;
 }
 
 function makeProps(over: Record<string, unknown> = {}) {
@@ -234,5 +250,128 @@ describe('useAudioRecorder — max-duration auto-stop', () => {
         expect(capturedMediaRecorder?.stop).toHaveBeenCalled();
         // Duration has advanced to at least 1s — confirms the timer was running
         expect(result.current.recording.duration).toBeGreaterThanOrEqual(1);
+    });
+});
+
+// Helper: an existing-recording fixture whose URL is not expired, so
+// refreshUrlBeforePlayback returns true without hitting the network.
+const existingRecordingFixture = {
+    id: 1,
+    presigned_url: 'https://example.com/audio.webm',
+    duration_seconds: 45,
+    file_size_bytes: 1024,
+    created_at: new Date().toISOString(),
+    url_expires_at: new Date(Date.now() + 2 * 3600 * 1000).toISOString(), // 2 h from now
+};
+
+// Helper: read the Nth (0-based) Audio instance constructed by global.Audio mock.
+function capturedAudio(index: number): { playbackRate: number; play: ReturnType<typeof vi.fn> } {
+    const mock = global.Audio as unknown as {
+        mock: {
+            results: Array<{ value: { playbackRate: number; play: ReturnType<typeof vi.fn> } }>;
+        };
+    };
+    const result = mock.mock.results[index];
+    if (!result) throw new Error(`No Audio instance at index ${index}`);
+    return result.value;
+}
+
+describe('useAudioRecorder — play() wrapper', () => {
+    beforeEach(setupWebApiMocks);
+
+    it('resets playbackRetryRef and invokes playback (new Audio constructed each call)', async () => {
+        // Arrange: hook with an existing recording so audioUrl is initialised
+        // (without a URL, playRecording returns early before constructing Audio).
+        const { result } = renderHook(() =>
+            useAudioRecorder(makeProps({ existingRecording: existingRecordingFixture }))
+        );
+
+        // Wait for the initialise-existing-recording effect to settle
+        // (sets audioUrl + state = 'stopped')
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(result.current.status.state).toBe('stopped');
+        expect(
+            (global.Audio as unknown as { mock: { results: unknown[] } }).mock.results
+        ).toHaveLength(0);
+
+        // Act 1: first play() — resets guard (was false), invokes playRecording.
+        await act(async () => {
+            await result.current.playback.play();
+        });
+
+        // Observable 1: a new Audio element was constructed (playback attempted).
+        expect(
+            (global.Audio as unknown as { mock: { results: unknown[] } }).mock.results
+        ).toHaveLength(1);
+        expect(result.current.status.state).toBe('playing');
+
+        // Act 2: second play() from the playing state — play() resets the guard
+        // (which the internal onerror path may have set to true) and calls
+        // playRecording again regardless, constructing a second Audio element.
+        // This directly asserts the contract: play() always re-attempts.
+        await act(async () => {
+            await result.current.playback.play();
+        });
+
+        // Observable 2: a second Audio element was constructed — the guard was
+        // reset so playRecording was not short-circuited.
+        expect(
+            (global.Audio as unknown as { mock: { results: unknown[] } }).mock.results
+        ).toHaveLength(2);
+    });
+});
+
+describe('useAudioRecorder — setPlaybackSpeed wrapper', () => {
+    beforeEach(setupWebApiMocks);
+
+    it('always updates state speed but pokes the live element ONLY while playing', async () => {
+        // Arrange: hook with an existing recording
+        const { result } = renderHook(() =>
+            useAudioRecorder(makeProps({ existingRecording: existingRecordingFixture }))
+        );
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(result.current.status.state).toBe('stopped');
+
+        // --- Not playing: speed state updates but NO audio element to poke ---
+
+        act(() => {
+            result.current.playback.setPlaybackSpeed(1.5);
+        });
+
+        // Observable: hook exposes updated speed
+        expect(result.current.playback.playbackSpeed).toBe(1.5);
+        // No Audio element has been constructed yet — no playbackRate mutation possible
+        expect(
+            (global.Audio as unknown as { mock: { results: unknown[] } }).mock.results
+        ).toHaveLength(0);
+
+        // --- Transition to playing ---
+
+        await act(async () => {
+            await result.current.playback.play();
+        });
+
+        expect(result.current.status.state).toBe('playing');
+        // playRecording applied the current playbackSpeed (1.5) to the element on construction
+        expect(capturedAudio(0).playbackRate).toBe(1.5);
+
+        // --- While playing: speed state updates AND element is poked immediately ---
+
+        act(() => {
+            result.current.playback.setPlaybackSpeed(2.0);
+        });
+
+        // Observable 1: state speed updated
+        expect(result.current.playback.playbackSpeed).toBe(2.0);
+        // Observable 2: live element's playbackRate was imperatively set to 2.0
+        // (applyPlaybackSpeed branches on stateRef.current === 'playing', which is true)
+        expect(capturedAudio(0).playbackRate).toBe(2.0);
     });
 });
