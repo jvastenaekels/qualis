@@ -111,7 +111,7 @@ export function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress
 // Step 1 (consent) is omitted from the filter dropdown by historical convention.
 export const FILTERABLE_STEP_KEYS = new Set(['presort', 'rough', 'fine', 'post'] as const);
 export const PAGE_SIZE = 25;
-export const columnHelper = createColumnHelper<DumpParticipant>();
+const columnHelper = createColumnHelper<DumpParticipant>();
 
 // ---------------------------------------------------------------------------
 // ParticipantCell — sub-component for the "Participant" id column cell (P2).
