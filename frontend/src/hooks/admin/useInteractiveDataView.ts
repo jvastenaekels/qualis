@@ -19,7 +19,7 @@
  * this component); the JSX shell and skeleton/error early-returns stay.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, type Dispatch, type SetStateAction } from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -68,6 +68,7 @@ export interface UseInteractiveDataViewParams {
 export interface UseInteractiveDataViewResult {
     status: { isLoading: boolean; error: unknown; hasData: boolean };
     data: DumpResponse;
+    rawData: unknown;
     table: ReturnType<typeof useReactTable<DumpParticipant>>;
     columns: ReturnType<typeof buildColumns>;
     pagination: { pageIndex: number; pageSize: number };
@@ -85,13 +86,13 @@ export interface UseInteractiveDataViewResult {
     };
     filters: {
         globalFilter: string;
-        setGlobalFilter: (v: string) => void;
+        setGlobalFilter: Dispatch<SetStateAction<string>>;
         qualityFilter: QualityFilter;
-        setQualityFilter: (v: QualityFilter) => void;
+        setQualityFilter: Dispatch<SetStateAction<QualityFilter>>;
         statusFilter: StatusFilter;
-        setStatusFilter: (v: StatusFilter) => void;
+        setStatusFilter: Dispatch<SetStateAction<StatusFilter>>;
         stepFilter: StepFilter;
-        setStepFilter: (v: StepFilter) => void;
+        setStepFilter: Dispatch<SetStateAction<StepFilter>>;
         consentFilters: Set<ConsentType>;
         toggleConsent: (type: ConsentType) => void;
         clearAllFilters: () => void;
@@ -99,9 +100,9 @@ export interface UseInteractiveDataViewResult {
     };
     dialogs: {
         packageDialogOpen: boolean;
-        setPackageDialogOpen: (v: boolean) => void;
+        setPackageDialogOpen: Dispatch<SetStateAction<boolean>>;
         clearAllDialogOpen: boolean;
-        setClearAllDialogOpen: (v: boolean) => void;
+        setClearAllDialogOpen: Dispatch<SetStateAction<boolean>>;
     };
     actions: {
         handleClearAllParticipants: () => Promise<void>;
@@ -390,6 +391,7 @@ export function useInteractiveDataView({
     return {
         status: { isLoading, error, hasData: Boolean(rawData) },
         data,
+        rawData,
         table,
         columns,
         pagination,

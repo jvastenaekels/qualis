@@ -119,6 +119,7 @@ export default function InteractiveDataView({
     const {
         status: { isLoading, error },
         data,
+        rawData,
         table,
         columns,
         pagination,
