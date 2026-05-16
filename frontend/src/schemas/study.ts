@@ -163,3 +163,10 @@ export const StudyConfigSchema = z.object({
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;
 export type PreSortField = z.infer<typeof PreSortFieldSchema>;
 export type Statement = z.infer<typeof StatementSchema>;
+// Additive type aliases — derived from the existing schema, no schema-shape
+// change, no runtime effect. PostsortConfig / PreSortFieldOption use
+// indexed-access because those sub-schemas are inline in StudyConfigSchema /
+// PreSortFieldSchema (extracting them to named consts is unnecessary).
+export type ProcessStep = z.infer<typeof ProcessStepSchema>;
+export type PostsortConfig = NonNullable<StudyConfig['postsort_config']>;
+export type PreSortFieldOption = NonNullable<PreSortField['options']>[number];

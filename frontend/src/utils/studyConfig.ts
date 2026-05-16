@@ -1,3 +1,5 @@
+import type { PreSortField, PostsortConfig, ProcessStep } from '@/schemas/study';
+
 /**
  * Structurally-typed inputs so these helpers also accept `StudyUpdate`
  * (admin designer drafts) and not just the participant-side `StudyConfig`.
@@ -28,3 +30,42 @@ export const isRoughSortEnabled = (config: RoughSortLike | null | undefined): bo
     if (!config) return true;
     return config.rough_sort_enabled !== false;
 };
+
+/**
+ * Structural input accepted by the config accessors: the participant-side
+ * `StudyConfig`, the admin designer draft (`StudyUpdate`), a study
+ * translation, or the opaque wire shape — all share the relevant keys.
+ * Widened to `unknown`-valued fields so the single controlled assertion in
+ * each accessor is the only place the opaque→typed bridge happens. No
+ * runtime validation (zod.parse) — type-only by design (see spec).
+ */
+type ConfigLike =
+    | {
+          presort_config?: unknown;
+          postsort_config?: unknown;
+          process_steps?: unknown;
+      }
+    | null
+    | undefined;
+
+/** Field map regardless of legacy (flat record) vs new ({enabled, fields}). */
+export function presortFields(config: ConfigLike): Record<string, PreSortField> {
+    const pc = config?.presort_config;
+    if (!pc || typeof pc !== 'object') return {};
+    if ('fields' in pc) {
+        return (pc as { fields?: Record<string, PreSortField> }).fields ?? {};
+    }
+    return pc as Record<string, PreSortField>;
+}
+
+export function postsortConfig(config: ConfigLike): PostsortConfig | undefined {
+    const pc = config?.postsort_config;
+    if (!pc || typeof pc !== 'object') return undefined;
+    return pc as PostsortConfig;
+}
+
+/** Steps from a config, designer draft, or a translation-like object. */
+export function processSteps(source: ConfigLike): ProcessStep[] {
+    const ps = source?.process_steps;
+    return Array.isArray(ps) ? (ps as ProcessStep[]) : [];
+}
