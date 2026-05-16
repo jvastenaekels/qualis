@@ -128,7 +128,6 @@ describe('useInteractiveDataView — filteredParticipants', () => {
             wrapper: AllTheProviders,
         });
         act(() => result.current.filters.setStatusFilter('completed'));
-        expect(result.current.table.getFilteredRowModel?.() ?? true).toBeTruthy();
         expect(result.current.metrics.completedCount).toBe(1);
     });
 });
