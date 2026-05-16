@@ -25,6 +25,19 @@ vi.mock('sonner', () => ({
     toast: mockToast,
 }));
 
+// Characterization (W3-followup oracle) only: the existing-recording load-failure
+// retry path in useAudioRecorder dynamically imports this module inside
+// refreshPresignedUrl(), which only runs when `sessionToken` is set. None of the
+// existing 45 tests set a sessionToken, so this mock is inert for them; it exists
+// so the load-failure path in behaviour #3 below is deterministic (rejects rather
+// than performing a real network call in jsdom).
+const mockGetAudioUrl = vi.hoisted(() =>
+    vi.fn().mockRejectedValue(new Error('refresh failed (characterization)'))
+);
+vi.mock('@/api/generated', () => ({
+    getAudioUrlApiAudioRecordingIdUrlGet: mockGetAudioUrl,
+}));
+
 describe('AudioRecorder', () => {
     // Captured MediaRecorder instance — set by mock constructor, used to trigger handlers
     let capturedMediaRecorder: {
@@ -944,5 +957,148 @@ describe('AudioRecorder', () => {
         unmount();
 
         expect(mockStream.getTracks()[0].stop).toHaveBeenCalled();
+    });
+
+    // ── CHARACTERIZATION — UI COUPLING (W3-FOLLOWUP ORACLE) ──────────
+    //
+    // These three tests pin the EXACT observable behaviour of the two
+    // imperative JSX→ref couplings in AudioRecorder.tsx on the UNCHANGED
+    // W3 baseline, so a later fold into useAudioRecorder wrappers is
+    // provably behaviour-preserving. They assert REAL observable state
+    // (the live `new Audio()` element's `.playbackRate`; a re-attempt =
+    // a fresh Audio construction), never a mock tautology.
+    describe('Characterization — ui coupling (W3-followup oracle)', () => {
+        /** The most recently constructed `new Audio()` instance (the live element). */
+        function lastAudioElement(): { playbackRate: number } | undefined {
+            return (
+                global.Audio as unknown as {
+                    mock: { results: { value: { playbackRate: number } }[] };
+                }
+            ).mock.results.at(-1)?.value;
+        }
+
+        /** How many `new Audio()` elements the hook has constructed so far. */
+        function audioConstructionCount(): number {
+            return (global.Audio as unknown as { mock: { results: unknown[] } }).mock.results
+                .length;
+        }
+
+        it('applies playbackRate to the live audio element when a speed button is clicked WHILE playing', async () => {
+            render(
+                <AudioRecorder {...defaultProps} existingRecording={existingRecordingFixture} />
+            );
+
+            // Start playback (reuse 'plays audio when play button is clicked').
+            fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+            });
+
+            const liveAudio = lastAudioElement();
+            expect(liveAudio).toBeDefined();
+            // Constructed default speed is 1.0 (hook sets audio.playbackRate =
+            // playbackSpeed at construction; default playbackSpeed is 1.0).
+            expect(liveAudio?.playbackRate).toBe(1.0);
+
+            // Click the 1.5x speed button WHILE playing → the JSX coupling
+            // (audioPlayerRef.current && state === 'playing') pokes the live
+            // element's playbackRate. Assert against the ELEMENT, not the button.
+            await act(async () => {
+                fireEvent.click(screen.getByText('1.5x'));
+            });
+            expect(lastAudioElement()?.playbackRate).toBe(1.5);
+
+            // A second speed change while still playing pokes again (2.0x).
+            await act(async () => {
+                fireEvent.click(screen.getByText('2x'));
+            });
+            expect(lastAudioElement()?.playbackRate).toBe(2.0);
+            // Still the SAME constructed element — no replay was triggered.
+            expect(audioConstructionCount()).toBe(1);
+        });
+
+        it('does NOT imperatively set playbackRate when a speed button is clicked while NOT playing', async () => {
+            render(
+                <AudioRecorder {...defaultProps} existingRecording={existingRecordingFixture} />
+            );
+
+            // Stopped state: the play bar is shown but playback was never started,
+            // so the hook never ran `new Audio()` — there is no live element to poke.
+            expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+            expect(audioConstructionCount()).toBe(0);
+
+            // Click 1.5x while NOT playing.
+            await act(async () => {
+                fireEvent.click(screen.getByText('1.5x'));
+            });
+
+            // State speed updated: the 1.5x button now carries the selected
+            // styling class the component applies when `playbackSpeed === speed`.
+            const selectedBtn = screen.getByText('1.5x').closest('button');
+            expect(selectedBtn?.className).toContain('bg-slate-100');
+            expect(selectedBtn?.className).toContain('text-slate-800');
+
+            // But the `state === 'playing'` guard short-circuits the element
+            // poke: no Audio element was ever constructed by the click, so the
+            // rate is only carried as state until a fresh playRecording applies
+            // it. (Snapshot of the current guard: no-poke when not playing.)
+            expect(audioConstructionCount()).toBe(0);
+        });
+
+        it('user play button resets the retry guard so a load-failed existing recording can be re-played', async () => {
+            // sessionToken makes the existing-recording retry branch in
+            // audio.onerror reachable (existingRecording && sessionToken &&
+            // !playbackRetryRef.current) — that branch sets
+            // playbackRetryRef.current = true.
+            render(
+                <AudioRecorder
+                    {...defaultProps}
+                    existingRecording={existingRecordingFixture}
+                    sessionToken="sess-characterization"
+                />
+            );
+
+            // First user play → constructs Audio #1.
+            fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+            });
+            expect(audioConstructionCount()).toBe(1);
+
+            // Drive the playback load-failure path: trigger the live element's
+            // error handler (the hook assigns audio.onerror). With a sessionToken
+            // and the guard still false, this sets playbackRetryRef.current = true
+            // and then awaits refreshPresignedUrl(), which the mocked
+            // @/api/generated rejects → catch → resetPlaybackAfterFailure()
+            // (state → 'stopped'). The internal playRecording() retry is NOT
+            // reached (it sits after the awaited, rejected refresh), so the
+            // guard stays true and no new Audio is constructed by the failure.
+            const failed = lastAudioElement() as unknown as {
+                onerror: (() => Promise<void>) | null;
+            };
+            expect(failed.onerror).toBeTypeOf('function');
+            await act(async () => {
+                await failed.onerror?.();
+            });
+
+            // Back to stopped, still exactly one Audio (no internal re-attempt).
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+            });
+            expect(mockToast.error).toHaveBeenCalled();
+            expect(audioConstructionCount()).toBe(1);
+
+            // Now the USER clicks the play button. The JSX coupling runs
+            // `playbackRetryRef.current = false; playRecording()`. Because the
+            // guard was reset, playback re-attempts → a NEW Audio is
+            // constructed (#2). This is the user-play path, distinct from the
+            // internal onerror retry path; it is the observable the fold must
+            // preserve.
+            fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+            });
+            expect(audioConstructionCount()).toBe(2);
+        });
     });
 });
