@@ -12,19 +12,15 @@ export interface DumpParticipant {
     duration_seconds: number | null;
     scores: (number | null)[];
     placements: Record<string, number>;
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    presort: Record<string, any>;
+    presort: Record<string, unknown>;
     postsort: {
         email?: string;
         newsletter_consent?: boolean;
         interview_consent?: boolean;
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-        questions_answers?: Record<string, any>;
+        questions_answers?: Record<string, unknown>;
         card_comments?: Record<string, string>;
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    } & Record<string, any>;
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    audio_recordings?: Record<string, any>;
+    } & Record<string, unknown>;
+    audio_recordings?: Record<string, unknown>;
     language: string;
     is_discarded: boolean;
     discard_reason: string | null;
@@ -44,14 +40,12 @@ export interface DumpResponse {
         statements: DumpStatement[];
         translations: { lang: string; title: string }[];
         grid_config?: Record<string, number> | { score: number; capacity: number }[];
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-        presort_config?: Record<string, any>;
+        presort_config?: Record<string, unknown>;
         postsort_config?: {
             email_collection_enabled?: boolean;
             newsletter_consent_enabled?: boolean;
             interview_consent_enabled?: boolean;
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-        } & Record<string, any>;
+        } & Record<string, unknown>;
         state: string;
         rough_sort_enabled?: boolean;
         // Distribution semantics (forced | free | flexible). When 'free', the

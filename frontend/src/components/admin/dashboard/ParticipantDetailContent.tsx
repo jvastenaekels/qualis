@@ -1,4 +1,5 @@
 import type { DumpParticipant, DumpResponse } from '@/components/admin/dashboard/types';
+import type { StudyRead } from '@/api/model';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -26,6 +27,13 @@ import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
 import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
 import type { InteractionUtils } from '@/types/grid';
+
+/** Shape of an audio recording entry in the participant answer blob. */
+type AudioEntry = {
+    presigned_url: string;
+    duration_seconds: number;
+    file_size_bytes: number;
+};
 
 interface ParticipantDetailContentProps {
     participant: DumpParticipant;
@@ -108,10 +116,8 @@ export function ParticipantDetailContent({
     };
 
     const hasAudioRecordings =
-        // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
-        (participant as any).audio_recordings &&
-        // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
-        Object.keys((participant as any).audio_recordings).length > 0;
+        participant.audio_recordings != null &&
+        Object.keys(participant.audio_recordings).length > 0;
 
     const handleExportAudio = async () => {
         if (!studySlug || !participant.db_id || !hasAudioRecordings) return;
@@ -145,11 +151,9 @@ export function ParticipantDetailContent({
         const sMap = new Map(statements.map((s) => [s.id, s]));
 
         // Parse Grid Config
-        // biome-ignore lint/suspicious/noExplicitAny: config structure varies
-        const rawConfig = (studyData.study.grid_config as any) || [];
+        const rawConfig = studyData.study.grid_config || [];
         const config: { score: number; capacity: number; id: string }[] = Array.isArray(rawConfig)
-            ? // biome-ignore lint/suspicious/noExplicitAny: dynamic mapping
-              rawConfig.map((c: any) => ({
+            ? rawConfig.map((c) => ({
                   score: c.score,
                   capacity: c.capacity,
                   id: String(c.score),
@@ -200,18 +204,15 @@ export function ParticipantDetailContent({
         return map;
     }, [gridPlacements]);
 
-    // biome-ignore lint/suspicious/noExplicitAny: participant type variation
-    const language = (participant as any).language || 'en';
-    // biome-ignore lint/suspicious/noExplicitAny: study type adaptation
-    const studyForSurvey = studyData.study as any;
+    const language = participant.language || 'en';
+    const studyForSurvey = studyData.study as unknown as StudyRead;
 
     const detailStatement = detailStatementId ? statementsMap.get(detailStatementId) : null;
     const detailComment = detailStatementId
         ? participant.postsort?.card_comments?.[String(detailStatementId)]
         : null;
     const detailAudio = detailStatementId
-        ? // biome-ignore lint/suspicious/noExplicitAny: audio recordings type
-          (participant as any).audio_recordings?.[`card_${detailStatementId}`]
+        ? (participant.audio_recordings?.[`card_${detailStatementId}`] as AudioEntry | undefined)
         : null;
 
     // Sidebar Content Logic
@@ -506,10 +507,7 @@ export function ParticipantDetailContent({
                                                 !!participant.postsort?.card_comments?.[String(sId)]
                                             }
                                             hasAudio={
-                                                // biome-ignore lint/suspicious/noExplicitAny: audio recordings type
-                                                !!(participant as any).audio_recordings?.[
-                                                    `card_${sId}`
-                                                ]
+                                                !!participant.audio_recordings?.[`card_${sId}`]
                                             }
                                             onClick={() => setDetailStatementId(sId)}
                                             isSelected={detailStatementId === sId}
@@ -558,11 +556,10 @@ export function ParticipantDetailContent({
                                         </h3>
                                         <div className="space-y-3">
                                             {Object.entries(
-                                                // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
-                                                (participant as any).audio_recordings as Record<
+                                                // audio_recordings is non-null here (hasAudioRecordings guard above)
+                                                participant.audio_recordings as Record<
                                                     string,
-                                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic audio data
-                                                    any
+                                                    AudioEntry
                                                 >
                                             ).map(([key, audio]) => {
                                                 // Resolve label from question_key

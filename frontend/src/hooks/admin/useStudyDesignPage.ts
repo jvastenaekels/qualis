@@ -191,8 +191,7 @@ export function applyTranslationDefaults(study: StudyRead): StudyRead {
 
         for (const field of fieldsToDefault) {
             if (!tr[field] || tr[field]?.trim() === '') {
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic field update
-                (tr as any)[field] = defaults[field];
+                tr[field] = defaults[field];
             }
         }
 
@@ -202,11 +201,9 @@ export function applyTranslationDefaults(study: StudyRead): StudyRead {
             }
         }
 
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-        if (!tr.process_steps || (tr.process_steps as any).length === 0) {
+        if (!tr.process_steps || tr.process_steps.length === 0) {
             if (defaults.process_steps) {
-                // biome-ignore lint/suspicious/noExplicitAny: dynamic assignment
-                (tr as any).process_steps = [...defaults.process_steps];
+                tr.process_steps = [...defaults.process_steps];
             }
         }
     });
@@ -525,11 +522,7 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         if (!draft || !effectiveSlug) return;
 
         // 1. Build synthetic config (same logic as side-preview)
-        // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-        const translation = (draft.translations as any[])?.find(
-            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-            (tr: any) => tr.language_code === activeLocale
-        );
+        const translation = draft.translations?.find((tr) => tr.language_code === activeLocale);
 
         const syntheticConfig = {
             ...draft,
@@ -548,10 +541,8 @@ export function useStudyDesignPage(): StudyDesignPageApi {
             ui_labels: translation?.ui_labels || {},
             process_steps: translation?.process_steps || [],
             language: activeLocale,
-            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-            statements: (draft.statements || []).map((s: any, index: number) => {
-                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-                const st = s.translations?.find((tr: any) => tr.language_code === activeLocale);
+            statements: (draft.statements || []).map((s, index) => {
+                const st = s.translations?.find((tr) => tr.language_code === activeLocale);
                 return {
                     id: index + 1,
                     code: s.code,

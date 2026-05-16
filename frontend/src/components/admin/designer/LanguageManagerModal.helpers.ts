@@ -5,23 +5,43 @@
  * - `applyLanguageInit`: add a brand-new language with empty fields and
  *   empty statement translations.
  *
- * Both helpers mutate `draft` in place. The signatures use `any` because the
- * Zustand store's `updateDraft` is typed `(d: any) => void` (load-bearing
- * dynamic JSON shapes — see CLAUDE.md project conventions).
+ * Both helpers mutate `draft` in place.
  */
 
-// biome-ignore lint/suspicious/noExplicitAny: load-bearing dynamic study draft shape
-type Draft = any;
-// biome-ignore lint/suspicious/noExplicitAny: load-bearing dynamic study read shape
-type Original = any;
+/** Minimal structural shape a study translation entry must have for spread-copy. */
+type TranslationEntry = { language_code: string };
+/** Minimal structural shape a statement must have for language patching. */
+type StatementLike = {
+    code: string;
+    translations?: { language_code: string; text: string }[] | null;
+};
 
-function ensureTranslationsArray(draft: Draft): void {
+/** Minimal structural shape the draft must satisfy for language operations. */
+type DraftLike = {
+    translations?: TranslationEntry[] | null;
+    statements?: StatementLike[] | null;
+};
+
+/** Minimal structural shape from the read-only original. */
+type OriginalLike =
+    | {
+          translations?: TranslationEntry[] | null;
+          statements?: StatementLike[] | null;
+      }
+    | null
+    | undefined;
+
+function ensureTranslationsArray(
+    draft: DraftLike
+): asserts draft is DraftLike & { translations: TranslationEntry[] } {
     if (!Array.isArray(draft.translations)) {
         draft.translations = [];
     }
 }
 
-function ensureStatementsArray(draft: Draft): void {
+function ensureStatementsArray(
+    draft: DraftLike
+): asserts draft is DraftLike & { statements: StatementLike[] } {
     if (!Array.isArray(draft.statements)) {
         draft.statements = [];
     }
@@ -33,26 +53,23 @@ function ensureStatementsArray(draft: Draft): void {
  * saved statement translation; if the statement is new (no original), seed
  * an empty translation entry.
  */
-export function applyLanguageRestore(draft: Draft, langCode: string, original: Original): void {
-    const existingStudyTrans = original?.translations?.find(
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation shape
-        (t: any) => t.language_code === langCode
-    );
+export function applyLanguageRestore(
+    draft: DraftLike,
+    langCode: string,
+    original: OriginalLike
+): void {
+    const existingStudyTrans = original?.translations?.find((t) => t.language_code === langCode);
     if (!existingStudyTrans) return;
 
     ensureTranslationsArray(draft);
-    draft.translations.push({ ...existingStudyTrans, _is_copy: false });
+    draft.translations.push({ ...existingStudyTrans, _is_copy: false } as TranslationEntry);
 
     ensureStatementsArray(draft);
     for (const stmt of draft.statements) {
         if (!Array.isArray(stmt.translations)) stmt.translations = [];
-        const originalStmt = original?.statements?.find(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic statement shape
-            (os: any) => os.code === stmt.code
-        );
+        const originalStmt = original?.statements?.find((os) => os.code === stmt.code);
         const originalStmtTrans = originalStmt?.translations?.find(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic statement-translation shape
-            (st: any) => st.language_code === langCode
+            (st) => st.language_code === langCode
         );
         stmt.translations.push({
             language_code: langCode,
@@ -66,12 +83,9 @@ export function applyLanguageRestore(draft: Draft, langCode: string, original: O
  * per-statement translations. Idempotent: skips if the language already
  * exists on the study or on a given statement.
  */
-export function applyLanguageInit(draft: Draft, langCode: string): void {
+export function applyLanguageInit(draft: DraftLike, langCode: string): void {
     ensureTranslationsArray(draft);
-    const exists = draft.translations.some(
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation shape
-        (t: any) => t.language_code === langCode
-    );
+    const exists = draft.translations.some((t) => t.language_code === langCode);
     if (!exists) {
         draft.translations.push({
             language_code: langCode,
@@ -80,16 +94,13 @@ export function applyLanguageInit(draft: Draft, langCode: string): void {
             description: '',
             instructions: '',
             condition_of_instruction: '',
-        });
+        } as TranslationEntry);
     }
 
     ensureStatementsArray(draft);
     for (const stmt of draft.statements) {
         if (!Array.isArray(stmt.translations)) stmt.translations = [];
-        const hasTrans = stmt.translations.some(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic statement-translation shape
-            (st: any) => st.language_code === langCode
-        );
+        const hasTrans = stmt.translations.some((st) => st.language_code === langCode);
         if (!hasTrans) {
             stmt.translations.push({ language_code: langCode, text: '' });
         }
