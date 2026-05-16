@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import {
     DndContext,
@@ -57,8 +58,10 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
     };
 
     // Dynamically get the icon component
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic icon component
-    const IconComponent = (LucideIcons as any)[step.icon] || LucideIcons.HelpCircle;
+    const IconComponent =
+        (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[
+            step.icon
+        ] ?? LucideIcons.HelpCircle;
 
     return (
         <div
@@ -273,15 +276,13 @@ export function ProcessStepEditor({
 
         const allIds = new Set<string>();
         draft.translations.forEach((t) => {
-            // biome-ignore lint/suspicious/noExplicitAny: missing type definition for process_steps
-            (t as any).process_steps?.forEach((s: any) => {
+            t.process_steps?.forEach((s) => {
                 allIds.add(s.id);
             });
         });
 
         const someMismatch = draft.translations.some((t) => {
-            // biome-ignore lint/suspicious/noExplicitAny: missing type definition for process_steps
-            const tIds = (t as any).process_steps?.map((s: any) => s.id) || [];
+            const tIds = t.process_steps?.map((s) => s.id) || [];
             return tIds.length !== allIds.size || tIds.some((id: string) => !allIds.has(id));
         });
 
@@ -290,22 +291,17 @@ export function ProcessStepEditor({
             updateDraft((d) => {
                 // We use the first translation that has steps as the master order
                 const masterTranslation = d.translations?.find(
-                    // biome-ignore lint/suspicious/noExplicitAny: missing type
-                    (t) => (t as any).process_steps?.length > 0
+                    (t) => (t.process_steps?.length ?? 0) > 0
                 );
-                // biome-ignore lint/suspicious/noExplicitAny: missing type
-                const masterSteps = (masterTranslation as any)?.process_steps || [];
+                const masterSteps = masterTranslation?.process_steps || [];
 
                 for (const t of d.translations || []) {
-                    // biome-ignore lint/suspicious/noExplicitAny: missing type
-                    if (!(t as any).process_steps) (t as any).process_steps = [];
-                    // biome-ignore lint/suspicious/noExplicitAny: missing type
-                    const tSteps = (t as any).process_steps;
+                    if (!t.process_steps) t.process_steps = [];
+                    const tSteps = t.process_steps;
 
                     // Add missing steps
                     for (const mStep of masterSteps) {
-                        // biome-ignore lint/suspicious/noExplicitAny: explicit any needed for dynamic objects
-                        if (!tSteps.find((ts: any) => ts.id === mStep.id)) {
+                        if (!tSteps.find((ts) => ts.id === mStep.id)) {
                             tSteps.push({
                                 ...mStep,
                                 title: '',
@@ -314,10 +310,8 @@ export function ProcessStepEditor({
                         }
                     }
                     // Remove extra steps (if any)
-                    // biome-ignore lint/suspicious/noExplicitAny: complex object manipulation
-                    const masterIds = new Set(masterSteps.map((ms: any) => ms.id));
-                    // biome-ignore lint/suspicious/noExplicitAny: complex object manipulation
-                    (t as any).process_steps = tSteps.filter((ts: any) => masterIds.has(ts.id));
+                    const masterIds = new Set(masterSteps.map((ms) => ms.id));
+                    t.process_steps = tSteps.filter((ts) => masterIds.has(ts.id));
                 }
             });
         }

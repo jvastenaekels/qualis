@@ -60,7 +60,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
+import type { StatementRead, StatementTranslationRead, GridColumn, StudyUpdate } from '@/api/model';
 
 // Define basic types for clarity
 type Statement = StatementRead;
@@ -85,8 +85,7 @@ interface SortableStatementItemProps {
     readOnly?: boolean;
     structureLocked?: boolean;
     activeLocale: string;
-    // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-    updateDraft: (fn: (d: any) => void) => void;
+    updateDraft: (fn: (d: StudyUpdate) => void) => void;
     staleInfo?: StaleInfo;
     onSync?: () => void;
     isSyncing?: boolean;
@@ -280,8 +279,7 @@ function SortableStatementItem({
                             variant="ghost"
                             size="icon"
                             onClick={() => {
-                                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-                                updateDraft((d: any) => {
+                                updateDraft((d) => {
                                     if (d.statements) {
                                         d.statements.splice(idx, 1);
                                     }
@@ -458,8 +456,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
         if (over && active.id !== over.id) {
             const oldIndex = localizedStatements.findIndex((s) => s.code === active.id);
             const newIndex = localizedStatements.findIndex((s) => s.code === over.id);
-            // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-            updateDraft((d: any) => {
+            updateDraft((d) => {
                 if (d.statements) {
                     d.statements = arrayMove(d.statements, oldIndex, newIndex);
                 }
@@ -470,8 +467,12 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
     const handleBulkSave = () => {
         if (!bulkText.trim()) return;
 
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic parsed statement items
-        let parsedItems: any[] = [];
+        type ParsedItem = {
+            code?: string | null;
+            text?: string;
+            translations?: { language_code: string; text: string }[];
+        };
+        let parsedItems: ParsedItem[] = [];
 
         if (detectedFormat.type === 'excel') {
             const rows = parseCsvTsv(bulkText, '\t');
@@ -487,14 +488,13 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
             if (hasCodeHeader || langHeaders.length > 0) {
                 // EXCEL HEADER MODE
                 parsedItems = rows.slice(1).map((cells) => {
-                    // biome-ignore lint/suspicious/noExplicitAny: dynamic parsed statement
-                    const item: any = { translations: [] };
+                    const item: ParsedItem = { translations: [] };
                     if (hasCodeHeader) {
                         item.code = cells[headers.indexOf('code')]?.trim();
                     }
                     langHeaders.forEach((lang) => {
                         const cellIdx = headers.indexOf(lang);
-                        if (cellIdx !== -1 && cells[cellIdx] !== undefined) {
+                        if (cellIdx !== -1 && cells[cellIdx] !== undefined && item.translations) {
                             item.translations.push({ language_code: lang, text: cells[cellIdx] });
                         }
                     });
@@ -533,8 +533,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
             });
         }
 
-        // biome-ignore lint/suspicious/noExplicitAny: draft update with dynamic statement structure
-        updateDraft((d: any) => {
+        updateDraft((d) => {
             if (importMode === 'replace') {
                 d.statements = [];
             }
@@ -558,8 +557,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
 
     const handleClearAll = () => {
         if (confirm(t('admin.design.qsort.set.confirm_clear'))) {
-            // biome-ignore lint/suspicious/noExplicitAny: complex types
-            updateDraft((d: any) => {
+            updateDraft((d) => {
                 d.statements = [];
             });
             toast.info(t('admin.design.qsort.set.cleared'));
@@ -671,17 +669,14 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
     };
 
     const handleSaveStatement = () => {
-        // biome-ignore lint/suspicious/noExplicitAny: complex state update
-        updateDraft((d: any) => {
-            if (d.statements?.[editingIndex as number]) {
-                const statement = d.statements[editingIndex as number];
-
+        updateDraft((d) => {
+            const statement = d.statements?.[editingIndex as number];
+            if (statement) {
                 // Update code
                 statement.code = editingCode;
 
                 const translation = statement.translations?.find(
-                    // biome-ignore lint/suspicious/noExplicitAny: complex types
-                    (t: any) => t.language_code === activeLocale
+                    (t) => t.language_code === activeLocale
                 );
                 if (translation) {
                     translation.text = editingText;
@@ -929,8 +924,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                     updateDraft((d) => {
                                                         if (d.statements) {
                                                             d.statements.forEach(
-                                                                // biome-ignore lint/suspicious/noExplicitAny: complex draft
-                                                                (s: any, idx: number) => {
+                                                                (s, idx: number) => {
                                                                     s.code = `s${idx + 1}`;
                                                                 }
                                                             );

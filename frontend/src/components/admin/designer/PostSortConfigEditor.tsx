@@ -21,6 +21,10 @@ import QuestionBuilder from './QuestionBuilder';
 
 import { useTranslation } from 'react-i18next';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
+import { postsortConfig } from '@/utils/studyConfig';
+import type { PostsortConfig } from '@/schemas/study';
+
+type PromptsMap = Record<string, string | Record<string, string> | undefined>;
 
 interface PostSortConfigEditorProps {
     readOnly?: boolean;
@@ -45,13 +49,12 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     // Helper to get translations in the active study locale
     const tStudy = (key: string) => i18n.t(key, { lng: activeLocale }) as string;
 
-    // biome-ignore lint/suspicious/noExplicitAny: complex config object
-    const config = draft.postsort_config as any;
+    const config = postsortConfig(draft);
 
     const extremeColumns = config?.extreme_columns || [];
     const allowRandomComments = config?.allow_random_comments ?? true;
     const allowMissingStatements = config?.missing_statements_enabled ?? true;
-    const prompts = config?.prompts || {};
+    const prompts = (config?.prompts ?? {}) as PromptsMap;
 
     const gridConfig = draft.grid_config as Array<{ score: number; capacity: number }> | undefined;
     const availableScores = gridConfig?.map((col) => col.score) || [];
@@ -66,17 +69,17 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     const setPromptText = (key: string, value: string) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig;
             if (!ps.prompts) ps.prompts = {};
-            const current = ps.prompts[key];
+            const promptsMap = ps.prompts as PromptsMap;
+            const current = promptsMap[key];
 
             if (!current) {
-                ps.prompts[key] = { [activeLocale]: value };
+                promptsMap[key] = { [activeLocale]: value };
             } else if (typeof current === 'string') {
-                ps.prompts[key] = { en: current, [activeLocale]: value };
+                promptsMap[key] = { en: current, [activeLocale]: value };
             } else {
-                ps.prompts[key] = { ...current, [activeLocale]: value };
+                promptsMap[key] = { ...current, [activeLocale]: value };
             }
         });
     };
@@ -84,8 +87,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     const addExtremeColumn = (score: number) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig;
             const current = ps.extreme_columns || [];
             if (!current.includes(score)) {
                 ps.extreme_columns = [...current, score].sort((a: number, b: number) => a - b);
@@ -96,8 +98,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
 
     const removeExtremeColumn = (score: number) => {
         updateDraft((d) => {
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig | null | undefined;
             if (ps) {
                 ps.extreme_columns = (ps.extreme_columns || []).filter((s: number) => s !== score);
             }
@@ -107,8 +108,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     const toggleAllowRandomComments = (checked: boolean) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig;
             ps.allow_random_comments = checked;
         });
     };
@@ -116,8 +116,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
     const toggleAllowMissingStatements = (checked: boolean) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig;
             ps.missing_statements_enabled = checked;
         });
     };
@@ -129,8 +128,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
 
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
+            const ps = d.postsort_config as PostsortConfig;
             ps.extreme_columns = [min, max].sort((a: number, b: number) => a - b);
         });
     };
@@ -517,9 +515,8 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                         // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — audio-section toggle with conditional default-config seed (steps/durations/required defaults inlined for legibility); the conditional seeding IS the contract for "first-time enable"
                                         updateDraft((d) => {
                                             if (!d.postsort_config) d.postsort_config = {};
-                                            // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                            const ps = d.postsort_config as any;
-                                            if (!ps.audio) ps.audio = {};
+                                            const ps = d.postsort_config as PostsortConfig;
+                                            if (!ps.audio) ps.audio = { enabled: false };
                                             ps.audio.enabled = checked;
                                             // Set defaults when enabling
                                             if (checked) {
@@ -560,9 +557,8 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                                 if (value < 30 || value > 600) return;
                                                 updateDraft((d) => {
                                                     if (!d.postsort_config) d.postsort_config = {};
-                                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                                    const ps = d.postsort_config as any;
-                                                    if (!ps.audio) ps.audio = {};
+                                                    const ps = d.postsort_config as PostsortConfig;
+                                                    if (!ps.audio) ps.audio = { enabled: true };
                                                     ps.audio.max_duration_seconds = value;
                                                 });
                                             }}
@@ -638,8 +634,8 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 if (checked === currentValue) return;
                                 updateDraft((d) => {
                                     if (!d.postsort_config) d.postsort_config = {};
-                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                    (d.postsort_config as any).email_collection_enabled = checked;
+                                    (d.postsort_config as PostsortConfig).email_collection_enabled =
+                                        checked;
                                 });
                             }}
                             disabled={readOnly}
@@ -661,10 +657,9 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                             if (checked === currentValue) return;
                                             updateDraft((d) => {
                                                 if (!d.postsort_config) d.postsort_config = {};
-
-                                                // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                                const config: any = d.postsort_config;
-                                                config.interview_consent_enabled = checked;
+                                                (
+                                                    d.postsort_config as PostsortConfig
+                                                ).interview_consent_enabled = checked;
                                             });
                                         }}
                                         disabled={readOnly}
@@ -693,9 +688,9 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                         if (checked === currentValue) return;
                                         updateDraft((d) => {
                                             if (!d.postsort_config) d.postsort_config = {};
-                                            // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                            (d.postsort_config as any).newsletter_consent_enabled =
-                                                checked;
+                                            (
+                                                d.postsort_config as PostsortConfig
+                                            ).newsletter_consent_enabled = checked;
                                         });
                                     }}
                                     disabled={readOnly}
