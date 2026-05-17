@@ -23,6 +23,13 @@ updates:
     labels:
       - "dependencies"
       - "backend"
+    # `mando` is a transitive dependency pulled in only by `radon`.
+    # radon 6.0.1 (latest) hard-caps it at `mando<0.8`, so a Dependabot
+    # bump to mando>=0.8 produces an unsolvable pip resolution and breaks
+    # the Scalingo deploy (PR #132 did exactly this). Its version is
+    # dictated by radon — never bump it independently.
+    ignore:
+      - dependency-name: "mando"
 
   - package-ecosystem: "npm"
     directory: "/frontend"
