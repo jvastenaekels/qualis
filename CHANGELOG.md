@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.7.0](https://github.com/jvastenaekels/qualis/compare/v0.6.8...v0.7.0) (2026-05-17)
+
+
+### Bug fixes
+
+* **admin:** /app/users showed no users + harden flaky backend tests ([#186](https://github.com/jvastenaekels/qualis/issues/186)) ([97beab2](https://github.com/jvastenaekels/qualis/commit/97beab254590a8ca5cdabcf977b7266b66ea2b3d))
+* **designer:** presortFields must not leak the {enabled} wrapper as a field map ([#185](https://github.com/jvastenaekels/qualis/issues/185)) ([375a4bc](https://github.com/jvastenaekels/qualis/commit/375a4bc21e26bfb2cec5b549ab5c8c7c2925a8d1))
+
+
+### Refactor
+
+* **admin:** extract useInteractiveDataView (code-quality wave 1) ([#176](https://github.com/jvastenaekels/qualis/issues/176)) ([1235b45](https://github.com/jvastenaekels/qualis/commit/1235b459f907e8dfa55f2034308ae2c965ed3533))
+* **audio:** extract useAudioRecorder — code-quality wave 3 ([#179](https://github.com/jvastenaekels/qualis/issues/179)) ([a2fd882](https://github.com/jvastenaekels/qualis/commit/a2fd8827d0b36992ff694dbc4130179d50d1b5e2))
+* **audio:** fold useAudioRecorder ui-coupling (W3 follow-up) ([#184](https://github.com/jvastenaekels/qualis/issues/184)) ([fd36db2](https://github.com/jvastenaekels/qualis/commit/fd36db216a53dd6309acf1a4614835304294e506))
+* **designer:** extract useQSortEditor — code-quality wave 4 ([#183](https://github.com/jvastenaekels/qualis/issues/183)) ([3c5cd7c](https://github.com/jvastenaekels/qualis/commit/3c5cd7cae8d25893230b3140e4a4bbef78042a15))
+* **types:** adopt StudyConfig types — code-quality wave 2 ([#178](https://github.com/jvastenaekels/qualis/issues/178)) ([ea033f6](https://github.com/jvastenaekels/qualis/commit/ea033f6d5162fe7a2d359464dd099ca45c228014))
+
+
+### Chore
+
+* release 0.7.0 ([5230f9a](https://github.com/jvastenaekels/qualis/commit/5230f9a16fd2a555b293ae6343a144b6bd77d5ec))
+
 ## [0.6.8](https://github.com/jvastenaekels/qualis/compare/v0.6.7...v0.6.8) (2026-05-15)
 
 
