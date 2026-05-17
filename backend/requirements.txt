@@ -145,7 +145,7 @@ mypy-extensions==1.1.0
     # via mypy
 nodeenv==1.10.0
     # via pre-commit
-numpy==2.4.2
+numpy==2.4.4
     # via qualis-backend
 packageurl-python==0.17.6
     # via cyclonedx-python-lib
