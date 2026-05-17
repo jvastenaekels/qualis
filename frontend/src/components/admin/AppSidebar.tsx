@@ -93,8 +93,16 @@ function NavLanguage() {
     );
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: mock user
-function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
+function NavUser({
+    user,
+    projectSlug,
+    isSuperuser,
+}: {
+    // biome-ignore lint/suspicious/noExplicitAny: mock user
+    user: any;
+    projectSlug?: string;
+    isSuperuser: boolean;
+}) {
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -150,6 +158,12 @@ function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
                                 <BadgeCheck className="mr-2 h-4 w-4" />
                                 {t('admin.layout.account', 'Account settings')}
                             </DropdownMenuItem>
+                            {isSuperuser && (
+                                <DropdownMenuItem onSelect={() => navigate('/app/users')}>
+                                    <ShieldCheck className="mr-2 h-4 w-4" />
+                                    {t('admin.layout.platform_settings', 'Platform settings')}
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={handleLogout}>
@@ -380,30 +394,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </SidebarMenu>
                     </SidebarGroup>
                 )}
-                {isSuperuser && (
-                    <SidebarGroup>
-                        <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
-                            {t('admin.sidebar.platform', 'Platform')}
-                        </SidebarGroupLabel>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    asChild
-                                    isActive={location.pathname === '/app/users'}
-                                >
-                                    <Link to="/app/users">
-                                        <Users />
-                                        <span>{t('admin.sidebar.users', 'Users')}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroup>
-                )}
             </SidebarContent>
             <SidebarFooter className="gap-2">
                 <NavLanguage />
-                <NavUser user={user} projectSlug={projectSlug} />
+                <NavUser user={user} projectSlug={projectSlug} isSuperuser={isSuperuser} />
             </SidebarFooter>
         </Sidebar>
     );
