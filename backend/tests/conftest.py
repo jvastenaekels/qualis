@@ -14,9 +14,13 @@ from dotenv import load_dotenv
 # Load .env from project root so TEST_DATABASE_URL is available
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
+import asyncio
+
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select, text
+from sqlalchemy.engine import make_url
 
 # Set testing environment variable BEFORE app modules are imported
 os.environ["TESTING"] = "true"
@@ -46,10 +50,82 @@ TEST_PASSWORD = "testpassword"
 
 # Use PostgreSQL for testing.
 # Set TEST_DATABASE_URL in your .env file (project root) or environment.
-TEST_DATABASE_URL = os.getenv(
+_BASE_TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
     "postgresql+asyncpg://postgres:postgres@localhost:5432/qualis_test",
 )
+
+
+def _derive_isolated_db() -> tuple[str, str, str | None]:
+    """Give every pytest *process* its own database.
+
+    Test isolation here is per-test ``DROP SCHEMA public CASCADE`` on a
+    single shared database. That is correct *within* one process but
+    catastrophic *across* concurrent processes: two overlapping
+    ``pytest`` runs (overlapping ``make ci-fast`` invocations, a CI job
+    racing a local run, two git worktrees — see the worktree test-env
+    notes) drop each other's schema mid-test, producing nondeterministic
+    SQLAlchemy failures that pass on every retry-in-isolation.
+
+    Fix: namespace the database name with ``{xdist-worker}_{pid}`` so
+    concurrent processes never share storage. CREATE/DROP DATABASE runs
+    over the *base* URL itself — the one the suite already connects to
+    successfully — so this assumes no extra privileges (e.g. access to
+    the ``postgres`` maintenance database) beyond what the suite needs
+    today, and leaves the base database pristine (only the per-process
+    copies are ever schema-dropped). Opt out (e.g. a CI role without
+    CREATEDB) with ``QUALIS_TEST_DB_ISOLATION=0`` — that restores the
+    legacy shared-DB behaviour and its concurrency hazard.
+
+    Returns ``(test_url, maintenance_url, isolated_db_name)``.
+    ``isolated_db_name`` is ``None`` when isolation is disabled.
+    """
+    url = make_url(_BASE_TEST_DATABASE_URL)
+    if os.getenv("QUALIS_TEST_DB_ISOLATION", "1") == "0":
+        return _BASE_TEST_DATABASE_URL, _BASE_TEST_DATABASE_URL, None
+    worker = os.getenv("PYTEST_XDIST_WORKER", "main")
+    db_name = f"{url.database or 'qualis_test'}_{worker}_{os.getpid()}"
+    # render_as_string(hide_password=False): str(URL) masks the password
+    # as "***", which would break authentication for every DB connection.
+    per_process_url = url.set(database=db_name).render_as_string(hide_password=False)
+    return per_process_url, _BASE_TEST_DATABASE_URL, db_name
+
+
+TEST_DATABASE_URL, _MAINTENANCE_DATABASE_URL, _ISOLATED_DB_NAME = _derive_isolated_db()
+# Propagate so subprocess-driven tests (Alembic integration) and any
+# importer of TEST_DATABASE_URL target this process's isolated database.
+os.environ["TEST_DATABASE_URL"] = TEST_DATABASE_URL
+
+
+async def _maintenance_exec(sql: str) -> None:
+    """Run one autocommit statement against the base database.
+
+    CREATE/DROP DATABASE cannot run inside a transaction, hence the
+    AUTOCOMMIT isolation level and a dedicated short-lived engine.
+    """
+    engine = create_async_engine(_MAINTENANCE_DATABASE_URL, isolation_level="AUTOCOMMIT")
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text(sql))
+    finally:
+        await engine.dispose()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _isolated_test_database():
+    """Create this process's database before tests, drop it after.
+
+    Sync fixture driving ``asyncio.run`` so it does not depend on
+    pytest-asyncio's per-test event-loop scope. ``WITH (FORCE)`` evicts
+    any straggler connection (PostgreSQL 13+) so the drop cannot hang.
+    """
+    if _ISOLATED_DB_NAME is None:
+        yield
+        return
+    asyncio.run(_maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)'))
+    asyncio.run(_maintenance_exec(f'CREATE DATABASE "{_ISOLATED_DB_NAME}"'))
+    yield
+    asyncio.run(_maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)'))
 
 
 @pytest_asyncio.fixture
