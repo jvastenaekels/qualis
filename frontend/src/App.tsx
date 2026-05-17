@@ -361,9 +361,12 @@ const router = createBrowserRouter([
 ]);
 
 import { ViewportProvider } from '@/contexts/ViewportContext';
+import { usePlatformConfigBootstrap } from '@/hooks/usePlatformConfigBootstrap';
 import { MotionConfig } from 'framer-motion';
 
 const App = () => {
+    usePlatformConfigBootstrap();
+
     return (
         <ErrorBoundary>
             <ViewportProvider>
