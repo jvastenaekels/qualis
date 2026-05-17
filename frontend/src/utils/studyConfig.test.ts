@@ -25,6 +25,18 @@ describe('presortFields — legacy/new union collapse', () => {
         expect(presortFields({ presort_config: null })).toEqual({});
         expect(presortFields(null)).toEqual({});
     });
+
+    // Regression (admin-E2E crash): new-shape config with `enabled` but NO
+    // `fields` key (presort enabled, zero fields — very common). MUST NOT
+    // fall through to the legacy branch and return the wrapper object (whose
+    // boolean `enabled` would then be iterated as a "field" by
+    // normalizeQuestionMap → normalizeQuestion(true) → "Cannot create
+    // property 'label' on boolean 'true'"). Pre-W2 code read `.fields` here
+    // (undefined → safe no-op); the accessor must reproduce that.
+    it('returns {} for an enabled wrapper that has no fields key', () => {
+        expect(presortFields({ presort_config: { enabled: true } })).toEqual({});
+        expect(presortFields({ presort_config: { enabled: false } })).toEqual({});
+    });
 });
 
 describe('postsortConfig', () => {

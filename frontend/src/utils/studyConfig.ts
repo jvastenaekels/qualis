@@ -48,11 +48,22 @@ type ConfigLike =
     | null
     | undefined;
 
-/** Field map regardless of legacy (flat record) vs new ({enabled, fields}). */
+/**
+ * Field map regardless of legacy (flat record) vs new ({enabled, fields}).
+ *
+ * The new wrapper shape is identified by the presence of EITHER `enabled` OR
+ * `fields` — in that case only the explicit `fields` map are fields (a config
+ * with `enabled` but no `fields` has zero presort fields → `{}`). Only a
+ * config carrying NEITHER key is a genuine legacy flat field-map. This matches
+ * the pre-accessor behaviour (`presort_config.fields`, undefined → no fields);
+ * returning the wrapper object itself would leak the boolean `enabled` into
+ * the field map (regression: normalizeQuestion(true) → "Cannot create
+ * property 'label' on boolean 'true'").
+ */
 export function presortFields(config: ConfigLike): Record<string, PreSortField> {
     const pc = config?.presort_config;
     if (!pc || typeof pc !== 'object') return {};
-    if ('fields' in pc) {
+    if ('fields' in pc || 'enabled' in pc) {
         return (pc as { fields?: Record<string, PreSortField> }).fields ?? {};
     }
     return pc as Record<string, PreSortField>;

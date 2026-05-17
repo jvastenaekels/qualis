@@ -116,3 +116,40 @@ describe('useStudyDesigner - importConfig', () => {
         expect(useStudyDesigner.getState().syncStatus).toBe('modified');
     });
 });
+
+describe('useStudyDesigner - setStudy normalize regression (admin-E2E crash)', () => {
+    // Regression: a study with presort enabled but ZERO presort fields has
+    // `presort_config: { enabled: true }` (no `fields` key). The design page
+    // loads it via setStudy → normalizeStudyData. The W2 `presortFields`
+    // accessor's legacy fallback used to return the wrapper object itself, so
+    // normalizeQuestionMap iterated the boolean `enabled` and called
+    // normalizeQuestion(true) → "TypeError: Cannot create property 'label' on
+    // boolean 'true'" → StudyDesignPage error boundary → admin E2E failures
+    // (study-status missing; export menu unreachable). setStudy must not throw
+    // and must produce a usable draft.
+    it('setStudy does not throw for presort_config:{enabled:true} (no fields)', () => {
+        const study = {
+            ...MOCK_STUDY,
+            presort_config: { enabled: true },
+        } as unknown as StudyRead;
+        expect(() => useStudyDesigner.getState().setStudy(study)).not.toThrow();
+        expect(useStudyDesigner.getState().draft).not.toBeNull();
+        expect(useStudyDesigner.getState().draft?.statements?.length).toBe(1);
+    });
+
+    it('setStudy still normalizes real presort fields under the new wrapper', () => {
+        const study = {
+            ...MOCK_STUDY,
+            presort_config: {
+                enabled: true,
+                fields: { age: { type: 'number', label: 'Age' } },
+            },
+        } as unknown as StudyRead;
+        expect(() => useStudyDesigner.getState().setStudy(study)).not.toThrow();
+        const pc = useStudyDesigner.getState().draft?.presort_config as {
+            fields?: Record<string, { label?: unknown }>;
+        };
+        // The field survived normalization (label localized to an object map).
+        expect(pc.fields?.age).toBeDefined();
+    });
+});
