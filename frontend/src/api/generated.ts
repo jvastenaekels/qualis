@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+    AdminSetEmailRequest,
     AnalysisRequest,
     AnalysisRunPatch,
     BodyLoginForAccessTokenApiTokenPost,
@@ -77,6 +78,7 @@ import type {
     ProjectInvitationCreate,
     ProjectMemberUpdate,
     ProjectUpdate,
+    RecoveryLinkRequest,
     RecruitmentLinkCreate,
     StudyCreate,
     StudyImportRequest,
@@ -145,6 +147,8 @@ import type {
     ProjectMemberRead,
     ProjectRead,
     ProjectWithRole,
+    PublicConfig,
+    RecoveryLinkResponse,
     RecruitmentLinkRead,
     ReportLogApiLogsPost200,
     ResolvedStudyConfigResponse,
@@ -8360,6 +8364,194 @@ export const useResetTotpEndpointApiAdminUsersUserIdResetTotpPost = <
 };
 
 /**
+ * Superuser-only: mint a password-reset link for out-of-band
+delivery (SMTP-optional mode). Does NOT rotate the password and
+persists nothing. Audit-logged on every call.
+ * @summary Recovery Link Endpoint
+ */
+export const recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost = (
+    userId: number,
+    recoveryLinkRequest: RecoveryLinkRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<RecoveryLinkResponse>({
+        url: `/api/admin/users/${userId}/recovery-link`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: recoveryLinkRequest,
+        signal,
+    });
+};
+
+export const getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>,
+        TError,
+        { userId: number; data: RecoveryLinkRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>,
+    TError,
+    { userId: number; data: RecoveryLinkRequest },
+    TContext
+> => {
+    const mutationKey = ['recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>,
+        { userId: number; data: RecoveryLinkRequest }
+    > = (props) => {
+        const { userId, data } = props ?? {};
+
+        return recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost(userId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>
+>;
+export type RecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMutationBody =
+    RecoveryLinkRequest;
+export type RecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Recovery Link Endpoint
+ */
+export const useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>,
+            TError,
+            { userId: number; data: RecoveryLinkRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof recoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost>>,
+    TError,
+    { userId: number; data: RecoveryLinkRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Superuser-only: set a user's email directly (SMTP-optional path,
+bypasses the F-03-011 dual-confirmation flow by design — the
+superuser is the trust anchor when SMTP may be unavailable). Clears
+any in-flight ``pending_email``. Audit-logged on every call.
+
+Side effect: the target's existing access tokens carry
+``sub=old-email``, so they stop validating on the next request
+(user-by-email lookup miss → 401) and the user must re-log in under
+the new address. ``password_changed_at`` is intentionally not bumped
+— an email change is not a credential rotation (consistent with
+F-03-011).
+ * @summary Set Email Endpoint
+ */
+export const setEmailEndpointApiAdminUsersUserIdSetEmailPost = (
+    userId: number,
+    adminSetEmailRequest: AdminSetEmailRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<UserReadAdmin>({
+        url: `/api/admin/users/${userId}/set-email`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: adminSetEmailRequest,
+        signal,
+    });
+};
+
+export const getSetEmailEndpointApiAdminUsersUserIdSetEmailPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>,
+        TError,
+        { userId: number; data: AdminSetEmailRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>,
+    TError,
+    { userId: number; data: AdminSetEmailRequest },
+    TContext
+> => {
+    const mutationKey = ['setEmailEndpointApiAdminUsersUserIdSetEmailPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>,
+        { userId: number; data: AdminSetEmailRequest }
+    > = (props) => {
+        const { userId, data } = props ?? {};
+
+        return setEmailEndpointApiAdminUsersUserIdSetEmailPost(userId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type SetEmailEndpointApiAdminUsersUserIdSetEmailPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>
+>;
+export type SetEmailEndpointApiAdminUsersUserIdSetEmailPostMutationBody = AdminSetEmailRequest;
+export type SetEmailEndpointApiAdminUsersUserIdSetEmailPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Set Email Endpoint
+ */
+export const useSetEmailEndpointApiAdminUsersUserIdSetEmailPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>,
+            TError,
+            { userId: number; data: AdminSetEmailRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof setEmailEndpointApiAdminUsersUserIdSetEmailPost>>,
+    TError,
+    { userId: number; data: AdminSetEmailRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getSetEmailEndpointApiAdminUsersUserIdSetEmailPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * List all recruitment links for a specific study.
  * @summary List Study Links
  */
@@ -14427,6 +14619,122 @@ export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext =
 };
 
 /**
+ * Return client bootstrap config. Unauthenticated by design — it
+exposes only the email-delivery mode, no secrets.
+ * @summary Get Public Config
+ */
+export const getPublicConfigApiConfigGet = (signal?: AbortSignal) => {
+    return customInstance<PublicConfig>({ url: `/api/config`, method: 'GET', signal });
+};
+
+export const getGetPublicConfigApiConfigGetQueryKey = () => {
+    return [`/api/config`] as const;
+};
+
+export const getGetPublicConfigApiConfigGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getGetPublicConfigApiConfigGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>> = ({
+        signal,
+    }) => getPublicConfigApiConfigGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetPublicConfigApiConfigGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>
+>;
+export type GetPublicConfigApiConfigGetQueryError = unknown;
+
+export function useGetPublicConfigApiConfigGet<
+    TData = Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>, TError, TData>
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetPublicConfigApiConfigGet<
+    TData = Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>, TError, TData>
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetPublicConfigApiConfigGet<
+    TData = Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Public Config
+ */
+
+export function useGetPublicConfigApiConfigGet<
+    TData = Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof getPublicConfigApiConfigGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetPublicConfigApiConfigGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Upload audio recording for a participant response.
 
 Args:
@@ -18373,6 +18681,56 @@ export const getPatchUserApiAdminUsersUserIdPatchResponseMock = (
     ...overrideResponse,
 });
 
+export const getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostResponseMock = (
+    overrideResponse: Partial<RecoveryLinkResponse> = {}
+): RecoveryLinkResponse => ({
+    kind: 'password_reset',
+    url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    expires_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getSetEmailEndpointApiAdminUsersUserIdSetEmailPostResponseMock = (
+    overrideResponse: Partial<UserReadAdmin> = {}
+): UserReadAdmin => ({
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    full_name: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    is_active: faker.datatype.boolean(),
+    is_superuser: faker.datatype.boolean(),
+    is_totp_enabled: faker.datatype.boolean(),
+    pending_email: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    owned_project_quota: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                count: faker.number.int({ min: undefined, max: undefined }),
+                limit: faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    email_verified_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    password_changed_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    last_login_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getListStudyLinksApiAdminRecruitmentSlugLinksGetResponseMock =
     (): RecruitmentLinkRead[] =>
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
@@ -19777,6 +20135,13 @@ export const getResumeSessionApiStudySlugResumeCodeGetResponseMock = (
 
 export const getReportLogApiLogsPostResponseMock = (): ReportLogApiLogsPost200 => ({
     [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
+});
+
+export const getGetPublicConfigApiConfigGetResponseMock = (
+    overrideResponse: Partial<PublicConfig> = {}
+): PublicConfig => ({
+    email_delivery: faker.helpers.arrayElement(['smtp', 'manual'] as const),
+    ...overrideResponse,
 });
 
 export const getUploadAudioApiAudioUploadPostResponseMock = (
@@ -21393,6 +21758,58 @@ export const getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMockHandler = (
     );
 };
 
+export const getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMockHandler = (
+    overrideResponse?:
+        | RecoveryLinkResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<RecoveryLinkResponse> | RecoveryLinkResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users/:userId/recovery-link',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getSetEmailEndpointApiAdminUsersUserIdSetEmailPostMockHandler = (
+    overrideResponse?:
+        | UserReadAdmin
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<UserReadAdmin> | UserReadAdmin),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users/:userId/set-email',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getSetEmailEndpointApiAdminUsersUserIdSetEmailPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler = (
     overrideResponse?:
         | RecruitmentLinkRead[]
@@ -22711,6 +23128,32 @@ export const getReportLogApiLogsPostMockHandler = (
     );
 };
 
+export const getGetPublicConfigApiConfigGetMockHandler = (
+    overrideResponse?:
+        | PublicConfig
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<PublicConfig> | PublicConfig),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/config',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetPublicConfigApiConfigGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getUploadAudioApiAudioUploadPostMockHandler = (
     overrideResponse?:
         | AudioUploadResponse
@@ -22874,6 +23317,8 @@ export const getQualisAPIMock = () => [
     getDeleteUserApiAdminUsersUserIdDeleteMockHandler(),
     getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMockHandler(),
     getResetTotpEndpointApiAdminUsersUserIdResetTotpPostMockHandler(),
+    getRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPostMockHandler(),
+    getSetEmailEndpointApiAdminUsersUserIdSetEmailPostMockHandler(),
     getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler(),
     getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandler(),
     getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler(),
@@ -22928,6 +23373,7 @@ export const getQualisAPIMock = () => [
     getResumeSessionApiStudySlugResumeCodeGetMockHandler(),
     getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMockHandler(),
     getReportLogApiLogsPostMockHandler(),
+    getGetPublicConfigApiConfigGetMockHandler(),
     getUploadAudioApiAudioUploadPostMockHandler(),
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),
     getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler(),
