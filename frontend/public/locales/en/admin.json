@@ -254,6 +254,7 @@
             "beta": "Research beta",
             "logout": "Log out",
             "account": "Account settings",
+            "platform_settings": "Platform settings",
             "admin_user": "Admin user"
         },
         "account": {
@@ -341,9 +342,7 @@
             "select_project": "Select project",
             "concourses": "Concourses",
             "concourse": "Concourse",
-            "members": "Team members",
-            "platform": "Platform",
-            "users": "Users"
+            "members": "Team members"
         },
         "concourse": {
             "title": "Concourse",

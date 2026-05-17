@@ -166,6 +166,7 @@
             "beta": "Bêta",
             "logout": "Déconnexion",
             "account": "Paramètres du compte",
+            "platform_settings": "Paramètres de la plateforme",
             "admin_user": "Administrateur"
         },
         "account": {
@@ -253,9 +254,7 @@
             "study_tools": "Outils d'étude",
             "concourses": "Concours",
             "concourse": "Concours",
-            "members": "Membres de l'équipe",
-            "platform": "Plateforme",
-            "users": "Utilisateurs"
+            "members": "Membres de l'équipe"
         },
         "concourse": {
             "title": "Concours",
