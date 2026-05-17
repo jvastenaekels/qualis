@@ -2192,6 +2192,8 @@
             "subtitle": "Manage platform accounts and audit hygiene.",
             "error_title": "Action failed",
             "generic_error": "Something went wrong. Please try again.",
+            "load_error_title": "Could not load users",
+            "load_error_body": "The user list could not be retrieved. Please refresh the page or try again later.",
             "search_placeholder": "Search by email or name",
             "empty": "No users match.",
             "inactive": "Inactive",

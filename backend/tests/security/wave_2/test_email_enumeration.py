@@ -116,24 +116,43 @@ async def _time_post(
     return r.status_code, body, dt
 
 
-async def _collect_arm(
-    fire: Callable[[], Awaitable[tuple[int, Any, float]]],
-) -> tuple[list[int], list[Any], float]:
-    """Fire ``fire()`` ``N_WARMUP + N_SAMPLES`` times. Drop warmup,
-    return (statuses, bodies, median_ms).
+async def _collect_interleaved(
+    known: Callable[[], Awaitable[tuple[int, Any, float]]],
+    unknown: Callable[[], Awaitable[tuple[int, Any, float]]],
+) -> tuple[float, float]:
+    """Sample both arms *alternately* in one loop; return
+    ``(median_known_ms, median_unknown_ms)`` over ``N_SAMPLES`` after
+    dropping ``N_WARMUP``.
 
-    Median (not mean) is used so sporadic CI scheduler/GC spikes in a
-    few samples don't shift the arm's reported latency — only a
-    systematic, exploitable shift in central tendency does.
+    Why interleaved, not arm-after-arm: the original collector ran all
+    ``known`` samples, then all ``unknown`` samples. Slow system-load
+    drift across the ~15 s phase boundary (a CI I/O burst, CPU
+    contention ramping — e.g. a concurrent backup during ``make ci``)
+    shifts one arm's median relative to the other with no actual
+    code-path leak, and a 200 ms bound can't survive that. Median +
+    warmup (the earlier hardening) defeats *sporadic spikes* but not
+    *phase-correlated drift*. Interleaving samples both arms under the
+    same instantaneous load, so drift hits both equally and cancels in
+    the delta. The order is alternated each iteration so neither arm
+    systematically pays the other's cache/scheduler warm-up cost.
+
+    Median (not mean) still guards against the residual sporadic spike.
     """
-    samples: list[tuple[int, Any, float]] = []
-    for _ in range(N_WARMUP + N_SAMPLES):
-        samples.append(await fire())
-    samples = samples[N_WARMUP:]
-    statuses = [s[0] for s in samples]
-    bodies = [s[1] for s in samples]
-    median_ms = statistics.median(s[2] for s in samples)
-    return statuses, bodies, median_ms
+    k_ms: list[float] = []
+    u_ms: list[float] = []
+    for i in range(N_WARMUP + N_SAMPLES):
+        if i % 2 == 0:
+            ks = await known()
+            us = await unknown()
+        else:
+            us = await unknown()
+            ks = await known()
+        k_ms.append(ks[2])
+        u_ms.append(us[2])
+    return (
+        statistics.median(k_ms[N_WARMUP:]),
+        statistics.median(u_ms[N_WARMUP:]),
+    )
 
 
 @pytest_asyncio.fixture
@@ -227,8 +246,7 @@ class TestTokenEnumeration:
                 data={"username": "no-such@example.com", "password": "wrong"},
             )
 
-        _, _, median_known = await _collect_arm(known)
-        _, _, median_unknown = await _collect_arm(unknown)
+        median_known, median_unknown = await _collect_interleaved(known, unknown)
 
         delta = abs(median_known - median_unknown)
         assert delta < TIMING_THRESHOLD_MS, (
@@ -291,8 +309,7 @@ class TestPasswordResetRequestEnumeration:
                 json_payload={"email": "no-such@example.com"},
             )
 
-        _, _, median_known = await _collect_arm(known)
-        _, _, median_unknown = await _collect_arm(unknown)
+        median_known, median_unknown = await _collect_interleaved(known, unknown)
 
         delta = abs(median_known - median_unknown)
         assert delta < self._RESET_TIMING_THRESHOLD_MS, (
@@ -339,8 +356,7 @@ class TestVerifyResendEnumeration:
                 json_payload={"email": "no-such@example.com"},
             )
 
-        _, _, median_known = await _collect_arm(known)
-        _, _, median_unknown = await _collect_arm(unknown)
+        median_known, median_unknown = await _collect_interleaved(known, unknown)
 
         delta = abs(median_known - median_unknown)
         assert delta < TIMING_THRESHOLD_MS, (
@@ -385,8 +401,7 @@ class TestTwofaDisableRequestEnumeration:
                 json_payload={"email": "no-such@example.com"},
             )
 
-        _, _, median_known = await _collect_arm(known)
-        _, _, median_unknown = await _collect_arm(unknown)
+        median_known, median_unknown = await _collect_interleaved(known, unknown)
 
         delta = abs(median_known - median_unknown)
         assert delta < TIMING_THRESHOLD_MS, (

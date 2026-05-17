@@ -235,4 +235,15 @@ describe('AdminUsersPage', () => {
         expect(screen.getByText(/no users match/i)).toBeInTheDocument();
         expect(screen.queryAllByTestId('admin-users-row')).toHaveLength(0);
     });
+
+    // Regression: a failed list query must surface an error, NOT masquerade
+    // as an empty "No users match." list (the bug that hid the limit=200 422).
+    it('surfaces a load error instead of the empty state when the query fails', () => {
+        useAdminUsersPageMock.mockReturnValue(
+            hookValue({ users: [], error: new Error('Request failed with status code 422') })
+        );
+        renderWithProviders(<AdminUsersPage />);
+        expect(screen.getByText(/could not load users/i)).toBeInTheDocument();
+        expect(screen.queryByText(/no users match/i)).not.toBeInTheDocument();
+    });
 });

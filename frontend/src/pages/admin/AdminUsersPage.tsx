@@ -126,6 +126,7 @@ export default function AdminUsersPage() {
     const {
         users,
         isLoading,
+        error,
         search,
         setSearch,
         filter,
@@ -211,6 +212,21 @@ export default function AdminUsersPage() {
                             {Array.from({ length: 4 }).map((_, i) => (
                                 <Skeleton key={i} className="h-16 w-full rounded-xl" />
                             ))}
+                        </div>
+                    ) : error != null ? (
+                        <div className="p-12">
+                            <Alert variant="destructive">
+                                <AlertCircle className="size-4" />
+                                <AlertTitle>
+                                    {t('admin.users.load_error_title', 'Could not load users')}
+                                </AlertTitle>
+                                <AlertDescription>
+                                    {t(
+                                        'admin.users.load_error_body',
+                                        'The user list could not be retrieved. Please refresh the page or try again later.'
+                                    )}
+                                </AlertDescription>
+                            </Alert>
                         </div>
                     ) : users.length === 0 ? (
                         <div className="p-12 text-center text-sm font-medium text-slate-500">

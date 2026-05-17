@@ -133,6 +133,24 @@ describe('deriveRiskBadges — dormant', () => {
     });
 });
 
+// Regression: the list query must respect the backend pagination contract.
+// `PaginationParams` caps `limit` at MAX_PAGE_SIZE=100; requesting 200 makes
+// the endpoint return 422, the page renders empty, and the error is swallowed
+// because AdminUsersPage never surfaces the query error. (#171 shipped at 200.)
+describe('useAdminUsersPage — list query contract', () => {
+    it('requests the user list with a limit within the API maximum (<=100)', () => {
+        renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
+
+        expect(mockListUsersHook).toHaveBeenCalled();
+        const params = mockListUsersHook.mock.calls[0]?.[0] as
+            | { limit?: number; offset?: number }
+            | undefined;
+        expect(params?.limit).toBeDefined();
+        expect(params?.limit).toBeLessThanOrEqual(100);
+        expect(params?.limit).toBeGreaterThanOrEqual(1);
+    });
+});
+
 // Fix C — renderHook integration tests for filter/search/sort inside useAdminUsersPage
 describe('useAdminUsersPage — filtered list integration', () => {
     const userA: AdminUser = {

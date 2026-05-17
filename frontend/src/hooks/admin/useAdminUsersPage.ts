@@ -105,7 +105,9 @@ export function useAdminUsersPage() {
         user: AdminUser;
     } | null>(null);
 
-    const listParams = { limit: 200, offset: 0 };
+    // limit is capped at the backend MAX_PAGE_SIZE (100); requesting more
+    // makes GET /api/admin/users return 422 and the page renders empty.
+    const listParams = { limit: 100, offset: 0 };
 
     const { data, isLoading, error } = useListUsersApiAdminUsersGet(listParams);
 
