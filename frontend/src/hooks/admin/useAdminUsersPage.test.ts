@@ -17,14 +17,21 @@ import {
 
 // ── Mocks ─────────────────────────────────────────────────────────
 
-const { mockListUsersHook, mockPatchHook, mockDeleteHook, mockForcePwHook, mockResetTotpHook } =
-    vi.hoisted(() => ({
-        mockListUsersHook: vi.fn(),
-        mockPatchHook: vi.fn(),
-        mockDeleteHook: vi.fn(),
-        mockForcePwHook: vi.fn(),
-        mockResetTotpHook: vi.fn(),
-    }));
+const {
+    mockListUsersHook,
+    mockPatchHook,
+    mockDeleteHook,
+    mockForcePwHook,
+    mockResetTotpHook,
+    mockRecoveryLinkHook,
+} = vi.hoisted(() => ({
+    mockListUsersHook: vi.fn(),
+    mockPatchHook: vi.fn(),
+    mockDeleteHook: vi.fn(),
+    mockForcePwHook: vi.fn(),
+    mockResetTotpHook: vi.fn(),
+    mockRecoveryLinkHook: vi.fn(),
+}));
 
 vi.mock('@/api/generated', () => ({
     useListUsersApiAdminUsersGet: mockListUsersHook,
@@ -32,6 +39,7 @@ vi.mock('@/api/generated', () => ({
     useDeleteUserApiAdminUsersUserIdDelete: mockDeleteHook,
     useForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost: mockForcePwHook,
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost: mockResetTotpHook,
+    useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost: mockRecoveryLinkHook,
     getListUsersApiAdminUsersGetQueryKey: () => ['list-users'],
 }));
 
@@ -64,6 +72,7 @@ beforeEach(() => {
     mockDeleteHook.mockReturnValue(makeIdleMutation());
     mockForcePwHook.mockReturnValue(makeIdleMutation());
     mockResetTotpHook.mockReturnValue(makeIdleMutation());
+    mockRecoveryLinkHook.mockReturnValue(makeIdleMutation());
 });
 
 // ── Pure function tests ───────────────────────────────────────────

@@ -34,6 +34,7 @@ import {
     useDeleteUserApiAdminUsersUserIdDelete,
     useForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost,
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost,
+    useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost,
     getListUsersApiAdminUsersGetQueryKey,
 } from '@/api/generated';
 import type { UserReadAdmin } from '@/api/model';
@@ -128,6 +129,9 @@ export function useAdminUsersPage() {
     const resetTotp = useResetTotpEndpointApiAdminUsersUserIdResetTotpPost({
         mutation: { onSuccess: invalidate },
     });
+    // No onSuccess invalidation: generating a recovery link is non-destructive
+    // and does not mutate any user-list state.
+    const recoveryLink = useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost();
 
     const now = useMemo(() => new Date(), []); // intentional: page-lifetime clock (admin page is short-lived)
 
@@ -169,7 +173,11 @@ export function useAdminUsersPage() {
         setPendingAction,
         now,
         isMutating:
-            patch.isPending || del.isPending || forcePwReset.isPending || resetTotp.isPending,
+            patch.isPending ||
+            del.isPending ||
+            forcePwReset.isPending ||
+            resetTotp.isPending ||
+            recoveryLink.isPending,
         mutationError: patch.error ?? del.error ?? forcePwReset.error ?? resetTotp.error ?? null,
         actions: {
             deactivate: (u: AdminUser) =>
@@ -182,6 +190,13 @@ export function useAdminUsersPage() {
                 patch.mutateAsync({ userId: u.id, data: { is_superuser: false } }),
             forcePasswordReset: (u: AdminUser) => forcePwReset.mutateAsync({ userId: u.id }),
             resetTotp: (u: AdminUser) => resetTotp.mutateAsync({ userId: u.id }),
+            generateRecoveryLink: async (u: AdminUser): Promise<string> => {
+                const res = await recoveryLink.mutateAsync({
+                    userId: u.id,
+                    data: { kind: 'password_reset' },
+                });
+                return res.url;
+            },
             delete: (u: AdminUser) => del.mutateAsync({ userId: u.id }),
         },
     };
