@@ -28,7 +28,7 @@ botocore==1.42.44
     #   s3transfer
 cachecontrol==0.14.4
     # via pip-audit
-certifi==2026.1.4
+certifi==2026.4.22
     # via
     #   httpcore
     #   httpx
