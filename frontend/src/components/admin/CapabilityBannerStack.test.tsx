@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithStore } from '@/test-utils/renderWithStore';
-import {
-    CapabilityBannerStack,
-    CapabilityBannerChip,
-} from './CapabilityBannerStack';
+import { CapabilityBannerStack, CapabilityBannerChip } from './CapabilityBannerStack';
 import type { CapabilityDescriptor } from '@/hooks/admin/useCapabilityBanners';
 
-const SMTP: CapabilityDescriptor = { id: 'smtp', guideHref: '/docs/guides/running-without-smtp.md' };
+const SMTP: CapabilityDescriptor = {
+    id: 'smtp',
+    guideHref: '/docs/guides/running-without-smtp.md',
+};
 const S3: CapabilityDescriptor = { id: 's3', guideHref: '/docs/guides/running-without-s3.md' };
 
 describe('CapabilityBannerStack', () => {

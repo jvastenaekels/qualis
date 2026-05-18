@@ -66,7 +66,7 @@ export function useCapabilityBanners(): UseCapabilityBanners {
             if (sig !== '') {
                 localStorage.setItem(
                     CAPABILITY_BANNERS_STORAGE_KEY,
-                    JSON.stringify({ collapsed: false, sig }),
+                    JSON.stringify({ collapsed: false, sig })
                 );
             }
         }
@@ -77,10 +77,10 @@ export function useCapabilityBanners(): UseCapabilityBanners {
             setCollapsedState(v);
             localStorage.setItem(
                 CAPABILITY_BANNERS_STORAGE_KEY,
-                JSON.stringify({ collapsed: v, sig }),
+                JSON.stringify({ collapsed: v, sig })
             );
         },
-        [sig],
+        [sig]
     );
 
     return { capabilities, collapsed, setCollapsed, count: capabilities.length };

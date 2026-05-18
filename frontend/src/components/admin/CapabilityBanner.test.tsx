@@ -10,7 +10,7 @@ describe('CapabilityBanner', () => {
                 message="Email delivery is not configured."
                 guideHref="/docs/guides/running-without-smtp.md"
                 guideLabel="View guide"
-            />,
+            />
         );
         const row = screen.getByRole('status');
         expect(row).toHaveTextContent('Email delivery is not configured.');

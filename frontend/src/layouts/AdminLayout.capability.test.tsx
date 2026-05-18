@@ -12,7 +12,7 @@ function renderLayout() {
         <Routes>
             <Route path="/app" element={<AdminLayout />} />
         </Routes>,
-        { initialEntries: ['/app'] },
+        { initialEntries: ['/app'] }
     );
 }
 

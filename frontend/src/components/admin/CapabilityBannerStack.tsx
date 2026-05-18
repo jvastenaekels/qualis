@@ -66,12 +66,16 @@ export function CapabilityBannerChip({ count, onExpand }: ChipProps) {
             onClick={onExpand}
             title={t(
                 'admin.capability_banner.chip_tooltip',
-                'Some platform capabilities are unavailable. Click for details.',
+                'Some platform capabilities are unavailable. Click for details.'
             )}
             className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100"
         >
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span>{t('admin.capability_banner.chip_count', 'Reduced functionality ({{n}})', { n: count })}</span>
+            <span>
+                {t('admin.capability_banner.chip_count', 'Reduced functionality ({{n}})', {
+                    n: count,
+                })}
+            </span>
             <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         </button>
     );

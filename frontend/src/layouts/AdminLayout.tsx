@@ -135,7 +135,10 @@ export default function AdminLayout() {
                     </div>
                     {collapsed && count > 0 && (
                         <div className="flex items-center px-4 shrink-0">
-                            <CapabilityBannerChip count={count} onExpand={() => setCollapsed(false)} />
+                            <CapabilityBannerChip
+                                count={count}
+                                onExpand={() => setCollapsed(false)}
+                            />
                         </div>
                     )}
                 </header>
