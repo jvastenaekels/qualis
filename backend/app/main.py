@@ -118,9 +118,7 @@ async def lifespan(app: FastAPI):
 
     from app.utils.storage_mode import storage_mode_banner_lines
 
-    for line in storage_mode_banner_lines(
-        s3_configured=settings.is_s3_configured
-    ):
+    for line in storage_mode_banner_lines(s3_configured=settings.is_s3_configured):
         logger.warning(line)
 
     yield
