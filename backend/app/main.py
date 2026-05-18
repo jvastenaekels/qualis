@@ -116,6 +116,13 @@ async def lifespan(app: FastAPI):
     for line in smtp_mode_banner_lines(smtp_configured=settings.is_smtp_configured):
         logger.warning(line)
 
+    from app.utils.storage_mode import storage_mode_banner_lines
+
+    for line in storage_mode_banner_lines(
+        s3_configured=settings.is_s3_configured
+    ):
+        logger.warning(line)
+
     yield
 
 

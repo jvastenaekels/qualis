@@ -99,6 +99,7 @@ module = [
     "app.services.email_change_service",
     # SMTP-optional mode — pure startup banner helper
     "app.utils.smtp_mode",
+    "app.utils.storage_mode",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
