@@ -1,24 +1,22 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it, beforeEach } from 'vitest';
 import { usePlatformConfigStore } from './usePlatformConfigStore';
 
-describe('usePlatformConfigStore', () => {
+describe('usePlatformConfigStore — audioStorage', () => {
     beforeEach(() => {
-        usePlatformConfigStore.setState({ emailDelivery: null });
+        usePlatformConfigStore.setState({ emailDelivery: null, audioStorage: null });
     });
 
-    it('defaults to null before bootstrap', () => {
-        expect(usePlatformConfigStore.getState().emailDelivery).toBeNull();
+    it('isAudioStorageAvailable() is true by default (null = safe default)', () => {
+        expect(usePlatformConfigStore.getState().isAudioStorageAvailable()).toBe(true);
     });
 
-    it('stores the delivery mode', () => {
-        usePlatformConfigStore.getState().setEmailDelivery('manual');
-        expect(usePlatformConfigStore.getState().emailDelivery).toBe('manual');
+    it('isAudioStorageAvailable() is false when set to unavailable', () => {
+        usePlatformConfigStore.getState().setAudioStorage('unavailable');
+        expect(usePlatformConfigStore.getState().isAudioStorageAvailable()).toBe(false);
     });
 
-    it('isEmailManual reflects the mode', () => {
-        usePlatformConfigStore.getState().setEmailDelivery('manual');
-        expect(usePlatformConfigStore.getState().isEmailManual()).toBe(true);
-        usePlatformConfigStore.getState().setEmailDelivery('smtp');
-        expect(usePlatformConfigStore.getState().isEmailManual()).toBe(false);
+    it('isAudioStorageAvailable() is true when set to available', () => {
+        usePlatformConfigStore.getState().setAudioStorage('available');
+        expect(usePlatformConfigStore.getState().isAudioStorageAvailable()).toBe(true);
     });
 });

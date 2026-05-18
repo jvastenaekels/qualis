@@ -11,10 +11,14 @@ export function usePlatformConfigBootstrap(): void {
     // manual-recovery UI they cannot action).
     const { data } = useGetPublicConfigApiConfigGet();
     const setEmailDelivery = usePlatformConfigStore((s) => s.setEmailDelivery);
+    const setAudioStorage = usePlatformConfigStore((s) => s.setAudioStorage);
 
     useEffect(() => {
         if (data?.email_delivery) {
             setEmailDelivery(data.email_delivery);
         }
-    }, [data, setEmailDelivery]);
+        if (data?.audio_storage) {
+            setAudioStorage(data.audio_storage);
+        }
+    }, [data, setEmailDelivery, setAudioStorage]);
 }
