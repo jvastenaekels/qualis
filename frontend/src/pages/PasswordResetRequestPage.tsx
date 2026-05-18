@@ -7,11 +7,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { passwordResetRequestApiPasswordResetRequestPost } from '@/api/generated';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 
 export default function PasswordResetRequestPage() {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
+    const isEmailManual = usePlatformConfigStore((s) => s.isEmailManual());
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,10 +32,15 @@ export default function PasswordResetRequestPage() {
         return (
             <div className="mx-auto max-w-md p-8 text-center">
                 <p>
-                    {t(
-                        'auth.password_reset.request_success',
-                        'If the email exists, a reset link is on its way.'
-                    )}
+                    {isEmailManual
+                        ? t(
+                              'auth.password_reset.request_success_manual',
+                              'Email delivery is not configured on this instance. Contact your administrator to obtain a reset link.'
+                          )
+                        : t(
+                              'auth.password_reset.request_success',
+                              'If the email exists, a reset link is on its way.'
+                          )}
                 </p>
             </div>
         );

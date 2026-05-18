@@ -13,7 +13,9 @@
  * return value and wires the confirm dialog to the hook's actions.
  */
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
     Users,
     Search,
@@ -24,8 +26,11 @@ import {
     Clock,
     UserCog,
     AlertCircle,
+    Check,
+    Copy,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -139,6 +144,49 @@ export default function AdminUsersPage() {
         actions,
     } = useAdminUsersPage();
 
+    const [revealedLink, setRevealedLink] = useState<string | null>(null);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const [setEmailTarget, setSetEmailTarget] = useState<AdminUser | null>(null);
+    const [newEmail, setNewEmail] = useState('');
+
+    const closeSetEmail = () => {
+        setSetEmailTarget(null);
+        setNewEmail('');
+    };
+
+    const trimmedEmail = newEmail.trim();
+    const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+
+    const submitSetEmail = async () => {
+        if (!setEmailTarget || !emailLooksValid) return;
+        try {
+            await actions.setEmail(setEmailTarget, trimmedEmail);
+            toast.success(t('admin.users.set_email_dialog.success', 'Email updated.'));
+            closeSetEmail();
+        } catch (err) {
+            toast.error(
+                readMutationError(
+                    err,
+                    t('admin.users.set_email_dialog.error', 'Could not set email.')
+                )
+            );
+        }
+    };
+
+    const generateLink = async (user: AdminUser) => {
+        try {
+            const url = await actions.generateRecoveryLink(user);
+            setRevealedLink(url);
+        } catch (err) {
+            toast.error(
+                readMutationError(
+                    err,
+                    t('admin.users.generic_error', 'Something went wrong. Please try again.')
+                )
+            );
+        }
+    };
+
     const confirmPending = async () => {
         if (!pendingAction) return;
         const { kind, user } = pendingAction;
@@ -242,6 +290,11 @@ export default function AdminUsersPage() {
                                     isMutating={isMutating}
                                     onAction={(kind) => setPendingAction({ kind, user: u })}
                                     onReactivate={(target) => actions.activate(target)}
+                                    onGenerateLink={(target) => generateLink(target)}
+                                    onSetEmail={(target) => {
+                                        setSetEmailTarget(target);
+                                        setNewEmail('');
+                                    }}
                                 />
                             ))}
                         </ul>
@@ -280,6 +333,113 @@ export default function AdminUsersPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <Dialog
+                open={revealedLink !== null}
+                onOpenChange={(o) => {
+                    if (!o) setRevealedLink(null);
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {t('admin.users.recovery_link.title', 'Password-reset link')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-slate-600 mb-3">
+                        {t(
+                            'admin.users.recovery_link.help',
+                            'Share this single-use link with the user out of band. It expires per the password-reset window.'
+                        )}
+                    </p>
+                    <div className="relative">
+                        <Input
+                            readOnly
+                            value={revealedLink ?? ''}
+                            className="pr-10 text-xs font-mono"
+                        />
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            aria-label={t('admin.users.recovery_link.copy', 'Copy link')}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 size-8 p-0"
+                            onClick={() => {
+                                if (revealedLink) {
+                                    navigator.clipboard.writeText(revealedLink);
+                                    setLinkCopied(true);
+                                    setTimeout(() => setLinkCopied(false), 2000);
+                                }
+                            }}
+                        >
+                            {linkCopied ? (
+                                <Check className="size-3 text-emerald-600" />
+                            ) : (
+                                <Copy className="size-3 text-slate-400" />
+                            )}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={setEmailTarget !== null}
+                onOpenChange={(o) => {
+                    if (!o) closeSetEmail();
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {t('admin.users.set_email_dialog.title', 'Set user email')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-slate-600 mb-3">
+                        {t(
+                            'admin.users.set_email_dialog.description',
+                            'This logs {{email}} out; they must sign in again using the new address. No confirmation email is sent.',
+                            { email: setEmailTarget?.email }
+                        )}
+                    </p>
+                    {setEmailTarget && (
+                        <p className="text-xs text-slate-500 mb-3">
+                            {t('admin.users.set_email_dialog.current', 'Current')}:{' '}
+                            <span className="font-mono">{setEmailTarget.email}</span>
+                        </p>
+                    )}
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            void submitSetEmail();
+                        }}
+                        className="space-y-4"
+                    >
+                        <div className="space-y-1.5">
+                            <label
+                                htmlFor="admin-set-email-input"
+                                className="text-xs font-bold text-slate-600"
+                            >
+                                {t('admin.users.set_email_dialog.label', 'New email address')}
+                            </label>
+                            <Input
+                                id="admin-set-email-input"
+                                type="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                autoComplete="off"
+                                className="text-sm"
+                            />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button type="button" variant="outline" onClick={closeSetEmail}>
+                                {t('admin.users.confirm.cancel', 'Cancel')}
+                            </Button>
+                            <Button type="submit" disabled={!emailLooksValid || isMutating}>
+                                {t('admin.users.set_email_dialog.submit', 'Set email')}
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -359,12 +519,16 @@ function UserRow({
     isMutating,
     onAction,
     onReactivate,
+    onGenerateLink,
+    onSetEmail,
 }: {
     user: AdminUser;
     now: Date;
     isMutating: boolean;
     onAction: (kind: ActionKind) => void;
     onReactivate: (user: AdminUser) => void;
+    onGenerateLink: (user: AdminUser) => void;
+    onSetEmail: (user: AdminUser) => void;
 }) {
     const { t } = useTranslation();
     const badges = deriveRiskBadges(user, now);
@@ -476,6 +640,15 @@ function UserRow({
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled={isMutating} onSelect={() => onAction('reset-totp')}>
                         {t('admin.users.action.reset_totp', 'Reset 2FA')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={isMutating} onSelect={() => onGenerateLink(user)}>
+                        {t(
+                            'admin.users.action.generate_reset_link',
+                            'Generate password-reset link'
+                        )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={isMutating} onSelect={() => onSetEmail(user)}>
+                        {t('admin.users.action.set_email', 'Set email')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

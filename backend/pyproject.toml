@@ -97,6 +97,8 @@ module = [
     "app.middleware.log_scrub",
     # F-03-011 — email-change dual-confirmation flow
     "app.services.email_change_service",
+    # SMTP-optional mode — pure startup banner helper
+    "app.utils.smtp_mode",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
@@ -151,6 +153,7 @@ module = [
     "app.schemas.audio",
     "app.schemas.auth",
     "app.schemas.common",
+    "app.schemas.config",
     "app.schemas.concourses",
     "app.schemas.participants",
     "app.schemas.projects",
@@ -246,6 +249,7 @@ module = [
     "app.routers.audio",
     "app.routers.admin.recruitment",
     "app.routers.admin.users",
+    "app.routers.config",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true

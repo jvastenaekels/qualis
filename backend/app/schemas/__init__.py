@@ -40,6 +40,7 @@ from .auth import (
     TwoFAEnableRequest,
 )
 from .common import PaginatedResponse, QuotaInfo
+from .config import PublicConfig
 from .participants import (
     ConsentInput,
     ConsentResponse,
@@ -91,8 +92,11 @@ from .studies import (
     StudyUpdate,
 )
 from .users import (
+    AdminSetEmailRequest,
     PasswordChange,
     PasswordConfirm,
+    RecoveryLinkRequest,
+    RecoveryLinkResponse,
     UserAdminUpdate,
     UserBase,
     UserCreate,
@@ -167,6 +171,8 @@ __all__ = [
     # common
     "PaginatedResponse",
     "QuotaInfo",
+    # config
+    "PublicConfig",
     # participants
     "ConsentInput",
     "ConsentResponse",
@@ -232,8 +238,11 @@ __all__ = [
     "StudyTranslationRead",
     "StudyUpdate",
     # users
+    "AdminSetEmailRequest",
     "PasswordChange",
     "PasswordConfirm",
+    "RecoveryLinkRequest",
+    "RecoveryLinkResponse",
     "UserAdminUpdate",
     "UserBase",
     "UserCreate",

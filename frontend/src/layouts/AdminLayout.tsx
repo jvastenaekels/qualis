@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import { useGetParticipantApiAdminStudiesParticipantsParticipantIdGet } from '@/api/generated';
@@ -25,6 +26,7 @@ export default function AdminLayout() {
     const location = useLocation();
     const { activeStudyId, setActiveStudy } = useAdminStore();
     const { currentProject } = useAuthStore();
+    const isEmailManual = usePlatformConfigStore((s) => s.isEmailManual());
     const { project: adminProject, study: adminStudy } = useAdminContext();
     const { t } = useTranslation();
 
@@ -70,6 +72,17 @@ export default function AdminLayout() {
                     location.pathname.includes('/design') && '!m-0 !rounded-none'
                 )}
             >
+                {isEmailManual && (
+                    <div
+                        role="status"
+                        className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-xs font-medium text-amber-800"
+                    >
+                        {t(
+                            'admin.smtp_banner.manual',
+                            'Email delivery not configured — recovery links are generated manually from Admin → Users.'
+                        )}
+                    </div>
+                )}
                 <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-2 px-4 min-w-0 flex-1">
                         <SidebarTrigger className="-ml-1" />

@@ -396,3 +396,12 @@ last_login_at
 patch_user
 force_password_reset_endpoint
 reset_totp_endpoint
+
+# --- SMTP-optional mode feature ---
+# FastAPI route endpoints registered via @router decorators and the
+# PublicConfig.email_delivery Pydantic field read at the JSON wire
+# boundary; vulture cannot see those dynamic dispatch sites.
+recovery_link_endpoint
+set_email_endpoint
+get_public_config
+email_delivery

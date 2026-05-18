@@ -48,6 +48,7 @@
             "request_body": "Enter your email and we'll send a reset link.",
             "request_submit": "Send reset link",
             "request_success": "If the email exists, a reset link is on its way.",
+            "request_success_manual": "Email delivery is not configured on this instance. Contact your administrator to obtain a reset link.",
             "confirm_title": "Choose a new password",
             "confirm_submit": "Reset password",
             "success_redirect": "Password updated. You can now sign in with your new password.",
@@ -103,6 +104,9 @@
         }
     },
     "admin": {
+        "smtp_banner": {
+            "manual": "Email delivery not configured — recovery links are generated manually from Admin → Users."
+        },
         "hub": {
             "title": "Researcher Hub",
             "welcome": "Welcome back,",
@@ -2226,7 +2230,23 @@
                 "reactivate": "Reactivate account",
                 "force_password_reset": "Force password reset",
                 "reset_totp": "Reset 2FA",
+                "generate_reset_link": "Generate password-reset link",
+                "set_email": "Set email",
                 "delete": "Delete user"
+            },
+            "recovery_link": {
+                "title": "Password-reset link",
+                "help": "Share this single-use link with the user out of band. It expires per the password-reset window.",
+                "copy": "Copy link"
+            },
+            "set_email_dialog": {
+                "title": "Set user email",
+                "description": "This logs {{email}} out; they must sign in again using the new address. No confirmation email is sent.",
+                "current": "Current",
+                "label": "New email address",
+                "submit": "Set email",
+                "success": "Email updated.",
+                "error": "Could not set email."
             },
             "confirm": {
                 "cancel": "Cancel",

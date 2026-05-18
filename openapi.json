@@ -3386,6 +3386,124 @@
         }
       }
     },
+    "/api/admin/users/{user_id}/recovery-link": {
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Recovery Link Endpoint",
+        "description": "Superuser-only: mint a password-reset link for out-of-band\ndelivery (SMTP-optional mode). Does NOT rotate the password and\npersists nothing. Audit-logged on every call.",
+        "operationId": "recovery_link_endpoint_api_admin_users__user_id__recovery_link_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryLinkResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{user_id}/set-email": {
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Set Email Endpoint",
+        "description": "Superuser-only: set a user's email directly (SMTP-optional path,\nbypasses the F-03-011 dual-confirmation flow by design \u2014 the\nsuperuser is the trust anchor when SMTP may be unavailable). Clears\nany in-flight ``pending_email``. Audit-logged on every call.\n\nSide effect: the target's existing access tokens carry\n``sub=old-email``, so they stop validating on the next request\n(user-by-email lookup miss \u2192 401) and the user must re-log in under\nthe new address. ``password_changed_at`` is intentionally not bumped\n\u2014 an email change is not a credential rotation (consistent with\nF-03-011).",
+        "operationId": "set_email_endpoint_api_admin_users__user_id__set_email_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminSetEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserReadAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/recruitment/{slug}/links": {
       "get": {
         "tags": [
@@ -6638,6 +6756,28 @@
         }
       }
     },
+    "/api/config": {
+      "get": {
+        "tags": [
+          "config"
+        ],
+        "summary": "Get Public Config",
+        "description": "Return client bootstrap config. Unauthenticated by design \u2014 it\nexposes only the email-delivery mode, no secrets.",
+        "operationId": "get_public_config_api_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/audio/upload": {
       "post": {
         "tags": [
@@ -6836,6 +6976,21 @@
         ],
         "title": "AckResponse",
         "description": "Generic acknowledgement: `{status: \"...\", details?: \"...\"}`.\n\nUsed by endpoints that mutate state and only need to confirm success\n(save_draft, update_progress, change_password, disable_totp, unlock_study)."
+      },
+      "AdminSetEmailRequest": {
+        "properties": {
+          "new_email": {
+            "type": "string",
+            "format": "email",
+            "title": "New Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_email"
+        ],
+        "title": "AdminSetEmailRequest",
+        "description": "Body for POST /api/admin/users/{id}/set-email (superuser-only,\nSMTP-optional direct email swap)."
       },
       "AnalysisRequest": {
         "properties": {
@@ -10499,6 +10654,24 @@
         "title": "ProjectWithRole",
         "description": "Schema for reading a project with the current user's role."
       },
+      "PublicConfig": {
+        "properties": {
+          "email_delivery": {
+            "type": "string",
+            "enum": [
+              "smtp",
+              "manual"
+            ],
+            "title": "Email Delivery"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email_delivery"
+        ],
+        "title": "PublicConfig",
+        "description": "Minimal client bootstrap payload.\n\n``email_delivery`` is \"smtp\" when SMTP credentials are configured and\n\"manual\" otherwise. When \"manual\", recovery links are generated by a\nsuperuser from the admin UI rather than emailed (see\ndocs/guides/running-without-smtp.md)."
+      },
       "QSortEntryInput": {
         "properties": {
           "statement_id": {
@@ -10592,6 +10765,47 @@
         ],
         "title": "QuotaInfo",
         "description": "Shared quota envelope used in member and owned-project counters.\n\n`limit` is `None` when the quota is unlimited (operator opted out via\n`0`-sentinel setting, or the requesting user is a superuser)."
+      },
+      "RecoveryLinkRequest": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "password_reset",
+            "title": "Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "RecoveryLinkRequest",
+        "description": "Body for POST /api/admin/users/{id}/recovery-link."
+      },
+      "RecoveryLinkResponse": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "password_reset",
+            "title": "Kind"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "url",
+          "expires_at"
+        ],
+        "title": "RecoveryLinkResponse",
+        "description": "A freshly-minted, never-persisted recovery link for out-of-band\ndelivery when SMTP is not configured."
       },
       "RecruitmentLinkCreate": {
         "properties": {

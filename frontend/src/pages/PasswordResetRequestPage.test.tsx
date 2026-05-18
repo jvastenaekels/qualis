@@ -7,6 +7,7 @@
 import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderWithProviders } from '../test-utils/test-utils';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import PasswordResetRequestPage from './PasswordResetRequestPage';
 
 vi.mock('@/api/generated', async () => {
@@ -22,6 +23,7 @@ import { passwordResetRequestApiPasswordResetRequestPost } from '@/api/generated
 describe('PasswordResetRequestPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        usePlatformConfigStore.setState({ emailDelivery: 'smtp' });
     });
 
     it('shows success message after a successful submit', async () => {
@@ -48,6 +50,34 @@ describe('PasswordResetRequestPage', () => {
         });
         fireEvent.click(screen.getByRole('button', { name: /send reset link/i }));
         await waitFor(() => expect(screen.getByText(/on its way/i)).toBeInTheDocument());
+    });
+
+    it('shows the admin-contact copy in manual mode after submit', async () => {
+        vi.mocked(passwordResetRequestApiPasswordResetRequestPost).mockResolvedValue(undefined);
+        usePlatformConfigStore.setState({ emailDelivery: 'manual' });
+        renderWithProviders(<PasswordResetRequestPage />, {
+            initialEntries: ['/forgot-password'],
+        });
+        fireEvent.change(screen.getByPlaceholderText('name@example.com'), {
+            target: { value: 'a@b.com' },
+        });
+        fireEvent.submit(screen.getByRole('button', { name: /send reset link/i }));
+        expect(await screen.findByText(/administrator/i)).toBeInTheDocument();
+        expect(screen.queryByText(/on its way/i)).not.toBeInTheDocument();
+    });
+
+    it('shows the generic copy in smtp mode after submit', async () => {
+        vi.mocked(passwordResetRequestApiPasswordResetRequestPost).mockResolvedValue(undefined);
+        usePlatformConfigStore.setState({ emailDelivery: 'smtp' });
+        renderWithProviders(<PasswordResetRequestPage />, {
+            initialEntries: ['/forgot-password'],
+        });
+        fireEvent.change(screen.getByPlaceholderText('name@example.com'), {
+            target: { value: 'a@b.com' },
+        });
+        fireEvent.submit(screen.getByRole('button', { name: /send reset link/i }));
+        expect(await screen.findByText(/on its way/i)).toBeInTheDocument();
+        expect(screen.queryByText(/administrator/i)).not.toBeInTheDocument();
     });
 
     it('renders the form with a title and email field', () => {

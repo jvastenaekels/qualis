@@ -21,8 +21,9 @@ foot-guns:
    working second factor; without it, the promotion is refused so the
    operator fixes the prerequisite first.
 
-The verb actions (force_password_reset, reset_totp) live here too so the
-router stays a thin HTTP layer.
+The verb actions (force_password_reset, reset_totp) and the
+side-effect-free ``mint_password_reset_link`` live here too so the router
+stays a thin HTTP layer.
 
 CONTRACT (at-least-one-active-superuser floor). The floor guarantee in
 rule 2 holds *only* if the endpoint runs ``assert_can_*`` + the flag
@@ -42,6 +43,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -156,6 +158,29 @@ async def force_password_reset(*, db: AsyncSession, target: User) -> None:
     send_password_reset(target.email, url)
 
 
+def mint_password_reset_link(*, target: User) -> tuple[str, datetime]:
+    """Mint a fresh password-reset link for ``target`` WITHOUT rotating
+    the password.
+
+    This is the SMTP-optional in-product path: a superuser obtains the
+    same link the user would receive by email and delivers it out of
+    band. Distinct from ``force_password_reset`` (which rotates the
+    password and locks the account). Nothing is persisted — the JWT is
+    stateless and self-expiring; the ``pwa`` claim still gives single-use
+    semantics via the existing confirm-time check.
+    """
+    expires = timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS)
+    token = create_email_token(
+        email=target.email,
+        purpose="password_reset",
+        expires_delta=expires,
+        password_changed_at=target.password_changed_at,
+    )
+    url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+    expires_at = datetime.now(timezone.utc) + expires
+    return url, expires_at
+
+
 async def reset_totp(*, db: AsyncSession, target: User) -> None:
     """Clear all TOTP state on the target account.
 
@@ -176,3 +201,20 @@ async def reset_totp(*, db: AsyncSession, target: User) -> None:
     target.is_totp_enabled = False
     target.totp_channel = None
     await db.commit()
+
+
+async def set_user_email(*, db: AsyncSession, target: User, new_email: str) -> None:
+    """Superuser-only direct email swap.
+
+    The SMTP-optional alternative to the user-driven dual-confirmation
+    flow: a trusted superuser sets the address with no confirmation loop.
+    Clears any in-flight ``pending_email``. Raises ``AdminUserError`` on a
+    uniqueness collision so the router can map it to 409.
+    """
+    target.email = new_email
+    target.pending_email = None
+    try:
+        await db.commit()
+    except IntegrityError as exc:
+        await db.rollback()
+        raise AdminUserError("email_already_registered") from exc

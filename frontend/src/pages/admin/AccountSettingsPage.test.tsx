@@ -4,8 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { renderWithProviders } from '../../test-utils/test-utils';
 import AccountSettingsPage from './AccountSettingsPage';
 
@@ -46,6 +47,8 @@ vi.mock('@/api/generated', async () => {
 describe('AccountSettingsPage 2FA channel selector', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // smtp => email option visible => current behavior; keeps pre-existing tests green
+        usePlatformConfigStore.setState({ emailDelivery: 'smtp' });
     });
 
     it('renders the channel selector when entering 2FA setup mode', async () => {
@@ -95,5 +98,65 @@ describe('AccountSettingsPage 2FA channel selector', () => {
         expect(
             screen.queryByRole('button', { name: /enable email-based 2fa/i })
         ).not.toBeInTheDocument();
+    });
+});
+
+describe('AccountSettingsPage 2FA channel selector — email delivery mode', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('hides the email 2FA channel option when email delivery is manual', async () => {
+        usePlatformConfigStore.setState({ emailDelivery: 'manual' });
+        renderWithProviders(<AccountSettingsPage />);
+        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/how should we deliver/i)).toBeInTheDocument();
+        });
+
+        // The 'app' option must always remain
+        expect(screen.queryByDisplayValue('app')).toBeInTheDocument();
+        // The 'email' channel radio must NOT be rendered
+        expect(screen.queryByDisplayValue('email')).not.toBeInTheDocument();
+    });
+
+    it('shows the email 2FA channel option when email delivery is smtp', async () => {
+        usePlatformConfigStore.setState({ emailDelivery: 'smtp' });
+        renderWithProviders(<AccountSettingsPage />);
+        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/how should we deliver/i)).toBeInTheDocument();
+        });
+
+        expect(screen.queryByDisplayValue('app')).toBeInTheDocument();
+        expect(screen.queryByDisplayValue('email')).toBeInTheDocument();
+    });
+
+    it('coerces a stale email selection back to app when delivery flips to manual', async () => {
+        usePlatformConfigStore.setState({ emailDelivery: 'smtp' });
+        renderWithProviders(<AccountSettingsPage />);
+        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+
+        await waitFor(() => expect(screen.getByText(/how should we deliver/i)).toBeInTheDocument());
+
+        // Select the Email channel radio (second one in tab order)
+        const radios = screen.getAllByRole('radio');
+        fireEvent.click(radios[1] as HTMLElement);
+
+        // The email-OTP enable affordance is gated by channelChoice === 'email'
+        expect(
+            await screen.findByRole('button', { name: /enable email-based 2fa/i })
+        ).toBeInTheDocument();
+
+        // Flip delivery to manual: the coercion useEffect must reset channelChoice to 'app'
+        act(() => usePlatformConfigStore.setState({ emailDelivery: 'manual' }));
+
+        await waitFor(() =>
+            expect(
+                screen.queryByRole('button', { name: /enable email-based 2fa/i })
+            ).not.toBeInTheDocument()
+        );
     });
 });

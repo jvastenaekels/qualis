@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,6 +29,7 @@ import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { parseApiErrorSync } from '@/lib/error-utils';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 
 type Translator = (key: string, fallback: string) => string;
 
@@ -68,6 +69,15 @@ const AccountSettingsPage = () => {
     const [totpToken, setTotpToken] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+    const isEmailManual = usePlatformConfigStore((s) => s.isEmailManual());
+
+    // When email delivery is manual the email channel is unusable (server rejects it);
+    // coerce any stale 'email' selection back to 'app' so the hidden option can't be submitted.
+    useEffect(() => {
+        if (isEmailManual && channelChoice === 'email') {
+            setChannelChoice('app');
+        }
+    }, [isEmailManual, channelChoice]);
 
     const { data: totpSetup, isLoading: isSetupLoading } = useSetupTotpApiMe2faSetupGet({
         query: {
@@ -357,37 +367,39 @@ const AccountSettingsPage = () => {
                                                 </div>
                                             </div>
                                         </label>
-                                        <label
-                                            className={cn(
-                                                'flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-white transition-colors',
-                                                channelChoice === 'email'
-                                                    ? 'border-indigo-300 bg-indigo-50/40'
-                                                    : 'border-slate-200 bg-white'
-                                            )}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="2fa-channel"
-                                                value="email"
-                                                checked={channelChoice === 'email'}
-                                                onChange={() => setChannelChoice('email')}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <div className="font-bold text-slate-900">
-                                                    {t(
-                                                        'admin.account.security.channel_email',
-                                                        'Email'
-                                                    )}
+                                        {!isEmailManual && (
+                                            <label
+                                                className={cn(
+                                                    'flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-white transition-colors',
+                                                    channelChoice === 'email'
+                                                        ? 'border-indigo-300 bg-indigo-50/40'
+                                                        : 'border-slate-200 bg-white'
+                                                )}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="2fa-channel"
+                                                    value="email"
+                                                    checked={channelChoice === 'email'}
+                                                    onChange={() => setChannelChoice('email')}
+                                                    className="mt-1"
+                                                />
+                                                <div>
+                                                    <div className="font-bold text-slate-900">
+                                                        {t(
+                                                            'admin.account.security.channel_email',
+                                                            'Email'
+                                                        )}
+                                                    </div>
+                                                    <div className="text-sm text-slate-500">
+                                                        {t(
+                                                            'admin.account.security.channel_email_desc',
+                                                            "We'll email you a 6-digit code each time you log in. Useful if you can't install an authenticator app."
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="text-sm text-slate-500">
-                                                    {t(
-                                                        'admin.account.security.channel_email_desc',
-                                                        "We'll email you a 6-digit code each time you log in. Useful if you can't install an authenticator app."
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </label>
+                                            </label>
+                                        )}
                                     </fieldset>
 
                                     {channelChoice === 'email' && (

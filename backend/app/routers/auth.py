@@ -153,6 +153,19 @@ async def login_for_access_token(
 
         if channel == "email":
             if not x_totp_token:
+                # 503 not 400: SMTP gap is a server capability deficit, not a client error (cf. the enrolment guard's 400, where the client picked the channel).
+                if not settings.is_smtp_configured:
+                    log_admin_action(
+                        actor_user_id=user.id,
+                        action="twofa_login_email_unavailable",
+                        resource="user",
+                        resource_id=user.id,
+                        channel="email",
+                    )
+                    raise HTTPException(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        detail="email_2fa_unavailable",
+                    )
                 try:
                     code = await issue_otp(db, user)
                 except OTPRateLimitError as e:
@@ -619,6 +632,11 @@ async def enable_totp(
             )
 
     # channel == "email"
+    if not settings.is_smtp_configured:
+        raise HTTPException(
+            status_code=400,
+            detail="email_2fa_unavailable",
+        )
     try:
         current_user.is_totp_enabled = True
         current_user.totp_channel = "email"
