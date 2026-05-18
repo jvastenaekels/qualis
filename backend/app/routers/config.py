@@ -11,7 +11,9 @@ router = APIRouter()
 @router.get("/config", response_model=PublicConfig)
 async def get_public_config() -> PublicConfig:
     """Return client bootstrap config. Unauthenticated by design — it
-    exposes only the email-delivery mode, no secrets."""
+    exposes only capability modes (email delivery, audio storage), no
+    secrets."""
     return PublicConfig(
-        email_delivery="smtp" if settings.is_smtp_configured else "manual"
+        email_delivery="smtp" if settings.is_smtp_configured else "manual",
+        audio_storage=("available" if settings.is_s3_configured else "unavailable"),
     )

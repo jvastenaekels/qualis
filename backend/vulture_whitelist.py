@@ -405,3 +405,7 @@ recovery_link_endpoint
 set_email_endpoint
 get_public_config
 email_delivery
+
+# --- S3-optional mode feature ---
+# Pydantic field read only at the JSON wire boundary; vulture can't see it.
+audio_storage
