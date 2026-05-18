@@ -7,7 +7,7 @@ def storage_mode_banner_lines(*, s3_configured: bool) -> list[str]:
     if s3_configured:
         return []
     return [
-        "Object storage (S3) is not configured — Qualis runs in STORAGE-OPTIONAL mode.",
+        "Object storage is not configured. Qualis is running in storage-optional mode.",
         "  Studies run normally; audio capture is unavailable.",
         "  Any study with audio enabled silently degrades to text-only responses:",
         "  no audio is collected and no error is shown to participants.",
