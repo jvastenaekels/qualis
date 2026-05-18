@@ -164,6 +164,24 @@ class Settings(BaseSettings):
         return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
 
     @property
+    def is_s3_configured(self) -> bool:
+        """True iff all four S3/object-storage credentials are populated.
+
+        When False, Qualis runs in STORAGE-OPTIONAL mode: the audio
+        subsystem is unavailable. Studies with audio enabled silently
+        degrade to text-only responses (no audio captured, no error
+        shown to participants); see docs/guides/running-without-s3.md.
+        The audio router uses this to return a clean 503 instead of an
+        AttributeError if it is ever reached.
+        """
+        return bool(
+            self.S3_ENDPOINT_URL
+            and self.S3_BUCKET_NAME
+            and self.S3_ACCESS_KEY_ID
+            and self.S3_SECRET_ACCESS_KEY
+        )
+
+    @property
     def email_verification_active(self) -> bool:
         """The verification gate only fires when both:
         - the operator opted in (EMAIL_VERIFICATION_REQUIRED=True), and
