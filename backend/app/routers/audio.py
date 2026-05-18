@@ -22,6 +22,18 @@ from app.limiter import limiter
 router = APIRouter(prefix="/api/audio", tags=["audio"])
 
 
+def require_audio_storage() -> None:
+    """Reject audio endpoints with a clean 503 when object storage is
+    unconfigured. Defence-in-depth: the adaptive UI suppresses the audio
+    affordance entirely (see GET /api/config audio_storage), so this is a
+    safety net, not the primary path. Without it, storage_service is built
+    with skip_init=True and any call raises AttributeError -> 500."""
+    if not settings.is_s3_configured:
+        raise HTTPException(
+            status_code=503, detail="audio_storage_unavailable"
+        )
+
+
 async def validate_audio_file(file: UploadFile) -> str:
     """
     Validate audio file type and size, return the sniffed MIME type.
@@ -96,7 +108,11 @@ async def check_storage_quota(
         )
 
 
-@router.post("/upload", response_model=AudioUploadResponse)
+@router.post(
+    "/upload",
+    response_model=AudioUploadResponse,
+    dependencies=[Depends(require_audio_storage)],
+)
 @limiter.limit("10/minute")
 async def upload_audio(
     request: Request,
@@ -255,7 +271,7 @@ async def upload_audio(
     )
 
 
-@router.delete("/{recording_id}")
+@router.delete("/{recording_id}", dependencies=[Depends(require_audio_storage)])
 @limiter.limit("10/minute")
 async def delete_audio_recording(
     request: Request,
@@ -310,7 +326,11 @@ async def delete_audio_recording(
     return {"message": "Audio deleted successfully"}
 
 
-@router.get("/{recording_id}/url", response_model=AudioRecordingRead)
+@router.get(
+    "/{recording_id}/url",
+    response_model=AudioRecordingRead,
+    dependencies=[Depends(require_audio_storage)],
+)
 @limiter.limit("30/minute")
 async def get_audio_url(
     request: Request,

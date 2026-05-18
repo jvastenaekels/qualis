@@ -409,3 +409,4 @@ email_delivery
 # --- S3-optional mode feature ---
 # Pydantic field read only at the JSON wire boundary; vulture can't see it.
 audio_storage
+require_audio_storage
