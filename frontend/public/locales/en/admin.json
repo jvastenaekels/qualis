@@ -104,9 +104,6 @@
         }
     },
     "admin": {
-        "smtp_banner": {
-            "manual": "Email delivery not configured — recovery links are generated manually from Admin → Users."
-        },
         "capability_banner": {
             "smtp": "Email delivery is not configured. Account recovery (password reset, email change, email-based two-factor authentication) requires manual administrator action.",
             "s3": "Object storage is not configured. Audio responses cannot be collected; audio-enabled studies fall back to text-only responses.",
