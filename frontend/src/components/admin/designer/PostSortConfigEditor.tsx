@@ -550,7 +550,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 <p className="mt-1">
                                     {t(
                                         'admin.design.postsort.audio.storage_unavailable_body',
-                                        'Object storage (S3) is not configured, so audio responses cannot be collected. You can still enable audio below, but participants will answer in text only — no audio is recorded and they see no error. Configure object storage and restart the server to capture audio.'
+                                        'Object storage is not configured, so audio responses cannot be collected. You may still enable audio, but participants will respond in text only and no recording is made. Configure object storage and restart the server to enable audio capture.'
                                     )}
                                 </p>
                             </div>

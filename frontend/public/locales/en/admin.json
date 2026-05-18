@@ -104,8 +104,13 @@
         }
     },
     "admin": {
-        "smtp_banner": {
-            "manual": "Email delivery not configured — recovery links are generated manually from Admin → Users."
+        "capability_banner": {
+            "smtp": "Email delivery is not configured. Account recovery (password reset, email change, email-based two-factor authentication) requires manual administrator action.",
+            "s3": "Object storage is not configured. Audio responses cannot be collected; audio-enabled studies fall back to text-only responses.",
+            "view_guide": "View guide",
+            "collapse": "Hide",
+            "chip_count": "Reduced functionality ({{n}})",
+            "chip_tooltip": "Some platform capabilities are unavailable. Click for details."
         },
         "hub": {
             "title": "Researcher Hub",
@@ -1605,7 +1610,7 @@
                     "max_duration_help": "Maximum recording time per question (30–600 seconds).",
                     "participant_choice_info": "Participants can respond with text, audio, or both for each question.",
                     "storage_unavailable_title": "Audio capture is unavailable on this server",
-                    "storage_unavailable_body": "Object storage (S3) is not configured, so audio responses cannot be collected. You can still enable audio below, but participants will answer in text only — no audio is recorded and they see no error. Configure object storage and restart the server to capture audio."
+                    "storage_unavailable_body": "Object storage is not configured, so audio responses cannot be collected. You may still enable audio, but participants will respond in text only and no recording is made. Configure object storage and restart the server to enable audio capture."
                 }
             },
             "interface": {

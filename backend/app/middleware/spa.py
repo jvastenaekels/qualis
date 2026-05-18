@@ -19,6 +19,7 @@ _BASE_DIR = os.path.dirname(
 )  # backend/
 _ROOT_DIR = os.path.dirname(_BASE_DIR)  # project root
 FRONTEND_DIST = os.path.join(_ROOT_DIR, "frontend", "dist")
+DOCS_DIR = os.path.join(_ROOT_DIR, "docs")
 
 _CACHEABLE_EXTENSIONS = (
     ".js",
@@ -39,6 +40,14 @@ def mount_spa(app: FastAPI) -> None:
     If the frontend build directory doesn't exist (e.g. in development),
     registers a simple root endpoint instead.
     """
+    # Serve the repo docs/ as static files so in-app guide links resolve
+    # (e.g. the capability banners' "View guide"). Independent of the
+    # frontend build; guarded so a packaging without docs/ degrades to a
+    # 404 link rather than a crash. Registered before the SPA catch-all so
+    # /docs/* is never swallowed by the client-side-routing fallback.
+    if os.path.isdir(DOCS_DIR):
+        app.mount("/docs", StaticFiles(directory=DOCS_DIR), name="docs")
+
     if not os.path.exists(FRONTEND_DIST):
 
         @app.get("/", include_in_schema=False)
