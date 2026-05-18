@@ -146,6 +146,32 @@ export default function AdminUsersPage() {
 
     const [revealedLink, setRevealedLink] = useState<string | null>(null);
     const [linkCopied, setLinkCopied] = useState(false);
+    const [setEmailTarget, setSetEmailTarget] = useState<AdminUser | null>(null);
+    const [newEmail, setNewEmail] = useState('');
+
+    const closeSetEmail = () => {
+        setSetEmailTarget(null);
+        setNewEmail('');
+    };
+
+    const trimmedEmail = newEmail.trim();
+    const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+
+    const submitSetEmail = async () => {
+        if (!setEmailTarget || !emailLooksValid) return;
+        try {
+            await actions.setEmail(setEmailTarget, trimmedEmail);
+            toast.success(t('admin.users.set_email_dialog.success', 'Email updated.'));
+            closeSetEmail();
+        } catch (err) {
+            toast.error(
+                readMutationError(
+                    err,
+                    t('admin.users.set_email_dialog.error', 'Could not set email.')
+                )
+            );
+        }
+    };
 
     const generateLink = async (user: AdminUser) => {
         try {
@@ -265,6 +291,10 @@ export default function AdminUsersPage() {
                                     onAction={(kind) => setPendingAction({ kind, user: u })}
                                     onReactivate={(target) => actions.activate(target)}
                                     onGenerateLink={(target) => generateLink(target)}
+                                    onSetEmail={(target) => {
+                                        setSetEmailTarget(target);
+                                        setNewEmail('');
+                                    }}
                                 />
                             ))}
                         </ul>
@@ -350,6 +380,66 @@ export default function AdminUsersPage() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            <Dialog
+                open={setEmailTarget !== null}
+                onOpenChange={(o) => {
+                    if (!o) closeSetEmail();
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {t('admin.users.set_email_dialog.title', 'Set user email')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-slate-600 mb-3">
+                        {t(
+                            'admin.users.set_email_dialog.description',
+                            'This logs {{email}} out; they must sign in again using the new address. No confirmation email is sent.',
+                            { email: setEmailTarget?.email }
+                        )}
+                    </p>
+                    {setEmailTarget && (
+                        <p className="text-xs text-slate-500 mb-3">
+                            {t('admin.users.set_email_dialog.current', 'Current')}:{' '}
+                            <span className="font-mono">{setEmailTarget.email}</span>
+                        </p>
+                    )}
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            void submitSetEmail();
+                        }}
+                        className="space-y-4"
+                    >
+                        <div className="space-y-1.5">
+                            <label
+                                htmlFor="admin-set-email-input"
+                                className="text-xs font-bold text-slate-600"
+                            >
+                                {t('admin.users.set_email_dialog.label', 'New email address')}
+                            </label>
+                            <Input
+                                id="admin-set-email-input"
+                                type="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                autoComplete="off"
+                                className="text-sm"
+                            />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button type="button" variant="outline" onClick={closeSetEmail}>
+                                {t('admin.users.confirm.cancel', 'Cancel')}
+                            </Button>
+                            <Button type="submit" disabled={!emailLooksValid || isMutating}>
+                                {t('admin.users.set_email_dialog.submit', 'Set email')}
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -430,6 +520,7 @@ function UserRow({
     onAction,
     onReactivate,
     onGenerateLink,
+    onSetEmail,
 }: {
     user: AdminUser;
     now: Date;
@@ -437,6 +528,7 @@ function UserRow({
     onAction: (kind: ActionKind) => void;
     onReactivate: (user: AdminUser) => void;
     onGenerateLink: (user: AdminUser) => void;
+    onSetEmail: (user: AdminUser) => void;
 }) {
     const { t } = useTranslation();
     const badges = deriveRiskBadges(user, now);
@@ -554,6 +646,9 @@ function UserRow({
                             'admin.users.action.generate_reset_link',
                             'Generate password-reset link'
                         )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={isMutating} onSelect={() => onSetEmail(user)}>
+                        {t('admin.users.action.set_email', 'Set email')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

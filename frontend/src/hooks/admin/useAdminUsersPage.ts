@@ -35,6 +35,7 @@ import {
     useForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost,
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost,
     useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost,
+    useSetEmailEndpointApiAdminUsersUserIdSetEmailPost,
     getListUsersApiAdminUsersGetQueryKey,
 } from '@/api/generated';
 import type { UserReadAdmin } from '@/api/model';
@@ -132,6 +133,13 @@ export function useAdminUsersPage() {
     // No onSuccess invalidation: generating a recovery link is non-destructive
     // and does not mutate any user-list state.
     const recoveryLink = useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost();
+    // Set-email DOES mutate user-list state (the row's email + the
+    // email_change_pending risk badge), so it invalidates on success —
+    // matching forcePwReset/resetTotp, unlike the non-destructive
+    // recovery-link generator above.
+    const setEmailMut = useSetEmailEndpointApiAdminUsersUserIdSetEmailPost({
+        mutation: { onSuccess: invalidate },
+    });
 
     const now = useMemo(() => new Date(), []); // intentional: page-lifetime clock (admin page is short-lived)
 
@@ -177,7 +185,8 @@ export function useAdminUsersPage() {
             del.isPending ||
             forcePwReset.isPending ||
             resetTotp.isPending ||
-            recoveryLink.isPending,
+            recoveryLink.isPending ||
+            setEmailMut.isPending,
         mutationError: patch.error ?? del.error ?? forcePwReset.error ?? resetTotp.error ?? null,
         actions: {
             deactivate: (u: AdminUser) =>
@@ -196,6 +205,16 @@ export function useAdminUsersPage() {
                     data: { kind: 'password_reset' },
                 });
                 return res.url;
+            },
+            // Returns Promise<void>: the onSuccess invalidate refetches the
+            // list, so the new email surfaces on the row without the caller
+            // threading the updated user back through. Mirrors the
+            // fire-and-refetch shape of forcePasswordReset/resetTotp.
+            setEmail: async (u: AdminUser, newEmail: string): Promise<void> => {
+                await setEmailMut.mutateAsync({
+                    userId: u.id,
+                    data: { new_email: newEmail },
+                });
             },
             delete: (u: AdminUser) => del.mutateAsync({ userId: u.id }),
         },

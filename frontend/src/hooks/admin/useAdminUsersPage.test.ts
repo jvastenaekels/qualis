@@ -24,6 +24,7 @@ const {
     mockForcePwHook,
     mockResetTotpHook,
     mockRecoveryLinkHook,
+    mockSetEmailHook,
 } = vi.hoisted(() => ({
     mockListUsersHook: vi.fn(),
     mockPatchHook: vi.fn(),
@@ -31,6 +32,7 @@ const {
     mockForcePwHook: vi.fn(),
     mockResetTotpHook: vi.fn(),
     mockRecoveryLinkHook: vi.fn(),
+    mockSetEmailHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
@@ -40,6 +42,7 @@ vi.mock('@/api/generated', () => ({
     useForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPost: mockForcePwHook,
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost: mockResetTotpHook,
     useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost: mockRecoveryLinkHook,
+    useSetEmailEndpointApiAdminUsersUserIdSetEmailPost: mockSetEmailHook,
     getListUsersApiAdminUsersGetQueryKey: () => ['list-users'],
 }));
 
@@ -73,6 +76,7 @@ beforeEach(() => {
     mockForcePwHook.mockReturnValue(makeIdleMutation());
     mockResetTotpHook.mockReturnValue(makeIdleMutation());
     mockRecoveryLinkHook.mockReturnValue(makeIdleMutation());
+    mockSetEmailHook.mockReturnValue(makeIdleMutation());
 });
 
 // ── Pure function tests ───────────────────────────────────────────

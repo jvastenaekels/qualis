@@ -44,7 +44,10 @@ def log_admin_action(
             slug) when applicable.
         **details: Free-form context (changed fields, old/new values,
             target email for invites, etc.). Must not contain PII or
-            secrets.
+            secrets. Exception: identity-change events (e.g.
+            ``admin_set_email``) and invitation targets intentionally
+            record the email address as forensic context — this is a
+            deliberate, reviewed exception, not a PII leak.
     """
     audit_logger.info(
         "actor_user_id=%s action=%s resource=%s id=%s details=%s",

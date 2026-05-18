@@ -69,44 +69,53 @@ beforeEach(() => {
     mockDeleteHook.mockReturnValue(makeIdleMutation());
     mockForcePwHook.mockReturnValue(makeIdleMutation());
     mockResetTotpHook.mockReturnValue(makeIdleMutation());
-    mockSetEmailHook.mockReturnValue(makeIdleMutation());
-    mockRecoveryLinkHook.mockReturnValue({
-        mutateAsync: vi.fn().mockResolvedValue({
-            kind: 'password_reset',
-            url: 'http://x/reset-password?token=abc',
-            expires_at: '2026-05-18T00:00:00Z',
-        }),
+    mockRecoveryLinkHook.mockReturnValue(makeIdleMutation());
+    mockSetEmailHook.mockReturnValue({
+        mutateAsync: vi.fn().mockResolvedValue({ ...base, email: 'new@example.com' }),
         isPending: false,
         error: null,
     });
 });
 
-// ── Recovery-link generation ──────────────────────────────────────
+// ── Superuser set-email ───────────────────────────────────────────
 
-describe('useAdminUsersPage — generateRecoveryLink', () => {
-    it('resolves to the reset-password URL returned by the endpoint', async () => {
+describe('useAdminUsersPage — setEmail', () => {
+    it('resolves once the updated user is returned by the endpoint', async () => {
         const { result } = renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
 
-        const url = await result.current.actions.generateRecoveryLink(base);
-
-        expect(url).toBe('http://x/reset-password?token=abc');
+        await expect(
+            result.current.actions.setEmail(base, 'new@example.com')
+        ).resolves.toBeUndefined();
     });
 
-    it('calls the mutation with userId and the password_reset kind body', async () => {
-        const mutateAsync = vi.fn().mockResolvedValue({
-            kind: 'password_reset',
-            url: 'http://x/reset-password?token=xyz',
-            expires_at: '2026-05-18T00:00:00Z',
-        });
-        mockRecoveryLinkHook.mockReturnValue({ mutateAsync, isPending: false, error: null });
+    it('calls the mutation with exactly userId and the new_email body', async () => {
+        const mutateAsync = vi
+            .fn()
+            .mockResolvedValue({ ...base, id: 42, email: 'changed@example.com' });
+        mockSetEmailHook.mockReturnValue({ mutateAsync, isPending: false, error: null });
 
         const { result } = renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
 
-        await result.current.actions.generateRecoveryLink({ ...base, id: 42 } as AdminUser);
+        await result.current.actions.setEmail(
+            { ...base, id: 42 } as AdminUser,
+            'changed@example.com'
+        );
 
         expect(mutateAsync).toHaveBeenCalledWith({
             userId: 42,
-            data: { kind: 'password_reset' },
+            data: { new_email: 'changed@example.com' },
         });
+    });
+
+    it('folds the set-email mutation pending state into isMutating', () => {
+        mockSetEmailHook.mockReturnValue({
+            mutateAsync: vi.fn(),
+            isPending: true,
+            error: null,
+        });
+
+        const { result } = renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
+
+        expect(result.current.isMutating).toBe(true);
     });
 });
