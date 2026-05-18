@@ -901,9 +901,33 @@ class TestTwoFAEmailOTP:
         await db.refresh(user)
 
     async def test_login_email_channel_no_header_issues_otp(
-        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
+        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog,
+        monkeypatch,
     ):
         from tests.conftest import TEST_PASSWORD
+        from app.core.config import settings
+
+        # Email-channel OTP issuance at login is only reachable when SMTP
+        # can actually deliver the code. With SMTP unconfigured the login
+        # endpoint now returns a distinct 503 (SMTP-optional mode) instead
+        # of silently issuing an OTP that only lands in the logs.
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+
+        # Stub the SMTP sender (no real network in tests) but keep the
+        # log line the assertion below greps for, matching the
+        # established _fake_send pattern used elsewhere in this module.
+        import logging
+
+        from app.routers import auth as auth_router
+
+        sender_log = logging.getLogger("app.utils.email")
+
+        def _fake_send_otp(email_to: str, code: str) -> None:
+            sender_log.info(f"MOCK 2fa-login-otp to {email_to}")
+
+        monkeypatch.setattr(auth_router, "send_twofa_login_otp", _fake_send_otp)
         await self._enable_email_2fa(db, test_user)
 
         with caplog.at_level("INFO", logger="app.utils.email"):
@@ -990,12 +1014,21 @@ class TestTwoFAEmailOTP:
         assert "access_token" in r2.json()
 
     async def test_enable_email_channel_does_not_require_totp_token(
-        self, client: AsyncClient, db: AsyncSession, test_user: User
+        self, client: AsyncClient, db: AsyncSession, test_user: User,
+        monkeypatch,
     ):
         """The /me/2fa/enable endpoint with channel='email' enables 2FA
         without needing a TOTP token (since the user is enrolling for email,
         not authenticator-app)."""
         from tests.conftest import TEST_PASSWORD
+        from app.core.config import settings
+
+        # Email-channel enrolment is only permitted when SMTP can deliver
+        # the codes; with SMTP unconfigured the endpoint now rejects it
+        # (SMTP-optional mode). This test pins the SMTP-configured path.
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
 
         # Get an access token first
         login = await client.post(
