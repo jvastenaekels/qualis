@@ -15,6 +15,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { toast } from 'sonner';
 import {
     Users,
@@ -128,6 +129,7 @@ function readMutationError(err: unknown, fallback: string): string {
 
 export default function AdminUsersPage() {
     const { t } = useTranslation();
+    const isEmailManual = usePlatformConfigStore((s) => s.isEmailManual());
     const {
         users,
         isLoading,
@@ -209,6 +211,18 @@ export default function AdminUsersPage() {
                 )}
                 icon={Users}
             />
+
+            {isEmailManual && (
+                <div
+                    role="status"
+                    className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800"
+                >
+                    {t(
+                        'admin.users.email_manual_note',
+                        'Email delivery is not configured. Use the password-reset link and set-email actions below for account recovery — no email is sent.'
+                    )}
+                </div>
+            )}
 
             {mutationError != null && (
                 <Alert variant="destructive">

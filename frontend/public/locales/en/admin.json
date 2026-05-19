@@ -2200,6 +2200,7 @@
         "users": {
             "title": "Users",
             "subtitle": "Manage platform accounts and audit hygiene.",
+            "email_manual_note": "Email delivery is not configured. Use the password-reset link and set-email actions below for account recovery — no email is sent.",
             "error_title": "Action failed",
             "generic_error": "Something went wrong. Please try again.",
             "load_error_title": "Could not load users",
