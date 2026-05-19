@@ -56,7 +56,8 @@
             "mismatch": "Le password non corrispondono.",
             "missing_token": "Nessun token di reimpostazione nell'URL.",
             "new_password_placeholder": "Nuova password",
-            "confirm_placeholder": "Conferma password"
+            "confirm_placeholder": "Conferma password",
+            "request_success_manual": "L'invio di e-mail non è configurato su questa istanza. Contatta l'amministratore per ottenere un link di reimpostazione."
         },
         "email": {
             "verification_sent": {
@@ -254,7 +255,8 @@
             "beta": "Research beta",
             "logout": "Esci",
             "account": "Impostazioni account",
-            "admin_user": "Utente admin"
+            "admin_user": "Utente admin",
+            "platform_settings": "Impostazioni della piattaforma"
         },
         "account": {
             "title": "Impostazioni account",
@@ -341,9 +343,7 @@
             "select_project": "Seleziona progetto",
             "concourses": "Concorsi",
             "concourse": "Concorso",
-            "members": "Membri del team",
-            "platform": "Piattaforma",
-            "users": "Utenti"
+            "members": "Membri del team"
         },
         "concourse": {
             "title": "Concorso",
@@ -1600,7 +1600,9 @@
                     "max_duration": "Durata massima",
                     "seconds": "secondi",
                     "max_duration_help": "Tempo massimo di registrazione per domanda (30–600 secondi).",
-                    "participant_choice_info": "I partecipanti possono rispondere con testo, audio o entrambi per ogni domanda."
+                    "participant_choice_info": "I partecipanti possono rispondere con testo, audio o entrambi per ogni domanda.",
+                    "storage_unavailable_body": "L'archiviazione oggetti non è configurata, quindi non è possibile raccogliere risposte audio. Puoi comunque abilitare l'audio, ma i partecipanti risponderanno solo in formato testo e non verrà effettuata alcuna registrazione. Configura l'archiviazione oggetti e riavvia il server per abilitare l'acquisizione audio.",
+                    "storage_unavailable_title": "L'acquisizione audio non è disponibile su questo server"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Riattiva account",
                 "force_password_reset": "Forza il reset della password",
                 "reset_totp": "Reimposta 2FA",
-                "delete": "Elimina utente"
+                "delete": "Elimina utente",
+                "generate_reset_link": "Genera link di reimpostazione della password",
+                "set_email": "Imposta e-mail"
             },
             "confirm": {
                 "cancel": "Annulla",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Rimuovere i privilegi di superutente da {{email}}.",
                 "promote_title": "Concedere l'accesso superutente?",
                 "promote_body": "Concedere a {{email}} i pieni privilegi di superutente sulla piattaforma."
+            },
+            "email_manual_note": "L'invio di e-mail non è configurato. Per il recupero dell'account utilizza il link di reimpostazione della password e l'azione di impostazione dell'e-mail qui sotto: non viene inviata alcuna e-mail.",
+            "load_error_body": "Non è stato possibile recuperare l'elenco degli utenti. Aggiorna la pagina o riprova più tardi.",
+            "load_error_title": "Impossibile caricare gli utenti",
+            "recovery_link": {
+                "copy": "Copia link",
+                "help": "Condividi questo link monouso con l'utente tramite un altro canale. Scade in base alla finestra di reimpostazione della password.",
+                "title": "Link di reimpostazione della password"
+            },
+            "set_email_dialog": {
+                "current": "Attuale",
+                "description": "Questo disconnette {{email}}; dovrà accedere di nuovo con il nuovo indirizzo. Non viene inviata alcuna e-mail di conferma.",
+                "error": "Impossibile impostare l'e-mail.",
+                "label": "Nuovo indirizzo e-mail",
+                "submit": "Imposta e-mail",
+                "success": "E-mail aggiornata.",
+                "title": "Imposta l'e-mail dell'utente"
             }
         }
     }
