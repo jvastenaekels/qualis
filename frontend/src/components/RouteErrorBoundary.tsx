@@ -8,11 +8,8 @@ import * as Sentry from '@sentry/react';
 import { useRouteError } from 'react-router-dom';
 import ErrorPage from '../pages/ErrorPage';
 import { ApiError } from '../api/client';
-import {
-    classifyRouteError,
-    shouldCaptureRouteError,
-    shouldThrottleChunkReload,
-} from './RouteErrorBoundary.helpers';
+import { classifyRouteError, shouldCaptureRouteError } from './RouteErrorBoundary.helpers';
+import { recoverFromChunkError } from '../lib/chunkReload';
 
 /**
  * RouteErrorBoundary
@@ -49,12 +46,15 @@ const RouteErrorBoundary = () => {
     }
 
     if (classification.kind === 'chunk-reload') {
-        if (!shouldThrottleChunkReload(classification.lastReload, classification.now)) {
-            console.warn('Chunk load error detected in RouteErrorBoundary. Reloading...');
-            sessionStorage.setItem(classification.storageKey, classification.now.toString());
-            window.location.reload();
-            return null;
-        }
+        // Centralised recovery: reloads up to the shared cap within a rolling
+        // window, then renders the recoverable ErrorPage instead of leaving
+        // the user on a silently-frozen page.
+        const outcome = recoverFromChunkError(error, {
+            storage: window.sessionStorage,
+            now: Date.now(),
+            reload: () => window.location.reload(),
+        });
+        if (outcome === 'reloading') return null;
         return <ErrorPage error={error as Error} />;
     }
 
