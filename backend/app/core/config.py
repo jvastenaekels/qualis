@@ -74,6 +74,15 @@ class Settings(BaseSettings):
     S3_ENDPOINT_URL: str | None = (
         None  # e.g., https://cellar-c2.services.clever-cloud.com
     )
+    # Browser-reachable object-storage host used *only* to mint presigned
+    # URLs, when it differs from the internal upload endpoint. The classic
+    # case is MinIO in docker-compose: the backend uploads via the internal
+    # service hostname (http://minio:9000) but the participant's browser
+    # must fetch playback URLs from a host-published address
+    # (http://localhost:9000). Presigning is an offline SigV4 operation, so
+    # a client pointed at this endpoint mints valid URLs without connecting.
+    # Leave unset for normal deployments where one endpoint serves both.
+    S3_PUBLIC_ENDPOINT_URL: str | None = None
     S3_REGION: str = "us-east-1"
     S3_BUCKET_NAME: str | None = None
     S3_ACCESS_KEY_ID: str | None = None

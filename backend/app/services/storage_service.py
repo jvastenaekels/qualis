@@ -117,6 +117,29 @@ class StorageService:
                 response_checksum_validation="when_required",
             ),
         )
+        # Presigned-URL client. When S3_PUBLIC_ENDPOINT_URL is set and differs
+        # from the internal endpoint, presigned URLs must point at the
+        # browser-reachable host, not the internal one (e.g. MinIO in
+        # docker-compose: backend uploads via http://minio:9000, the
+        # participant's browser plays back from http://localhost:9000).
+        # Presigning is an offline SigV4 operation, so this client never has
+        # to reach the public host. Otherwise reuse the single client.
+        public_endpoint = settings.S3_PUBLIC_ENDPOINT_URL
+        if public_endpoint and public_endpoint != settings.S3_ENDPOINT_URL:
+            self.presign_client = boto3.client(
+                "s3",
+                endpoint_url=public_endpoint,
+                region_name=settings.S3_REGION,
+                aws_access_key_id=settings.S3_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
+                config=BotoConfig(
+                    request_checksum_calculation="when_required",
+                    response_checksum_validation="when_required",
+                ),
+            )
+        else:
+            self.presign_client = self.s3_client
+
         # settings.S3_BUCKET_NAME is str | None; the all() guard above guarantees
         # it is non-None at this point. Use an explicit raise (not assert) so the
         # narrow holds even if Python is run with -O.
@@ -232,7 +255,7 @@ class StorageService:
             ServiceError: If URL generation fails
         """
         try:
-            url = self.s3_client.generate_presigned_url(
+            url = self.presign_client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self.bucket_name, "Key": s3_key},
                 ExpiresIn=expiration,

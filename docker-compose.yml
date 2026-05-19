@@ -1,3 +1,13 @@
+# Internal S3 credentials/endpoint shared by the backend (server-side
+# uploads) and the one-shot bucket bootstrap. The browser never uses these;
+# presigned playback URLs are minted against S3_PUBLIC_ENDPOINT_URL below.
+x-s3-internal-env: &s3-internal-env
+  S3_ENDPOINT_URL: http://minio:9000
+  S3_BUCKET_NAME: qualis-audio
+  S3_ACCESS_KEY_ID: qualis
+  S3_SECRET_ACCESS_KEY: qualis-minio-dev
+  S3_REGION: us-east-1
+
 services:
   db:
     image: postgres:16-alpine
@@ -13,9 +23,45 @@ services:
       timeout: 3s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: qualis
+      MINIO_ROOT_PASSWORD: qualis-minio-dev
+    ports:
+      - "9000:9000"  # S3 API — must be host-reachable for audio playback
+      - "9001:9001"  # web console (http://localhost:9001), optional
+    volumes:
+      - miniodata:/data
+
+  # One-shot: waits for MinIO to accept connections, then creates and
+  # configures the audio bucket (ACL, CORS, lifecycle) via the existing
+  # scripts/create_bucket.py. Reuses the backend image (boto3 + the script
+  # are already present). Exits 0; the backend gates on its success.
+  bucket-init:
+    build: ./backend
+    environment:
+      <<: *s3-internal-env
+    depends_on:
+      minio:
+        condition: service_started
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - >
+        until uv run python -c "import boto3,os;
+        boto3.client('s3', endpoint_url=os.environ['S3_ENDPOINT_URL'],
+        aws_access_key_id=os.environ['S3_ACCESS_KEY_ID'],
+        aws_secret_access_key=os.environ['S3_SECRET_ACCESS_KEY']).list_buckets()"
+        2>/dev/null; do echo "waiting for minio..."; sleep 2; done
+        && uv run python scripts/create_bucket.py
+
   backend:
     build: ./backend
     environment:
+      <<: *s3-internal-env
       DATABASE_URL: postgresql+asyncpg://qualis:qualis@db:5432/qualis
       SECRET_KEY: docker-dev-secret-change-in-production
       IP_HASH_SALT: docker-dev-salt-change-in-production
@@ -23,9 +69,16 @@ services:
       ENVIRONMENT: development
       ADMIN_EMAIL: admin@example.com
       ADMIN_PASSWORD: admin123
+      # Browser-reachable MinIO host for presigned playback URLs. The
+      # backend still uploads via the internal http://minio:9000.
+      S3_PUBLIC_ENDPOINT_URL: http://localhost:9000
     depends_on:
       db:
         condition: service_healthy
+      bucket-init:
+        condition: service_completed_successfully
+      minio:
+        condition: service_started
     healthcheck:
       test:
         [
@@ -46,3 +99,4 @@ services:
 
 volumes:
   pgdata:
+  miniodata:
