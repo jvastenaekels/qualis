@@ -104,14 +104,6 @@
         }
     },
     "admin": {
-        "capability_banner": {
-            "smtp": "Email delivery is not configured. Account recovery (password reset, email change, email-based two-factor authentication) requires manual administrator action.",
-            "s3": "Object storage is not configured. Audio responses cannot be collected; audio-enabled studies fall back to text-only responses.",
-            "view_guide": "View guide",
-            "collapse": "Hide",
-            "chip_count": "Reduced functionality ({{n}})",
-            "chip_tooltip": "Some platform capabilities are unavailable. Click for details."
-        },
         "hub": {
             "title": "Researcher Hub",
             "welcome": "Welcome back,",
@@ -2200,6 +2192,7 @@
         "users": {
             "title": "Users",
             "subtitle": "Manage platform accounts and audit hygiene.",
+            "email_manual_note": "Email delivery is not configured. Use the password-reset link and set-email actions below for account recovery — no email is sent.",
             "error_title": "Action failed",
             "generic_error": "Something went wrong. Please try again.",
             "load_error_title": "Could not load users",
