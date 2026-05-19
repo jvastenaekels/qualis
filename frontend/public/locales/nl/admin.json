@@ -56,7 +56,8 @@
             "mismatch": "Wachtwoorden komen niet overeen.",
             "missing_token": "Geen resettoken in de URL.",
             "new_password_placeholder": "Nieuw wachtwoord",
-            "confirm_placeholder": "Wachtwoord bevestigen"
+            "confirm_placeholder": "Wachtwoord bevestigen",
+            "request_success_manual": "E-mailverzending is niet geconfigureerd op deze instantie. Neem contact op met je beheerder voor een resetlink."
         },
         "email": {
             "verification_sent": {
@@ -254,7 +255,8 @@
             "beta": "Onderzoeksbèta",
             "logout": "Uitloggen",
             "account": "Accountinstellingen",
-            "admin_user": "Beheerder"
+            "admin_user": "Beheerder",
+            "platform_settings": "Platforminstellingen"
         },
         "account": {
             "title": "Accountinstellingen",
@@ -341,9 +343,7 @@
             "select_project": "Project selecteren",
             "concourses": "Concoursen",
             "concourse": "Concours",
-            "members": "Teamleden",
-            "platform": "Platform",
-            "users": "Gebruikers"
+            "members": "Teamleden"
         },
         "concourse": {
             "title": "Concours",
@@ -1600,7 +1600,9 @@
                     "max_duration": "Maximale duur",
                     "seconds": "seconden",
                     "max_duration_help": "Maximale opnameduur per vraag (30–600 seconden).",
-                    "participant_choice_info": "Deelnemers kunnen per vraag antwoorden met tekst, audio of beide."
+                    "participant_choice_info": "Deelnemers kunnen per vraag antwoorden met tekst, audio of beide.",
+                    "storage_unavailable_body": "Objectopslag is niet geconfigureerd, dus audioantwoorden kunnen niet worden verzameld. Je kunt audio nog steeds inschakelen, maar deelnemers antwoorden alleen in tekst en er wordt geen opname gemaakt. Configureer objectopslag en start de server opnieuw op om audio-opname in te schakelen.",
+                    "storage_unavailable_title": "Audio-opname is niet beschikbaar op deze server"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Account reactiveren",
                 "force_password_reset": "Wachtwoordreset afdwingen",
                 "reset_totp": "2FA resetten",
-                "delete": "Gebruiker verwijderen"
+                "delete": "Gebruiker verwijderen",
+                "generate_reset_link": "Resetlink voor wachtwoord genereren",
+                "set_email": "E-mail instellen"
             },
             "confirm": {
                 "cancel": "Annuleren",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Superbeheerder-rechten verwijderen van {{email}}.",
                 "promote_title": "Superbeheerder-toegang verlenen?",
                 "promote_body": "{{email}} volledige superbeheerder-rechten verlenen over het platform."
+            },
+            "email_manual_note": "E-mailverzending is niet geconfigureerd. Gebruik de resetlink voor het wachtwoord en de actie 'E-mail instellen' hieronder voor accountherstel — er wordt geen e-mail verzonden.",
+            "load_error_body": "De gebruikerslijst kon niet worden opgehaald. Vernieuw de pagina of probeer het later opnieuw.",
+            "load_error_title": "Kan gebruikers niet laden",
+            "recovery_link": {
+                "copy": "Link kopiëren",
+                "help": "Deel deze eenmalige link via een ander kanaal met de gebruiker. De link verloopt volgens het venster voor het opnieuw instellen van het wachtwoord.",
+                "title": "Resetlink voor wachtwoord"
+            },
+            "set_email_dialog": {
+                "current": "Huidig",
+                "description": "Hierdoor wordt {{email}} afgemeld; de gebruiker moet opnieuw inloggen met het nieuwe adres. Er wordt geen bevestigingsmail verzonden.",
+                "error": "Kan e-mail niet instellen.",
+                "label": "Nieuw e-mailadres",
+                "submit": "E-mail instellen",
+                "success": "E-mail bijgewerkt.",
+                "title": "E-mail van gebruiker instellen"
             }
         }
     }

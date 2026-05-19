@@ -56,7 +56,8 @@
             "mismatch": "Las contraseñas no coinciden.",
             "missing_token": "No hay token de restablecimiento en la URL.",
             "new_password_placeholder": "Nueva contraseña",
-            "confirm_placeholder": "Confirmar contraseña"
+            "confirm_placeholder": "Confirmar contraseña",
+            "request_success_manual": "El envío de correos no está configurado en esta instancia. Póngase en contacto con su administrador para obtener un enlace de restablecimiento."
         },
         "email": {
             "verification_sent": {
@@ -254,7 +255,8 @@
             "beta": "Beta de investigación",
             "logout": "Cerrar sesión",
             "account": "Configuración de cuenta",
-            "admin_user": "Usuario administrador"
+            "admin_user": "Usuario administrador",
+            "platform_settings": "Configuración de la plataforma"
         },
         "account": {
             "title": "Configuración de cuenta",
@@ -341,9 +343,7 @@
             "select_project": "Seleccionar proyecto",
             "concourses": "Concursos",
             "concourse": "Concurso",
-            "members": "Miembros del equipo",
-            "platform": "Plataforma",
-            "users": "Usuarios"
+            "members": "Miembros del equipo"
         },
         "concourse": {
             "title": "Concurso",
@@ -1600,7 +1600,9 @@
                     "max_duration": "Duración máxima",
                     "seconds": "segundos",
                     "max_duration_help": "Tiempo máximo de grabación por pregunta (30–600 segundos).",
-                    "participant_choice_info": "Los participantes pueden responder con texto, audio o ambos para cada pregunta."
+                    "participant_choice_info": "Los participantes pueden responder con texto, audio o ambos para cada pregunta.",
+                    "storage_unavailable_body": "El almacenamiento de objetos no está configurado, por lo que no se pueden recopilar respuestas de audio. Aún puede habilitar el audio, pero los participantes responderán solo con texto y no se realizará ninguna grabación. Configure el almacenamiento de objetos y reinicie el servidor para habilitar la captura de audio.",
+                    "storage_unavailable_title": "La captura de audio no está disponible en este servidor"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Reactivar cuenta",
                 "force_password_reset": "Forzar restablecimiento de contraseña",
                 "reset_totp": "Restablecer 2FA",
-                "delete": "Eliminar usuario"
+                "delete": "Eliminar usuario",
+                "generate_reset_link": "Generar enlace de restablecimiento de contraseña",
+                "set_email": "Establecer correo electrónico"
             },
             "confirm": {
                 "cancel": "Cancelar",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Eliminar los privilegios de superusuario de {{email}}.",
                 "promote_title": "¿Conceder acceso de superusuario?",
                 "promote_body": "Conceder a {{email}} plenos privilegios de superusuario sobre la plataforma."
+            },
+            "email_manual_note": "El envío de correos no está configurado. Utilice el enlace de restablecimiento de contraseña y la acción de establecer correo electrónico que aparecen abajo para la recuperación de la cuenta: no se envía ningún correo.",
+            "load_error_body": "No se pudo recuperar la lista de usuarios. Actualice la página o vuelva a intentarlo más tarde.",
+            "load_error_title": "No se pudieron cargar los usuarios",
+            "recovery_link": {
+                "copy": "Copiar enlace",
+                "help": "Comparta este enlace de un solo uso con el usuario por otro canal. Caduca según la ventana de restablecimiento de contraseña.",
+                "title": "Enlace de restablecimiento de contraseña"
+            },
+            "set_email_dialog": {
+                "current": "Actual",
+                "description": "Esto cierra la sesión de {{email}}; deberá iniciar sesión de nuevo con la nueva dirección. No se envía ningún correo de confirmación.",
+                "error": "No se pudo establecer el correo electrónico.",
+                "label": "Nueva dirección de correo electrónico",
+                "submit": "Establecer correo electrónico",
+                "success": "Correo electrónico actualizado.",
+                "title": "Establecer el correo electrónico del usuario"
             }
         }
     }

@@ -56,7 +56,8 @@
             "mismatch": "Salasanat eivät täsmää.",
             "missing_token": "Nollausavainta ei löydy URL-osoitteesta.",
             "new_password_placeholder": "Uusi salasana",
-            "confirm_placeholder": "Vahvista salasana"
+            "confirm_placeholder": "Vahvista salasana",
+            "request_success_manual": "Sähköpostien lähetystä ei ole määritetty tässä asennuksessa. Pyydä nollauslinkki järjestelmänvalvojalta."
         },
         "email": {
             "verification_sent": {
@@ -166,7 +167,8 @@
             "beta": "Tutkimuksen beta-versio",
             "logout": "Kirjaudu ulos",
             "account": "Tilin asetukset",
-            "admin_user": "Ylläpitäjä"
+            "admin_user": "Ylläpitäjä",
+            "platform_settings": "Alustan asetukset"
         },
         "account": {
             "title": "Tilin asetukset",
@@ -253,9 +255,7 @@
             "concourses": "Lausekokoelmat",
             "concourse": "Lausekokoelma",
             "privacy": "Tietosuoja",
-            "members": "Tiimin jäsenet",
-            "platform": "Alusta",
-            "users": "Käyttäjät"
+            "members": "Tiimin jäsenet"
         },
         "concourse": {
             "title": "Lausekokoelma",
@@ -1511,7 +1511,9 @@
                     "max_duration": "Enimmäiskesto",
                     "seconds": "sekuntia",
                     "max_duration_help": "Tallennuksen enimmäiskesto per kysymys (30–600 sekuntia).",
-                    "participant_choice_info": "Osallistujat voivat vastata tekstillä, äänellä tai molemmilla kuhunkin kysymykseen."
+                    "participant_choice_info": "Osallistujat voivat vastata tekstillä, äänellä tai molemmilla kuhunkin kysymykseen.",
+                    "storage_unavailable_body": "Objektitallennustilaa ei ole määritetty, joten äänivastauksia ei voida kerätä. Voit silti ottaa äänen käyttöön, mutta osallistujat vastaavat vain tekstillä eikä tallennetta tehdä. Määritä objektitallennustila ja käynnistä palvelin uudelleen, jotta äänitallennus voidaan ottaa käyttöön.",
+                    "storage_unavailable_title": "Äänitallennus ei ole käytettävissä tällä palvelimella"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Ota uudelleen käyttöön",
                 "force_password_reset": "Pakota salasanan nollaus",
                 "reset_totp": "Nollaa kaksivaiheinen tunnistautuminen",
-                "delete": "Poista käyttäjä"
+                "delete": "Poista käyttäjä",
+                "generate_reset_link": "Luo salasanan nollauslinkki",
+                "set_email": "Aseta sähköposti"
             },
             "confirm": {
                 "cancel": "Peruuta",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Poistetaan pääkäyttäjäoikeudet käyttäjältä {{email}}.",
                 "promote_title": "Myönnetäänkö pääkäyttäjäoikeudet?",
                 "promote_body": "Myönnetään käyttäjälle {{email}} täydet pääkäyttäjäoikeudet alustalla."
+            },
+            "email_manual_note": "Sähköpostien lähetystä ei ole määritetty. Käytä tilin palauttamiseen alla olevaa salasanan nollauslinkkiä ja sähköpostin asetustoimintoa — sähköpostia ei lähetetä.",
+            "load_error_body": "Käyttäjäluetteloa ei voitu hakea. Päivitä sivu tai yritä myöhemmin uudelleen.",
+            "load_error_title": "Käyttäjiä ei voitu ladata",
+            "recovery_link": {
+                "copy": "Kopioi linkki",
+                "help": "Jaa tämä kertakäyttöinen linkki käyttäjälle toista kanavaa pitkin. Se vanhenee salasanan nollausikkunan mukaisesti.",
+                "title": "Salasanan nollauslinkki"
+            },
+            "set_email_dialog": {
+                "current": "Nykyinen",
+                "description": "Tämä kirjaa käyttäjän {{email}} ulos; hänen on kirjauduttava uudelleen sisään uudella osoitteella. Vahvistussähköpostia ei lähetetä.",
+                "error": "Sähköpostia ei voitu asettaa.",
+                "label": "Uusi sähköpostiosoite",
+                "submit": "Aseta sähköposti",
+                "success": "Sähköposti päivitetty.",
+                "title": "Aseta käyttäjän sähköposti"
             }
         }
     }

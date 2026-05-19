@@ -56,7 +56,8 @@
             "mismatch": "Les mots de passe ne correspondent pas.",
             "missing_token": "Aucun jeton de réinitialisation dans l'URL.",
             "new_password_placeholder": "Nouveau mot de passe",
-            "confirm_placeholder": "Confirmer le mot de passe"
+            "confirm_placeholder": "Confirmer le mot de passe",
+            "request_success_manual": "L'envoi d'e-mails n'est pas configuré sur cette instance. Contactez votre administrateur pour obtenir un lien de réinitialisation."
         },
         "email": {
             "verification_sent": {
@@ -1548,7 +1549,9 @@
                     "max_duration": "Durée maximale",
                     "seconds": "secondes",
                     "max_duration_help": "Durée maximale d'enregistrement par question (30–600 secondes).",
-                    "participant_choice_info": "Les participants peuvent répondre par texte, par audio, ou les deux pour chaque question."
+                    "participant_choice_info": "Les participants peuvent répondre par texte, par audio, ou les deux pour chaque question.",
+                    "storage_unavailable_body": "Le stockage objet n'est pas configuré ; les réponses audio ne peuvent donc pas être collectées. Vous pouvez tout de même activer l'audio, mais les participants répondront uniquement en texte et aucun enregistrement ne sera réalisé. Configurez le stockage objet et redémarrez le serveur pour activer la capture audio.",
+                    "storage_unavailable_title": "La capture audio est indisponible sur ce serveur"
                 }
             },
             "interface": {
@@ -2224,7 +2227,9 @@
                 "reactivate": "Réactiver le compte",
                 "force_password_reset": "Forcer la réinitialisation du mot de passe",
                 "reset_totp": "Réinitialiser la 2FA",
-                "delete": "Supprimer l'utilisateur"
+                "delete": "Supprimer l'utilisateur",
+                "generate_reset_link": "Générer un lien de réinitialisation du mot de passe",
+                "set_email": "Définir l'e-mail"
             },
             "confirm": {
                 "cancel": "Annuler",
@@ -2241,6 +2246,23 @@
                 "demote_body": "Retirer les privilèges superutilisateur de {{email}}.",
                 "promote_title": "Accorder les droits superutilisateur ?",
                 "promote_body": "Accorder à {{email}} les pleins privilèges superutilisateur sur la plateforme."
+            },
+            "email_manual_note": "L'envoi d'e-mails n'est pas configuré. Utilisez le lien de réinitialisation du mot de passe et l'action de définition de l'adresse e-mail ci-dessous pour la récupération du compte — aucun e-mail n'est envoyé.",
+            "load_error_body": "La liste des utilisateurs n'a pas pu être récupérée. Veuillez actualiser la page ou réessayer plus tard.",
+            "load_error_title": "Impossible de charger les utilisateurs",
+            "recovery_link": {
+                "copy": "Copier le lien",
+                "help": "Partagez ce lien à usage unique avec l'utilisateur par un autre canal. Il expire selon la fenêtre de réinitialisation du mot de passe.",
+                "title": "Lien de réinitialisation du mot de passe"
+            },
+            "set_email_dialog": {
+                "current": "Actuelle",
+                "description": "Cela déconnecte {{email}} ; cette personne devra se reconnecter avec la nouvelle adresse. Aucun e-mail de confirmation n'est envoyé.",
+                "error": "Impossible de définir l'e-mail.",
+                "label": "Nouvelle adresse e-mail",
+                "submit": "Définir l'e-mail",
+                "success": "E-mail mis à jour.",
+                "title": "Définir l'e-mail de l'utilisateur"
             }
         }
     }
