@@ -11,6 +11,7 @@ import App from './App';
 import './i18n';
 import './index.css';
 import { migrateLegacyStorage } from './utils/migrateLegacyStorage';
+import { recoverFromChunkError } from './lib/chunkReload';
 
 // Run the libre-q-* → qualis-* storage rename before any code touches the
 // new namespace. Idempotent; no-op once the legacy keys are gone.
@@ -41,40 +42,24 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
 
 // Handle chunk loading failures (e.g., after deployments with new asset hashes)
-// This prevents users from seeing broken pages due to stale cached HTML
-const handleChunkError = (error: string | Error | undefined) => {
-    const errorMessage = typeof error === 'string' ? error : error?.message || '';
-    if (
-        errorMessage.includes('Failed to fetch dynamically imported module') ||
-        errorMessage.includes('Importing a module script failed') ||
-        errorMessage.includes('loading chunk') ||
-        errorMessage.includes('NetworkError when attempting to fetch resource')
-    ) {
-        console.warn('Chunk loading failed, reloading page to fetch latest version...');
-        // Store that we tried to reload to prevent infinite loops
-        const reloadAttempted = sessionStorage.getItem('chunk-reload-attempted');
-        if (!reloadAttempted) {
-            sessionStorage.setItem('chunk-reload-attempted', 'true');
-            window.location.reload();
-        } else {
-            // If reload already attempted, clear the flag and show error
-            sessionStorage.removeItem('chunk-reload-attempted');
-            console.error('Failed to load after reload, this may be a network issue');
-        }
-    }
+// This prevents users from seeing broken pages due to stale cached HTML.
+// Recovery policy is centralised in lib/chunkReload (single sessionStorage
+// key + rolling window) so the global listeners, ErrorBoundary, and
+// RouteErrorBoundary cannot race each other with divergent throttles.
+const handleChunkError = (error: unknown) => {
+    recoverFromChunkError(error, {
+        storage: window.sessionStorage,
+        now: Date.now(),
+        reload: () => window.location.reload(),
+    });
 };
 
 window.addEventListener('error', (event) => {
-    handleChunkError(event.message || event.error);
+    handleChunkError(event.error ?? event.message);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
     handleChunkError(event.reason);
-});
-
-// Clear reload flag on successful load
-window.addEventListener('load', () => {
-    sessionStorage.removeItem('chunk-reload-attempted');
 });
 
 const rootContainer = document.getElementById('root');
