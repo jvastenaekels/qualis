@@ -116,6 +116,28 @@ Qualis uses the standard AWS S3 SDK (boto3). Any S3-compatible provider should w
 
 For non-AWS providers, you may need to set an additional `S3_ENDPOINT_URL` environment variable pointing to the provider's S3-compatible endpoint.
 
+### Split internal / public endpoint (`S3_PUBLIC_ENDPOINT_URL`)
+
+When the object-storage host the **backend** reaches differs from the
+host the **participant's browser** must reach for playback, set the
+optional `S3_PUBLIC_ENDPOINT_URL`. Presigned playback URLs are then
+minted against it while server-side uploads keep using
+`S3_ENDPOINT_URL`. Presigning is an offline SigV4 operation, so the
+backend never has to reach the public host itself.
+
+The canonical case is the bundled `docker-compose.yml`, which runs a
+local MinIO so the demo has working audio out of the box:
+
+| Variable | Value | Used by |
+|----------|-------|---------|
+| `S3_ENDPOINT_URL` | `http://minio:9000` | backend upload (internal Docker network) |
+| `S3_PUBLIC_ENDPOINT_URL` | `http://localhost:9000` | browser playback (host-published port) |
+
+Leave `S3_PUBLIC_ENDPOINT_URL` unset for normal single-endpoint
+deployments (AWS, Cellar, R2) — presigning then reuses the one client.
+The bucket itself is created and configured automatically by the
+`bucket-init` service via `scripts/create_bucket.py`.
+
 ---
 
 ## Upload Reliability
