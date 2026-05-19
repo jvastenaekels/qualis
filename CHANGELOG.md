@@ -1,5 +1,72 @@
 # Changelog
 
+## [0.7.1](https://github.com/jvastenaekels/qualis/compare/v0.7.0...v0.7.1) (2026-05-19)
+
+
+### Features
+
+* **admin:** CapabilityBanner presentational row ([e1bba38](https://github.com/jvastenaekels/qualis/commit/e1bba38eff15d7aaa564362b22a58c0f05c2b00c))
+* **admin:** CapabilityBannerStack + collapsed chip ([d9d8a42](https://github.com/jvastenaekels/qualis/commit/d9d8a427820a10ba02b7987ace18d8bbfef76cb5))
+* **admin:** contextual email-manual note in Admin &gt; Users ([226b7d3](https://github.com/jvastenaekels/qualis/commit/226b7d350ac24665066ccb423e3d78c1504c21b6))
+* **admin:** move superuser platform settings into account menu ([#187](https://github.com/jvastenaekels/qualis/issues/187)) ([02e0b9d](https://github.com/jvastenaekels/qualis/commit/02e0b9d530866f96e8ef5313c6bf578c2b8232e4))
+* **admin:** on-demand password-reset link reveal for SMTP-optional mode ([1fd06e5](https://github.com/jvastenaekels/qualis/commit/1fd06e515159f09360c15f18abeb022781df16e3))
+* **admin:** replace SMTP banner with CapabilityBannerStack + chip ([ccf8afe](https://github.com/jvastenaekels/qualis/commit/ccf8afe3b0cb5916d94125888a08e09a65a83984))
+* **admin:** study-design note when audio storage unavailable ([6322b20](https://github.com/jvastenaekels/qualis/commit/6322b207ffcda17fd26d21e49e1f3224d6d4c0cc))
+* **admin:** superuser direct set-email for SMTP-optional mode ([f6390cc](https://github.com/jvastenaekels/qualis/commit/f6390cce738904efe2aaaad8f4386bb806d1ab26))
+* **admin:** useCapabilityBanners hook (derive + collapse persistence) ([773838c](https://github.com/jvastenaekels/qualis/commit/773838c2997dd5385a1d2a59090016f3f796f30e))
+* **api:** expose audio_storage capability on GET /api/config ([6a57bf1](https://github.com/jvastenaekels/qualis/commit/6a57bf1c7c6381f89fcac4ab2435ff2992d3e6da))
+* **audio:** 503 safety-net when object storage is unconfigured ([20546b0](https://github.com/jvastenaekels/qualis/commit/20546b0d2a5cbb2cb20121627b4bd7d174286d05))
+* **auth:** clear 503 for legacy email-2FA login when SMTP manual ([b971abb](https://github.com/jvastenaekels/qualis/commit/b971abb522d0a1e01f88b589ecce240dc361937f))
+* **auth:** reject email-2FA enrolment when SMTP unconfigured ([fcac806](https://github.com/jvastenaekels/qualis/commit/fcac806829cb00ef22b7bbe011c6fb3727868f88))
+* **config:** expose email_delivery capability via GET /api/config ([9edea19](https://github.com/jvastenaekels/qualis/commit/9edea1932ef531d1ff909739e17b9e2667332541))
+* **config:** is_s3_configured capability flag ([f29a55f](https://github.com/jvastenaekels/qualis/commit/f29a55ff11831f5c16429f928201c02309506587))
+* **frontend:** admin banner when email delivery is manual ([e000a10](https://github.com/jvastenaekels/qualis/commit/e000a1097f780749c36f8fc5b2e461f680fe45fe))
+* **frontend:** forgot-password copy adapts to email-manual mode ([2c27816](https://github.com/jvastenaekels/qualis/commit/2c27816a78c2900364d98f37a1c83c651014fca8))
+* **frontend:** generate + reveal password-reset link from Admin &gt; Users ([a575f3a](https://github.com/jvastenaekels/qualis/commit/a575f3add4e2faadf03a84e4dee476a8b6c0c47d))
+* **frontend:** hide email-2FA channel when SMTP unconfigured ([b18db6c](https://github.com/jvastenaekels/qualis/commit/b18db6cee5fe47b3398bef5c7d824871c321cf25))
+* **frontend:** platform-config store + GET /api/config bootstrap ([4f6f619](https://github.com/jvastenaekels/qualis/commit/4f6f619d42de7237b92de046618a62e70c178640))
+* **frontend:** platform-config store carries audio_storage ([1d8adff](https://github.com/jvastenaekels/qualis/commit/1d8adff2b55d84a2fb05e8f36e29764f86097bf0))
+* **frontend:** wire superuser set-email UI; close email-change in-product gap ([a99dd31](https://github.com/jvastenaekels/qualis/commit/a99dd31307d3dab339b9ebf3b758f3aec1c3b59b))
+* **i18n:** capability-banner strings (professional register) ([22d4286](https://github.com/jvastenaekels/qualis/commit/22d42864c90af699f5dd47a55c71871a141bfb22))
+* **participant:** audio degrades to text-only when storage absent ([fe23fef](https://github.com/jvastenaekels/qualis/commit/fe23fef907da11a1fd8a6d21024eb84fe45c51d0))
+* SMTP-optional mode — fully usable without email ([6971302](https://github.com/jvastenaekels/qualis/commit/6971302caa0ec44fbcfe9a351a674dcf51d70f3f))
+* **spa:** serve repo docs/ statically at /docs ([3a45326](https://github.com/jvastenaekels/qualis/commit/3a45326c50901b4071e861072532f534858ea78b))
+* **startup:** log email-optional capability banner when SMTP absent ([59b38f4](https://github.com/jvastenaekels/qualis/commit/59b38f4f7334372f0fe24278d4aefe98b8da799c))
+* **startup:** log storage-optional banner when S3 absent ([0935926](https://github.com/jvastenaekels/qualis/commit/0935926f4fef966d18a2fcc82e477517fdd4ac43))
+
+
+### Bug fixes
+
+* **deps:** pin mando&lt;0.8 to resolve radon conflict breaking Scalingo deploy ([#203](https://github.com/jvastenaekels/qualis/issues/203)) ([af65271](https://github.com/jvastenaekels/qualis/commit/af652717aab5aa1130e31fe7d576898af459a32f))
+* **spa:** unify stale-chunk recovery; stop silent post-deploy freeze ([6f07495](https://github.com/jvastenaekels/qualis/commit/6f0749550b51c34ebd9d62e540b5a338b18e4362))
+* **test:** configure S3 for audio security suites under the new guard ([9b79ba5](https://github.com/jvastenaekels/qualis/commit/9b79ba5cff737dc49c11c26c146bce0f0bf01f8b))
+
+
+### Refactor
+
+* **admin:** align study-design audio note to professional register ([ad5ca91](https://github.com/jvastenaekels/qualis/commit/ad5ca917e2c077462238f3ea2ea95242ca16f3df))
+* **admin:** remove global capability-banner chrome ([507185c](https://github.com/jvastenaekels/qualis/commit/507185c38c6840474d6e33a54146d935f54ca0ee))
+* **designer:** QSortEditor W3b — adopt helpers + dnd-kit, slim test ([f241b7a](https://github.com/jvastenaekels/qualis/commit/f241b7a9f306262e5baf2a25dfadbbbdec3474c7))
+* **startup:** align SMTP/S3 banner first lines (professional register) ([dd1e182](https://github.com/jvastenaekels/qualis/commit/dd1e1826eb58085a8acb3d0306342752d5a77208))
+
+
+### Documentation
+
+* **guides:** running Qualis without SMTP — capability matrix ([04da211](https://github.com/jvastenaekels/qualis/commit/04da211bf74ac917fa6e5bee298fb1eb271909b5))
+* **guides:** running without S3 / object storage ([ec1266b](https://github.com/jvastenaekels/qualis/commit/ec1266b35380c3fe6d773dc62b15cd6f9204e1d6))
+* last-superuser shell escape; audit docstring PII carve-out. ([a99dd31](https://github.com/jvastenaekels/qualis/commit/a99dd31307d3dab339b9ebf3b758f3aec1c3b59b))
+* **plan:** capability-banners implementation plan (9 tasks, TDD) ([6d1e39b](https://github.com/jvastenaekels/qualis/commit/6d1e39b1eac98c4edbbc445fffccac649bf231fa))
+* **plan:** contextual-only capability warnings (3 tasks, TDD) ([5ece091](https://github.com/jvastenaekels/qualis/commit/5ece0915c69a9ba8d12dc904c7fd600ea7bca325))
+* **plan:** S3-optional mode implementation plan (10 tasks, TDD) ([05a96e0](https://github.com/jvastenaekels/qualis/commit/05a96e08c3de5d95a31f791b4734b18f20c949fc))
+* **plan:** SMTP-optional mode implementation plan ([5f15e9a](https://github.com/jvastenaekels/qualis/commit/5f15e9a90d54b29aa64b9a631a825001539417df))
+* **readme:** replace screenshots with curated app captures ([#202](https://github.com/jvastenaekels/qualis/issues/202)) ([6da6a24](https://github.com/jvastenaekels/qualis/commit/6da6a24e4285de20c200204ec43fd4aac00961f5))
+* **spec:** capability-banners clarity & behaviour redesign ([f81b87d](https://github.com/jvastenaekels/qualis/commit/f81b87dce7212b53043fbf16ee5abb32fec3373c))
+* **spec:** contextual-only capability warnings (remove global banner) ([e06f381](https://github.com/jvastenaekels/qualis/commit/e06f381a07127a62236ca0b8292561bcdb2b59d1))
+* **spec:** pin docs static-serve mechanism (backend /docs mount) ([7df6ad9](https://github.com/jvastenaekels/qualis/commit/7df6ad9524c72c99433b9284a7ddd1d49580a414))
+* **spec:** S3-optional mode design ([7973bc2](https://github.com/jvastenaekels/qualis/commit/7973bc27d263d47c10ae0fbc0d2cd6db7f8e44c1))
+* **spec:** SMTP-optional mode design ([6c10618](https://github.com/jvastenaekels/qualis/commit/6c10618a44fb3ac34b702c47f78ae41cf08c9867))
+* **test:** warn future authors the S3 autouse fixture masks the 503 path ([66268ab](https://github.com/jvastenaekels/qualis/commit/66268abec0de8c669cab090fa065c3a94885882b))
+
 ## [0.7.0](https://github.com/jvastenaekels/qualis/compare/v0.6.8...v0.7.0) (2026-05-17)
 
 
