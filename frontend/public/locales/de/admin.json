@@ -56,7 +56,8 @@
             "mismatch": "Die Passwörter stimmen nicht überein.",
             "missing_token": "Kein Token zum Zurücksetzen in der URL.",
             "new_password_placeholder": "Neues Passwort",
-            "confirm_placeholder": "Passwort bestätigen"
+            "confirm_placeholder": "Passwort bestätigen",
+            "request_success_manual": "Der E-Mail-Versand ist auf dieser Instanz nicht konfiguriert. Wenden Sie sich an Ihren Administrator, um einen Link zum Zurücksetzen zu erhalten."
         },
         "email": {
             "verification_sent": {
@@ -254,7 +255,8 @@
             "beta": "Forschungs-Beta",
             "logout": "Abmelden",
             "account": "Kontoeinstellungen",
-            "admin_user": "Admin-Benutzer"
+            "admin_user": "Admin-Benutzer",
+            "platform_settings": "Plattformeinstellungen"
         },
         "account": {
             "title": "Kontoeinstellungen",
@@ -341,9 +343,7 @@
             "select_project": "Projekt auswählen",
             "concourses": "Aussagenpools",
             "concourse": "Aussagenpool",
-            "members": "Teammitglieder",
-            "platform": "Plattform",
-            "users": "Benutzer"
+            "members": "Teammitglieder"
         },
         "concourse": {
             "title": "Aussagenpool",
@@ -1600,7 +1600,9 @@
                     "max_duration": "Maximale Dauer",
                     "seconds": "Sekunden",
                     "max_duration_help": "Maximale Aufnahmezeit pro Frage (30–600 Sekunden).",
-                    "participant_choice_info": "Teilnehmer können für jede Frage mit Text, Audio oder beidem antworten."
+                    "participant_choice_info": "Teilnehmer können für jede Frage mit Text, Audio oder beidem antworten.",
+                    "storage_unavailable_body": "Der Objektspeicher ist nicht konfiguriert, daher können keine Audioantworten erfasst werden. Sie können Audio dennoch aktivieren, aber die Teilnehmer antworten nur in Textform und es wird keine Aufnahme erstellt. Konfigurieren Sie den Objektspeicher und starten Sie den Server neu, um die Audioaufnahme zu aktivieren.",
+                    "storage_unavailable_title": "Audioaufnahme ist auf diesem Server nicht verfügbar"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Konto reaktivieren",
                 "force_password_reset": "Passwortzurücksetzung erzwingen",
                 "reset_totp": "2FA zurücksetzen",
-                "delete": "Benutzer löschen"
+                "delete": "Benutzer löschen",
+                "generate_reset_link": "Link zum Zurücksetzen des Passworts erzeugen",
+                "set_email": "E-Mail festlegen"
             },
             "confirm": {
                 "cancel": "Abbrechen",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Superbenutzer-Rechte von {{email}} entfernen.",
                 "promote_title": "Superbenutzer-Zugang gewähren?",
                 "promote_body": "{{email}} vollständige Superbenutzer-Rechte auf der Plattform gewähren."
+            },
+            "email_manual_note": "Der E-Mail-Versand ist nicht konfiguriert. Verwenden Sie für die Kontowiederherstellung den Link zum Zurücksetzen des Passworts und die Aktion „E-Mail festlegen“ unten – es wird keine E-Mail gesendet.",
+            "load_error_body": "Die Benutzerliste konnte nicht abgerufen werden. Bitte aktualisieren Sie die Seite oder versuchen Sie es später erneut.",
+            "load_error_title": "Benutzer konnten nicht geladen werden",
+            "recovery_link": {
+                "copy": "Link kopieren",
+                "help": "Teilen Sie diesen Einmal-Link über einen anderen Kanal mit dem Benutzer. Er läuft entsprechend dem Zeitfenster zum Zurücksetzen des Passworts ab.",
+                "title": "Link zum Zurücksetzen des Passworts"
+            },
+            "set_email_dialog": {
+                "current": "Aktuell",
+                "description": "Dadurch wird {{email}} abgemeldet; die Anmeldung muss mit der neuen Adresse erneut erfolgen. Es wird keine Bestätigungs-E-Mail gesendet.",
+                "error": "E-Mail konnte nicht festgelegt werden.",
+                "label": "Neue E-Mail-Adresse",
+                "submit": "E-Mail festlegen",
+                "success": "E-Mail aktualisiert.",
+                "title": "Benutzer-E-Mail festlegen"
             }
         }
     }

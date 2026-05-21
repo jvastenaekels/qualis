@@ -56,7 +56,8 @@
       "mismatch": "Hasła nie są zgodne.",
       "missing_token": "Brak tokenu resetowania w adresie URL.",
       "new_password_placeholder": "Nowe hasło",
-      "confirm_placeholder": "Potwierdź hasło"
+      "confirm_placeholder": "Potwierdź hasło",
+      "request_success_manual": "Wysyłka e-maili nie jest skonfigurowana w tej instancji. Skontaktuj się z administratorem, aby uzyskać link resetujący."
     },
     "email": {
       "verification_sent": {
@@ -254,7 +255,8 @@
       "beta": "Wersja badawcza beta",
       "logout": "Wyloguj",
       "account": "Ustawienia konta",
-      "admin_user": "Użytkownik administracyjny"
+      "admin_user": "Użytkownik administracyjny",
+      "platform_settings": "Ustawienia platformy"
     },
     "account": {
       "title": "Ustawienia konta",
@@ -341,9 +343,7 @@
       "select_project": "Wybierz projekt",
       "concourses": "Konkursy",
       "concourse": "Konkurs",
-      "members": "Członkowie zespołu",
-      "platform": "Platforma",
-      "users": "Użytkownicy"
+      "members": "Członkowie zespołu"
     },
     "concourse": {
       "title": "Konkurs",
@@ -1600,7 +1600,9 @@
           "max_duration": "Maksymalny czas trwania",
           "seconds": "sekund",
           "max_duration_help": "Maksymalny czas nagrywania na pytanie (30–600 sekund).",
-          "participant_choice_info": "Uczestnicy mogą odpowiadać tekstem, nagraniem audio lub obydwoma sposobami na każde pytanie."
+          "participant_choice_info": "Uczestnicy mogą odpowiadać tekstem, nagraniem audio lub obydwoma sposobami na każde pytanie.",
+          "storage_unavailable_body": "Magazyn obiektów nie jest skonfigurowany, więc nie można zbierać odpowiedzi audio. Nadal możesz włączyć audio, ale uczestnicy będą odpowiadać wyłącznie tekstem i żadne nagranie nie zostanie wykonane. Skonfiguruj magazyn obiektów i uruchom ponownie serwer, aby włączyć przechwytywanie audio.",
+          "storage_unavailable_title": "Przechwytywanie audio jest niedostępne na tym serwerze"
         }
       },
       "interface": {
@@ -2225,7 +2227,9 @@
         "reactivate": "Reaktywuj konto",
         "force_password_reset": "Wymuś reset hasła",
         "reset_totp": "Zresetuj 2FA",
-        "delete": "Usuń użytkownika"
+        "delete": "Usuń użytkownika",
+        "generate_reset_link": "Wygeneruj link resetujący hasło",
+        "set_email": "Ustaw e-mail"
       },
       "confirm": {
         "cancel": "Anuluj",
@@ -2242,6 +2246,23 @@
         "demote_body": "Usuń uprawnienia superużytkownika od {{email}}.",
         "promote_title": "Przyznać dostęp superużytkownika?",
         "promote_body": "Przyznaj {{email}} pełne uprawnienia superużytkownika na platformie."
+      },
+      "email_manual_note": "Wysyłka e-maili nie jest skonfigurowana. Do odzyskania konta użyj poniższego linku resetującego hasło oraz akcji ustawienia adresu e-mail — żaden e-mail nie jest wysyłany.",
+      "load_error_body": "Nie udało się pobrać listy użytkowników. Odśwież stronę lub spróbuj ponownie później.",
+      "load_error_title": "Nie można załadować użytkowników",
+      "recovery_link": {
+        "copy": "Kopiuj link",
+        "help": "Udostępnij ten jednorazowy link użytkownikowi innym kanałem. Wygasa zgodnie z oknem resetowania hasła.",
+        "title": "Link resetujący hasło"
+      },
+      "set_email_dialog": {
+        "current": "Bieżący",
+        "description": "Spowoduje to wylogowanie {{email}}; użytkownik musi zalogować się ponownie przy użyciu nowego adresu. Żaden e-mail potwierdzający nie jest wysyłany.",
+        "error": "Nie można ustawić adresu e-mail.",
+        "label": "Nowy adres e-mail",
+        "submit": "Ustaw e-mail",
+        "success": "Zaktualizowano e-mail.",
+        "title": "Ustaw e-mail użytkownika"
       }
     }
   }

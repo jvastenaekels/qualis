@@ -12,14 +12,6 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19985835.svg)](https://doi.org/10.5281/zenodo.19985835)
 
-<p align="center">
-  <img src="docs/assets/screenshots/participant-welcome-mobile.png" alt="Study welcome screen on mobile" height="300" />
-  <img src="docs/assets/screenshots/participant-finesort-desktop.png" alt="Q-sort distribution grid on desktop" height="300" />
-  <img src="docs/assets/screenshots/participant-postsort-mobile.png" alt="Post-sort reflection screen on mobile" height="300" />
-</p>
-
-<p align="center"><sub>Participant experience: study landing (mobile) · the Q-sort grid (desktop) · post-sort reflection (mobile)</sub></p>
-
 ---
 
 ## Statement of need
@@ -73,13 +65,6 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Mobile-first drag-and-drop.** Touch-optimised sorting with auto-pan, dwell-zoom, and edge scrolling, so participants without desktop access are not excluded.
 - **Intercultural studies.** Translate statements, instructions, consent forms, and UI labels into multiple languages; participants see the study in their preferred language. Lowers the barrier to cross-cultural and multi-site Q research.
 
-<p align="center">
-  <img src="docs/assets/screenshots/participant-roughsort-desktop.png" alt="Rough-sort triage on desktop" height="300" />
-  <img src="docs/assets/screenshots/participant-roughsort-mobile.png" alt="Rough-sort triage on mobile" height="300" />
-  <img src="docs/assets/screenshots/participant-finesort-mobile.png" alt="Fine-sort grid placement on mobile" height="300" />
-</p>
-<p align="center"><sub>The same rough-sort and fine-sort flow adapts from desktop to phone — no app or plugin to install.</sub></p>
-
 ### Study design
 
 - **Visual grid designer** with symmetry lock, capacity validation, and configurable score ranges.
@@ -88,11 +73,6 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
 - **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study, since not every protocol uses it.
 - **Pilot mode** to run through the full participant experience without persisting any data.
-
-<p align="center">
-  <img src="docs/assets/screenshots/admin-study-design-grid.png" alt="Visual Q-sort distribution grid designer" width="78%" />
-</p>
-<p align="center"><sub>Visual grid designer: bell-curve distribution editor with symmetry lock and live capacity validation.</sub></p>
 
 ### Concourse
 
@@ -104,11 +84,6 @@ A reusable pool of candidate statements that lives at the project level, not the
 - **Item-level comments** for team discussion of curatorial choices, alongside concourse-level memos that travel with exports for replication and pre-registration packages.
 - **Q-set sampling** into a study with one click; the link back to the concourse is preserved.
 
-<p align="center">
-  <img src="docs/assets/screenshots/admin-concourse.png" alt="Project-scoped concourse with status workflow" width="78%" />
-</p>
-<p align="center"><sub>Project-scoped statement pool with per-item codes, status workflow, and curation tracking.</sub></p>
-
 ### Analysis
 
 - **Built-in factor analysis** for initial exploration without exporting to external software.
@@ -118,26 +93,12 @@ A reusable pool of candidate statements that lives at the project level, not the
 - **Distinguishing and consensus statements** classified via Standard Error of Differences at multiple significance levels (p < 0.05, 0.01, 0.001).
 - **Factor arrays, z-scores, composite reliability** (Spearman-Brown), and factor correlation matrix.
 
-<p align="center">
-  <img src="docs/assets/screenshots/admin-analysis-diagnostics.png" alt="Scree plot and factor-retention diagnostics" width="48%" />
-  <img src="docs/assets/screenshots/admin-analysis-factor-arrays.png" alt="Factor array reconstructed as an idealized Q-sort" width="48%" />
-</p>
-<p align="center">
-  <img src="docs/assets/screenshots/admin-analysis-loadings.png" alt="Factor loadings with auto-flagging and participant voices" width="78%" />
-</p>
-<p align="center"><sub>Factor-retention diagnostics (scree, Kaiser/parallel/Velicer) · factor arrays as idealized Q-sorts · loadings with auto-flagging and the participant <em>voices</em> panel.</sub></p>
-
 ### Data collection and monitoring
 
 - **Recruitment links** (public, single-use, or capacity-limited) with QR code generation and funnel tracking (started vs. completed).
 - **Monitoring dashboard** with submission timelines, device breakdowns, and completion rates.
 - **Session review** with grid reconstruction, survey responses, and audio playback.
 - **Discard with reason** to flag problematic responses while preserving the audit trail.
-
-<p align="center">
-  <img src="docs/assets/screenshots/admin-monitoring.png" alt="Study monitoring dashboard" width="78%" />
-</p>
-<p align="center"><sub>Monitoring dashboard: lifecycle state, participant count, completion rate, and a live activity feed.</sub></p>
 
 ### Export and interoperability
 

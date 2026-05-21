@@ -56,7 +56,8 @@
             "mismatch": "As palavras-passe não coincidem.",
             "missing_token": "Nenhum token de reposição no URL.",
             "new_password_placeholder": "Nova palavra-passe",
-            "confirm_placeholder": "Confirmar palavra-passe"
+            "confirm_placeholder": "Confirmar palavra-passe",
+            "request_success_manual": "O envio de e-mails não está configurado nesta instância. Contacte o seu administrador para obter um link de reposição."
         },
         "email": {
             "verification_sent": {
@@ -254,7 +255,8 @@
             "beta": "Beta de investigação",
             "logout": "Terminar sessão",
             "account": "Definições da conta",
-            "admin_user": "Utilizador administrador"
+            "admin_user": "Utilizador administrador",
+            "platform_settings": "Definições da plataforma"
         },
         "account": {
             "title": "Definições da conta",
@@ -341,9 +343,7 @@
             "select_project": "Selecionar projeto",
             "concourses": "Concursos",
             "concourse": "Concurso",
-            "members": "Membros da equipa",
-            "platform": "Plataforma",
-            "users": "Utilizadores"
+            "members": "Membros da equipa"
         },
         "concourse": {
             "title": "Concurso",
@@ -1600,7 +1600,9 @@
                     "max_duration": "Duração máxima",
                     "seconds": "segundos",
                     "max_duration_help": "Tempo máximo de gravação por pergunta (30–600 segundos).",
-                    "participant_choice_info": "Os participantes podem responder com texto, áudio ou ambos em cada pergunta."
+                    "participant_choice_info": "Os participantes podem responder com texto, áudio ou ambos em cada pergunta.",
+                    "storage_unavailable_body": "O armazenamento de objetos não está configurado, pelo que não é possível recolher respostas em áudio. Pode mesmo assim ativar o áudio, mas os participantes responderão apenas em texto e não será efetuada qualquer gravação. Configure o armazenamento de objetos e reinicie o servidor para ativar a captura de áudio.",
+                    "storage_unavailable_title": "A captura de áudio não está disponível neste servidor"
                 }
             },
             "interface": {
@@ -2225,7 +2227,9 @@
                 "reactivate": "Reativar conta",
                 "force_password_reset": "Forçar redefinição de palavra-passe",
                 "reset_totp": "Repor 2FA",
-                "delete": "Eliminar utilizador"
+                "delete": "Eliminar utilizador",
+                "generate_reset_link": "Gerar link de reposição da palavra-passe",
+                "set_email": "Definir e-mail"
             },
             "confirm": {
                 "cancel": "Cancelar",
@@ -2242,6 +2246,23 @@
                 "demote_body": "Remover os privilégios de superutilizador de {{email}}.",
                 "promote_title": "Conceder acesso de superutilizador?",
                 "promote_body": "Conceder a {{email}} plenos privilégios de superutilizador sobre a plataforma."
+            },
+            "email_manual_note": "O envio de e-mails não está configurado. Para a recuperação da conta, utilize o link de reposição da palavra-passe e a ação de definição do e-mail abaixo — não é enviado nenhum e-mail.",
+            "load_error_body": "Não foi possível obter a lista de utilizadores. Atualize a página ou tente novamente mais tarde.",
+            "load_error_title": "Não foi possível carregar os utilizadores",
+            "recovery_link": {
+                "copy": "Copiar link",
+                "help": "Partilhe este link de utilização única com o utilizador por outro canal. Expira de acordo com a janela de reposição da palavra-passe.",
+                "title": "Link de reposição da palavra-passe"
+            },
+            "set_email_dialog": {
+                "current": "Atual",
+                "description": "Isto termina a sessão de {{email}}; terá de iniciar sessão novamente com o novo endereço. Não é enviado nenhum e-mail de confirmação.",
+                "error": "Não foi possível definir o e-mail.",
+                "label": "Novo endereço de e-mail",
+                "submit": "Definir e-mail",
+                "success": "E-mail atualizado.",
+                "title": "Definir o e-mail do utilizador"
             }
         }
     }

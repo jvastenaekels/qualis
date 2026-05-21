@@ -1,0 +1,131 @@
+# Q-methodology and product terminology for Finnish (fi).
+# Used by Claude Code during translation. Edit before translating; treat as a contract.
+#
+# CONTEXT: Added during the admin-i18n-sync work (post docker-minio demo).
+# The fi locale already shipped a full, human-quality translation without a
+# glossary; the canonical choices below are reverse-engineered from the
+# existing fi/participant.json + fi/admin.json so future additions stay
+# consistent with what is already on screen. Verify against the live locale
+# before changing any canonical term.
+language: fi
+language_name: Suomi
+
+terms:
+  # Q-methodology core (anchored to existing fi locale usage)
+  concourse: Lausekokoelma          # sidebar canon; body prose may say "väittämäpooli"
+  Q-methodology: Q-metodologia
+  Q-sort: Q-lajittelu
+  Q-set: Q-joukko
+  statement: väittämä
+  factor: faktori
+  factor analysis: faktorianalyysi
+  factor loading: faktorilataus
+  factor array: faktorijärjestys
+  eigenvalue: ominaisarvo
+  presort: alustava lajittelu
+  rough sort: karkea lajittelu
+  fine sort: tarkka lajittelu
+  postsort: jälkilajittelu
+  sorting grid: lajitteluruudukko
+
+  # Product entities
+  study: tutkimus
+  study design: tutkimuksen suunnittelu
+  recruitment: rekrytointi
+  participant: osallistuja
+  user: käyttäjä
+  member: jäsen
+  owner: omistaja
+  viewer: katselija
+  editor: muokkaaja
+  consent: suostumus
+  consent form: suostumuslomake
+  audio recording: äänitallenne
+  memo: muistio
+  draft: luonnos
+  resume code: jatkamiskoodi
+  invitation: kutsu
+  project: projekti
+  administrator: pääkäyttäjä          # also used for "superuser"-level admin
+
+  # UI primitives
+  grid: ruudukko
+  cancel: Peruuta
+  save: Tallenna
+  saving: Tallennetaan...
+  delete: Poista
+  copy: Kopioi
+  view (verb / button): Näytä
+  loading: Ladataan
+  dashboard: Koontinäyttö
+  slug: slug                          # technical term, keep lowercase English
+  share (verb / button): Jaa
+  settings: asetukset
+  platform: alusta
+  email: sähköposti
+  email address: sähköpostiosoite
+  password: salasana
+  password reset: salasanan nollaus
+  reset link: nollauslinkki
+  link: linkki
+  object storage: objektitallennustila
+  error: virhe
+
+  # State labels (standardise to these)
+  draft (state): Luonnos
+  active: Aktiivinen
+  paused: Keskeytetty
+  closed: Suljettu
+  archived: Arkistoitu
+  completed: Valmis
+  discarded: Hylätty
+  in_progress: Käynnissä
+  abandoned: Keskeytetty
+
+notes: |
+  # === REGISTER ===
+  - Finnish has no strong T/V (tu/vous) split. The existing fi locale
+    addresses the reader in the second person singular ("sinä", "sinulle",
+    "sähköpostiosoitteesi"). Stay consistent: polite-neutral, second person
+    singular. Do NOT switch to the passive/impersonal mid-flow where the
+    surrounding strings use direct address.
+  - GDPR / consent / destructive-action text: keep it plain and direct,
+    matching the existing consent prose, which already uses second person.
+
+  # === MORPHOLOGY (Finnish is agglutinative + 15 cases) ===
+  - Button labels are imperative or noun: "Tallenna", "Peruuta", "Kopioi",
+    "Näytä", "Poista". Capitalise the first letter; the rest lower-case.
+  - Compound nouns are written solid, not hyphenated:
+    "sähköpostiosoite" (not "sähköposti-osoite"), "nollauslinkki",
+    "objektitallennustila", "salasanan nollaus" (genitive + noun).
+  - When a UI string needs a noun in a non-nominative case (object of an
+    action, "to the user" = "käyttäjälle"), inflect correctly rather than
+    forcing the dictionary form. Glossary entries are nominative lemmas;
+    decline them as the sentence requires.
+
+  # === COUNT-AND-NOUN PATTERN ===
+  - After a numeral the noun takes the partitive singular: "{{count}}
+    käyttäjää", "{{count}} tutkimusta" — never the nominative plural.
+    Preserve the `{{placeholder}}` verbatim; only the noun inflects.
+
+  # === FALSE-FRIEND / CONSISTENCY TRAPS ===
+  - "set email" (admin action that changes a user's address) →
+    "Aseta sähköposti" / "Vaihda sähköpostiosoite", NEVER "lähetä"
+    (= send).
+  - "reset" (password) → "nollaus"/"nollaa", consistent with the existing
+    "nollauslinkki". Do not introduce "palautus" (= restore/refund) for
+    password reset.
+  - "platform settings" (instance-wide admin) → "Alustan asetukset",
+    genitive "alustan", NOT "alusta-asetukset".
+  - "object storage" (S3) → "objektitallennustila"; "configure" it →
+    "määritä". "not configured" → "ei ole määritetty".
+  - "single-use link" → "kertakäyttöinen linkki".
+  - "out of band" (share a link by another channel) → render the intent
+    ("toista kanavaa pitkin" / "erikseen"), not a literal calque.
+  - "Current" (label showing the present value) → "Nykyinen".
+  - "instance" (this deployment) → "tässä asennuksessa" / "tämä asennus",
+    not "instanssi" unless the surrounding locale already uses it.
+
+  # === NUMBERS ===
+  - Qualis formats numbers via Intl; do not edit numeric tokens or decimal
+    separators inside strings.
