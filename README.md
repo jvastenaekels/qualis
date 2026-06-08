@@ -154,7 +154,7 @@ Open [http://localhost:3000](http://localhost:3000) and log in with:
 | Email | `admin@example.com` |
 | Password | `admin123` |
 
-After seeding, the example participant flow is available at [http://localhost:3000/coastal-wetland-futures](http://localhost:3000/coastal-wetland-futures).
+After seeding, the example participant flow is available at [http://localhost:3000/hemp-bioeconomy-futures](http://localhost:3000/hemp-bioeconomy-futures).
 
 Stop the stack with:
 
@@ -206,7 +206,7 @@ cd backend && uv run python seed.py data/example-study.json && cd ..
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study, you can also visit `http://localhost:5173/coastal-wetland-futures` to walk the participant flow.
+If you seeded the example study, you can also visit `http://localhost:5173/hemp-bioeconomy-futures` to walk the participant flow.
 
 ### Verifying your setup
 

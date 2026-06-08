@@ -1,133 +1,141 @@
 {
-  "slug": "coastal-wetland-futures",
+  "slug": "hemp-bioeconomy-futures",
   "translations": {
     "en": {
-      "title": "Coastal Wetland Futures",
-      "description": "A synthetic demo Q-study on social-ecological trade-offs around a coastal wetland. Inspired by open-access Q-methodology research on wetland ecosystem services, climate adaptation, and landscape values. 25 statements, forced distribution from -4 to +4.",
-      "instruction": "Sort each statement according to how strongly it represents your own view about the future of the coastal wetland, from 'least like my view' on the left to 'most like my view' on the right.",
-      "consent_text": "This is a synthetic demonstration study used to illustrate the Qualis workflow. By participating you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded.",
-      "thank_you_text": "Thank you for completing the example sort. This is a demonstration study; no real research conclusions are drawn from your responses."
+      "title": "Hemp Bioeconomy Futures",
+      "description": "A synthetic demo Q-study on competing futures for the hemp bioeconomy. It is inspired by research on public promises, territorial value chains, low-carbon materials, water protection, CBD regulation, and disappointed green-energy projects. 25 statements, bell-shaped forced distribution from -4 to +4.",
+      "subtitle": "Promises, equipment, territories, and disappointments",
+      "objective": "Explore competing viewpoints on how hemp futures should be made credible, funded, territorialized, regulated, and kept open.",
+      "instructions": "This study asks you to express your personal viewpoint through a sorting process. There are no right or wrong answers; the goal is to compare different ways of imagining the future of the hemp bioeconomy.",
+      "condition_of_instruction": "Please rank the following statements from those least like your view to those most like your view about the future of the hemp bioeconomy.",
+      "pre_instruction": "Based on your first reaction, divide the cards into three piles: those you tend to agree with, those you tend to disagree with, and those about which you are neutral or undecided.",
+      "consent_title": "Demo consent",
+      "consent_description": "This is a synthetic demonstration study used to illustrate the Qualis workflow. By participating, you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded."
     },
     "fr": {
-      "title": "Futurs d'une zone humide côtière",
-      "description": "Une étude Q synthétique de démonstration sur les arbitrages socio-écologiques autour d'une zone humide côtière. Elle s'inspire de recherches Q en accès ouvert sur les services écosystémiques des zones humides, l'adaptation climatique et les valeurs paysagères. 25 énoncés, distribution forcée de -4 à +4.",
-      "instruction": "Classez chaque énoncé selon le degré auquel il représente votre propre point de vue sur l'avenir de la zone humide côtière, de « le moins comme mon point de vue » à gauche à « le plus comme mon point de vue » à droite.",
-      "consent_text": "Ceci est une étude synthétique de démonstration illustrant le workflow Qualis. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée.",
-      "thank_you_text": "Merci d'avoir complété ce tri d'exemple. Il s'agit d'une étude de démonstration ; aucune conclusion de recherche réelle n'est tirée de vos réponses."
+      "title": "Futurs de la bioéconomie du chanvre",
+      "description": "Une étude Q synthétique de démonstration sur les futurs concurrents de la bioéconomie du chanvre. Elle s'inspire de recherches sur les promesses publiques, les chaînes de valeur territoriales, les matériaux bas carbone, la protection de l'eau, la régulation du CBD et les projets d'énergie verte désappointés. 25 énoncés, distribution forcée en cloche de -4 à +4.",
+      "subtitle": "Promesses, équipements, territoires et désappointements",
+      "objective": "Explorer des points de vue concurrents sur la manière de rendre les futurs du chanvre crédibles, financés, territorialisés, régulés et ouverts.",
+      "instructions": "Cette étude vous invite à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; l'objectif est de comparer différentes manières d'imaginer l'avenir de la bioéconomie du chanvre.",
+      "condition_of_instruction": "Veuillez classer les énoncés suivants de ceux qui correspondent le moins à votre point de vue à ceux qui correspondent le plus à votre point de vue sur l'avenir de la bioéconomie du chanvre.",
+      "pre_instruction": "Selon votre première réaction, répartissez les cartes en trois piles : celles avec lesquelles vous avez tendance à être d'accord, celles avec lesquelles vous avez tendance à être en désaccord, et celles pour lesquelles votre avis est neutre ou indécis.",
+      "consent_title": "Consentement de démonstration",
+      "consent_description": "Ceci est une étude synthétique de démonstration illustrant le workflow Qualis. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée."
     }
   },
-  "default_language_code": "en",
+  "default_language": "en",
   "grid_config": [
-    {"score": -4, "capacity": 2},
-    {"score": -3, "capacity": 3},
+    {"score": -4, "capacity": 1},
+    {"score": -3, "capacity": 2},
     {"score": -2, "capacity": 3},
     {"score": -1, "capacity": 4},
-    {"score": 0, "capacity": 1},
+    {"score": 0, "capacity": 5},
     {"score": 1, "capacity": 4},
     {"score": 2, "capacity": 3},
-    {"score": 3, "capacity": 3},
-    {"score": 4, "capacity": 2}
+    {"score": 3, "capacity": 2},
+    {"score": 4, "capacity": 1}
   ],
   "statements": [
     {"code": "S01", "translations": {
-      "en": "Protecting the wetland's ecological functions should come before expanding tourism infrastructure.",
-      "fr": "La protection des fonctions écologiques de la zone humide doit passer avant l'expansion des infrastructures touristiques."
+      "en": "Hemp futures become credible only when they are attached to factories, contracts, standards, or public programmes.",
+      "fr": "Les futurs du chanvre deviennent crédibles seulement lorsqu'ils sont attachés à des usines, des contrats, des normes ou des programmes publics."
     }},
     {"code": "S02", "translations": {
-      "en": "Local livelihoods should not be sacrificed for conservation goals decided elsewhere.",
-      "fr": "Les moyens de subsistance locaux ne doivent pas être sacrifiés au nom d'objectifs de conservation décidés ailleurs."
+      "en": "Low-carbon construction should be the priority market for hemp, even if other outlets grow more quickly.",
+      "fr": "La construction bas carbone doit être le débouché prioritaire du chanvre, même si d'autres marchés progressent plus vite."
     }},
     {"code": "S03", "translations": {
-      "en": "Water use for agriculture should be limited when it threatens lagoon health.",
-      "fr": "L'usage agricole de l'eau doit être limité lorsqu'il menace la santé de la lagune."
+      "en": "Hemp should first be developed where it can help protect water, soils, and crop rotations.",
+      "fr": "Le chanvre doit d'abord être développé là où il peut contribuer à protéger l'eau, les sols et les rotations agricoles."
     }},
     {"code": "S04", "translations": {
-      "en": "Traditional fishing knowledge should guide wetland management decisions.",
-      "fr": "Les savoirs traditionnels liés à la pêche doivent guider les décisions de gestion de la zone humide."
+      "en": "A hemp bioeconomy is valuable only if processing and added value remain close to the producing territories.",
+      "fr": "Une bioéconomie du chanvre n'a de valeur que si la transformation et la valeur ajoutée restent proches des territoires producteurs."
     }},
     {"code": "S05", "translations": {
-      "en": "Eco-tourism can fund conservation without damaging the character of the place.",
-      "fr": "L'écotourisme peut financer la conservation sans abîmer le caractère du lieu."
+      "en": "Public support for hemp should depend on measured evidence, not on the plant's green reputation.",
+      "fr": "Le soutien public au chanvre doit dépendre de preuves mesurées, et non de la réputation écologique de la plante."
     }},
     {"code": "S06", "translations": {
-      "en": "Strict protection rules often ignore the practical realities of people who live from the land.",
-      "fr": "Les règles strictes de protection ignorent souvent les réalités pratiques des personnes qui vivent de la terre."
+      "en": "CBD and hemp flowers should be treated as legitimate agricultural futures, not as a distraction from industrial fibre.",
+      "fr": "Le CBD et les fleurs de chanvre doivent être traités comme des futurs agricoles légitimes, et non comme une distraction par rapport à la fibre industrielle."
     }},
     {"code": "S07", "translations": {
-      "en": "A wetland has value in itself, even when it does not provide direct benefits to people.",
-      "fr": "Une zone humide a une valeur en elle-même, même lorsqu'elle ne fournit pas de bénéfices directs aux humains."
+      "en": "The legal instability around CBD makes it too fragile to anchor the long-term hemp bioeconomy.",
+      "fr": "L'instabilité juridique autour du CBD rend ce débouché trop fragile pour ancrer la bioéconomie du chanvre à long terme."
     }},
     {"code": "S08", "translations": {
-      "en": "Public authorities should enforce clear water-use limits rather than rely on voluntary action.",
-      "fr": "Les autorités publiques doivent imposer des limites claires d'usage de l'eau plutôt que compter sur l'action volontaire."
+      "en": "Without harvesting machines, storage sites, and defibering capacity, hemp remains a promise more than a sector.",
+      "fr": "Sans machines de récolte, sites de stockage et capacités de défibrage, le chanvre reste davantage une promesse qu'une filière."
     }},
     {"code": "S09", "translations": {
-      "en": "Farmers, fishers, tourism workers, and conservationists should co-design the management plan.",
-      "fr": "Agriculteurs, pêcheurs, acteurs du tourisme et conservationnistes doivent co-concevoir le plan de gestion."
+      "en": "Cooperative supply chains are better suited than isolated start-ups to make hemp credible for farmers.",
+      "fr": "Les chaînes coopératives sont mieux placées que des start-up isolées pour rendre le chanvre crédible auprès des agriculteurs."
     }},
     {"code": "S10", "translations": {
-      "en": "The wetland's cultural identity is as important as its biodiversity.",
-      "fr": "L'identité culturelle de la zone humide est aussi importante que sa biodiversité."
+      "en": "Hemp needs industrial scale to move beyond niche experiments and become a serious bioeconomy material.",
+      "fr": "Le chanvre a besoin d'une échelle industrielle pour dépasser les expérimentations de niche et devenir un matériau sérieux de bioéconomie."
     }},
     {"code": "S11", "translations": {
-      "en": "Climate adaptation should focus on restoring natural water flows and buffers.",
-      "fr": "L'adaptation climatique doit se concentrer sur la restauration des flux d'eau naturels et des zones tampons."
+      "en": "Scaling hemp too quickly could reproduce the extractive habits that the bioeconomy claims to replace.",
+      "fr": "Changer d'échelle trop vite pourrait reproduire les logiques extractives que la bioéconomie prétend remplacer."
     }},
     {"code": "S12", "translations": {
-      "en": "Economic diversification is a better long-term strategy than protecting current land uses at all costs.",
-      "fr": "La diversification économique est une meilleure stratégie à long terme que la protection à tout prix des usages actuels des terres."
+      "en": "Farmers will not commit to hemp without stable prices, contracts, and a clear place in the rotation.",
+      "fr": "Les agriculteurs ne s'engageront pas dans le chanvre sans prix stables, contrats et place claire dans la rotation."
     }},
     {"code": "S13", "translations": {
-      "en": "Scientific monitoring should carry more weight than local impressions when the two conflict.",
-      "fr": "Le suivi scientifique doit peser davantage que les impressions locales lorsque les deux se contredisent."
+      "en": "Public procurement should accept a higher price for hemp materials when it builds local capacity and lowers carbon.",
+      "fr": "La commande publique doit accepter un coût plus élevé pour les matériaux en chanvre lorsqu'ils construisent une capacité locale et réduisent le carbone."
     }},
     {"code": "S14", "translations": {
-      "en": "Visitors should have easier access to the wetland so they can understand why it matters.",
-      "fr": "Les visiteurs doivent avoir un accès plus facile à la zone humide afin de comprendre pourquoi elle compte."
+      "en": "Hemp should not be presented as a miracle crop; its limits must be visible from the start.",
+      "fr": "Le chanvre ne doit pas être présenté comme une plante miracle ; ses limites doivent être visibles dès le départ."
     }},
     {"code": "S15", "translations": {
-      "en": "Too much visitor access would turn the wetland into a product rather than a living place.",
-      "fr": "Un accès touristique excessif transformerait la zone humide en produit plutôt qu'en lieu vivant."
+      "en": "Local industrial histories, such as textile regions, can give hemp futures a stronger public meaning.",
+      "fr": "Les histoires industrielles locales, comme celles des territoires textiles, peuvent donner un sens public plus fort aux futurs du chanvre."
     }},
     {"code": "S16", "translations": {
-      "en": "Compensation should be offered when environmental rules reduce household income.",
-      "fr": "Une compensation doit être proposée lorsque les règles environnementales réduisent le revenu des ménages."
+      "en": "If hemp products depend on subsidies forever, they should not be called a durable bioeconomy.",
+      "fr": "Si les produits du chanvre dépendent indéfiniment des subventions, ils ne doivent pas être appelés une bioéconomie durable."
     }},
     {"code": "S17", "translations": {
-      "en": "The best management decisions are those that keep future options open under climate uncertainty.",
-      "fr": "Les meilleures décisions de gestion sont celles qui gardent des options ouvertes face à l'incertitude climatique."
+      "en": "Energy projects based on hemp should receive support only after tariffs, infrastructure, and buyers are secured.",
+      "fr": "Les projets énergétiques fondés sur le chanvre ne doivent être soutenus qu'après sécurisation des tarifs, des infrastructures et des acheteurs."
     }},
     {"code": "S18", "translations": {
-      "en": "Wetland restoration should prioritize habitats for birds, fish, and plants over recreational uses.",
-      "fr": "La restauration de la zone humide doit prioriser les habitats des oiseaux, poissons et plantes plutôt que les usages récréatifs."
+      "en": "The most important future for hemp is not one sector, but a plural economy linking fibre, hurd, seed, flower, and waste streams.",
+      "fr": "Le futur le plus important du chanvre n'est pas un secteur unique, mais une économie plurielle reliant fibre, chènevotte, graine, fleur et coproduits."
     }},
     {"code": "S19", "translations": {
-      "en": "Local people will support conservation only if they see concrete benefits for their community.",
-      "fr": "Les habitants soutiendront la conservation seulement s'ils voient des bénéfices concrets pour leur communauté."
+      "en": "Bio-based construction standards and insurance rules matter more for hemp adoption than public enthusiasm.",
+      "fr": "Les normes de construction biosourcée et les règles d'assurance comptent davantage pour l'adoption du chanvre que l'enthousiasme public."
     }},
     {"code": "S20", "translations": {
-      "en": "Agricultural pollution is a more urgent problem than tourism pressure.",
-      "fr": "La pollution agricole est un problème plus urgent que la pression touristique."
+      "en": "Hemp projects should be judged by who captures value, not only by whether the product is renewable.",
+      "fr": "Les projets chanvre doivent être jugés selon qui capte la valeur, et pas seulement selon le caractère renouvelable du produit."
     }},
     {"code": "S21", "translations": {
-      "en": "Tourism pressure is a more urgent problem than agricultural water use.",
-      "fr": "La pression touristique est un problème plus urgent que l'usage agricole de l'eau."
+      "en": "Small territorial experiments are more trustworthy than national claims about a single hemp transition.",
+      "fr": "Les petites expérimentations territoriales sont plus crédibles que les grands récits nationaux d'une transition unique par le chanvre."
     }},
     {"code": "S22", "translations": {
-      "en": "Management should make conflicts visible instead of hiding them behind consensus language.",
-      "fr": "La gestion doit rendre les conflits visibles plutôt que les masquer derrière un langage de consensus."
+      "en": "Hemp will remain marginal unless major builders, retailers, and public agencies create predictable demand.",
+      "fr": "Le chanvre restera marginal tant que les grands constructeurs, distributeurs et acteurs publics ne créeront pas une demande prévisible."
     }},
     {"code": "S23", "translations": {
-      "en": "Small compromises by every sector are better than a single strict rule for everyone.",
-      "fr": "De petits compromis dans chaque secteur valent mieux qu'une règle unique et stricte pour tous."
+      "en": "Food, craft, and wellness uses deserve a place in the hemp future, even if they do not look industrial.",
+      "fr": "Les usages alimentaires, artisanaux et bien-être méritent une place dans le futur du chanvre, même s'ils ne semblent pas industriels."
     }},
     {"code": "S24", "translations": {
-      "en": "The wetland should be managed as part of a wider social-ecological system, not as an isolated site.",
-      "fr": "La zone humide doit être gérée comme partie d'un système socio-écologique plus large, et non comme un site isolé."
+      "en": "Conflicts around law, taxation, land use, and public funding should be made visible instead of hidden behind consensus language.",
+      "fr": "Les conflits autour du droit, de la fiscalité, de l'usage des terres et du financement public doivent être rendus visibles plutôt que masqués par un langage de consensus."
     }},
     {"code": "S25", "translations": {
-      "en": "If difficult choices are delayed, climate change will make them more costly and less fair.",
-      "fr": "Si les choix difficiles sont reportés, le changement climatique les rendra plus coûteux et moins justes."
+      "en": "The future of hemp should stay open-ended; locking it too early into one market would make the sector weaker.",
+      "fr": "Le futur du chanvre doit rester ouvert ; le verrouiller trop tôt dans un seul marché rendrait la filière plus fragile."
     }}
   ],
   "presort_config": {},
@@ -149,34 +157,42 @@
       "q_perspective": {
         "type": "select",
         "label": {
-          "en": "Which perspective best describes your relationship to the coastal wetland?",
-          "fr": "Quelle perspective décrit le mieux votre lien avec la zone humide côtière ?"
+          "en": "Which perspective best describes your relationship to the hemp bioeconomy?",
+          "fr": "Quelle perspective décrit le mieux votre lien avec la bioéconomie du chanvre ?"
         },
         "required": true,
         "options": [
           {
-            "value": "resident",
-            "label": { "en": "Local resident", "fr": "Habitant·e local·e" }
+            "value": "farmer",
+            "label": { "en": "Farmer or grower", "fr": "Agriculteur·rice ou producteur·rice" }
           },
           {
-            "value": "tourism",
-            "label": { "en": "Tourism operator", "fr": "Acteur·rice du tourisme" }
+            "value": "processor",
+            "label": { "en": "Processor or cooperative", "fr": "Transformateur·rice ou coopérative" }
           },
           {
-            "value": "conservation",
-            "label": { "en": "Conservation manager", "fr": "Gestionnaire de conservation" }
+            "value": "builder",
+            "label": { "en": "Builder or material user", "fr": "Constructeur·rice ou utilisateur·rice de matériaux" }
           },
           {
-            "value": "fisher",
-            "label": { "en": "Fisher", "fr": "Pêcheur·euse" }
+            "value": "public_actor",
+            "label": { "en": "Public authority or agency", "fr": "Collectivité ou agence publique" }
+          },
+          {
+            "value": "researcher",
+            "label": { "en": "Researcher or student", "fr": "Chercheur·euse ou étudiant·e" }
+          },
+          {
+            "value": "citizen",
+            "label": { "en": "Interested citizen", "fr": "Citoyen·ne intéressé·e" }
           }
         ]
       },
       "q_confidence": {
         "type": "rating",
         "label": {
-          "en": "How confident are you that your sort reflects your view?",
-          "fr": "Dans quelle mesure êtes-vous confiant·e que votre tri reflète votre point de vue ?"
+          "en": "How confident are you that your sort reflects your view of hemp futures?",
+          "fr": "Dans quelle mesure êtes-vous confiant·e que votre tri reflète votre point de vue sur les futurs du chanvre ?"
         },
         "required": false,
         "scale_points": 5,
