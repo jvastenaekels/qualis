@@ -43,10 +43,10 @@
 - **Location:** `.env:1-2`
 - **Observation:** The file `.env` present at the repo root (untracked, correctly listed in `.gitignore`) contains:
   ```
-  DATABASE_URL=postgresql://julien:xK7mQ9vR2pLw@localhost/libre_q
-  TEST_DATABASE_URL=postgresql+asyncpg://julien:xK7mQ9vR2pLw@localhost/libre_q_test
+  DATABASE_URL=postgresql://julien:REDACTED-LOCAL-DEV-PW@localhost/libre_q
+  TEST_DATABASE_URL=postgresql+asyncpg://julien:REDACTED-LOCAL-DEV-PW@localhost/libre_q_test
   ```
-  The password `xK7mQ9vR2pLw` is a real credential. The `tests/conftest.py:14` and `scripts/create_bucket.py:16` both call `load_dotenv()` pointing at this file. If this file is accidentally committed (e.g., via `git add -A`) or shared, the database password is exposed. No `.env.example` template exists at the repo root to guide contributors — only `backend/.env.s3.example` (committed, clean, placeholder values only).
+  The password `REDACTED-LOCAL-DEV-PW` is a real credential. The `tests/conftest.py:14` and `scripts/create_bucket.py:16` both call `load_dotenv()` pointing at this file. If this file is accidentally committed (e.g., via `git add -A`) or shared, the database password is exposed. No `.env.example` template exists at the repo root to guide contributors — only `backend/.env.s3.example` (committed, clean, placeholder values only).
 - **Impact:** Database credential exposure would allow direct DB access to all participant data (Q-sorts, consent records, audio metadata), constituting a RGPD Art. 5(1)(f) breach (integrity/confidentiality). For SoftwareX, a publicly accessible repo with exposed credentials at any point in history is a desk-reject risk.
 - **Recommendation:** (1) Verify the credential is not in any historical commit (`git log --all -- .env`). (2) Create a committed `.env.example` at repo root with placeholder values. (3) Add a pre-commit hook or CI check (`git-secrets` or `gitleaks --no-git`) that blocks `.env` commits.
 - **Effort:** S

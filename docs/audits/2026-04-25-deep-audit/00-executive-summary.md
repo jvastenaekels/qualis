@@ -54,7 +54,7 @@ Acceptable as ongoing work post-launch:
 | ID | Effort | Title |
 |----|:------:|-------|
 | **F-01-001** | S | PyJWT CVE-2026-32597 — `crit` header bypass allows forged JWT acceptance (bump `pyjwt>=2.12.0`) |
-| **F-01-002** | S | Local `.env` contains real DB credentials (`xK7mQ9vR2pLw`); no `.env.example` template |
+| **F-01-002** | S | Local `.env` contains real DB credentials (`REDACTED-LOCAL-DEV-PW`); no `.env.example` template |
 | **F-01-003** | S | Test-router endpoints (`/api/test/cleanup-all`, `/api/test/seed`) unauthenticated when `ENVIRONMENT` not set to "production" |
 | **F-12-001** | S | No git tag — submitted version not frozen, Zenodo cannot archive |
 | **F-12-002** | S | No `.zenodo.json`, no Zenodo DOI |

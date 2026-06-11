@@ -156,7 +156,7 @@ Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 | Email | `admin@example.com` |
 | Password | `admin123` |
 
-After seeding, the example participant flow is available at [http://localhost:3000/hemp-bioeconomy-futures](http://localhost:3000/hemp-bioeconomy-futures).
+After seeding, the example participant flow is available at [http://localhost:3000/study/hemp-bioeconomy-futures](http://localhost:3000/study/hemp-bioeconomy-futures).
 
 Stop the stack with:
 
@@ -208,7 +208,7 @@ cd backend && uv run python seed.py data/example-study.json && cd ..
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study, you can also visit `http://localhost:5173/hemp-bioeconomy-futures` to walk the participant flow.
+If you seeded the example study, you can also visit `http://localhost:5173/study/hemp-bioeconomy-futures` to walk the participant flow.
 
 ### Verifying your setup
 
@@ -219,6 +219,26 @@ make ci
 # Or run only the tests
 make test
 ```
+
+### Reproducing the analytical validation (Lipset 1963)
+
+Qualis ships a second bundled example that pins its factor-analysis engine to
+an external, citable reference: the openly published Lipset (1963) "Value
+Patterns of Democracy" Q dataset (33 statements, 9 Q-sorts), redistributed with
+the R [`qmethod`](https://cran.r-project.org/package=qmethod) package under
+GPL-2-or-later. No R is required to reproduce the check.
+
+```bash
+make demo-up
+make demo-lipset       # seeds the `lipset-democracy` study
+make validate-lipset   # exit 0 = Qualis matches the qmethod reference
+```
+
+`make validate-lipset` runs a PCA / Varimax / auto-flagging three-factor
+analysis and asserts an identical flag assignment for all nine Q-sorts and
+rotated loadings agreeing with the frozen `qmethod` reference. See
+[`validation/lipset/README.md`](validation/lipset/README.md) for details and how
+to regenerate the reference from R.
 
 ### Deploy
 
