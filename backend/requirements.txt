@@ -2,33 +2,37 @@
 #    uv export --no-hashes --format requirements-txt --output-file requirements.txt
 aiofiles==25.1.0
     # via qualis-backend
-alembic==1.18.3
+alembic==1.18.4
     # via qualis-backend
 annotated-doc==0.0.4
-    # via fastapi
+    # via
+    #   fastapi
+    #   typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.12.1
+anyio==4.13.0
     # via
     #   httpx
     #   starlette
     #   watchfiles
+ast-serialize==0.5.0
+    # via mypy
 asyncpg==0.31.0
     # via qualis-backend
-bandit==1.9.3
+bandit==1.9.4
 bcrypt==5.0.0
     # via qualis-backend
 boolean-py==5.0
     # via license-expression
-boto3==1.42.44
+boto3==1.43.24
     # via qualis-backend
-botocore==1.42.44
+botocore==1.43.24
     # via
     #   boto3
     #   s3transfer
 cachecontrol==0.14.4
     # via pip-audit
-certifi==2026.1.4
+certifi==2026.5.20
     # via
     #   httpcore
     #   httpx
@@ -36,14 +40,13 @@ certifi==2026.1.4
     #   sentry-sdk
 cfgv==3.5.0
     # via pre-commit
-charset-normalizer==3.4.4
+charset-normalizer==3.4.7
     # via requests
-click==8.3.1
+click==8.4.1
     # via
     #   deptry
     #   import-linter
     #   rich-toolkit
-    #   typer
     #   uvicorn
 colorama==0.4.6
     # via
@@ -52,17 +55,20 @@ colorama==0.4.6
     #   deptry
     #   pytest
     #   radon
+    #   typer
     #   uvicorn
-coverage==7.13.2
+coverage==7.14.1
     # via pytest-cov
-cyclonedx-python-lib==11.6.0
+cyclonedx-python-lib==11.9.0
     # via pip-audit
 defusedxml==0.7.1
     # via py-serializable
 deprecated==1.3.1
     # via limits
-deptry==0.24.0
-distlib==0.4.0
+deptry==0.25.1
+detect-installer==0.1.0
+    # via fastapi-cloud-cli
+distlib==0.4.2
     # via virtualenv
 dnspython==2.8.0
     # via email-validator
@@ -72,27 +78,28 @@ email-validator==2.3.0
     #   pydantic
 execnet==2.1.2
     # via pytest-xdist
-fastapi==0.136.1
+fastapi==0.136.3
     # via
     #   qualis-backend
     #   sentry-sdk
-fastapi-cli==0.0.20
+fastapi-cli==0.0.24
     # via fastapi
-fastapi-cloud-cli==0.11.0
+fastapi-cloud-cli==0.19.0
     # via fastapi-cli
 fastar==0.11.0
     # via
     #   fastapi
     #   fastapi-cloud-cli
-filelock==3.20.3
+filelock==3.29.1
     # via
     #   cachecontrol
+    #   python-discovery
     #   virtualenv
-greenlet==3.3.1
+greenlet==3.5.1
     # via sqlalchemy
 grimp==3.14
     # via import-linter
-gunicorn==25.0.1
+gunicorn==26.0.0
     # via qualis-backend
 h11==0.16.0
     # via
@@ -100,15 +107,15 @@ h11==0.16.0
     #   uvicorn
 httpcore==1.0.9
     # via httpx
-httptools==0.7.1
+httptools==0.8.0
     # via uvicorn
 httpx==0.28.1
     # via
     #   fastapi
     #   fastapi-cloud-cli
     #   qualis-backend
-hypothesis==6.152.2
-identify==2.6.16
+hypothesis==6.155.2
+identify==2.6.19
     # via pre-commit
 idna==3.18
     # via
@@ -116,7 +123,7 @@ idna==3.18
     #   email-validator
     #   httpx
     #   requests
-import-linter==2.9
+import-linter==2.11
 iniconfig==2.3.0
     # via pytest
 jinja2==3.1.6
@@ -125,11 +132,11 @@ jmespath==1.1.0
     # via
     #   boto3
     #   botocore
-librt==0.7.8 ; platform_python_implementation != 'PyPy'
+librt==0.11.0 ; platform_python_implementation != 'PyPy'
     # via mypy
 license-expression==30.4.4
     # via cyclonedx-python-lib
-limits==5.6.0
+limits==5.8.0
     # via slowapi
 mako==1.3.12
     # via
@@ -137,7 +144,7 @@ mako==1.3.12
     #   qualis-backend
 mando==0.7.1
     # via radon
-markdown-it-py==4.0.0
+markdown-it-py==4.2.0
     # via rich
 markupsafe==3.0.3
     # via
@@ -147,16 +154,16 @@ mdurl==0.1.2
     # via markdown-it-py
 msgpack==1.1.2
     # via cachecontrol
-mypy==1.19.1
+mypy==2.1.0
 mypy-extensions==1.1.0
     # via mypy
 nodeenv==1.10.0
     # via pre-commit
-numpy==2.4.2
+numpy==2.4.6
     # via qualis-backend
 packageurl-python==0.17.6
     # via cyclonedx-python-lib
-packaging==26.0
+packaging==26.2
     # via
     #   deptry
     #   gunicorn
@@ -165,7 +172,7 @@ packaging==26.0
     #   pip-requirements-parser
     #   pytest
     #   requirements-parser
-pathspec==1.0.4
+pathspec==1.1.1
     # via mypy
 pip==26.1.2
     # via pip-api
@@ -174,15 +181,16 @@ pip-api==0.0.34
 pip-audit==2.10.0
 pip-requirements-parser==32.0.1
     # via pip-audit
-platformdirs==4.5.1
+platformdirs==4.10.0
     # via
     #   pip-audit
+    #   python-discovery
     #   virtualenv
 pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pre-commit==4.5.1
+pre-commit==4.6.0
 py-serializable==2.1.0
     # via cyclonedx-python-lib
 pydantic==2.13.3
@@ -194,9 +202,9 @@ pydantic==2.13.3
     #   qualis-backend
 pydantic-core==2.46.3
     # via pydantic
-pydantic-extra-types==2.11.0
+pydantic-extra-types==2.11.1
     # via fastapi
-pydantic-settings==2.14.0
+pydantic-settings==2.14.1
     # via
     #   fastapi
     #   qualis-backend
@@ -216,11 +224,13 @@ pytest==9.0.3
     #   pytest-asyncio
     #   pytest-cov
     #   pytest-xdist
-pytest-asyncio==1.3.0
-pytest-cov==7.0.0
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
     # via botocore
+python-discovery==1.4.0
+    # via virtualenv
 python-dotenv==1.2.2
     # via
     #   pydantic-settings
@@ -228,7 +238,7 @@ python-dotenv==1.2.2
     #   uvicorn
 python-magic==0.4.27
     # via qualis-backend
-python-multipart==0.0.28
+python-multipart==0.0.32
     # via
     #   fastapi
     #   qualis-backend
@@ -238,30 +248,30 @@ pyyaml==6.0.3
     #   pre-commit
     #   uvicorn
 radon==6.0.1
-requests==2.33.1
+requests==2.34.2
     # via
     #   cachecontrol
     #   pip-audit
     #   qualis-backend
 requirements-parser==0.13.0
     # via deptry
-rich==14.3.2
+rich==15.0.0
     # via
     #   bandit
     #   import-linter
     #   pip-audit
     #   rich-toolkit
     #   typer
-rich-toolkit==0.18.1
+rich-toolkit==0.20.1
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
 rignore==0.7.6
     # via fastapi-cloud-cli
-ruff==0.14.14
-s3transfer==0.16.0
+ruff==0.15.16
+s3transfer==0.18.0
     # via boto3
-sentry-sdk==2.58.0
+sentry-sdk==2.62.0
     # via
     #   fastapi-cloud-cli
     #   qualis-backend
@@ -285,13 +295,15 @@ starlette==1.2.1
     # via
     #   fastapi
     #   qualis-backend
-stevedore==5.6.0
+stevedore==5.8.0
     # via bandit
-tomli==2.4.0
-    # via pip-audit
+tomli==2.4.1
+    # via
+    #   deptry
+    #   pip-audit
 tomli-w==1.2.0
     # via pip-audit
-typer==0.21.1
+typer==0.26.7
     # via
     #   fastapi-cli
     #   fastapi-cloud-cli
@@ -309,7 +321,6 @@ typing-extensions==4.15.0
     #   qualis-backend
     #   rich-toolkit
     #   sqlalchemy
-    #   typer
     #   typing-inspection
 typing-inspection==0.4.2
     # via
@@ -322,19 +333,19 @@ urllib3==2.7.0
     #   qualis-backend
     #   requests
     #   sentry-sdk
-uvicorn==0.40.0
+uvicorn==0.49.0
     # via
     #   fastapi
     #   fastapi-cli
     #   fastapi-cloud-cli
 uvloop==0.22.1 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
     # via uvicorn
-virtualenv==20.36.1
+virtualenv==21.4.2
     # via pre-commit
-vulture==2.14
-watchfiles==1.1.1
+vulture==2.16
+watchfiles==1.2.0
     # via uvicorn
 websockets==16.0
     # via uvicorn
-wrapt==2.1.0
+wrapt==2.2.1
     # via deprecated

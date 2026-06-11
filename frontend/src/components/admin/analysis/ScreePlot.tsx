@@ -32,6 +32,10 @@ export function ScreePlot({
             factor: index + 1,
             eigenvalue: Number(value.toFixed(3)),
         }));
+    const formatTooltipValue = (value: unknown) => {
+        const numericValue = typeof value === 'number' ? value : Number(value);
+        return Number.isFinite(numericValue) ? numericValue.toFixed(3) : '';
+    };
 
     return (
         <div className="space-y-2 min-w-0">
@@ -73,11 +77,11 @@ export function ScreePlot({
                         }}
                     />
                     <Tooltip
-                        formatter={(value: number | undefined) => [
-                            value?.toFixed(3) ?? '',
+                        formatter={(value) => [
+                            formatTooltipValue(value),
                             t('admin.analysis.eigenvalue', 'Eigenvalue'),
                         ]}
-                        labelFormatter={(label: number) =>
+                        labelFormatter={(label) =>
                             `${t('admin.analysis.factor', 'Factor')} ${label}`
                         }
                     />
