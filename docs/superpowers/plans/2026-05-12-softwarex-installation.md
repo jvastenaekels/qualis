@@ -22,7 +22,7 @@ make demo-seed
 make demo-smoke
 ```
 
-Then open `http://localhost:3000`, log in with `admin@example.com` / `admin123`, and optionally visit `http://localhost:3000/coastal-wetland-futures`.
+Then open `http://localhost:3000`, log in with `admin@example.com` / `admin123`, and optionally visit `http://localhost:3000/study/hemp-bioeconomy-futures`.
 
 The local development path remains:
 
@@ -179,7 +179,7 @@ demo-seed:
 demo-smoke:
 	curl -fsS http://localhost:3000/ >/dev/null
 	curl -fsS http://localhost:3000/health >/dev/null
-	curl -fsS http://localhost:3000/api/study/coastal-wetland-futures >/dev/null
+	curl -fsS http://localhost:3000/api/study/hemp-bioeconomy-futures >/dev/null
 
 demo-down:
 	docker compose down
@@ -564,7 +564,7 @@ Open [http://localhost:3000](http://localhost:3000) and log in with:
 | Email | `admin@example.com` |
 | Password | `admin123` |
 
-After seeding, the example participant flow is available at [http://localhost:3000/coastal-wetland-futures](http://localhost:3000/coastal-wetland-futures).
+After seeding, the example participant flow is available at [http://localhost:3000/study/hemp-bioeconomy-futures](http://localhost:3000/study/hemp-bioeconomy-futures).
 
 Stop the stack with:
 
@@ -616,7 +616,7 @@ cd backend && uv run python seed.py data/example-study.json && cd ..
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study, you can also visit `http://localhost:5173/coastal-wetland-futures` to walk the participant flow.
+If you seeded the example study, you can also visit `http://localhost:5173/study/hemp-bioeconomy-futures` to walk the participant flow.
 
 ### Verifying your setup
 
