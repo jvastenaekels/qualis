@@ -12,6 +12,9 @@ exclude = [
     "doi\\.org/10\\.4135/9781446251911",
     "zenodo\\.org/account/settings/github/",
     "localhost:3000",
+    # Commercial Q-software vendor site cited in the README comparison table;
+    # resolves in browsers/curl but bot-protection can block automated checkers.
+    "qmethodsoftware\\.com",
 ]
 
 # Skip localhost URLs in tutorial code blocks

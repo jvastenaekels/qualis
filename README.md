@@ -27,9 +27,9 @@ The studies this orientation invites tend to share a few practical needs:
 - keeping what participants say about their sort attached to the analysis;
 - making the analytical choices open to discussion and revision by a research team.
 
-Existing tools cover parts of this workflow well — browser-based collection, desktop factor analysis, format conversion — but they sit in separate systems. Design, collection, analysis, interpretation, privacy operations, and export end up scattered across tools, and the research record has to be reassembled at each import and export boundary, where the audit trail can weaken.
+The open-source and freely available tools most Q researchers reach for each cover part of this workflow well — browser-based collection, desktop factor analysis, format conversion — but sit in separate systems: design, collection, analysis, interpretation, privacy operations, and export end up scattered across tools, and the research record has to be reassembled at each import and export boundary, where the audit trail can weaken. A few hosted commercial platforms (Q Method Software / Qsortware, and the now-discontinued Q-Assessor) do integrate collection and analysis in one place, but they are closed-source and vendor-hosted: the data leaves the institution's control, the analytical internals cannot be inspected, and — as Q-Assessor's 2024 shutdown shows — a study's tooling can disappear with the vendor.
 
-Qualis's central design claim is **continuity**: statements, translations, recruitment links, Q-sorts, participant responses, analytical memos, consent and withdrawal events, and export files stay linked as research objects in one self-hosted project, rather than moving between separate tools. The platform implements this through a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; collaborative interpretation; and export to PQMethod, R, and Ken-Q formats. Researchers can use Qualis as a data-collection frontend feeding their preferred analysis tool, or as a complete platform — the export bridges to established Q-analytic tools stay open either way.
+Qualis's central design claim is **continuity**: statements, translations, recruitment links, Q-sorts, participant responses, analytical memos, consent and withdrawal events, and export files stay linked as research objects in one self-hosted project, rather than moving between separate tools. The platform implements this through a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; collaborative interpretation; and export to PQMethod, R, and Ken-Q formats. Researchers can use Qualis as a data-collection frontend feeding their preferred analysis tool, or as a complete platform — the export bridges to established Q-analytic tools stay open either way. What sets Qualis apart from the integrated commercial platforms is that this continuity is open-source and self-hostable, keeping data and analytical choices under the researcher's control, and that it adds reflexive-workflow affordances — audio post-sorts, shared analytical memos, and a versioned reusable concourse with item-level discussion — that none of the other Q tools surveyed here, open or commercial, provide.
 
 The choices behind each analytical step are visible and adjustable. Multiple researchers can work on the same project, with collaborative memos for analytical reflexivity, optional audio post-sorts that travel with the analysis, and a voices panel that keeps participant material adjacent to factor interpretation.
 
@@ -39,22 +39,24 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 
 ## Comparison with existing tools
 
-| Capability | HTMLQ | Quince (Banasick) | PQMethod | Ken-Q Analysis | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Qualis |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| Browser-based data collection | Yes | Yes | No | No | No | No | **Yes** |
-| Documented mobile & tablet support | Tablet | Yes | No | — | No | N/A | **Yes** |
-| Built-in factor analysis | No | No | Yes | Yes | Yes | Yes | **Yes** |
-| Multi-language studies | No | No | No | No | No | N/A | **Yes** |
-| Audio post-sort responses | No | No | No | No | No | No | **Yes** |
-| Shared memos | No | No | No | No | No | No | **Yes** |
-| Reusable concourse with versioning and item-level discussion | No | No | No | No | No | No | **Yes** |
-| Recruitment tracking & funnels | No | No | No | No | No | No | **Yes** |
-| Team collaboration (roles) | No | No | No | No | No | No | **Yes** |
-| Interop with PQMethod / R / Ken-Q formats | CSV out | KADE / PQMethod | Native | Imports PQMethod | Imports CSV/PQMethod | Yes (import & export) | **Yes** |
-| Self-hosted | Yes | Frontend only | Desktop | Yes (static site) | Desktop | Yes (local R) | **Yes** |
-| Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2+) | **Yes (AGPL-3)** |
+| Capability | HTMLQ | Quince (Banasick) | PQMethod | Ken-Q Analysis | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Q-Assessor\* | Qsortware\* | Qualis |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Browser-based data collection | Yes | Yes | No | No | No | No | Yes | Yes | **Yes** |
+| Documented mobile & tablet support | Tablet | Yes | No | — | No | N/A | — | Yes | **Yes** |
+| Built-in factor analysis | No | No | Yes | Yes | Yes | Yes | Yes | Yes | **Yes** |
+| Participant-facing multi-language studies | No | No | No | No | No | N/A | — | — | **Yes** |
+| Audio post-sort responses | No | No | No | No | No | No | — | — | **Yes** |
+| Shared memos | No | No | No | No | No | No | — | — | **Yes** |
+| Reusable concourse with versioning and item-level discussion | No | No | No | No | No | No | — | — | **Yes** |
+| Recruitment tracking & funnels | No | No | No | No | No | No | Enrollment | — | **Yes** |
+| Team collaboration (roles) | No | No | No | No | No | No | — | — | **Yes** |
+| Interop with PQMethod / R / Ken-Q formats | CSV out | KADE / PQMethod | Native | Imports PQMethod | Imports CSV/PQMethod | Yes (import & export) | PQMethod export | Yes | **Yes** |
+| Self-hosted | Yes | Frontend only | Desktop | Yes (static site) | Desktop | Yes (local R) | No | No | **Yes** |
+| Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2+) | No | No | **Yes (AGPL-3)** |
 
-*"—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR.*
+\*Q-Assessor and Qsortware are closed-source, vendor-hosted commercial platforms that, unlike the open-source tools above, integrate collection and analysis in one system — so the **Open source** and **Self-hosted** rows, not integration itself, mark Qualis's distinction from them. Q-Assessor ceased operation in September 2024; its column reflects its last-documented feature set.
+
+*Capabilities were checked against each tool's published materials in June 2026. "—" indicates no documented support was found at the time of writing — for the closed commercial tools many internals are undocumented, so "—" is not a positive claim of absence. "Participant-facing multi-language studies" means statements, instructions, and consent are translated so a participant chooses a language and sorts in it, distinct from a localizable single-language interface (which Quince and the commercial tools offer). Sources: [Quince](https://github.com/shawnbanasick/quince), [Q Method Software / Qsortware](https://qmethodsoftware.com/), and the published materials of PQMethod, Ken-Q Analysis, KADE (Banasick), HTMLQ, and qmethod (Zabala). Corrections welcome via PR.*
 
 ---
 
