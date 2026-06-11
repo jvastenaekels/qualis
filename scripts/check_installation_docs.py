@@ -43,7 +43,7 @@ def check_readme_demo_path() -> list[str]:
         "make demo-up",
         "make demo-seed",
         "make demo-smoke",
-        "http://localhost:3000",
+        "http://localhost:3000/login",
         "hemp-bioeconomy-futures",
         "admin@example.com",
         "admin123",
