@@ -12,13 +12,15 @@ The dashboard is scoped to a single study at a time. The active study is selecte
 
 | Page | Path | Purpose |
 | ---- | ---- | ------- |
-| Overview | `/admin/studies/{slug}` | Study state, headline counts, recent activity |
-| Design | `/admin/studies/{slug}/design` | Study configuration (7 tabs) |
-| Recruitment | `/admin/studies/{slug}/recruitment` | Access links, conversion funnel |
-| Data | `/admin/studies/{slug}/data` | Participant table, charts, individual sessions, exports |
-| Analysis | `/admin/studies/{slug}/analysis` | Factor analysis runs, scree plot, results tabs |
+| Overview | `/app/{projectSlug}/studies/{studySlug}` | Study state, headline counts, recent activity |
+| Design | `/app/{projectSlug}/studies/{studySlug}/design` | Study configuration (7 tabs) |
+| Recruitment | `/app/{projectSlug}/studies/{studySlug}/recruitment` | Access links, per-link usage |
+| Data | `/app/{projectSlug}/studies/{studySlug}/data` | Participant table, charts, individual sessions, exports |
+| Analysis | `/app/{projectSlug}/studies/{studySlug}/analysis` | Factor analysis runs, scree plot, results tabs |
 | Members | `/app/{projectSlug}/members` | Project-level: invitations, roles, removal |
-| Profile | `/admin/profile` | Account settings, 2FA |
+| Account | `/app/{projectSlug}/account` | Account settings, 2FA |
+
+The `/admin/...` paths are legacy redirects retained for old bookmarks only; they rewrite to the canonical `/app/...` routes above.
 
 A **Memos** drawer is available on every study and concourse page via a toolbar icon (see [Memos](#memos)).
 
@@ -43,7 +45,7 @@ Seven tabs.
 
 | Field | Notes |
 | ----- | ----- |
-| Slug | Unique within the project. Editable in Draft. |
+| Slug | Globally unique across all studies (column-level unique constraint). Editable in Draft. |
 | Default language | ISO 639-1 fallback locale. |
 | Study state | One of Draft, Active, Paused, Closed, Archived. State transitions are constrained (see below). |
 | Show statement codes | Toggles `S1`, `S2`, … visibility on cards. |
@@ -62,7 +64,7 @@ State transitions:
 
 ### Presort, Postsort
 
-Survey field types: `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, `email`, and (post-sort only, when S3 is configured) `text_audio`.
+Survey field types: `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, `email`, `rating`, and `text_audio` (audio-recording field; surfaced in the post-sort UI when S3 audio storage is configured).
 
 Per-question features: localized labels and placeholders, required validation, conditional visibility (`equals`, `not_equals`, `contains`, `greater_than`, `less_than`), drag-to-reorder.
 
@@ -86,7 +88,7 @@ Logo URL, accent colour, primary colour, partner logos. See [`study-configuratio
 
 ### Interface
 
-Interaction mode (drag, tap-to-place) and overall interface style.
+Customizes participant-facing wording: navigation/button labels, terminology (`ui_labels`), methodology tips, and per-step help text (`step_help`). (No interaction-mode or interface-style toggle exists.)
 
 ### Import / Export
 
@@ -104,7 +106,7 @@ Interaction mode (drag, tap-to-place) and overall interface style.
 | ------- | ----- |
 | Create link | Three types: public (unlimited), individual (single-use token), limited (capped uses). |
 | QR code | Generated per link for printed materials. |
-| Funnel | Total Links / Started / Submitted / Success Rate. |
+| Per-link usage | Each link shows its own Started and Submitted counts. |
 | Revoke | `DELETE /api/admin/recruitment/links/{link_id}`. |
 
 ---
@@ -122,17 +124,18 @@ Columns: anonymous ID, status, submission timestamp, duration, language, device 
 
 ### Participant detail
 
-Click any row to open the inspector (three tabs: Visual Sort, Responses, Environment).
+Click any row to open the inspector (four tabs: Session Metadata, Pre-Sort, Q-Sort Grid, Post-Sort).
 
 | Tab | Content |
 | --- | ------- |
-| Visual Sort | Reconstructed Q-grid (`GridSort` in read-only mode). |
-| Responses | All presort and postsort answers; audio playback when present. |
-| Environment | Device, browser, language, IP-hash, durations, timestamps. |
+| Session Metadata | Device, browser, language, IP-hash, durations, timestamps. |
+| Pre-Sort | Presort answers (audio playback when present). |
+| Q-Sort Grid | Reconstructed Q-grid (`GridSort` in read-only mode). |
+| Post-Sort | Postsort answers + card comments (audio playback when present). |
 
 ### Discard / restore
 
-Discarding a participant requires a reason. Discarded rows are excluded from analysis and exports but are preserved for audit.
+Discarding a participant lets you record an optional reason. Discarded rows are excluded from analysis and exports but are preserved for audit.
 
 ### Pilot-mode sessions
 
@@ -173,7 +176,7 @@ Eigenvalues with a Kaiser reference line at `λ = 1`. Source: `GET /api/admin/st
 
 Diagnostic block surfaced at the top of the Analysis page. Source: `POST /api/admin/studies/{slug}/analysis/preview-range`.
 
-- **Eigenvalue / variance preview** for a configurable factor-count range (typically 1–10), so you can scan how variance breaks down without committing to a full run per candidate.
+- **Eigenvalue / variance preview** for a configurable factor-count range (range starts at 2; default `2..min(6, max factors)`, capped at 8 by the backend), so you can scan how variance breaks down without committing to a full run per candidate.
 - **Cumulative variance** and **scree-line context** alongside the Kaiser λ = 1 reference.
 - **Recommended factor count** based on the Kaiser criterion, with a manual override that drives the next run.
 
@@ -242,15 +245,13 @@ Project-scoped page (path: `/app/{projectSlug}/members`). Lists project members 
 
 ### Invitations
 
-The **Invite member** dialog accepts an email and role. If SMTP is configured, an email is sent; otherwise a shareable invitation link is shown in a confirmation dialog. Pending invitations are listed alongside the member table.
+The **Invite member** dialog accepts an email and role. It always returns and displays a shareable invitation link in a confirmation dialog, and additionally attempts to email the invitee (the email is silently skipped — with a server-side warning — when SMTP is not configured). Pending invitations are listed alongside the member table.
 
 This page replaces the previous embedded members list inside Project Settings.
 
 ---
 
-## Profile
-
-### Account
+## Account
 
 Email, full name, password change.
 

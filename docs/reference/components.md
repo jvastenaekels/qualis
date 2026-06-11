@@ -212,7 +212,6 @@ Sorted alphabetically within each category. Paths are relative to `frontend/src/
 | `GuidanceCard` | `admin/GuidanceCard.tsx` | Collapsible info / tip / warning card. |
 | `LegacyRedirect` | `admin/LegacyRedirect.tsx` | Redirects legacy `/admin/*` paths. |
 | `ProjectSwitcher` | `admin/ProjectSwitcher.tsx` | Active-project selector. |
-| `StudySwitcher` | `admin/StudySwitcher.tsx` | Active-study selector. |
 | `CreateStudyDialog` | `admin/CreateStudyDialog.tsx` | Dialog to create a study. |
 | `ImportStudyDialog` | `admin/ImportStudyDialog.tsx` | Dialog to import a study from JSON. |
 | `AudioPlayer` | `admin/AudioPlayer.tsx` | Audio playback for participant responses. |
@@ -223,7 +222,7 @@ Sorted alphabetically within each category. Paths are relative to `frontend/src/
 | Component | Path | Purpose |
 | --- | --- | --- |
 | `InteractiveDataView` | `admin/dashboard/InteractiveDataView.tsx` | Searchable, paginated participant table. |
-| `ParticipantDetailContent` | `admin/dashboard/ParticipantDetailContent.tsx` | Tabbed inspector (Visual Sort / Responses / Environment). |
+| `ParticipantDetailContent` | `admin/dashboard/ParticipantDetailContent.tsx` | Tabbed inspector (Session Metadata / Pre-Sort / Q-Sort Grid / Post-Sort). |
 | `ParticipantMetadataCard` | `admin/dashboard/ParticipantMetadataCard.tsx` | Device, browser, IP-hash, durations. |
 | `RecentActivityCard` | `admin/dashboard/RecentActivityCard.tsx` | Recent submissions + engagement metrics. |
 | `RecruitmentModule` | `admin/dashboard/RecruitmentModule.tsx` | Study link sharing with QR. |
@@ -251,10 +250,8 @@ Sorted alphabetically within each category. Paths are relative to `frontend/src/
 | --- | --- | --- |
 | `BrandingEditor` | `admin/designer/BrandingEditor.tsx` | Logo, accent colour, partner logos. |
 | `ConditionOfInstructionEditor` | `admin/designer/ConditionOfInstructionEditor.tsx` | Multi-language sorting prompt editor. |
-| `ExportConfigButton` | `admin/designer/ExportConfigButton.tsx` | Download study config as JSON. |
 | `IconPicker` | `admin/designer/IconPicker.tsx` | Lucide icon dropdown. |
 | `ImageUploadInput` | `admin/designer/ImageUploadInput.tsx` | Image upload with size/format validation. |
-| `ImportConfigButton` | `admin/designer/ImportConfigButton.tsx` | Import a study config from JSON. |
 | `ImportFromConcourseDialog` | `admin/designer/ImportFromConcourseDialog.tsx` | Pick concourse items to import as statements. |
 | `InterfaceEditor` | `admin/designer/InterfaceEditor.tsx` | Interaction mode + interface style. |
 | `IntroductionEditor` | `admin/designer/IntroductionEditor.tsx` | Multi-language intro + process steps. |
@@ -289,36 +286,41 @@ A few component-level hooks are reused:
 
 ### `useGridZoom`
 
-Manages zoom/pan state and zonal focus for `GridSort`.
+Manages zoom/pan state and zonal focus for `GridSort`. Lives at `hooks/useGridZoom.ts` (root of `hooks/`, not an `<area>` subdir).
 
 ```typescript
 const { transformRef, performAutoFit, zoomIn, zoomOut } = useGridZoom({
   wrapperRef,
   contentRef,
-  pyramidRef,
-  gridColumns,
-  activePile,
+  onZoomChange,
+  onTransformChange,
 });
 ```
 
 ### `useFineSortDrag`
 
-Drag-and-drop logic for fine sort (including edge panning).
+Drag-and-drop logic for fine sort (including edge panning). Lives at `hooks/useFineSortDrag.ts` (root of `hooks/`, not an `<area>` subdir).
 
 ```typescript
 const {
-  sensors,
+  activeId,
   handleDragStart,
+  handleDragMove,
   handleDragEnd,
+  handleDragCancel,
+  findClosestEmptyRow,
   handleCardClick,
   handleSlotClick,
 } = useFineSortDrag({
-  allCards,
-  placements,
-  selectedCardId,
-  onPlaceCard,
-  onMoveCard,
-  onSwapCards,
+  responses,
+  gridColumns,
+  actions,
+  onSelectionChange,
+  selectedId,
+  interactionUtils,
+  onPan,
+  statements,
+  distributionMode,
 });
 ```
 

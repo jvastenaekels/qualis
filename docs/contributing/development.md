@@ -43,7 +43,7 @@ qualis/
 make install
 ```
 
-This runs `cd backend && uv sync` (Python deps into `backend/.venv/`) and `cd frontend && npm install`. If `uv` is not installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+This runs `cd backend && uv sync` (Python deps into `backend/.venv/`) and `cd frontend && npm ci`. If `uv` is not installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
 ### Set up the database
 
@@ -97,7 +97,7 @@ cd backend && uv run python init_db.py && cd ..
 cd backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
-After seeding, you can walk the participant flow at <http://localhost:5173/hemp-bioeconomy-futures>.
+After seeding, you can walk the participant flow at <http://localhost:5173/study/hemp-bioeconomy-futures>.
 
 ### Run the dev servers
 
@@ -112,7 +112,7 @@ Verify: <http://localhost:8000/docs> (Swagger) and <http://localhost:5173>. Log 
 
 ### Verify the dev loop
 
-Edit a visible string in `frontend/src/pages/admin/AdminDashboard.tsx`, save, watch the browser update via HMR. Revert.
+Edit a visible string in `frontend/src/components/admin/AdminDashboard.tsx`, save, watch the browser update via HMR. Revert.
 
 ---
 
@@ -131,7 +131,7 @@ pre-commit run --all-files
 
 | Scope | Command | Purpose |
 | ----- | ------- | ------- |
-| All | `make install` | Install Python (`uv sync`) and Node (`npm install`) dependencies. |
+| All | `make install` | Install Python (`uv sync`) and Node (`npm ci`) dependencies. |
 | All | `make lint` | Ruff + Biome. |
 | All | `make check` | Type checks (mypy, tsc), security (bandit), dead-code (vulture, deptry), API sync, i18n parity. |
 | All | `make test` | pytest + Vitest. |
@@ -152,10 +152,10 @@ Any change to backend routes or Pydantic schemas requires a client regeneration:
 
 ## Architecture checks
 
-Two fitness functions run via `make check`:
+Two architecture fitness functions run in CI ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)), not via `make check`:
 
-- **Backend** — `import-linter` enforces `routers` → `services` → `schemas` → `models`.
-- **Frontend** — `dependency-cruiser` rejects circular dependencies and orphan files.
+- **Backend** — `import-linter` (`uv run lint-imports`) enforces `routers` → `services` → `schemas` → `models`. Config: `[tool.importlinter]` in `backend/pyproject.toml`.
+- **Frontend** — `dependency-cruiser` (`npm run lint:architecture`) rejects circular dependencies and orphan files. Config: `frontend/.dependency-cruiser.cjs`.
 
 ## Database maintenance
 
@@ -181,7 +181,7 @@ For the migration chain and conventions, see the "Database Migrations" section i
 | `app/routers/admin/` | Admin API routes (studies, projects, exports, analysis, memos) |
 | `app/services/` | Business logic services |
 | `app/core/config.py` | Application configuration |
-| `alembic/` | Database migration scripts |
+| `db_migrations/` | Alembic migration scripts; `script_location` set in `alembic.ini` |
 | `tests/` | pytest test suite |
 
 ### Frontend

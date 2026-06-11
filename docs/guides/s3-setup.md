@@ -66,19 +66,23 @@ Create an IAM user or role with the following policy:
 Set the following environment variables in your deployment:
 
 ```bash
+S3_ENDPOINT_URL=https://s3.eu-west-1.amazonaws.com
 S3_BUCKET_NAME=qualis-audio
-S3_REGION=eu-west-1
 S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+S3_REGION=eu-west-1
 ```
+
+`S3_ENDPOINT_URL` is required for **every** provider, including AWS S3 (use the regional endpoint, e.g. `https://s3.eu-west-1.amazonaws.com`). The audio feature stays disabled if it is unset. `S3_REGION` is optional and defaults to `us-east-1`; it is not part of the enablement gate.
 
 For Scalingo:
 
 ```bash
+scalingo --app qualis env-set S3_ENDPOINT_URL=https://s3.eu-west-1.amazonaws.com
 scalingo --app qualis env-set S3_BUCKET_NAME=qualis-audio
-scalingo --app qualis env-set S3_REGION=eu-west-1
 scalingo --app qualis env-set S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 scalingo --app qualis env-set S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+scalingo --app qualis env-set S3_REGION=eu-west-1
 ```
 
 ---
@@ -96,9 +100,9 @@ After setting the environment variables and restarting the application:
 
 ## How Audio Storage Works
 
-1. **Upload**: When a participant records audio, the browser captures it as WebM/Opus. The frontend uploads the audio blob to `POST /api/audio/upload/{participant_id}`.
+1. **Upload**: When a participant records audio, the browser captures it as WebM/Opus. The frontend uploads the audio blob to `POST /api/audio/upload`, identifying the participant via a `session_token` form field (no participant ID in the path).
 2. **Storage**: The backend generates a unique S3 key, uploads the file, and stores metadata in the `audio_recordings` table.
-3. **Playback**: When a researcher views a participant's detail page, the backend generates presigned URLs (`GET /api/audio/{recording_id}`) that expire after a configured duration.
+3. **Playback**: When a researcher views a participant's detail page, the backend generates presigned URLs at `GET /api/audio/{recording_id}/url` that expire after a fixed 1 hour.
 4. **Export**: Audio recordings can be downloaded as a ZIP from the participant detail view.
 
 ---
@@ -114,7 +118,7 @@ Qualis uses the standard AWS S3 SDK (boto3). Any S3-compatible provider should w
 | **Backblaze B2** | Use S3-compatible API endpoint |
 | **Cloudflare R2** | Use S3-compatible API endpoint |
 
-For non-AWS providers, you may need to set an additional `S3_ENDPOINT_URL` environment variable pointing to the provider's S3-compatible endpoint.
+`S3_ENDPOINT_URL` is mandatory for every provider — set it to the provider's S3-compatible endpoint (for AWS S3, use the regional endpoint, e.g. `https://s3.eu-west-1.amazonaws.com`).
 
 ---
 
@@ -123,7 +127,7 @@ For non-AWS providers, you may need to set an additional `S3_ENDPOINT_URL` envir
 The backend implements automatic retry logic for S3 uploads to handle transient network issues:
 
 - **Retried errors**: `RequestTimeout`, `ServiceUnavailable`, `InternalError`, `SlowDown`
-- **Retry strategy**: Exponential backoff (1s, 2s, 4s) with a maximum of 3 total attempts.
+- **Retry strategy**: Exponential backoff with delays of 1s then 2s, up to 3 total attempts (the third/final attempt is not followed by a delay).
 - **Non-retried errors**: Permission errors (403), invalid bucket (404), and other client errors fail immediately.
 
 ### Audio Validation
@@ -148,4 +152,4 @@ Presigned URLs have an expiration time. Refresh the page to generate new URLs.
 
 ### Audio recording not available in study designer
 
-Verify that all four S3 environment variables (`S3_BUCKET_NAME`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) are set. For non-AWS providers, also set `S3_ENDPOINT_URL`. The audio feature is only enabled when `S3_BUCKET_NAME` is configured.
+Verify that all four gating S3 environment variables (`S3_ENDPOINT_URL`, `S3_BUCKET_NAME`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) are set. `S3_REGION` is a fifth, optional variable (default `us-east-1`) that does not gate the feature. The audio feature is enabled only when all four of `S3_ENDPOINT_URL`, `S3_BUCKET_NAME`, `S3_ACCESS_KEY_ID`, and `S3_SECRET_ACCESS_KEY` are set.

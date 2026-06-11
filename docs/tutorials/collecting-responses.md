@@ -21,9 +21,9 @@ This tutorial continues from [Your First Study](your-first-study.md).
 ## Step 1: Navigate to the Recruitment Page
 
 1. From the admin dashboard, make sure your project and study are selected.
-2. In the left sidebar, click **Recruitment**.
+2. In the left sidebar, click **Access** (this opens the `/recruitment` route).
 
-You will see summary cards at the top: **Total Links**, **Started**, and **Submitted**.
+The page shows the study URL, the access rules, and the recruitment-links table (with per-link started and submitted counts).
 
 ---
 
@@ -31,11 +31,11 @@ You will see summary cards at the top: **Total Links**, **Started**, and **Submi
 
 A public link can be used by multiple participants.
 
-1. Click the **New Access Link** button.
+1. Click the **New access link** button.
 2. Configure:
    - **Link Type:** Public (Multiple usage)
    - **Campaign Name:** `Social Media Campaign`
-3. Click **Generate Links**.
+3. Click **Provision links**.
 
 A new row appears in the table with the campaign name, link type, token, and usage count.
 
@@ -45,23 +45,23 @@ A new row appears in the table with the campaign name, link type, token, and usa
 
 Individual links are single-use: each link can only be used for one submission.
 
-1. Click **New Access Link** again.
+1. Click **New access link** again.
 2. Configure:
    - **Link Type:** Individual (Single usage)
    - **Campaign Name:** `Interview Panel Batch 1`
-   - **Number of links to generate:** `10`
-3. Click **Generate Links**.
+   - **Batch size:** `10`
+3. Click **Provision links**.
 
 ---
 
 ## Step 4: Create a Limited Capacity Link
 
-1. Click **New Access Link**.
+1. Click **New access link**.
 2. Configure:
    - **Link Type:** Limited (Set capacity)
    - **Campaign Name:** `Department A`
-   - **Participant Capacity:** `25`
-3. Click **Generate Links**.
+   - **Max submissions:** `25`
+3. Click **Provision links**.
 
 ---
 
@@ -92,7 +92,7 @@ This is the single best way to spot rough edges in instructions, statement wordi
 
 1. Click **Overview** in the left sidebar.
 
-The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from link usage, session starts, and final submissions; gaps between stages are usually where dropout happens.
+The page shows: the study status, three metric cards (**Sample size (N)**, **Completion rate**, **Median duration**), a recent-activity card, and a **Share study** module with the public study URL and a QR code. Per-link started and submitted counts are shown in the recruitment-links table on the Access page (from each link's start and usage counts).
 
 ---
 
@@ -123,11 +123,11 @@ The Data page provides:
 
 If you identify a response that should be excluded:
 
-1. In the Data page, open the row's action menu (kebab icon at the end of the row).
-2. Click **Discard**.
-3. Enter a reason (e.g., "Completed in under 30 seconds — likely random").
+1. In the Data page, click the participant row to open the detail page.
+2. In the metadata card, click the **Discard** button. A confirmation dialog opens.
+3. Optionally enter a reason in the **Reason (optional)** field (e.g., "Completed in under 30 seconds — likely random"), then confirm.
 
-Discarded participants are excluded from exports and analysis by default, but the data is preserved for audit. To restore, open the same menu and click **Restore**.
+Discarded participants are excluded from exports and analysis by default, but the data is preserved for audit. To restore, reopen the same participant's detail page and click the **Restore** button (the same button, now labelled **Restore**).
 
 For the full set of state transitions a study goes through (Active → Paused → Closed → Archived), see [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). For now, leave your tutorial study Active.
 

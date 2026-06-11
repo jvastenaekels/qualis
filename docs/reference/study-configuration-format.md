@@ -36,7 +36,6 @@ For runtime configuration of a study (the same fields as they appear in the data
     "statements": [
       {
         "code": "S1",
-        "display_order": 1,
         "translations": [
           { "language_code": "en", "text": "Statement text in English" },
           { "language_code": "fr", "text": "Texte de l'énoncé en Français" }
@@ -65,11 +64,11 @@ For runtime configuration of a study (the same fields as they appear in the data
       "accent_color": "#4F46E5",
       "primary_color": "#0EA5E9",
       "logo_url": "https://example.com/logo.png",
-      "partner_logos": []
+      "partners": []
     },
     "presort_config": {
       "enabled": true,
-      "questions": []
+      "fields": {}
     },
     "postsort_config": {
       "enabled": true,
@@ -98,7 +97,7 @@ For runtime configuration of a study (the same fields as they appear in the data
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `slug` | string | Unique identifier within a project. May be re-mapped on import if the slug already exists. |
+| `slug` | string | On export, the study's slug is written here. On import this value is ignored: the caller must supply a brand-new `new_slug` (3-100 chars, lowercase letters/digits/hyphens) as a separate request field, and a collision with an existing slug is rejected with HTTP 400 — slugs are never auto-remapped. |
 | `default_language` | string | ISO 639-1 fallback language code. |
 | `show_statement_codes` | boolean | If true, statement codes (`S1`, `S2`) are visible to participants. Default `false`. |
 | `randomize_statement_order` | boolean | If true, statement display order is shuffled deterministically per session. Default `false`. |
@@ -110,8 +109,8 @@ For runtime configuration of a study (the same fields as they appear in the data
 | `statements` | array | Statement objects. |
 | `translations` | array | Per-language study content. |
 | `branding` | object \| null | Branding (colors, logos). |
-| `presort_config` | object | Demographic / pre-sort survey definition. See [`configuration.md`](configuration.md). |
-| `postsort_config` | object | Post-sort survey + audio quota. See [`configuration.md`](configuration.md). |
+| `presort_config` | object | Demographic / pre-sort survey definition. Field definitions live in `fields`, a keyed object (record) — not an array — optionally wrapped with an `enabled` boolean. See [`configuration.md`](configuration.md). |
+| `postsort_config` | object | Post-sort survey + audio quota. Field definitions live in `questions`, a keyed object (record). See [`configuration.md`](configuration.md). |
 
 ### Grid configuration object
 
@@ -132,8 +131,9 @@ The relationship between `sum(capacity)` and the statement count depends on `dis
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `code` | string | Stable statement identifier (e.g. `"S1"`). |
-| `display_order` | integer | Order used when `randomize_statement_order` is `false`. |
 | `translations` | array | One entry per language: `{ "language_code", "text" }`. |
+
+Statement order is conveyed by array position — statements are exported sorted by their stored `display_order` and re-indexed (`0, 1, 2, …`) on import. `display_order` is not a field of this JSON format.
 
 ### Translation object
 
@@ -149,7 +149,7 @@ The relationship between `sum(capacity)` and the statement count depends on `dis
 | `instructions` | string \| null | Markdown content shown on the welcome page. |
 | `consent_title` | string \| null | Title for the consent step. |
 | `consent_description` | string \| null | Full text of the consent form. |
-| `ui_labels` | object | Overrides for default button text (e.g. `{"start_button": "Go!"}`). |
+| `ui_labels` | object | Overrides for default button text, keyed by dotted i18n keys — `welcome.start`, `common.next`, `post.submit`, `fine.actions.validate`, … — not ad-hoc names like `start_button`. E.g. `{"welcome.start": "Go!"}`. |
 | `process_steps` | array | Custom step definitions for the progress indicator. |
 | `methodology_tips` | array | Tip strings shown contextually during sorting. |
 | `step_help` | object | Per-step help content for the help overlay. |
@@ -161,7 +161,7 @@ The relationship between `sum(capacity)` and the statement count depends on `dis
 | `accent_color` | string \| null | CSS colour for accents (buttons, links). Max 50 chars. |
 | `primary_color` | string \| null | CSS colour for primary surfaces. Max 50 chars. |
 | `logo_url` | string \| null | URL for the study logo shown on the welcome page. |
-| `partner_logos` | array | List of partner logo URLs displayed in the footer. |
+| `partners` | array | Array of `{ id, name, logo_url, url? }` objects for partner logos displayed on the welcome page. |
 
 The branding object is stored as a JSON blob on the study record; unknown keys are preserved on round-trip but ignored by the UI.
 
@@ -170,7 +170,7 @@ The branding object is stored as a JSON blob on the study record; unknown keys a
 When importing, the following rules are enforced:
 
 1. **Format** — file must be valid JSON.
-2. **Required fields** — `slug`, `default_language`, `statements`, `grid_config`.
-3. **Statement balance** — `sum(grid_config[i].capacity) == len(statements)`.
+2. **Required fields** — `translations`, `statements`, `grid_config`. (`slug` is not read from the file — the new slug is supplied separately via `new_slug`; `default_language` defaults to `"en"` if absent.)
+3. **Statement balance** — a mismatch between `sum(grid_config[i].capacity)` and the statement count produces a non-blocking warning during validate-import; it does not block import.
 4. **Language codes** — every `language_code` must be a 2-letter ISO 639-1 code.
-5. **Translation completeness** — every language declared on a statement or in `translations` must appear in the study's translations array (i.e. the import service treats the union of all `language_code` values as the study's enabled languages).
+5. **Translation fields** — each entry in `translations` must have a non-empty `language_code` and `title`, and each `language_code` must match `^[a-z]{2}(-[A-Z]{2})?$`.

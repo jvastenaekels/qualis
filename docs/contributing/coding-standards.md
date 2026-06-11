@@ -16,7 +16,7 @@ Define the shape of data before writing logic.
 Write a failing test before the implementation. The test fixes the intent and the "definition of done" before any code is generated.
 
 - **Frontend**: Vitest for hooks and pure logic; testing-library for component interactions. Test behaviour, not implementation details.
-- **Backend**: pytest with `conftest.py` fixtures. Database tests run inside transactions that roll back between tests.
+- **Backend**: pytest with `conftest.py` fixtures. Each database test gets a freshly recreated schema (the `db` fixture drops and recreates the `public` schema around every test), so tests are isolated from one another even though committed data is not rolled back.
 - **E2E**: Playwright for critical happy paths only — execution is slow.
 
 See [`testing.md`](testing.md) for the test stack and conventions.
@@ -40,7 +40,7 @@ See [`testing.md`](testing.md) for the test stack and conventions.
 | Unit tests | pytest, Vitest |
 | Build | Frontend production build |
 
-`make ci-fast` (~30–90 s) is the inner-loop equivalent. CI runs the same checks; local failures will fail in CI.
+`make ci-fast` (~30–90 s) is the inner-loop equivalent. `make ci-fast` is a fast SUBSET of `make ci` — it skips bandit, radon, vulture, pip-audit, deptry, schema/relationship/API/i18n checks, the build, integration tests, and E2E. A green `ci-fast` does NOT guarantee a green CI; run the full `make ci` before pushing.
 
 ## 5. Q-methodology invariants
 

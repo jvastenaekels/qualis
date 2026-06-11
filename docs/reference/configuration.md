@@ -52,7 +52,7 @@ Boolean. When true (default), participants go through a 3-pile triage (agree / n
 
 ### `presort_config`
 
-Demographic / pre-sort fields. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, and `email` field types. Definitions are open-ended JSON; the wire shape is not enforced at the schema level beyond validity.
+Demographic / pre-sort fields. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, `email`, `text_audio` (free text with an optional voice recording), and `rating` (a labelled numeric scale) field types. The canonical list of valid types is `PreSortFieldSchema` in `frontend/src/schemas/study.ts`. Definitions are open-ended JSON; the wire shape is not enforced at the schema level beyond validity.
 
 ```json
 {

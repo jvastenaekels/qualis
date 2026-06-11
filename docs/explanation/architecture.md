@@ -202,7 +202,7 @@ erDiagram
     PROJECT_MEMBER {
         int project_id FK
         int user_id FK
-        enum role "owner | researcher | viewer"
+        enum role "owner | member | viewer"
         datetime joined_at
     }
 
@@ -438,7 +438,7 @@ The architectural choices visible above (project-scoped requests, hybrid Zustand
 
 1. **Self-hosting under a researcher's institution.** A SaaS architecture would have made several design decisions easier (centralised auth, shared object storage, fewer env vars). Self-hosting with GDPR data-residency in mind dictates that secrets, hashing salts, S3 endpoints, and SMTP routing all stay configurable per deployment, and that the participant flow contains no third-party calls.
 
-2. **Critical Q-methodology rather than classical Q-as-a-tool.** The persistence of every analysis run with its parameters, the editability of researcher notes on a run, the per-statement audit of who flagged what — these only make sense if you treat analytical choices as part of the result, rather than as a one-shot computation. The schema is shaped to keep the trail.
+2. **A persistent trail of analytical choices.** The persistence of every analysis run with its parameters, the editability of researcher notes on a run, the per-statement audit of who flagged what — these only make sense if you treat analytical choices as part of the research record, rather than as a one-shot computation. The schema is shaped to keep the trail, so reflexive interpretation is possible; the same schema supports a classical workflow just as well.
 
 3. **Auditable handling of participant data.** IP hashing with a per-deployment salt, consent-version hashes per participant, forward-only `last_step_reached`, deterministic randomisation seeded by the session token, and admin- and participant-mediated GDPR Art. 17 erasure are not features added on top — they are constraints that ruled out simpler implementations from the start.
 

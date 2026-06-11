@@ -17,12 +17,12 @@
 - **Schemas:** [backend/app/schemas/](../../backend/app/schemas/) — Pydantic validation schemas; all HTTP I/O uses these.
 - **Services:** [backend/app/services/](../../backend/app/services/) — Business logic layer (study_service, export_service, recruitment_service).
 - **Routers:** [backend/app/routers/](../../backend/app/routers/) — HTTP endpoint definitions; delegate to services.
-- **Database:** PostgreSQL with Alembic migrations; use `python init_db.py` to reset locally.
+- **Database:** PostgreSQL with Alembic migrations. Run `make db-reset` (which calls `python init_db.py --reset`) to drop and recreate the local schema; plain `python init_db.py` only applies migrations and seeds.
 
 **Three-tier architecture:** Routers → Services → Models. Import-linter enforces this.
 
 ### Frontend (React/TypeScript)
-- **Pages:** [src/pages/](../../frontend/src/pages/) — Public study interface (Landing, Rough Sort, Fine Sort, Post-Sort, Submission).
+- **Pages:** [src/pages/](../../frontend/src/pages/) — Public study interface (Landing, Consent, Pre-Sort, Rough Sort, Fine Sort, Post-Sort, Study Status). Submission has no dedicated page; it is handled inside PostSortPage via the `useSubmitStudy` hook.
 - **Admin:** [src/components/admin/dashboard/](../../frontend/src/components/admin/dashboard/) — Research dashboard (studies, participants, analytics, exports).
 - **Stores:** [src/store/](../../frontend/src/store/) — Zustand atomic stores (useConfigStore, useSessionStore, useResponseStore, useUIStore).
 - **Hooks:** [src/hooks/](../../frontend/src/hooks/) — Custom logic extraction (useGridCalculations, useFineSortDrag, useSubmitStudy, etc.).
@@ -32,7 +32,7 @@
 ## Q-Methodology Domain Knowledge
 
 **Critical for validation logic:**
-- **Q-Grid:** Forced distribution table following a bell curve (e.g., -3 to +3, 9 slots total).
+- **Q-Grid:** Forced distribution table following a bell curve (e.g., scores -3 to +3 = 7 columns). The total slot count is the sum of each column's capacity (one capacity per score), set by the study designer.
 - **Ipsative Data:** Each card's position is relative to other cards in *that user's* sort.
 - **Validation Rule:** A sort is invalid if any grid slot is empty or contains duplicate cards—submission is rejected until perfectly filled.
 - **Workflow:** Consent → Preliminary Questions → Rough Sort (3-way bucket) → Fine Sort (grid) → Post-Sort Survey → Submission.
@@ -46,12 +46,13 @@ make db-reset
 
 # Create new migration after model change
 make migration-new
-# Then apply migrations automatically on startup, or run:
+# Migrations run on deploy via the Procfile postdeploy phase (scripts/migrate.py);
+# app startup only validates the schema, it does not migrate. To apply them manually:
 cd backend && uv run python scripts/migrate.py
 ```
 
 ### 2. Backend Feature Workflow (Architect-Builder Pattern)
-1. **Define the Type:** Update [backend/app/schemas/](../../backend/app/schemas/) with Pydantic models (no `Any` types).
+1. **Define the Type:** Update [backend/app/schemas/](../../backend/app/schemas/) with Pydantic models; avoid `Any` except for deliberately open-ended JSON-column payloads (e.g. `presort_config`/`postsort_config`/`draft_responses`), which are exempt from `disallow_any_explicit` per CLAUDE.md.
 2. **Define the Endpoint:** Add router in [backend/app/routers/](../../backend/app/routers/) or [backend/app/routers/admin/](../../backend/app/routers/admin/).
 3. **Write the Trap (Failing Test):** [backend/tests/integration/](../../backend/tests/integration/) or [backend/tests/unit/](../../backend/tests/unit/).
 4. **Implement Logic:** [backend/app/services/](../../backend/app/services/) using SQLAlchemy models.
@@ -108,10 +109,10 @@ make e2e         # playwright (study + admin flows)
 - **Drag-and-Drop:** [dnd-kit](https://docs.dndkit.com/) primitives for sort interactions; custom hooks for physics (useFineSortDrag, useGridCalculations).
 
 ### Internationalization (i18n)
-- **Supported:** English (en), French (fr), Finnish (fi).
+- **Supported:** see `SUPPORTED_LANGUAGES` in [frontend/src/constants/languages.ts](../../frontend/src/constants/languages.ts) (currently en, fr, fi, de, es, it, nl, pt, pl).
 - **Static UI:** i18next labels in [public/locales/](../../frontend/public/locales/).
 - **Dynamic Content:** Study titles, instructions, statements fetched from backend; localized per participant.
-- **Validation:** `npm run i18n-check` verifies all keys are present in all language files.
+- **Validation:** `npm run i18n-check` enforces strict key parity for the participant namespace (mismatches fail CI); the admin namespace is best-effort (warnings only, missing admin.json tolerated via the English fallback).
 
 ## Important Files & References
 

@@ -208,12 +208,13 @@ Email-driven auth flows (sign-up verification, password reset, 2FA email-OTP, 2F
 | `SMTP_PORT` | `587` | Standard submission port with STARTTLS. |
 | `SMTP_USER` | — | SMTP credentials username. |
 | `SMTP_PASSWORD` | — | SMTP credentials password. |
-| `SMTP_FROM` | — | Sender address shown to recipients. |
+| `EMAILS_FROM_EMAIL` | — | Sender address shown to recipients. Required for a valid From header. |
+| `EMAILS_FROM_NAME` | — | Display name for the sender. |
 | `EMAIL_VERIFICATION_REQUIRED` | `true` | Enforce email verification on sign-up when SMTP is active. Set to `false` only to test the unverified-account UX with SMTP configured. |
-| `EMAIL_VERIFY_TOKEN_EXPIRE_HOURS` | `48` | Validity window for the sign-up verification link. |
+| `EMAIL_VERIFY_TOKEN_EXPIRE_HOURS` | `24` | Validity window for the sign-up verification link. |
 | `PASSWORD_RESET_TOKEN_EXPIRE_HOURS` | `1` | Validity window for the password-reset link. |
 | `TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES` | `15` | Validity window for the 2FA self-serve disable link. |
-| `TWOFA_EMAIL_OTP_EXPIRE_MINUTES` | `10` | Validity window for each 2FA email-OTP code. |
+| `TWOFA_EMAIL_OTP_EXPIRE_MINUTES` | `5` | Validity window for each 2FA email-OTP code. |
 | `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS` | `30` | Minimum interval between OTP resend requests per user. |
 
 **Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.

@@ -23,7 +23,7 @@ The four sections below follow the order they typically enter a workflow.
 
 ## 1. Choosing the factor count (Explorer panel)
 
-The Explorer panel sits at the top of the Analysis page once you have loaded a run. It shows eigenvalue and cumulative variance for a configurable preview range — typically 1 to 10 factors.
+The Explorer panel sits at the top of the Analysis page once you have loaded a run. It shows eigenvalue and cumulative variance for a preview range from 2 factors up to a cap of 8 (or *n* − 1 valid participants, whichever is smaller). On open, the panel auto-loads a 2…min(6, max) range.
 
 The default Kaiser criterion (eigenvalue > 1) is a starting point, not a verdict. Reasons to deviate:
 
@@ -31,9 +31,9 @@ The default Kaiser criterion (eigenvalue > 1) is a starting point, not a verdict
 - **Theoretical legibility.** A four-factor solution that maps onto a known theoretical typology may be preferable to a five-factor solution that splits one viewpoint in two for purely statistical reasons.
 - **Sample-size constraints.** With small N, retaining many factors over-fits. As a rule of thumb, do not retain more factors than `N / 6`.
 
-Adjust the preview range to scan up to 8 or 10 factors and look for an *elbow* — a point where successive eigenvalues drop sharply. That elbow plus the Kaiser line is your starting hypothesis. Re-run the analysis with that factor count.
+The panel automatically previews up to 8 factors (capped at *n* − 1 valid participants); read the scree/elbow from the auto-generated table — looking for an *elbow*, a point where successive eigenvalues drop sharply. That elbow plus the Kaiser line is your starting hypothesis. Re-run the analysis with that factor count.
 
-> **Document your choice.** Open a new analysis memo (Memos toolbar) and write one sentence: *« retained 3 factors based on Kaiser + variance elbow at 4 → 5 »*. This is the kind of decision a reviewer asks about three months later.
+> **Document your choice.** Open the Methodology memo on the Study Design page (right-side panel) and write one sentence: *« retained 3 factors based on Kaiser + variance elbow at 4 → 5 »*. Memos are study-level, not tied to the Analysis page. This is the kind of decision a reviewer asks about three months later.
 
 ---
 
@@ -45,13 +45,13 @@ Once you have a candidate solution, ask whether a small change in the analysis w
 2. **Different flagging** — re-run with manual flagging that excludes one or two borderline cases. Stable factors are robust to flagging choices.
 3. **Different N** — if you have collected more responses since your initial run, re-run on the larger N.
 
-The Compare panel aligns two analysis runs via Tucker φ congruence (computed in the browser; see `frontend/src/utils/tuckerPhi.ts`):
+The Compare panel aligns two analysis runs via Tucker φ congruence (computed in the browser; see `frontend/src/utils/tuckerPhi.ts`). The panel itself flags an **ambiguous match** (amber) only when |φ| < 0.85. As a stricter manual reading convention:
 
 - **φ ≥ 0.95** — factors are essentially identical.
 - **0.90 ≤ φ < 0.95** — equivalent, with minor differences in loadings.
 - **φ < 0.90** — not the same factor; the perturbation did matter.
 
-The aligned-arrays view reorders + sign-flips the second run's factors to maximise congruence with the first, so you can read the delta columns to see *which statements moved between runs*. Statements that moved by more than 1 position are worth a second look.
+The aligned-arrays view reorders + sign-flips the second run's factors to maximise congruence with the first, so you can read the delta columns to see *which statements moved between runs*. Statements whose z-score shifted by |Δz| ≥ 0.5 (the threshold at which the Δz chip is highlighted amber) are worth a second look.
 
 > **Document your choice.** Save a memo: *« compared run 4 (manual flag, 3F) vs run 7 (auto, 3F): φ_diag = 0.97 / 0.94 / 0.91, statements 11 and 23 moved at the boundary — kept run 4 »*.
 
@@ -61,13 +61,14 @@ The aligned-arrays view reorders + sign-flips the second run's factors to maximi
 
 The factor array tells you *what* a factor agrees and disagrees with. It does not tell you *why this viewpoint exists* — that is the interpretive layer.
 
-Click into a factor on the Analysis page to enter the **factor canvas** in focus mode. The factor array sits on the left; a **voices panel** on the right pulls participant material for the highest-loading flagged participants:
+Click into a factor on the Analysis page to enter the **factor canvas** in focus mode. The canvas stacks its panels vertically: the Statements card, then a **voices panel** below it, then the factor-narrative editor. The voices panel pulls participant material for participants flagged on this factor who left a post-sort comment or audio recording:
 
 - Post-sort comments from those participants.
 - Audio playback (if your study collected post-sort audio) for the same participants.
-- Distinguishing statements at the +3 and -3 extremes.
 
-Drag voices from the panel onto the canvas to ground each interpretive claim about the factor in specific participant material. The result is a panel you can copy-paste into the *Findings* section of a paper, with each claim sourced from one or more participants.
+Distinguishing statements do not appear in the voices panel; they are marked with a **D** badge in the Statements card, surfaced by |z| ordering (top 12), not at fixed +3/−3 grid positions.
+
+Click the ▸+ button on a comment to insert it as an attributed blockquote into the factor narrative, grounding each interpretive claim about the factor in specific participant material. The result is a panel you can copy-paste into the *Findings* section of a paper, with each claim sourced from one or more participants.
 
 This is where critical-Q practice diverges from purely statistical interpretation. The factor array stops being a finished object: it becomes the starting point for interpretive work where situated participant voices remain visible all the way through to the writeup.
 

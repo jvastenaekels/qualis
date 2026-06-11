@@ -11,7 +11,7 @@ For the corresponding API endpoints (with rate limits and authorisation), see [`
 | Format | When to use it | Output |
 | ------ | -------------- | ------ |
 | **CSV (wide)** | Spreadsheet inspection, Excel / SPSS / Stata. | One row per non-discarded participant. |
-| **PQMethod ZIP** | PQMethod or Ken-Q desktop analysis. | `.dat` + `.sta`, completed participants only. |
+| **PQMethod ZIP** | PQMethod or Ken-Q desktop analysis. | `.sta` + `.dat` + `.ans` (PQMethod project-info file), completed participants only. |
 | **R-Kit ZIP** | R analysis with the `qmethod` package. | CSV + auto-generated R script. |
 | **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata + memos (methodology + analysis trail). |
 | **JSON dump** | Backups; bespoke pipelines. | Complete study + every participant placement. |
@@ -57,9 +57,9 @@ Configure the per-study quota under `postsort_config.audio.max_storage_mb` (see 
 
 ## Built-in analysis
 
-For PCA or centroid extraction with varimax rotation, you do not need to export at all — open **Study → Analysis** and run a factor analysis in the browser. Each run is persisted to the audit trail. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis).
+For PCA or centroid extraction with varimax or judgmental rotation, you do not need to export at all — open **Study → Analysis** and run a factor analysis in the browser. Judgmental (manual) rotation is built in: choose the **judgmental** rotation option and define the manual rotation pairs in the sub-panel. Each run is persisted to the audit trail. See the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis).
 
-Use exports when you need a tool that Qualis does not provide (manual / judgmental rotation, custom scripts, journal-required formats).
+Use exports when you need a tool that Qualis does not provide (custom scripts, journal-required formats).
 
 ---
 
@@ -68,10 +68,10 @@ Use exports when you need a tool that Qualis does not provide (manual / judgment
 Before exporting, audit responses to decide which to keep:
 
 1. **Grid reconstruction** — Clicking a participant opens a high-fidelity visual of their final Q-sort.
-2. **Quality flags** — Completion duration and device type are surfaced in the participant table; sort by either to spot anomalies.
+2. **Quality flags** — Completion duration is surfaced as a sortable column; device type is shown as an icon on each participant row. Sort by duration to spot anomalies.
 3. **Qualitative context** — Card comments and audio responses are shown alongside the grid.
 
-Mark problematic rows with **Discard** (a reason is required). Discarded rows are excluded from analysis and from the CSV / PQMethod / R-Kit / Package exports, but are preserved in the database for audit.
+Mark problematic rows with **Discard** (an optional reason can be recorded). Discarded rows are excluded from analysis and from the CSV / PQMethod / R-Kit / Package exports, but are preserved in the database for audit.
 
 ---
 

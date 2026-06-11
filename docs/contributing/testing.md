@@ -1,6 +1,6 @@
 # Testing Guide
 
-Qualis uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
+Qualis is tested at three levels: unit, integration, and end-to-end (E2E). We prioritize **automation** and **reliability** so the platform stays stable as it grows.
 
 ---
 
@@ -27,10 +27,13 @@ make test
 # Run full E2E suite (spins up its own environment)
 make e2e
 
-# Run Fast CI checks (Lint + Check + Test + Build) - Recommended before push
+# Run fast inner loop (lint + types + unit tests, ~30-90s)
+make ci-fast
+
+# Run full local CI (Lint + Check + Test + Build) - run before push
 make ci
 
-# Run Full CI checks (Fast CI + DB Reset + E2E)
+# Run Full CI checks (Full local CI + DB Reset + E2E)
 make ci-full
 ```
 
@@ -47,7 +50,7 @@ frontend/src/
 ├── components/             # Reusable components
 │   └── __tests__/          # (Optional) specific unit tests
 ├── integration/            # Integration tests (Page flows, complex interactions)
-│   ├── StudyFlow.test.tsx
+│   ├── StudyStateManagement.test.tsx
 │   └── ...
 ├── test-utils/             # Test utilities and providers
 │   ├── test-utils.tsx      # Main export
@@ -143,8 +146,8 @@ frontend/e2e/
 │   ├── test-data.ts        # Data builders (Studies, Participants)
 │   └── global-setup.ts     # Global environment config
 ├── integration/
-│   ├── admin-participant-consistency.spec.ts
-│   ├── study-happy-path.spec.ts
+│   ├── state-management.spec.ts
+│   ├── auth-email.spec.ts
 │   └── ...
 └── ...
 ```
@@ -192,8 +195,12 @@ cd backend && uv run pytest tests/
 ```
 backend/tests/
 ├── conftest.py             # Global fixtures (DB session, async client)
-├── test_api_study.py       # API Endpoint tests
-├── test_models.py          # SQLAlchemy Model logic
+├── test_admin_projects.py  # API Endpoint tests
+├── test_error_handling.py  # Error-handling tests
+├── unit/                   # Unit tests (bulk of the suite)
+├── integration/            # Integration tests
+├── security/               # Security tests
+├── property/               # Property-based tests
 └── ...
 ```
 
@@ -226,15 +233,15 @@ Runs automatically during `make ci`.
 
 The project uses GitHub Actions.
 
-| Workflow       | Trigger        | Description                                                       |
-| :------------- | :------------- | :---------------------------------------------------------------- |
-| **CI (Fast)**  | PRs, Push      | Runs Lint, Types, Unit/Integration Tests. Blocks merge if failed. |
-| **E2E (Slow)** | PRs (Frontend) | Runs full Playwright suite.                                       |
-| **Deploy**     | Push to `main` | Deploys to Scalingo.                                              |
+| Workflow       | Trigger                       | Description                                                                                                              |
+| :------------- | :---------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **Qualis CI**  | Push + PR to `main`/`develop` | Runs Lint, Types, Unit/Integration Tests **and** E2E (`e2e-study` + `e2e-admin` jobs). Blocks merge if failed.            |
+
+E2E is not a standalone workflow: it runs as the `e2e-study` and `e2e-admin` jobs inside the **Qualis CI** workflow (split into study and admin Playwright projects via `npm run test:e2e:study` / `npm run test:e2e:admin`, not a single full run). Deployment is not a GitHub Actions job — it is platform-driven (Scalingo) via the `Procfile` `postdeploy:` / `web:` phases.
 
 ### Deployment Verification
 
-After deployment, Scalingo runs a `release` phase defined in the `Procfile` that:
+After deployment, Scalingo runs a `postdeploy` phase defined in the `Procfile` that:
 
 1. Migrates the database (`python scripts/migrate.py` which calls `alembic upgrade head`).
-2. Ensures basic infrastructure is initialized (`python init_db.py`).
+2. Ensures basic infrastructure is initialized (`python init_db.py --skip-migrations` — migrations already ran in step 1).

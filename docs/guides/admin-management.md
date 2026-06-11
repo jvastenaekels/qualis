@@ -17,9 +17,9 @@ Researchers are strongly encouraged to enable Two-Factor Authentication (TOTP).
 
 Once enabled, login takes the password first, then the TOTP code. To disable, you must re-enter the current password.
 
-**2FA login channels.** After entering the password, the user can choose to receive the 2FA code via their authenticator app (TOTP) or by email (a 6-digit one-time code valid for 10 minutes, subject to a 30-second resend cooldown). The email channel requires SMTP to be configured; see [`deployment.md`](deployment.md#email-transport-auth-flows).
+**2FA login channels.** After entering the password, the user can choose to receive the 2FA code via their authenticator app (TOTP) or by email (a 6-digit one-time code valid for 5 minutes (default `TWOFA_EMAIL_OTP_EXPIRE_MINUTES`), subject to a 30-second resend cooldown). The email channel requires SMTP to be configured; see [`deployment.md`](deployment.md#email-transport-auth-flows).
 
-**Lost authenticator (self-serve recovery).** If a user loses access to their authenticator app, they can initiate a 2FA disable flow from the login screen. A time-limited link (15 minutes by default) is sent to their registered email address. Opening the link disables 2FA on the account without admin involvement. Admins cannot manually bypass 2FA or verify accounts through the admin UI — the flows are entirely email-driven.
+**Lost authenticator (self-serve recovery).** If a user loses access to their authenticator app, they can initiate a 2FA disable flow from the login screen. A time-limited link (15 minutes by default) is sent to their registered email address. Opening the link disables 2FA on the account without admin involvement. A platform superuser can also manually clear a user's TOTP from the admin Users page (`POST /api/admin/users/{id}/reset-totp`), removing their second factor; this does not bump `password_changed_at` or revoke existing sessions. Email *verification*, by contrast, remains email-only — admins cannot mark an email verified through the admin UI.
 
 ## Email verification
 
@@ -34,8 +34,8 @@ Project Owners can invite collaborators and set their role from **Project settin
 ### Invite
 
 1. Enter the collaborator's email.
-2. Choose a role (**Researcher** or **Viewer**).
-3. Click **Send Invitation**.
+2. Choose a role (**Member** or **Viewer**).
+3. Click **Create & send invitation**.
 
 Qualis generates a unique registration link. If SMTP is configured, the user receives an email; otherwise, the link is logged to stdout (visible in the deployment logs) and shown in the dashboard for manual sharing.
 
@@ -45,15 +45,17 @@ For an invited person already registered, the link grants project access immedia
 
 Project membership maps to study-level capability as follows:
 
-| Capability | Owner | Researcher | Viewer |
+| Capability | Owner | Member | Viewer |
 | ---------- | :---: | :--------: | :----: |
 | View configuration | ✓ | ✓ | ✓ |
-| Update text / translations (Active or Paused) | ✓ | ✓ | — |
+| Update text / translations (Draft only) | ✓ | ✓ | — |
 | Update structure (Draft only) | ✓ | ✓ | — |
 | Change study state | ✓ | ✓ | — |
 | Export study data | ✓ | ✓ | — |
 | Manage project members | ✓ | — | — |
-| Delete study | ✓ | — | — |
+| Delete study [^delete] | ✓ | — | — |
+
+[^delete]: Requires study Owner role **and** platform superuser, and the study must already be **Archived**.
 
 Project Owners automatically have Owner-level access on every study in their project. Project deletion (separate from study deletion) is also Owner-only and requires the project to contain no studies.
 
@@ -68,9 +70,9 @@ Studies progress through five states. The full transition rules are in [`../refe
 | State | Public access | Editing |
 | ----- | ------------- | ------- |
 | Draft | None | Full structural editing. |
-| Active | Open via recruitment links | Translations and metadata only. Grid + statements are locked. |
-| Paused | Suspended | Same as Active. Use to fix a typo in a statement without taking the study down. |
+| Active | Open via recruitment links | Collection-window dates (start/end) only. Translations, grid, and statements are locked — switch back to Draft to edit them. |
+| Paused | Suspended | Same as Active. |
 | Closed | Revoked | Same as Active. Exports remain available. |
 | Archived | Revoked | None. Long-term storage; hidden from the active list. |
 
-Use **Paused** rather than **Closed** if you need to fix a typo while the study is live. Use **Closed** when data collection is definitively over.
+Use **Paused** rather than **Closed** to temporarily suspend public access without ending the study. Fixing a typo in a statement is not possible from Paused — switch the study back to **Draft** to edit statements or translations, then re-activate. Use **Closed** when data collection is definitively over.

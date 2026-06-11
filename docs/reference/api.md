@@ -159,17 +159,16 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | Method | Path | Min role | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
 | GET | `/api/admin/{parent}/{id}/memo` | Viewer | — | Full memo (entries with comment threads) for a study or concourse |
-| GET | `/api/admin/{parent}/{id}/memo/entries` | Viewer | — | List entries only (no comment payloads) |
-| POST | `/api/admin/{parent}/{id}/memo/entries` | Editor | 30/min | Create a new memo entry |
+| POST | `/api/admin/{parent}/{id}/memo/entries` | Editor | 60/min | Create a new memo entry |
 | GET | `/api/admin/{parent}/{id}/memo/unread` | Viewer | — | Unread-mention count for the current user |
-| PATCH | `/api/admin/memo-entries/{eid}` | Editor | 30/min | Update entry title, body, or position |
-| DELETE | `/api/admin/memo-entries/{eid}` | Editor | 30/min | Delete an entry (cascades to comments) |
+| PATCH | `/api/admin/memo-entries/{eid}` | Editor | 60/min | Update entry title, body, or position |
+| DELETE | `/api/admin/memo-entries/{eid}` | Editor | 60/min | Delete an entry (cascades to comments) |
 | GET | `/api/admin/memo-entries/{eid}/comments` | Viewer | — | List comments on an entry |
 | POST | `/api/admin/memo-entries/{eid}/comments` | Editor | 60/min | Post a comment with optional `mentions: int[]` |
-| PATCH | `/api/admin/memo-comments/{cid}` | author | 30/min | Edit a comment body |
-| DELETE | `/api/admin/memo-comments/{cid}` | author | 30/min | Soft-delete a comment |
-| POST | `/api/admin/memo-comments/{cid}/resolve` | Editor | 30/min | Mark a comment as resolved |
-| POST | `/api/admin/memo-comments/{cid}/unresolve` | Editor | 30/min | Reopen a resolved comment |
+| PATCH | `/api/admin/memo-comments/{cid}` | author | 60/min | Edit a comment body |
+| DELETE | `/api/admin/memo-comments/{cid}` | author | 60/min | Soft-delete a comment |
+| POST | `/api/admin/memo-comments/{cid}/resolve` | Editor | 60/min | Mark a comment as resolved |
+| POST | `/api/admin/memo-comments/{cid}/unresolve` | Editor | 60/min | Reopen a resolved comment |
 | GET | `/api/admin/memo/templates` | Viewer | — | Preconfigured templates (e.g. methodology memo) |
 
 ### Admin — lifecycle (`/api/admin/studies/{slug}`)
@@ -184,7 +183,7 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | Method | Path | Min role | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
 | GET | `.../export/csv` | Editor | 10/min | Wide-format CSV (one row per non-discarded participant) |
-| GET | `.../export/pqmethod` | Editor | 10/min | PQMethod ZIP (`.dat` + `.sta`); completed participants only |
+| GET | `.../export/pqmethod` | Editor | 10/min | PQMethod ZIP (`.dat` + `.sta` + `.ans`); completed participants only |
 | GET | `.../export/r-kit` | Editor | 10/min | R-Kit ZIP (CSV + auto-generated `qmethod` script) |
 | GET | `.../export/package` | Editor | 10/min | Research package ZIP (CSV + JSON + codebook + metadata) |
 | GET | `.../export/config` | Viewer | — | Study configuration only (no participant data) |
@@ -261,8 +260,9 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | Method | Path | Auth | Rate limit | Purpose |
 | --- | --- | --- | --- | --- |
 | GET | `/api/admin/users` | superuser | — | List system users |
-| POST | `/api/admin/users` | superuser | 30/min | Create a system user |
 | DELETE | `/api/admin/users/{user_id}` | superuser | 30/min | Delete a user (cannot self-delete) |
+
+Users are not created from this collection; they self-register via `POST /api/register`.
 
 ---
 
@@ -339,8 +339,8 @@ All errors follow a single JSON schema:
 
 ```json
 {
-  "code": 422,
-  "message": "Validation Error",
+  "code": "validation_error",
+  "message": "Validation failed for the request.",
   "details": [
     {
       "loc": ["body", "qsort", 0, "grid_score"],
@@ -353,7 +353,7 @@ All errors follow a single JSON schema:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `code` | integer | HTTP status code |
+| `code` | string | Stable machine-readable error identifier (e.g. `validation_error`, `resource_not_found`) |
 | `message` | string | Human-readable summary |
 | `details` | array \| null | Validation entries (Pydantic) or conflict info |
 
@@ -378,9 +378,10 @@ Sent on every response by the security middleware:
 
 | Header | Value |
 | --- | --- |
-| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` |
-| `Content-Security-Policy` | Restricts sources; allows the configured S3 endpoint for audio |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` |
+| `Content-Security-Policy` | `default-src 'self'`; `script-src 'self'`; `style-src` allows `'unsafe-inline'` + Google Fonts; `img-src`/`connect-src`/`font-src` allow `https:`; `media-src 'self' blob:` plus the configured `S3_ENDPOINT_URL` (presigned-audio playback); `frame-ancestors 'none'`; `upgrade-insecure-requests` |
 | `X-Frame-Options` | `DENY` |
 | `X-Content-Type-Options` | `nosniff` |
+| `X-XSS-Protection` | `1; mode=block` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `Permissions-Policy` | Restricts camera; allows microphone (self) |
+| `Permissions-Policy` | `camera=(), microphone=(self), geolocation=(), interest-cohort=()` |

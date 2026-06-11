@@ -40,8 +40,8 @@ banner exist so the operator is never surprised by this.
 
 ## What the operator sees
 
-- A startup log line: *"Object storage (S3) is not configured — Qualis
-  runs in STORAGE-OPTIONAL mode"* followed by the consequences and the
+- A startup log line: *"Object storage is not configured. Qualis is
+  running in storage-optional mode."* followed by the consequences and the
   exact environment variables to set.
 - In the study designer, under the audio toggle: a notice that audio
   responses will not be collected on this server.

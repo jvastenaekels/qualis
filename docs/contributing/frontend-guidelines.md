@@ -17,7 +17,9 @@ Pages and complex components delegate state-and-effect logic to a colocated hook
 
 **Trigger:** if a component body grows past ~100 LOC of non-JSX logic, extract a hook before adding more.
 
-**JSX shell complexity:** when a page is mostly large declarative JSX (multiple GuidanceCard panels, tabbed UI, modals), the `noExcessiveCognitiveComplexity` rule fires on the JSX shell itself. Add `// biome-ignore lint/complexity/noExcessiveCognitiveComplexity` on the page component as the documented exception (precedent: AnalysisPage, StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Never suppress inside the hook.
+**JSX shell complexity:** when a page is mostly large declarative JSX (multiple GuidanceCard panels, tabbed UI, modals), the `noExcessiveCognitiveComplexity` rule fires on the JSX shell itself. Add `// biome-ignore lint/complexity/noExcessiveCognitiveComplexity` on the page component as the documented exception (precedent: StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Never suppress inside the hook.
+
+> A page can also avoid the suppression by splitting its body into sub-component shells (precedent: AnalysisPage decomposes into `ExploreShell` / `InterpretShell`).
 
 For the canonical list of pages already converted and the conventions around them, see the "Hook-driven components" section in [`CLAUDE.md`](../../CLAUDE.md).
 
@@ -41,7 +43,7 @@ The frontend never hand-writes `fetch` or `axios` calls. Use the Orval-generated
 
 1. Update the backend Pydantic schema or router.
 2. Run `make generate-api`.
-3. Use the regenerated hook (e.g. `useGetStudyQuery`).
+3. Use the regenerated hook (e.g. `useGetStudyApiAdminStudiesSlugGet`, named from the full operationId).
 4. Commit the regenerated `frontend/src/api/generated.ts`.
 
 CI runs `make check-api` and fails if the committed client is out of sync with the backend.
