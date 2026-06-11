@@ -12,6 +12,13 @@ indeterminate in factor analysis), and asserts:
 No R is required: the reference is the committed
 ``qmethod_reference.json`` (regenerate it with ``qmethod_reference.R``).
 
+This script is the **live-API twin** of
+``backend/tests/integration/test_lipset_validation.py``, which enforces the
+same ``1e-4`` bound and factor partition **offline in CI** (calling the
+pipeline directly, no Docker/API). Keep ``LOADING_TOL`` below in lockstep with
+that test. Use this script to confirm the numbers also survive the full
+deployed request path.
+
 Prerequisites (a reviewer runs):
 
     make demo-up

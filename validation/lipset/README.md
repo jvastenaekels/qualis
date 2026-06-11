@@ -7,13 +7,37 @@ reference** rather than to its own output. Qualis must reproduce the
 which is redistributed with the [`qmethod`](https://cran.r-project.org/package=qmethod)
 R package (Zabala 2014) under GPL-2-or-later.
 
+The frozen oracle covers **two extractions** — PCA and Brown's centroid,
+both varimax-rotated and auto-flagged — and, for each, benchmarks not just
+rotated loadings but **z-scores, factor arrays, and the flag matrix** (plus
+per-factor reliability / SE / eigenvalue for PCA). This anchors the
+statistics researchers actually interpret, and externally validates the
+classical centroid method the engine advertises.
+
 ## Files
 
 | File | Role |
 | --- | --- |
-| `qmethod_reference.json` | Frozen reference: rotated loadings + automatic flags from `qmethod` 1.8.4. |
-| `qmethod_reference.R` | Regenerates the reference from `qmethod` itself (chain-of-custody). |
-| `compare.py` | Runs Qualis' analysis via the API, aligns factors, asserts the match. Pure stdlib, **no R needed**. |
+| `qmethod_reference.json` | Frozen reference (schema 2): PCA **and** centroid solutions — loadings, auto-flags, z-scores, factor arrays; PCA also reliability/SE/eigenvalue. From `qmethod` 1.8.4. |
+| `qmethod_reference.R` | Regenerates the reference from `qmethod` itself (chain-of-custody). Requires `qmethod` + `jsonlite`. |
+| `compare.py` | Runs Qualis' analysis via the **live API**, aligns factors, asserts loadings + partition. Pure stdlib, **no R needed**. |
+| `backend/tests/integration/test_lipset_validation.py` | The full oracle enforced **offline in CI** — calls the analysis pipeline directly, no Docker/API. |
+
+## Continuous enforcement (CI)
+
+The equivalence is **regression-guarded on every commit**:
+`backend/tests/integration/test_lipset_validation.py` runs in the standard
+`pytest tests` job (`make ci` / GitHub Actions) and, **offline**, calls
+`run_analysis()` on the committed Q-sort matrix and compares to the frozen
+`qmethod_reference.json`. For **both** PCA and centroid it asserts rotated
+loadings, z-scores, factor arrays and the auto-flag matrix; for PCA it also
+asserts per-factor reliability, SE of factor scores, and eigenvalues. Bounds:
+`1e-4` for PCA loadings/z-scores (eigendecomposition is exact), `2e-4` for
+centroid (iterative extraction), exact for factor arrays and flags.
+
+`compare.py` remains the **live-API twin** (loadings + partition), run on
+demand to confirm the same numbers survive the full deployed request path
+(serialisation, persisted `AnalysisRun`, DB round-trip).
 
 ## Reproduce (no R required)
 
@@ -33,14 +57,20 @@ indeterminate), and asserts:
 
 Exit code `0` = passed, `1` = failed.
 
-## Regenerate the reference (requires R + qmethod)
+## Regenerate the reference (requires R + qmethod + jsonlite)
 
 ```bash
 Rscript validation/lipset/qmethod_reference.R
 ```
 
-The committed `qmethod_reference.json` was produced with `qmethod`
-1.8.4 (call: `qmethod(lipset[[1]], nfactors=3, rotation="varimax",
-forced=TRUE)`). Last verified: Qualis reproduces it with an identical
-nine-sort factor assignment and a maximum loading difference of
-`0.0001`.
+The script writes `qmethod_reference.json` verbatim from two `qmethod` calls
+on its own bundled `lipset` dataset:
+
+- `qmethod(lipset[[1]], nfactors=3, extraction="PCA",      rotation="varimax", forced=TRUE)`
+- `qmethod(lipset[[1]], nfactors=3, extraction="centroid", rotation="varimax", forced=TRUE)`
+
+The committed reference was produced with `qmethod` 1.8.4. Last verified,
+Qualis reproduces it with: identical nine-sort flag matrices and factor
+arrays for both extractions; PCA loadings/z-scores within `6.5e-5`/`5.0e-5`;
+centroid loadings/z-scores within `1.1e-4`/`1.3e-4`; reliability/SE within
+`1e-7`.
