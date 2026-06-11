@@ -27,7 +27,7 @@
 | **Researcher members** of the operator institution | Authorised users of the controller | Per-project access via `ProjectMember.role`. Subject to the operator's internal access policy. |
 
 **Key consequence.** No traffic flows through any Qualis-maintainer-operated
-endpoint at request time (`SECURITY.md:46`). The maintainers cannot subpoena
+endpoint at request time (`SECURITY.md:54`). The maintainers cannot subpoena
 or intercept participant data because they never see it. This is not a
 contractual claim — it is a property of the self-hosted-by-design architecture.
 
@@ -196,8 +196,8 @@ Today there is no participant-facing self-export. Operator path:
 2. Verify the participant's identity out-of-band.
 3. Identify the participant row (resume code, recruitment email, or session token).
 4. Use the admin per-participant export endpoint:
-   `GET /api/admin/studies/{slug}/participants/{id}/export.json`
-   (`backend/app/routers/admin/exports.py:175-256`) — admin auth required.
+   `GET /api/admin/studies/{slug}/participants/{id}/export/json`
+   (`backend/app/routers/admin/exports.py:237-289`) — admin auth required.
    Available formats: JSON (the canonical machine-readable form for Art. 15
    portability), CSV.
 5. Send the exported document to the participant. Strip researcher annotations
@@ -226,9 +226,11 @@ Qualis offers two paths; both call the same service
 
 - **Participant self-service:**
   `DELETE /api/study/{slug}/personal-data?session_token=…`
-  (`backend/app/routers/participants.py:216-264`).
+  (`backend/app/routers/participants.py:286-352`).
   Bound to the participant's `session_token`; the participant exercises this
-  via the resume page (no admin involvement). Audit row emitted with
+  via the `EraseMyDataDialog` control on the post-sort feedback page (no admin
+  involvement). A submitted participant who follows a resume link is redirected
+  to that post-sort page, where the control appears. Audit row emitted with
   `mode=participant_self` (F-05-008).
 - **Admin-mediated:**
   `DELETE /api/admin/studies/{slug}/participants/{participant_id}/personal-data`
@@ -319,7 +321,7 @@ ships no NER. **The screening before publication or sharing is the
 operator's job.** Recommended workflow:
 
 1. Before any export or publication, run the per-study CSV export
-   (`/api/admin/studies/{slug}/exports/full`) and review the
+   (`/api/admin/studies/{slug}/export/csv`) and review the
    `card_comment` column manually.
 2. For sensitive studies, apply quote-screening at study-design time: the
    default `consent_description` already says "comments may be quoted to
@@ -363,7 +365,7 @@ Eight per-deployment actions Qualis cannot do for you:
    periodic job that lists `audio/<prefix>/...` keys and deletes any whose
    prefix does not appear in `audio_recordings.s3_key`. Cadence: monthly is
    reasonable; the bucket is small (≤100 MB per study by default,
-   `backend/app/routers/audio.py:71`). F-05-005 is documented as
+   `backend/app/routers/audio.py:91`). F-05-005 is documented as
    operator-side.
 6. **Schedule `cleanup_consumed_email_tokens.py`** (F-03-003). The script
    exists at `backend/scripts/cleanup_consumed_email_tokens.py` and deletes
@@ -410,7 +412,7 @@ practices".
 | **Integrity** | Art. 32(1)(b) | Access-token revocation on password change (`iat` claim + `password_changed_at`, F-03-010); email-change dual-confirmation (F-03-011); CSP `script-src 'self'`; DOMPurify on user-submitted HTML; `frame-ancestors 'none'`. | Trust the password-change flow; do not weaken CSP. |
 | **Availability** | Art. 32(1)(b) | Application-level rate limits (slowapi) bound DoS at credential-grade endpoints (F-06-001); per-study `max_storage_mb` quota; per-file `AUDIO_MAX_FILE_SIZE_MB` cap. | Backup strategy (DB dumps, S3 versioning); capacity planning; CDN/edge protection. (Operator infra; out of audit scope.) |
 | **Resilience** | Art. 32(1)(b) | Stateless backend; idempotent submit (F-06-006); fail-open S3 anonymisation (legal erasure not blocked by infra outage). | Multi-replica deployment; failover plan. |
-| **Regular testing** | Art. 32(1)(d) | `security-scans.yml` CI workflow (gitleaks + pip-audit + npm-audit + semgrep + logger-URL lint, Wave 6); 95-case IDOR harness (F-04-001); 14-test log-scrub regression (F-03-013); Dependabot weekly; this audit (Waves 1-7). | Annual external pen-test; review SECURITY.md disclosure inbox. |
+| **Regular testing** | Art. 32(1)(d) | `security-scans.yml` CI workflow (gitleaks + pip-audit + npm-audit + semgrep + logger-URL lint, Wave 6); 95-case IDOR harness (F-04-001); 15-test log-scrub regression (F-03-013); Dependabot weekly; this audit (Waves 1-7). | Annual external pen-test; review SECURITY.md disclosure inbox. |
 | **Container hardening** | Art. 32(1)(b) | Backend `Dockerfile` runs as non-root `app` user (F-02-006); nginx host-allowlist (F-02-007). | Container-host kernel patching; rootless runtime if available. |
 | **Supply chain** | Art. 32(1)(b) | GitHub Actions third-party SHA-pinned (Wave 6); direct-pin floors for CVE-fixed transitives (`pygments`, `python-dotenv`, `requests`); pip-audit + npm-audit gates. | Review Dependabot PRs weekly; subscribe to GitHub security advisories. |
 | **Audit logging** | Art. 32(1)(b), Art. 5(2) accountability | `app.audit` structured rows for every state-mutating admin path; lifecycle audit (F-05-008) covers anonymise / erase / discard / bulk_anonymise / participant self-erase. | Route `app.audit` to tamper-evident sink (file-with-rotation-and-hash or SIEM). |
@@ -776,7 +778,7 @@ Each section traces back to the audit material that produced it:
 | §2 Data flows | `05-consent-anonymisation.md` §"Data lifecycle map"; `08-threat-model.md` §3. |
 | §3 Personal-data inventory | `05-consent-anonymisation.md` §"GDPR-memo material" (a). |
 | §4 Lawful-basis menu | New (this memo); cites Member-State law. |
-| §5 Subject-rights playbook | `05-consent-anonymisation.md` Findings F-05-001, F-05-007, F-05-008, F-05-009; `backend/app/routers/admin/exports.py:175-256`; `backend/app/routers/participants.py:216-264`; `backend/app/routers/admin/lifecycle.py:253-316`. |
+| §5 Subject-rights playbook | `05-consent-anonymisation.md` Findings F-05-001, F-05-007, F-05-008, F-05-009; `backend/app/routers/admin/exports.py:237-289`; `backend/app/routers/participants.py:286-352`; `backend/app/routers/admin/lifecycle.py:253-316`. |
 | §6 Retention / anonymisation | `05-consent-anonymisation.md` §"GDPR-memo material" (b)+(c); `99-action-backlog.md` Wave 4 (F-05-001/002/003/004/005/008/010); `backend/app/services/study_data_service.py:73-160`. |
 | §7 Art. 32 checklist | `08-threat-model.md`; `SECURITY.md`; `07-supply-chain.md` Wave 6 deliverables; cumulative findings in `99-action-backlog.md`. |
 | §8 Breach notification | `SECURITY.md` "Reporting a vulnerability"; `08-threat-model.md` §4 STRIDE per boundary; F-05-008 lifecycle audit. |

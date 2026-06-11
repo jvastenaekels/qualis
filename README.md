@@ -16,7 +16,7 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 
 ## Statement of need
 
-Q-methodology, introduced by Stephenson (1953) as a way of studying subjectivity through rank-ordered statements, is used across the social sciences and in applied fields including health, sustainability, education, and public policy. A growing share of recent work draws on critical research traditions that foreground reflexivity, transparency of analytical choices, the situatedness of subjectivities, and the integration of participant voice into interpretation (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
+Q-methodology, introduced by Stephenson (1953) as a way of studying subjectivity through rank-ordered statements, is used across the social sciences and in applied fields including health, sustainability, education, and public policy. A growing share of recent work extends a reflexive tradition that foregrounds transparency of analytical choices, reflexivity, and the integration of participant voice into interpretation (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
 The studies this orientation invites tend to share a few practical needs:
 
@@ -27,11 +27,13 @@ The studies this orientation invites tend to share a few practical needs:
 - keeping what participants say about their sort attached to the analysis;
 - making the analytical choices open to discussion and revision by a research team.
 
-Qualis covers the full workflow in a single self-hosted browser application with a modern, user-friendly interface: a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; and export to PQMethod, R, and Ken-Q formats.
+Existing tools cover parts of this workflow well — browser-based collection, desktop factor analysis, format conversion — but they sit in separate systems. Design, collection, analysis, interpretation, privacy operations, and export end up scattered across tools, and the research record has to be reassembled at each import and export boundary, where the audit trail can weaken.
+
+Qualis's central design claim is **continuity**: statements, translations, recruitment links, Q-sorts, participant responses, analytical memos, consent and withdrawal events, and export files stay linked as research objects in one self-hosted project, rather than moving between separate tools. The platform implements this through a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; collaborative interpretation; and export to PQMethod, R, and Ken-Q formats. Researchers can use Qualis as a data-collection frontend feeding their preferred analysis tool, or as a complete platform — the export bridges to established Q-analytic tools stay open either way.
 
 The choices behind each analytical step are visible and adjustable. Multiple researchers can work on the same project, with collaborative memos for analytical reflexivity, optional audio post-sorts that travel with the analysis, and a voices panel that keeps participant material adjacent to factor interpretation.
 
-Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
+Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to support the GDPR-aware consent, withdrawal, and data-residency practices common in European Q research. These are technical safeguards and operational paths; compliance remains a matter for each institution's own ethics and legal process.
 
 ---
 
@@ -68,7 +70,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 ### Study design
 
 - **Visual grid designer** with symmetry lock, capacity validation, and configurable score ranges.
-- **Survey builder** with 9 question types (text, number, select, radio, checkbox, date, email, textarea, audio), conditional visibility, reordering, and per-question validation.
+- **Survey builder** with 10 question types (text, long text, number, date, email, audio, dropdown, radio, checkboxes, rating), conditional visibility, reordering, and per-question validation.
 - **Markdown-formatted content** for instructions, consent forms, and condition of instruction.
 - **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
 - **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study, since not every protocol uses it.
@@ -78,7 +80,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 
 A reusable pool of candidate statements that lives at the project level, not the study level. Researchers can curate the concourse over time, draw on it across multiple studies, and keep the curatorial trail attached to the data.
 
-- **Project-scoped statement pool** with status workflow (proposed, kept, dropped) so the team can see what was considered and what was excluded.
+- **Project-scoped statement pool** with status workflow (proposed, accepted, rejected) so the team can see what was considered and what was excluded.
 - **Per-item provenance**: source citation, multilingual translations, free-form tags, and an editable code.
 - **Version history** on each statement so revisions are traceable.
 - **Item-level comments** for team discussion of curatorial choices, alongside concourse-level memos that travel with exports for replication and pre-registration packages.
@@ -87,7 +89,7 @@ A reusable pool of candidate statements that lives at the project level, not the
 ### Analysis
 
 - **Built-in factor analysis** for initial exploration without exporting to external software.
-- **PCA or Centroid extraction** (Brown 1980) with Varimax rotation and Kaiser normalization.
+- **PCA or Centroid extraction** (Brown 1980) with Varimax or judgmental (manual) rotation and Kaiser normalization.
 - **Scree plot** with Kaiser criterion reference line for factor selection.
 - **Auto-flagging** using significance and dominance thresholds, or manual flagging for full researcher control.
 - **Distinguishing and consensus statements** classified via Standard Error of Differences at multiple significance levels (p < 0.05, 0.01, 0.001).
@@ -147,7 +149,7 @@ make demo-seed
 make demo-smoke
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and log in with:
+Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
 | Field | Value |
 | ----- | ----- |
@@ -270,10 +272,10 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 **Author contributions:**
 
-- **Julien Vastenaekels** (Université de Reims Champagne-Ardenne): software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology.
-- **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology. No direct code contribution.
+- **Julien Vastenaekels** (Université de Reims Champagne-Ardenne): software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's methodological positioning across Q-methodology traditions.
+- **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's methodological positioning across Q-methodology traditions. No direct code contribution.
 
-**Methodological inspiration:** Qualis aims to be useful across Q-methodology traditions — from classical Brown-school analysis to more interpretive and critical orientations. The platform's design is informed in particular by readings of Stephenson (1953), Brown (1980), McKeown & Thomas (1988/2013), Watts & Stenner (2012), and, on the reflexive and participant-voice side, Stainton Rogers (1997), Stenner (2011), and Sneegas (2020). These works are inspirations rather than endorsements; the responsibility for any given design choice rests with Qualis.
+**Methodological inspiration:** Qualis aims to be useful across Q-methodology traditions — from classical Brown-school analysis to more interpretive and reflexive orientations. The platform's design is informed in particular by readings of Stephenson (1953), Brown (1980), McKeown & Thomas (1988/2013), Watts & Stenner (2012), and, on the reflexive and participant-voice side, Stainton Rogers (1997), Stenner (2011), and Sneegas (2020). These works are inspirations rather than endorsements; the responsibility for any given design choice rests with Qualis.
 
 **Open-source dependencies:** Qualis builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
 

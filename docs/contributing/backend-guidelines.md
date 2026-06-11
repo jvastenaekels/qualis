@@ -1,6 +1,6 @@
 # Backend Architectural Guidelines
 
-This document outlines the architectural patterns and best practices for the Qualis backend (FastAPI), ensuring consistency, maintainability, and scalability.
+This document describes the architectural patterns and conventions for the Qualis backend (FastAPI).
 
 ## 1. High-Level Architecture
 
@@ -23,7 +23,7 @@ graph TD
 2.  **Service Layer (`app/services/`)**:
     *   **Responsibility**: Business logic, domain rules, validation beyond structure, and orchestration.
     *   **Rule**: Services accept Pydantic Schemas or primitives, and interact with SQLAlchemy Models. They should catch DB errors and raise application-specific exceptions if needed (or let global handlers catch them).
-    *   **Dependency Injection**: Services are typically injected into Routers via `Depends()`.
+    *   **Dependency Injection**: Services are stateless classes of `@staticmethod` async methods; routers call them directly (e.g. `StudyService.create_study(db, ...)`). `Depends()` is reserved for `get_db`, `get_current_user`, and the project/study role-guard factories — not services.
 
 3.  **Data Layer (`app/models/`)**:
     *   **Responsibility**: Database schema definitions (SQLAlchemy), grouped by subdomain (`user`, `project`, `study`, `participant`, `recruitment`, `concourse`, `analysis`).
@@ -37,8 +37,8 @@ graph TD
 
 ```text
 backend/app/
-├── core/           # Config, security, exceptions
-├── middleware/     # Global middleware (CORS, error handling)
+├── core/           # Config (config.py); security lives in utils/, exceptions in app/exceptions.py
+├── middleware/     # Global middleware (error handling, security headers, SPA, log scrubbing)
 ├── routers/        # HTTP endpoints (admin/, auth.py, etc.)
 ├── schemas/        # Pydantic models, one module per subdomain
 ├── models/         # SQLAlchemy models, one module per subdomain
@@ -56,15 +56,19 @@ Most modules in `app/` are under `mypy --strict` via `[[tool.mypy.overrides]]` i
 
 ## 3.1 JWT families and claim isolation
 
-Qualis uses three JWT families, all signed with `SECRET_KEY` but isolated by a strict `purpose` claim:
+Qualis uses three JWT families, all signed with `SECRET_KEY`. They are distinguished by **different mechanisms** — there is no single shared `purpose` claim: the access family carries no discriminator, the invitation family uses a `type` claim, and only the email-flow family uses a `purpose` claim.
 
-| Family | `purpose` claim | Usage |
-| ------ | --------------- | ----- |
-| **Access** | `access` | Standard bearer token issued at login; carries `sub` (user id) and role. |
-| **Invitation** | `invitation` | Single-use project-invitation link; carries `email` + `project_id`. |
-| **Email-flow** | `email-verification` / `password-reset` / `2fa-disable` | Time-limited tokens for auth email flows; each carries a `jti` that is consumed once. |
+| Family | Discriminator | Usage |
+| ------ | ------------- | ----- |
+| **Access** | (none) | Standard bearer token issued at login; carries `sub` (the user's email) plus `iat`/`exp`. No role claim — authorization is resolved server-side from the User and ProjectMember records. |
+| **Invitation** | `type` = `invitation` | Project- or study-scoped invitation link (7-day expiry); carries the invitee email in `sub`, `role`, and optionally `project_id` or `study_id`. Not single-use — there is no jti/denylist; the link is replayable until it expires. |
+| **Email-flow** | `purpose` = `email_verify` / `password_reset` / `twofa_disable` / `email_change_confirm` / `email_change_cancel` | Time-limited tokens for auth email flows; every token carries a `jti`, but single-use enforcement varies by purpose (see below). |
 
-`app.utils.security.decode_token(token, expected_purpose=...)` enforces the purpose check before returning claims. Passing a token from one family to an endpoint that expects another raises `InvalidTokenError`, so a stolen password-reset link cannot be replayed as an access token even though both are signed with the same key. The 2FA-disable JTI is additionally stored in the `consumed_email_tokens` table to prevent replay of the same link twice.
+`decode_email_token(token, expected_purpose=...)` enforces the purpose check (raising `ValueError` on mismatch). Access and invitation tokens use separate decoders — `decode_access_token` (no discriminator) and `decode_invitation_token` (checks the `type` claim, raising `jwt.InvalidTokenError`).
+
+Cross-family misuse is rejected, but the error type differs: invitation-token misuse raises `jwt.InvalidTokenError`, email-flow purpose mismatch raises `ValueError`. The access decoder does no purpose check — email-flow tokens are kept out of it via the `aud`/`iss` claims that `decode_email_token` validates, not via the access path.
+
+Single-use enforcement on email-flow tokens varies by purpose: only `twofa_disable` records its jti in the `consumed_email_tokens` table. `password_reset` instead uses the `pwa` (`password_changed_at`) claim as replay defense — a rotated password kills the token — and `email_verify` relies on idempotency.
 
 ## 4. Best Practices
 

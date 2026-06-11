@@ -16,7 +16,7 @@ Use the **Recruitment** page to generate access links and watch participation in
 | Individual | Single-use tokens for panel recruitment or longitudinal designs. |
 | Limited | Capped usage (e.g. 50 per cohort). |
 
-Each link exposes a QR code for printed materials. The funnel chart on the same page (Started / Submitted / Success Rate) is the fastest way to spot a drop-off — large gaps between Started and Submitted usually point at the welcome page, the consent text, or grid sizing.
+Each link exposes a QR code for printed materials. Each public link row shows live `started` and `submitted` counts in the links table; comparing them per link is the fastest way to spot a drop-off — large gaps between started and submitted usually point at the welcome page, the consent text, or grid sizing.
 
 ## Quality-control responses
 
@@ -43,7 +43,7 @@ The setting is reversible until activation. To switch modes on an active study, 
 
 ## Use memos as a design and analysis log
 
-Memos are short markdown notes attached to a study (or a concourse) and surfaced via the toolbar drawer on every admin page of that parent. Three suggested categories:
+Memos are short markdown notes attached to a study (or a concourse) and surfaced via the toolbar drawer on the study Design page and the Concourse Detail page (not on the study's other admin pages). Three suggested categories:
 
 - **Methodology memos** — rationale for the CoI, the distribution mode, the rough-sort toggle, the language(s) supported. Write these as you design, while the choices are still in front of you. They answer the reviewer questions you will get later ("why forced?", "why N=12?") and stop your future self from second-guessing what you already decided.
 - **Analysis memos** — notes on factor decisions during the refinement workflow: how many factors you retained, which manual flagging overrides you applied, why you dropped or split a particular factor. See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) once that tutorial lands.
@@ -63,9 +63,9 @@ Use the **Preview** action in the designer toolbar (pilot mode) to walk through 
 
 Studies move through Draft → Active → Paused → Closed → Archived. The constraints on each transition are documented in [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). The two transitions you will use most often are:
 
-- **Draft → Active.** Triggers server-side validation. Once Active, the grid and statements are read-only; translations and metadata stay editable.
+- **Draft → Active.** Triggers server-side validation. Once Active, the configuration (including the grid, statements, translations, and metadata) is read-only; only the collection-window dates (start/end date) can be changed. To edit translations or any other field you must switch the study back to Draft first.
 - **Active → Paused.** Suspends new submissions while you fix a typo in a statement or instruction, without taking the study down permanently.
 
 ## Where data lives
 
-Submissions persist as soon as a participant clicks Submit. Each submission gets a confirmation code shown to the participant. To retrieve the data, see the [Data Export guide](data-export.md). For the database schema (only relevant when running custom SQL on a self-hosted instance), see [`../explanation/architecture.md#data-model`](../explanation/architecture.md#data-model).
+Submissions persist as soon as a participant clicks Submit. Each submission gets a confirmation code shown to the participant. To retrieve the data, see the [Data Export guide](data-export.md). For the database schema (only relevant when running custom SQL on a self-hosted instance), see [`../explanation/architecture.md#database-schema`](../explanation/architecture.md#database-schema).

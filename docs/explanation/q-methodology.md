@@ -1,8 +1,8 @@
 # Q-methodology: a researcher's guide
 
-Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Qualis provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
+Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Qualis provides the digital infrastructure to conduct Q-studies online. It offers affordances for both **classical Brown-style analysis** (Stephenson 1953; Brown 1980) and the **reflexive practices** in the lineage of Stainton Rogers (1997), Stenner (2011), and Sneegas (2020) — without committing you to either school.
 
-If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Qualis"](#critical-q-methodology-in-qualis) below, which states what Qualis implements, what it defers, and why.
+If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Where Qualis sits"](#where-qualis-sits) below, which states what Qualis implements, what it keeps accessible to the analyst, and why.
 
 ---
 
@@ -93,7 +93,7 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
 
 The grid above is a *forced* distribution — every column must hold its declared capacity at submission. This is the Brown-school default and the one most published Q studies use, because the trade-offs participants commit to are what makes Q-sorts directly comparable across people.
 
-A *free* distribution drops the per-column constraint. Participants must still place every statement, but columns can absorb overflow. The slot counts are an upper hint rather than a rule. Critical-Q practitioners sometimes prefer this on the grounds that the forced shape imposes a structure on subjectivity rather than measuring it (Watts & Stenner 2012, ch. 4; Brown et al. 2015).
+A *free* distribution drops the per-column constraint. Participants must still place every statement, but columns can absorb overflow. The slot counts are an upper hint rather than a rule. Researchers in the reflexive tradition sometimes prefer this on the grounds that the forced shape imposes a structure on subjectivity rather than measuring it (Watts & Stenner 2012, ch. 4; Brown et al. 2015).
 
 Qualis also offers a *flexible* mode that keeps the total enforced but treats per-column capacities as soft hints with a designer warning — a compromise between forced and free.
 
@@ -131,38 +131,34 @@ For the JSON shape used to declare a Q-grid in Qualis, see the [Configuration re
 
 ## Two strands of Q
 
-Q-methodology has historically split into two strands, and the choice between them shapes how a study is designed, analysed, and written up. The next section explains where Qualis sits in that split. If you are encountering Q-methodology for the first time, the short version is: Qualis follows the **critical Q** tradition, which treats the researcher's analytical choices as themselves part of the result, rather than as neutral knobs.
+Q-methodology has historically split into two strands, and the choice between them shapes how a study is designed, analysed, and written up. The next section explains where Qualis sits relative to that split.
 
-### Critical Q-methodology in Qualis
+### Where Qualis sits
 
-**Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. **Critical Q** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
+**Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. The **reflexive tradition** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
 
-Qualis is designed for the critical strand. The platform supports classical workflows too (the underlying factor analysis is the same), but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
+Qualis provides affordances for **both** strands. Extraction, rotation, and export support conventional Brown-style analytical workflows; alongside them, provenance records, editable analysis runs, collaborative memos, and participant-response panels keep the interpretive material beside the factor tables. Qualis does not replace judgmental rotation or abductive factor interpretation — it keeps the relevant evidence and reasoning accessible while the analyst makes those choices. The features below are framed around the **reflexive needs** because that is where the design goes beyond what classical Q tools (PQMethod, qmethod-R, Ken-Q) directly target; none of them constrains a classical workflow.
 
 ### What this means in practice
 
-| Critical Q principle | How Qualis supports it |
-|----------------------|--------------------------|
+| Reflexive / transparency need | How Qualis supports it |
+|-------------------------------|--------------------------|
 | Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. |
 | Researcher control over flagging | Auto-flagging is a starting point. Flagging is exposed and editable per study, and researcher decisions are part of the audit trail. |
-| Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the critical Q practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
+| Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the reflexive practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
 | Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel. The constructed nature of the P-set is visible rather than implicit. |
-| Multilingual studies | Statements, instructions, consent text, and the participant UI can be translated. Critical Q research often crosses language and cultural boundaries; this should not require reverse-engineering the platform. |
+| Multilingual studies | Statements, instructions, consent text, and the participant UI can be translated. Cross-cultural and multi-site Q research often crosses language boundaries; this should not require reverse-engineering the platform. |
 | Self-hosted data residency | Qualis runs on the researcher's infrastructure; participant data does not transit through a third-party SaaS. Important for GDPR compliance, ethics committees, and the trust relationship with participants. |
 
 For the running list of implemented analytical features and their parameters, see the [Analysis section of the Admin Dashboard reference](../reference/admin-dashboard.md#analysis). For the comparison with PQMethod, qmethod-R, KADE, FlashQ/HTMLQ, and Ken-Q, see the capability table in the project [README](../../README.md#comparison-with-existing-tools).
 
-### Deliberate limitations
+### Rotation: automatic and judgmental
 
-These are scoped out of the v0.1 release with explicit rationale.
+Stainton Rogers (1997) and Watts & Stenner (2012) describe manual (judgmental) rotation as a moment where the researcher exercises explicit interpretive judgment. Qualis supports both **Varimax** (automatic) and **judgmental** rotation. A judgmental run applies a sequence of paired-factor rotations in order; the sequence is persisted with the analysis run, so the rotation path is part of the audit trail and can be documented in a methods section. Researchers who prefer to rotate elsewhere can still export the Q-sort matrix in PQMethod or R `qmethod` format, perform the rotation there, and bring the result back.
 
-**Manual (judgmental) rotation is not currently supported.** Stainton Rogers (1997) and Watts & Stenner (2012) cite manual rotation as a moment where the researcher exercises explicit interpretive judgment, so the omission is a real gap from a strict critical Q standpoint. The reasoning for deferring it to v0.2:
+### On the roadmap
 
-1. The mathematics is well-established, but exposing it in a usable interface (interactive loadings table, paired-factor angle controls, real-time recomputation) is a substantial UX undertaking we did not want to ship half-finished.
-2. With the AnalysisRun audit trail, researchers using varimax can fully document and justify their choice of rotation. This partially compensates for the lack of judgmental rotation.
-3. As a workaround for v0.1, researchers needing judgmental rotation can export their Q-sort matrix in PQMethod or R `qmethod` format, perform the rotation in those tools, and document the choice in their methods section.
-
-The gap is on the v0.2 plan.
+Some extensions remain on the roadmap rather than in the current release — for example image-based statements (building on existing visual Q practice) and post-study participant communication channels. These are planned to keep the same project, study, participant, and export boundaries.
 
 ---
 
@@ -174,7 +170,7 @@ The gap is on the v0.2 plan.
 - Brown, S. R. (1980). _Political Subjectivity: Applications of Q Methodology in Political Science_. Yale University Press.
 - Brown, S. R. (1993). A Primer on Q Methodology. _Operant Subjectivity_, 16(3/4), 91–138. https://doi.org/10.22488/okstate.93.100504
 
-### Critical Q-methodology
+### Reflexive and interpretive Q-methodology
 
 - Stainton Rogers, R. (1997). Q Methodology and "Going Critical": Some Reflections on the British Dialect. _Operant Subjectivity_, 21(1/2). https://doi.org/10.22488/okstate.97.100545
 - Robbins, P., & Krueger, R. (2000). Beyond Bias? The Promise and Limits of Q Method in Human Geography. _The Professional Geographer_, 52(4), 636–648. https://doi.org/10.1111/0033-0124.00252

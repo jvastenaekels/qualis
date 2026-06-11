@@ -38,7 +38,7 @@ The configuration card exposes four parameters:
 - **Rotation** — leave on **Varimax**.
 - **Flagging** — leave on **Auto**.
 
-Click **Run Analysis**. Processing takes a few seconds. Four result tabs appear: **Loadings**, **Factor Arrays**, **Statements**, **Characteristics**.
+Click **Commit and interpret**. Processing takes a few seconds. Four result tabs appear: **Loadings**, **Factor Arrays**, **Statements**, **Summary**.
 
 > The defaults you just used are the standard Q-methodology baseline (Brown 1980; Watts & Stenner 2012). When you are ready to vary them, see [`../explanation/q-methodology.md`](../explanation/q-methodology.md) for the trade-offs between PCA / centroid extraction, varimax / no rotation, and auto / manual flagging.
 
@@ -51,10 +51,10 @@ You see a table where each **row** is a participant and each **column** is a fac
 What to look for in a healthy result:
 
 - Cells exceeding the significance threshold are highlighted.
-- Some rows are **flagged** (starred): they load significantly on exactly one factor and "define" that factor.
+- Some rows are **flagged** (shown with an F1/F2 badge): they load significantly on exactly one factor and "define" that factor.
 - A clean structure shows most participants loading high on one factor and low on the others.
 
-If everything looks noisy and nothing is flagged, you almost certainly do not have enough participants yet. This is expected on a tutorial-sized dataset.
+If everything looks noisy and nothing is flagged, you probably do not have enough participants yet. This is expected on a tutorial-sized dataset.
 
 To override the auto-flagging, switch the **Flagging** control to **Manual** and click cells to flag them by hand.
 
@@ -80,7 +80,7 @@ When you are interpreting a real study, distinguishing statements are usually wh
 
 ---
 
-## Step 6: Characteristics tab
+## Step 6: Summary tab
 
 A summary card per factor:
 

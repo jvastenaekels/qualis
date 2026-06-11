@@ -17,7 +17,7 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **Time required:** ~30 minutes
 
-**Prerequisites:** A Qualis account with researcher-level access. If you are running Qualis locally, see the [Development Workflow guide](../contributing/development.md) first.
+**Prerequisites:** A Qualis account with Owner or Member access to a project (the roles that can create studies). If you are running Qualis locally, see the [Development Workflow guide](../contributing/development.md) first.
 
 ---
 
@@ -49,11 +49,11 @@ Qualis creates the study in **Draft** state and takes you to the **Study Designe
 
 - **General** 👋 — title, description, consent form
 - **Pre-sort** 📋 — pre-sorting questionnaire (demographics, eligibility)
-- **Condition** 🎯 — Condition of Instruction, plus the rough-sort toggle and post-sort defaults
+- **Condition** 🎯 — Condition of Instruction, plus the rough-sort toggle
 - **Q-sort** 🧩 — statements and the distribution grid (forced, free, or flexible)
 - **Post-sort** 💬 — post-sorting questionnaire
 - **Theme** 🎨 — logo, colors, partner logos
-- **Interface** ✨ — UI label customization and behavioral options
+- **Interface** ✨ — UI label and terminology customization
 
 ---
 
@@ -94,16 +94,16 @@ The General tab is where you define what participants see before they begin.
 
 Presort questions collect demographic or background information before participants begin sorting.
 
+> Each question's field key is assigned automatically and appears in the exported data; you choose the type, label, and options, but you do not enter a key in the UI.
+
 1. Click the **Pre-sort** tab.
 2. Click **Add Question** and configure the first question:
-   - **Field key:** `work_arrangement`
    - **Type:** Select (dropdown)
    - **Label:** `What is your current work arrangement?`
    - **Required:** Yes
    - **Options:** `Fully remote`, `Hybrid (some days remote, some in office)`, `Fully in-office`, `Freelance / Self-employed`
 
 3. Click **Add Question** for a second question:
-   - **Field key:** `experience_years`
    - **Type:** Select
    - **Label:** `How many years of professional experience do you have?`
    - **Required:** Yes
@@ -132,7 +132,7 @@ The Condition of Instruction tells participants the mental frame through which t
 > - **Avoid moral framings** (*"good vs bad"*, *"right vs wrong"*) unless that is exactly the question — they collapse subjectivity onto a single axis.
 > - **Pilot the CoI on three or four colleagues** and ask them to paraphrase it back. If three of them paraphrase differently, the CoI is ambiguous.
 >
-> Treat CoI design as a research decision worth documenting: the choice of frame shapes what you can discover, so record why you phrased it as you did. The Condition tab is also where the **rough-sort toggle** and the post-sort defaults live — see Step 8 for a discussion of when to enable rough-sort.
+> Treat CoI design as a research decision worth documenting: the choice of frame shapes what you can discover, so record why you phrased it as you did. The Condition tab is also where the **rough-sort toggle** lives — see Step 8 for a discussion of when to enable rough-sort.
 
 ---
 
@@ -180,6 +180,13 @@ The pyramid shape is intentional: it has more slots in the middle and fewer at t
 >
 > For this tutorial we use **forced** — the most common starting point and the cleanest pedagogical example. The mode lives on the Q-sort tab and is reversible until activation. For the formal field reference, see [`configuration.md`](../reference/configuration.md#distribution_mode).
 
+### 6c: Research Settings
+
+The Q-sort tab also has a **Research Settings** card with two behavioral toggles:
+
+- **Randomize statement order**: Recommended to reduce ordering bias.
+- **Show statement codes**: Useful for think-aloud protocols.
+
 Click **Save**.
 
 ---
@@ -187,7 +194,7 @@ Click **Save**.
 ## Step 7: Add Post-Sort Questions (Post-Sort Tab)
 
 1. Click the **Post-sort** tab.
-2. Enable the extreme column feedback (on by default). Participants will be asked to explain their choices for statements placed at -3 and +3.
+2. Click **Add defaults** to seed feedback prompts for the most extreme columns — Qualis uses the grid's lowest and highest scores, which here are -3 and +3. Extreme-column feedback is off until you add columns. Participants will then be asked to explain their choices for statements placed at -3 and +3.
 3. Optionally, add a custom question:
    - **Key:** `overall_thoughts`
    - **Type:** Textarea
@@ -215,8 +222,7 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 
 ### Interface tab
 
-- **Randomize statement order**: Recommended to reduce ordering bias.
-- **Show statement codes**: Useful for think-aloud protocols.
+Customize the navigation button labels, sorting terminology, methodology hints, and per-step help text that participants see.
 
 ---
 

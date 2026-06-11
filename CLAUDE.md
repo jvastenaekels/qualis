@@ -49,7 +49,7 @@ make migration-new    # Create a new Alembic migration
 
 ### General
 - No `any` in TypeScript — use `unknown` or specific types. Use `// biome-ignore` only when truly necessary.
-- No non-null assertions (`!`) — handle null values explicitly.
+- Avoid non-null assertions (`!`) — Biome warns on them (not a blocking error); handle null values explicitly.
 - Run `npm run lint:fix` (frontend) or `uv run ruff format` (backend) to auto-fix formatting.
 
 ### Strict-typed Python modules
@@ -79,7 +79,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.core.config` — pydantic-settings BaseSettings stubs
 - `app.middleware.security`, `app.middleware.errors`, `app.middleware.spa`
 - `app.database`, `app.schema_validation`
-- All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
+- `app.schemas.*` modules (11 modules: analysis, audio, auth, common, config, concourses, participants, projects, recruitment, studies, users) — Pydantic v2 BaseModel stubs. `app.schemas.memos` is in a separate relaxed block; `app.schemas.responses` is not yet under any override.
 - `app.models` (package) — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary; the override covers all sub-modules (user, project, study, participant, recruitment, concourse, analysis)
 - `app.dependencies` — wave 4: Callable[…, Coroutine[Any,Any,T]] factory deps; Coroutine yield/send are always Any
 - `app.routers.logs` — wave 4 batch 1: LogEntry.context is dict[str, Any] (open-ended frontend error data)
@@ -91,7 +91,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.submissions` — wave 4 batch 3: dict[str, Any] x2 for service-derived submission/study payloads
 - `app.routers.auth` — wave 4 batch 3: 8 return types; no casts needed (utils/security is fully strict)
 - `app.routers.admin.studies` — wave 4 batch 3: list[StaleStatementEntry] from concourse_service TypedDict
-- `app.routers.admin.concourses` — wave 4 batch 3: 15 return types (ORM models serialised via response_model)
+- `app.routers.admin.concourses` — wave 4 batch 3: 16 return types (ORM models serialised via response_model)
 - `app.routers.admin.exports` — wave 4 batch 3: StreamingResponse x6 + dict[str, Any] x2 for dump endpoints
 - `app.routers.admin.projects` — wave 4 batch 3: PaginatedResponse[ProjectWithRole|ProjectMemberRead] casts
 - `app.routers.admin.studies_import_export` — wave 4 batch 3: ValidationResult/StudyImportResponse + JSONResponse for export
@@ -126,8 +126,8 @@ Inside a strict module: every function declares its return type, no implicit `An
 ### Database Migrations (Alembic)
 - Generate: `make migration-new` (auto-generates from model changes)
 - **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
-- Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
-- Migration chain (23 migrations as of 2026-05-15, head `60af83267ba5`):
+- Migrations run automatically on deploy via the `Procfile` `postdeploy` process (`python scripts/postdeploy.py`), which invokes `scripts/migrate.py` (alembic upgrade) then `init_db.py --skip-migrations`
+- Migration chain (33 migrations as of 2026-06-11, head `60af83267ba5`):
   `initial_schema` → `rename_randomize_statements_to_randomize_statement_order`
   → `remove_consent_buttons` → `add_pre_instruction`
   → `add_is_test_run_to_participants` → `add_audio_recordings_table`
@@ -138,6 +138,11 @@ Inside a strict module: every function declares its return type, no implicit `An
   → `add_item_versions_and_comments` → `rename_workspace_to_project`
   → `add_analysis_runs_table` → `add_anonymised_at_to_participants`
   → `rename_workspace_indexes_to_project_add_is_discarded_index`
+  → `add_factor_notes_json` → `drop_participants_is_test_run`
+  → `add_construction_memo` → `add_distribution_mode`
+  → `add_manual_rotations` → `add_bootstrap`
+  → `add_methodology_memo` → `add_data_retention_months`
+  → `add_memo_entries` → `add_rough_sort_enabled`
   → `add_auth_email_flows` → `fix_password_changed_at_default`
   → `rename_researcher_to_member_and_owner_uniqueness`
   → `add_pending_email_column` → `add_last_login_at`
@@ -164,13 +169,13 @@ independently from JSX; the component file stays small and declarative.
   derived transforms (they must be passed to JSX elements), visual-only state
   (`cardDimensions`, `zoomLevel`, animation callbacks).
 
-**All six target pages converted (Phase 5 item G complete):**
+**All six target pages converted (Phase 5 item G complete).** Five map to a single named hook (useFineSort, useRoughSort, useStudyDesignPage, useRecruitmentPage, useConcourseDetailPage); the Analysis page is split across three phase hooks (useExplorePhase / useInterpretPhase / useInteractiveDataView):
 - `useFineSort` ← `FineSortPage` (hooks/participant/useFineSort.ts) — wave 1
 - `useRoughSort` ← `RoughSortPage` (hooks/participant/useRoughSort.ts) — wave 1
-- `useAnalysisPage` ← `AnalysisPage` (hooks/admin/useAnalysisPage.ts) — wave 2, 12 hook tests
-- `useStudyDesignPage` ← `StudyDesignPage` (hooks/admin/useStudyDesignPage.ts) — wave 3, 13 hook tests, 42-field API
-- `useRecruitmentPage` ← `RecruitmentPage` (hooks/admin/useRecruitmentPage.ts) — wave 4, 18 hook tests
-- `useConcourseDetailPage` ← `ConcourseDetailPage` (hooks/admin/useConcourseDetailPage.ts) — wave 5, 20 hook tests, 94-field API
+- `useExplorePhase` + `useInterpretPhase` + `useInteractiveDataView` ← `AnalysisPage` (hooks/admin/) — wave 2; the Analysis page is decomposed into three phase hooks rather than a single `useAnalysisPage` (useExplorePhase 31 tests, useInterpretPhase 24 tests, useInteractiveDataView 6 tests)
+- `useStudyDesignPage` ← `StudyDesignPage` (hooks/admin/useStudyDesignPage.ts) — wave 3, 13 hook tests, 44-field API
+- `useRecruitmentPage` ← `RecruitmentPage` (hooks/admin/useRecruitmentPage.ts) — wave 4, 19 hook tests
+- `useConcourseDetailPage` ← `ConcourseDetailPage` (hooks/admin/useConcourseDetailPage.ts) — wave 5, 20 hook tests, 97-field API
 
 **Test convention:** add `hooks/<area>/use<Name>.test.ts` covering ≥5 pure logic
 paths without rendering. The existing page test files remain in place as integration
@@ -182,8 +187,8 @@ beyond ~100 LOC of non-JSX logic, extract a `use<Name>` hook before adding more 
 **JSX shell complexity:** when the page is mostly large declarative JSX (multiple
 GuidanceCard panels, tabbed UI, modals), the noExcessiveCognitiveComplexity rule
 fires on the JSX shell itself. Adding a `// biome-ignore lint/complexity/noExcessiveCognitiveComplexity`
-on the page component is the documented exception (precedent: AnalysisPage,
-StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Only suppress on the
+on the page component is the documented exception (precedent: StudyDesignPage,
+RecruitmentPage, ConcourseDetailPage). Only suppress on the
 shell, never inside the hook.
 
 ### Admin header policy
@@ -197,11 +202,14 @@ hierarchy; every other piece of header chrome must respect that.
   (`…/concourses/:id`, `…/participants/:id`) get a typed special case.
 - **L2 Page header** (`StudyPageHeader`): the page's function. Two patterns:
   - **Entity entry-point pages** → H1 = entity name. Project Dashboard = `project.title`,
-    Study Overview = `study.translations[0].title`, Participant detail = "Participant #N".
+    Study Overview = `study.translations[0].title`, Participant detail = "Participant {{code}}"
+    (a truncated, uppercased session-token code).
   - **All other pages** → H1 = functional name ("Settings", "Analysis", "Data", "Access",
     "Project settings", "Profile"). Never `project.title` / `study.title` — those are in
     the breadcrumb already.
-- **L3 Section titles** (`CardTitle` / `<h2>`): typography is `text-lg font-black text-slate-900`.
+- **L3 Section titles** (admin section `<h2>` / ad-hoc `CardTitle` usages): the convention is
+  `text-lg font-black text-slate-900`, applied per-title (not centralised — the base
+  `ui/card` `CardTitle` ships `font-semibold leading-none tracking-tight`).
   L4 item titles inside cards may use `font-semibold` (precedent: AdminDashboard study cards).
 
 **Naming canon.** One label per section, propagated to three keys:
