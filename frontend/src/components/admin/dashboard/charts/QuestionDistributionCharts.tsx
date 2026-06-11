@@ -54,6 +54,11 @@ const CHARTABLE_TYPES = new Set(['select', 'radio', 'checkbox']);
 const BAR_COLOR = '#6366f1';
 const NO_ANSWER_COLOR = '#cbd5e1';
 
+function formatCountTooltipValue(value: unknown) {
+    const numericValue = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(numericValue) ? numericValue : 0;
+}
+
 /** Extract questions record from presort_config (handles legacy flat format + new {enabled, fields} format) */
 function getPresortQuestions(
     config: Record<string, unknown> | undefined
@@ -270,11 +275,11 @@ export function QuestionDistributionCharts({
                                             fontSize: '12px',
                                         }}
                                         itemStyle={{ fontWeight: 600 }}
-                                        formatter={(value: number | undefined) => [
-                                            value ?? 0,
+                                        formatter={(value) => [
+                                            formatCountTooltipValue(value),
                                             t('admin.data.charts.count', 'Count'),
                                         ]}
-                                        labelFormatter={(label: string) => label}
+                                        labelFormatter={(label) => `${label ?? ''}`}
                                     />
                                     <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                                         {item.bars.map((bar, idx) => (
