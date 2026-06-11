@@ -29,7 +29,7 @@ to the reference (factor order and sign are mathematically
 indeterminate), and asserts:
 
 - an **identical factor assignment** for all nine Q-sorts, and
-- rotated loadings agreeing within `1e-3`.
+- rotated loadings agreeing within `1e-4`.
 
 Exit code `0` = passed, `1` = failed.
 

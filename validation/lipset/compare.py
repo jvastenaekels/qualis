@@ -34,7 +34,11 @@ BASE = os.environ.get("QUALIS_URL", "http://localhost:3000")
 EMAIL = os.environ.get("ADMIN_EMAIL", "admin@example.com")
 PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 SLUG = "lipset-democracy"
-LOADING_TOL = 1e-3
+# Manuscript §3 claims rotated loadings agree "within 0.0001"; this gate enforces
+# that bound so the paper's number is CI-backed. Last verified observed maximum:
+# 1e-4 (see validation/lipset/README.md). If a future qmethod/numpy bump makes
+# this borderline-fail, widen to 2e-4 rather than silently loosening to 1e-3.
+LOADING_TOL = 1e-4
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
