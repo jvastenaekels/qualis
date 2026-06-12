@@ -24,7 +24,7 @@ class AnalysisRun(Base):
     """Persisted record of a Q-method factor analysis execution.
 
     Captures both the analytical choices the researcher made (extraction,
-    rotation, n_factors, flagging mode/threshold) and the full result, so
+    rotation, n_factors, flagging mode) and the full result, so
     that analytical decisions are auditable across sessions and visible to
     co-authors and reviewers. This supports the critical Q-methodology
     requirement that analytical choices be transparent (Stainton Rogers

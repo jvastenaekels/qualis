@@ -1131,6 +1131,30 @@ function InterpretShell({
                 </div>
             </div>
 
+            {/* Non-fatal analysis warnings (e.g. centroid non-convergence, F-06-010).
+                Persistent rather than dismissible: a data-quality caveat should
+                stay visible while the analyst interprets and writes up the run. */}
+            {analysisResult.warnings && analysisResult.warnings.length > 0 ? (
+                <div
+                    className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900"
+                    role="status"
+                    aria-live="polite"
+                    data-testid="analysis-warnings"
+                >
+                    <AlertTriangle className="size-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <div className="flex-1">
+                        <p className="font-semibold">
+                            {t('admin.analysis.warnings_title', 'This analysis raised warnings')}
+                        </p>
+                        <ul className="mt-1 list-disc pl-5 space-y-0.5">
+                            {analysisResult.warnings.map((w, i) => (
+                                <li key={`${i}-${w}`}>{w}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            ) : null}
+
             {/* Results */}
             {mode === 'focus' ? (
                 <FactorCanvas

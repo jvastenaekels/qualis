@@ -7199,6 +7199,14 @@
               }
             ],
             "description": "Bootstrap stability output (Zabala & Pascual 2016). Set only when the request opted in via `bootstrap_iterations`."
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings",
+            "description": "Non-fatal warnings raised while computing this result, e.g. centroid extraction that did not fully converge (F-06-010). Empty when the analysis ran cleanly. Surfaced to the researcher above the results."
           }
         },
         "type": "object",

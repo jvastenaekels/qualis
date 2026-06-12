@@ -28,6 +28,13 @@ from app.types.wire import (
 
 logger = logging.getLogger(__name__)
 
+# Average reliability coefficient used in the Spearman-Brown composite
+# reliability and the standard error of factor scores. Fixed at 0.8 following
+# the qmethod-R default (Brown 1980, Political Subjectivity, p. 293); Qualis
+# does not currently expose this as a per-study parameter, so it is a named
+# constant rather than a configurable input (F-06-004).
+DEFAULT_AV_REL_COEF = 0.8
+
 
 # ---------------------------------------------------------------------------
 # Cluster 1 — Analysis wire types (private to this module)
@@ -136,6 +143,7 @@ class AnalysisRunResult(TypedDict):
     distinguishing: list[StatementClassEntry]
     consensus: list[StatementClassEntry]
     manual_rotations: list[dict[str, object]]
+    warnings: list[str]
 
 
 def build_sort_matrix(
@@ -256,7 +264,7 @@ def extract_pca(cor_mat: NDArray[np.float64], n_factors: int) -> NDArray[np.floa
 
 def extract_centroid(
     cor_mat: NDArray[np.float64], n_factors: int, spc: float = 1e-5
-) -> NDArray[np.float64]:
+) -> tuple[NDArray[np.float64], list[str]]:
     """Extract factors using Brown's centroid method.
 
     Based on Brown (1980), Political Subjectivity, pp. 208-224.
@@ -269,7 +277,14 @@ def extract_centroid(
         spc: Convergence threshold
 
     Returns:
-        Loadings matrix of shape (n_participants, n_factors)
+        Tuple of (loadings, warnings) where ``loadings`` has shape
+        (n_participants, n_factors) and ``warnings`` is a list of
+        human-readable strings describing any non-convergence or
+        degeneracy encountered during extraction (empty when the
+        iteration converged cleanly for every factor). The same messages
+        are also emitted via ``logger.warning`` for server-side logs;
+        the returned list is what gets surfaced to the researcher (see
+        F-06-010).
 
     Translated to Python in 2026 by Julien Vastenaekels from the R `qmethod`
     package (centroid.R, Frans Hermans, 2021), used under GPL-2+.
@@ -278,6 +293,7 @@ def extract_centroid(
     n = cor_mat.shape[0]
     tmat = cor_mat.copy()
     loadings = np.zeros((n, n_factors))
+    warnings: list[str] = []
 
     for f in range(n_factors):
         np.fill_diagonal(tmat, 0.0)
@@ -302,6 +318,11 @@ def extract_centroid(
                 f + 1,
                 max_reflections,
             )
+            warnings.append(
+                f"Centroid factor {f + 1}: sign-reflection step did not stabilise "
+                f"after {max_reflections} iterations; loadings for this factor may "
+                "be less reliable."
+            )
 
         # Step 2: Initial factor estimate
         col_sums = tmat.sum(axis=0)
@@ -312,6 +333,11 @@ def extract_centroid(
             logger.warning(
                 "Centroid factor %d: degenerate initial estimate (sum <= 0)",
                 f + 1,
+            )
+            warnings.append(
+                f"Centroid factor {f + 1}: degenerate initial estimate; extraction "
+                f"stopped early, so fewer than the {n_factors} requested factors "
+                "were fully extracted."
             )
             break
         f1 = t1 / np.sqrt(sum_t1)
@@ -325,6 +351,10 @@ def extract_centroid(
             if sum_t2 <= 0:
                 logger.warning(
                     "Centroid factor %d: degenerate matrix (sum <= 0)", f + 1
+                )
+                warnings.append(
+                    f"Centroid factor {f + 1}: residual matrix became degenerate "
+                    "during iteration; this factor may be unreliable."
                 )
                 break
             t2 = tmat.sum(axis=0) + rmean_new
@@ -341,6 +371,11 @@ def extract_centroid(
                 "Centroid factor %d: did not converge after %d iterations",
                 f + 1,
                 max_iter,
+            )
+            warnings.append(
+                f"Centroid factor {f + 1}: did not converge after {max_iter} "
+                f"iterations (tolerance {spc:g}); loadings for this factor may be "
+                "less reliable."
             )
 
         # Step 4: Reverse reflections on the factor
@@ -361,7 +396,7 @@ def extract_centroid(
 
         tmat = residual
 
-    return loadings
+    return loadings, warnings
 
 
 def rotate_varimax(
@@ -679,7 +714,7 @@ def compute_factor_characteristics(
     loadings: NDArray[np.float64],
     flagged: NDArray[np.bool_],
     z_scores: NDArray[np.float64],
-    av_rel_coef: float = 0.8,
+    av_rel_coef: float = DEFAULT_AV_REL_COEF,
 ) -> tuple[list[FactorCharacteristicDict], NDArray[np.float64], NDArray[np.float64]]:
     """Compute factor characteristics, correlation, and SED matrix.
 
@@ -687,7 +722,9 @@ def compute_factor_characteristics(
         loadings: (Rotated) loadings matrix (n_participants x n_factors)
         flagged: Flagging matrix (n_participants x n_factors)
         z_scores: Z-scores matrix (n_statements x n_factors)
-        av_rel_coef: Average reliability coefficient (default 0.8)
+        av_rel_coef: Average reliability coefficient. Fixed at the qmethod-R /
+            Brown (1980) default of 0.8 (``DEFAULT_AV_REL_COEF``); not exposed
+            as a per-study parameter (F-06-004).
 
     Returns:
         Tuple of (characteristics, factor_correlation, sed_matrix)
@@ -1056,10 +1093,11 @@ def run_analysis(
     all_eigenvalues, _ = compute_eigenvalues(cor_mat)
 
     # Step 3: Factor extraction
+    warnings: list[str] = []
     if extraction == "pca":
         unrotated = extract_pca(cor_mat, n_factors)
     elif extraction == "centroid":
-        unrotated = extract_centroid(cor_mat, n_factors)
+        unrotated, warnings = extract_centroid(cor_mat, n_factors)
     else:
         raise ValueError(f"Unknown extraction method: {extraction}")
 
@@ -1082,7 +1120,17 @@ def run_analysis(
     rotated = standardize_factor_signs(rotated)
 
     # Step 5: Flagging
-    if flagging == "manual" and manual_flags_matrix is not None:
+    if flagging == "manual":
+        if manual_flags_matrix is None:
+            # Fail loudly rather than silently falling back to auto flagging
+            # (F-06-004). The router already rejects this combination with a
+            # 400, but a service-level guard stops any future caller from
+            # silently producing an auto-flagged solution it asked to be
+            # manual. Bootstrap/preview deliberately pass flagging="auto".
+            raise ValueError(
+                "flagging='manual' requires a manual_flags_matrix; refusing to "
+                "silently fall back to automatic flagging"
+            )
         flags = manual_flags_matrix
     else:
         flags = flag_sorts(rotated, n_statements)
@@ -1122,6 +1170,7 @@ def run_analysis(
         distinguishing=dist_list,
         consensus=cons_list,
         manual_rotations=list(manual_rotations) if manual_rotations else [],
+        warnings=warnings,
     )
 
 

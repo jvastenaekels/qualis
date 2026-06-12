@@ -503,6 +503,8 @@
             "reanalyzing": "Re-analyzing...",
             "success": "Analysis complete. {{n}} factors extracted.",
             "error": "Analysis failed: {{message}}",
+            "warnings_title": "This analysis raised warnings",
+            "ci_tooltip": "95% percentile CI (2.5th–97.5th percentile of bootstrapped z-scores) [{{lo}}, {{hi}}]",
             "scree_hint": "Each bar shows how much variance a factor explains (its eigenvalue). The dashed line marks eigenvalue = 1 (Kaiser criterion). Click a bar to select the number of factors to extract.",
             "kaiser_suggestion": "{{n}} factor(s) have eigenvalues above 1 (Kaiser criterion)",
             "factor": "Factor",
@@ -672,10 +674,10 @@
             "bootstrap": {
                 "toggle_label": "Run bootstrap stability",
                 "iterations_label": "Iterations (B)",
-                "helper": "Optional. Resamples Q-sorts B times to estimate confidence intervals on factor scores.",
+                "helper": "Optional. Resamples Q-sorts B times to estimate percentile confidence intervals on factor scores.",
                 "running": "Running bootstrap…",
                 "se_column": "Mean SE (z)",
-                "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); analysis is repeated B times to estimate 95% CIs on z-scores."
+                "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); analysis is repeated B times to estimate 95% percentile CIs (2.5th–97.5th percentile) on z-scores. Resampling does not preserve participant identity, so each resample is auto-flagged even when the committed run used manual flagging."
             },
             "explore": {
                 "diagnostics_title": "Diagnostics",

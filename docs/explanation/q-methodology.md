@@ -143,7 +143,7 @@ Qualis provides affordances for **both** strands. Extraction, rotation, and expo
 
 | Reflexive / transparency need | How Qualis supports it |
 |-------------------------------|--------------------------|
-| Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. |
+| Transparency of analytical choices | Every analysis run is persisted with the choices that produced it — extraction method, number of factors, rotation, flagging mode, and any judgmental rotations. Researchers can audit what was changed when, and explain those choices in their methods section. The reliability coefficient behind composite reliability and the standard errors is held at the qmethod-R / Brown (1980) default (`av_rel_coef` = 0.8) rather than being a per-study setting. |
 | Researcher control over flagging | Auto-flagging is a starting point. Flagging is exposed and editable per study, and researcher decisions are part of the audit trail. |
 | Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the reflexive practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
 | Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel. The constructed nature of the P-set is visible rather than implicit. |

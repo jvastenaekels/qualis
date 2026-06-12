@@ -366,6 +366,7 @@ async def run_factor_analysis(
         ],
         manual_rotations=list(body.manual_rotations) if body.manual_rotations else [],
         bootstrap=bootstrap_payload,
+        warnings=result["warnings"],
     )
 
     # Persist the run as part of the audit trail. We persist on the success

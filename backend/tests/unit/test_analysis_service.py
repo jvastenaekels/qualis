@@ -165,17 +165,18 @@ class TestExtractPCA:
 class TestExtractCentroid:
     def test_shape(self, dataset):
         cor = correlation_matrix(dataset)
-        loadings = extract_centroid(cor, 2)
+        loadings, warnings = extract_centroid(cor, 2)
         assert loadings.shape == (8, 2)
+        assert warnings == []
 
     def test_loadings_not_all_zero(self, dataset):
         cor = correlation_matrix(dataset)
-        loadings = extract_centroid(cor, 2)
+        loadings, _ = extract_centroid(cor, 2)
         assert np.any(np.abs(loadings) > 0.1)
 
     def test_single_factor(self, dataset):
         cor = correlation_matrix(dataset)
-        loadings = extract_centroid(cor, 1)
+        loadings, _ = extract_centroid(cor, 1)
         assert loadings.shape == (8, 1)
 
 
@@ -508,14 +509,14 @@ class TestCentroidEdgeCases:
     def test_centroid_single_factor(self, dataset):
         """Single factor centroid extraction should produce valid loadings."""
         cor = correlation_matrix(dataset)
-        loadings = extract_centroid(cor, 1)
+        loadings, _ = extract_centroid(cor, 1)
         assert loadings.shape == (8, 1)
         assert not np.all(loadings == 0)
 
     def test_centroid_many_factors(self, dataset):
         """Extracting many factors (up to n_participants) should not crash."""
         cor = correlation_matrix(dataset)
-        loadings = extract_centroid(cor, 7)
+        loadings, _ = extract_centroid(cor, 7)
         assert loadings.shape == (8, 7)
 
     def test_centroid_near_singular(self):
@@ -532,9 +533,57 @@ class TestCentroidEdgeCases:
             dtype=np.float64,
         )
         cor = correlation_matrix(data)
-        loadings = extract_centroid(cor, 2)
+        loadings, _ = extract_centroid(cor, 2)
         assert loadings.shape == (4, 2)
         assert np.all(np.isfinite(loadings))
+
+
+class TestCentroidWarnings:
+    """F-06-010: centroid non-convergence / degeneracy is surfaced, not silent."""
+
+    def test_clean_run_has_no_warnings(self, dataset):
+        cor = correlation_matrix(dataset)
+        _loadings, warnings = extract_centroid(cor, 2)
+        assert warnings == []
+
+    def test_degenerate_matrix_emits_warning(self):
+        # Perfectly collinear participants -> all-ones correlation; the residual
+        # collapses after factor 1, so factor 2 hits the degenerate-estimate path.
+        cor = np.ones((4, 4))
+        _loadings, warnings = extract_centroid(cor, 3)
+        assert warnings, "expected a non-convergence/degeneracy warning"
+        assert any("Centroid factor" in w for w in warnings)
+        assert any("degenerate" in w.lower() for w in warnings)
+
+    def test_run_analysis_propagates_centroid_warnings(self):
+        # 6 statements x 4 identical participants -> all-ones correlation matrix.
+        col = np.linspace(2.0, -2.0, 6).reshape(-1, 1)
+        data = np.tile(col, (1, 4))
+        result = run_analysis(
+            data, n_factors=2, extraction="centroid", rotation="varimax"
+        )
+        assert result["warnings"], "centroid warnings should reach run_analysis"
+
+    def test_run_analysis_pca_has_empty_warnings(self, dataset):
+        result = run_analysis(
+            dataset, n_factors=2, extraction="pca", rotation="varimax"
+        )
+        assert result["warnings"] == []
+
+
+class TestManualFlaggingGuard:
+    """F-06-004: manual flagging never silently falls back to auto."""
+
+    def test_manual_without_matrix_raises(self, dataset):
+        with pytest.raises(ValueError, match="manual_flags_matrix"):
+            run_analysis(
+                dataset,
+                n_factors=2,
+                extraction="pca",
+                rotation="varimax",
+                flagging="manual",
+                manual_flags_matrix=None,
+            )
 
 
 class TestVarimaxEdgeCases:

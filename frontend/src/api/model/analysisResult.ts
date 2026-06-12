@@ -39,4 +39,6 @@ export interface AnalysisResult {
     manual_rotations?: ManualRotation[];
     /** Bootstrap stability output (Zabala & Pascual 2016). Set only when the request opted in via `bootstrap_iterations`. */
     bootstrap?: AnalysisResultBootstrap;
+    /** Non-fatal warnings raised while computing this result, e.g. centroid extraction that did not fully converge (F-06-010). Empty when the analysis ran cleanly. Surfaced to the researcher above the results. */
+    warnings?: string[];
 }
