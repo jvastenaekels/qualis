@@ -136,6 +136,8 @@ A reusable pool of candidate statements that lives at the project level, not the
 
 This is the recommended path for SoftwareX evaluation and first-time use. It starts PostgreSQL, the backend, and the built frontend with development demo credentials.
 
+> The first `make demo-up` **builds the backend and frontend images from source** (no pre-built image is pulled), so the initial run compiles the stack and may take a few minutes; subsequent runs reuse the cached layers. Qualis is self-hosted by design — there is no third-party-hosted instance, which is the point: participant data stays on infrastructure you control.
+
 Prerequisite:
 
 - Docker with the `docker compose` plugin
