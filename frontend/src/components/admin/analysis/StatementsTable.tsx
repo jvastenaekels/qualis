@@ -237,7 +237,14 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                                 )}
                                                 title={
                                                     stab
-                                                        ? `95% CI [${stab.ci_lower.toFixed(2)}, ${stab.ci_upper.toFixed(2)}]`
+                                                        ? t(
+                                                              'admin.analysis.ci_tooltip',
+                                                              '95% percentile CI (2.5th–97.5th percentile of bootstrapped z-scores) [{{lo}}, {{hi}}]',
+                                                              {
+                                                                  lo: stab.ci_lower.toFixed(2),
+                                                                  hi: stab.ci_upper.toFixed(2),
+                                                              }
+                                                          )
                                                         : undefined
                                                 }
                                             >

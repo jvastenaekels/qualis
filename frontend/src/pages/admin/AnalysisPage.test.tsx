@@ -570,6 +570,64 @@ describe('AnalysisPage', () => {
         expect(await screen.findByText(/Reading Factor Loadings/i)).toBeInTheDocument();
     });
 
+    it('surfaces non-fatal analysis warnings above the results (F-06-010)', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        const warning = 'Centroid factor 2: did not converge after 1000 iterations';
+        mockGetRunHook.mockReturnValue({
+            data: {
+                ...mockRun,
+                result: {
+                    ...mockResult,
+                    warnings: [warning],
+                } as unknown as AnalysisRunRead['result'],
+            },
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        const banner = await screen.findByTestId('analysis-warnings');
+        expect(banner).toHaveTextContent(warning);
+    });
+
+    it('renders no warnings banner when the run is clean', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        // Wait for the interpret phase to mount, then assert no warnings banner.
+        await screen.findAllByTestId('interpret-phase');
+        expect(screen.queryByTestId('analysis-warnings')).not.toBeInTheDocument();
+    });
+
     // ── Phase-routing tests (Task 11) ──────────────────────────────
 
     it('renders Explore phase by default when no run is loaded', async () => {
