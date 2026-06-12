@@ -10,7 +10,7 @@ abstract: >-
   to PQMethod, Ken-Q Analysis, and the R qmethod package. It supports
   transparency of analytical choices and integration of post-sort
   participant voice.
-version: "0.7.0" # x-release-please-version
+version: "0.7.1" # x-release-please-version
 date-released: "2026-05-15" # update manually when merging the release PR
 doi: "10.5281/zenodo.19985835"
 identifiers:
