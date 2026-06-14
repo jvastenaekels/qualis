@@ -200,7 +200,7 @@ pydantic==2.13.3
     #   pydantic-extra-types
     #   pydantic-settings
     #   qualis-backend
-pydantic-core==2.46.3
+pydantic-core==2.47.0
     # via pydantic
 pydantic-extra-types==2.11.1
     # via fastapi
