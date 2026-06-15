@@ -2114,14 +2114,6 @@
                         "copy_success": "Link copiado para a área de transferência!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} lugares usados",
-                "quota_full_tooltip": "Limite de membros atingido. Aumente MAX_MEMBERS_PER_PROJECT ou remova um membro."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} projetos próprios",
-                "quota_full_tooltip": "Atingiu o limite de projetos próprios."
             }
         },
         "members": {

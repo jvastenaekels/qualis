@@ -39,12 +39,6 @@ export default function CreateProjectPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { setCurrentProject, setProjects, projects } = useAuthStore();
-    const ownedQuota = useAuthStore((s) => s.user?.owned_project_quota);
-    const ownedQuotaFull =
-        ownedQuota !== undefined &&
-        ownedQuota !== null &&
-        ownedQuota.limit !== null &&
-        ownedQuota.count >= ownedQuota.limit;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const queryClient = useQueryClient();
 
@@ -185,17 +179,6 @@ export default function CreateProjectPage() {
                                 )}
                             />
                             <div className="flex flex-col gap-3 pt-4">
-                                {ownedQuota !== undefined &&
-                                    ownedQuota !== null &&
-                                    ownedQuota.limit !== null && (
-                                        <p className="text-sm text-slate-600 text-right">
-                                            {t('admin.projects.create.quota', {
-                                                count: ownedQuota.count,
-                                                limit: ownedQuota.limit,
-                                                defaultValue: '{{count}}/{{limit}} owned projects',
-                                            })}
-                                        </p>
-                                    )}
                                 <div className="flex justify-end gap-3">
                                     <Button
                                         variant="outline"
@@ -209,15 +192,7 @@ export default function CreateProjectPage() {
                                     <Button
                                         type="submit"
                                         className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm border-none"
-                                        disabled={isSubmitting || ownedQuotaFull}
-                                        title={
-                                            ownedQuotaFull
-                                                ? t(
-                                                      'admin.projects.create.quota_full_tooltip',
-                                                      "You've reached your owned-project limit."
-                                                  )
-                                                : undefined
-                                        }
+                                        disabled={isSubmitting}
                                     >
                                         {isSubmitting ? (
                                             <>

@@ -2114,14 +2114,6 @@
             "copy_success": "Link skopiowany do schowka!"
           }
         }
-      },
-      "members": {
-        "quota": "{{count}}/{{limit}} miejsc zajętych",
-        "quota_full_tooltip": "Osiągnięto limit członków. Zwiększ MAX_MEMBERS_PER_PROJECT lub usuń członka."
-      },
-      "create": {
-        "quota": "{{count}}/{{limit}} posiadanych projektów",
-        "quota_full_tooltip": "Osiągnięto limit posiadanych projektów."
       }
     },
     "members": {

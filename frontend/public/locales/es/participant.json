@@ -136,8 +136,6 @@
         "github_aria": "Ver el código fuente en GitHub"
     },
     "errors": {
-        "member_limit_reached": "Se ha alcanzado el límite de miembros del proyecto.",
-        "owner_project_limit_reached": "No puede ser propietario de más proyectos.",
         "owner_role_immutable": "El rol de propietario solo se puede asignar al crear el proyecto.",
         "access_denied_title": "Acceso denegado",
         "access_denied_description": "No tiene permiso para realizar esta acción.",

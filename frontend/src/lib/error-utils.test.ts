@@ -5,12 +5,12 @@ describe('resolveApiErrorKey', () => {
     it('maps known codes (in `code` field) to i18n keys', () => {
         expect(
             resolveApiErrorKey({
-                code: 'MEMBER_LIMIT_REACHED',
-                message: 'Project member limit reached (5/5).',
+                code: 'OWNER_ROLE_IMMUTABLE',
+                message: 'The owner role cannot be changed.',
             })
         ).toEqual({
-            key: 'errors.member_limit_reached',
-            fallback: 'Project member limit reached (5/5).',
+            key: 'errors.owner_role_immutable',
+            fallback: 'The owner role cannot be changed.',
         });
     });
 
@@ -38,18 +38,6 @@ describe('resolveApiErrorKey', () => {
         expect(resolveApiErrorKey({})).toEqual({
             key: null,
             fallback: 'An error occurred.',
-        });
-    });
-
-    it('maps OWNER_PROJECT_LIMIT_REACHED in code field', () => {
-        expect(
-            resolveApiErrorKey({
-                code: 'OWNER_PROJECT_LIMIT_REACHED',
-                message: 'You have reached the project creation limit.',
-            })
-        ).toEqual({
-            key: 'errors.owner_project_limit_reached',
-            fallback: 'You have reached the project creation limit.',
         });
     });
 

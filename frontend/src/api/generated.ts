@@ -173,7 +173,7 @@ import type {
 
 import { customInstance } from './mutator';
 /**
- * Get current active user, including owner-project quota state.
+ * Get current active user.
  * @summary Read Users Me
  */
 export const readUsersMeApiMeGet = (signal?: AbortSignal) => {
@@ -15246,19 +15246,6 @@ export const getReadUsersMeApiMeGetResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
-    owned_project_quota: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-            {
-                count: faker.number.int({ min: undefined, max: undefined }),
-                limit: faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-            },
-            null,
-        ]),
-        undefined,
-    ]),
     ...overrideResponse,
 });
 
@@ -15276,19 +15263,6 @@ export const getUpdateUserMeApiMePatchResponseMock = (
     is_totp_enabled: faker.datatype.boolean(),
     pending_email: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
-    owned_project_quota: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-            {
-                count: faker.number.int({ min: undefined, max: undefined }),
-                limit: faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-            },
-            null,
-        ]),
         undefined,
     ]),
     ...overrideResponse,
@@ -15336,19 +15310,6 @@ export const getRegisterUserApiRegisterPostResponseMock = (
         pending_email: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
-                null,
-            ]),
-            undefined,
-        ]),
-        owned_project_quota: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                {
-                    count: faker.number.int({ min: undefined, max: undefined }),
-                    limit: faker.helpers.arrayElement([
-                        faker.number.int({ min: undefined, max: undefined }),
-                        null,
-                    ]),
-                },
                 null,
             ]),
             undefined,
@@ -18611,19 +18572,6 @@ export const getListUsersApiAdminUsersGetResponseMock = (
                 ]),
                 undefined,
             ]),
-            owned_project_quota: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    {
-                        count: faker.number.int({ min: undefined, max: undefined }),
-                        limit: faker.helpers.arrayElement([
-                            faker.number.int({ min: undefined, max: undefined }),
-                            null,
-                        ]),
-                    },
-                    null,
-                ]),
-                undefined,
-            ]),
             email_verified_at: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -18663,19 +18611,6 @@ export const getPatchUserApiAdminUsersUserIdPatchResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
-    owned_project_quota: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-            {
-                count: faker.number.int({ min: undefined, max: undefined }),
-                limit: faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-            },
-            null,
-        ]),
-        undefined,
-    ]),
     email_verified_at: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -18711,19 +18646,6 @@ export const getSetEmailEndpointApiAdminUsersUserIdSetEmailPostResponseMock = (
     is_totp_enabled: faker.datatype.boolean(),
     pending_email: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
-    owned_project_quota: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([
-            {
-                count: faker.number.int({ min: undefined, max: undefined }),
-                limit: faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-            },
-            null,
-        ]),
         undefined,
     ]),
     email_verified_at: faker.helpers.arrayElement([
@@ -18850,19 +18772,6 @@ export const getListProjectsApiAdminProjectsGetResponseMock = (
                                 ]),
                                 undefined,
                             ]),
-                            owned_project_quota: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    {
-                                        count: faker.number.int({ min: undefined, max: undefined }),
-                                        limit: faker.helpers.arrayElement([
-                                            faker.number.int({ min: undefined, max: undefined }),
-                                            null,
-                                        ]),
-                                    },
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
                         },
                         role: faker.helpers.arrayElement(Object.values(ProjectRole)),
                         joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -18870,13 +18779,6 @@ export const getListProjectsApiAdminProjectsGetResponseMock = (
                 ),
                 undefined,
             ]),
-            member_quota: {
-                count: faker.number.int({ min: undefined, max: undefined }),
-                limit: faker.helpers.arrayElement([
-                    faker.number.int({ min: undefined, max: undefined }),
-                    null,
-                ]),
-            },
             user_role: faker.helpers.arrayElement(Object.values(ProjectRole)),
         })
     ),
@@ -18916,32 +18818,12 @@ export const getCreateProjectApiAdminProjectsPostResponseMock = (
                     ]),
                     undefined,
                 ]),
-                owned_project_quota: faker.helpers.arrayElement([
-                    faker.helpers.arrayElement([
-                        {
-                            count: faker.number.int({ min: undefined, max: undefined }),
-                            limit: faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                        },
-                        null,
-                    ]),
-                    undefined,
-                ]),
             },
             role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
     ]),
-    member_quota: {
-        count: faker.number.int({ min: undefined, max: undefined }),
-        limit: faker.helpers.arrayElement([
-            faker.number.int({ min: undefined, max: undefined }),
-            null,
-        ]),
-    },
     ...overrideResponse,
 });
 
@@ -18975,32 +18857,12 @@ export const getGetProjectApiAdminProjectsSlugGetResponseMock = (
                     ]),
                     undefined,
                 ]),
-                owned_project_quota: faker.helpers.arrayElement([
-                    faker.helpers.arrayElement([
-                        {
-                            count: faker.number.int({ min: undefined, max: undefined }),
-                            limit: faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                        },
-                        null,
-                    ]),
-                    undefined,
-                ]),
             },
             role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
     ]),
-    member_quota: {
-        count: faker.number.int({ min: undefined, max: undefined }),
-        limit: faker.helpers.arrayElement([
-            faker.number.int({ min: undefined, max: undefined }),
-            null,
-        ]),
-    },
     user_role: faker.helpers.arrayElement(Object.values(ProjectRole)),
     ...overrideResponse,
 });
@@ -19035,32 +18897,12 @@ export const getUpdateProjectApiAdminProjectsSlugPatchResponseMock = (
                     ]),
                     undefined,
                 ]),
-                owned_project_quota: faker.helpers.arrayElement([
-                    faker.helpers.arrayElement([
-                        {
-                            count: faker.number.int({ min: undefined, max: undefined }),
-                            limit: faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                        },
-                        null,
-                    ]),
-                    undefined,
-                ]),
             },
             role: faker.helpers.arrayElement(Object.values(ProjectRole)),
             joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         })),
         undefined,
     ]),
-    member_quota: {
-        count: faker.number.int({ min: undefined, max: undefined }),
-        limit: faker.helpers.arrayElement([
-            faker.number.int({ min: undefined, max: undefined }),
-            null,
-        ]),
-    },
     ...overrideResponse,
 });
 
@@ -19086,19 +18928,6 @@ export const getListProjectMembersApiAdminProjectsSlugMembersGetResponseMock = (
                 pending_email: faker.helpers.arrayElement([
                     faker.helpers.arrayElement([
                         faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        null,
-                    ]),
-                    undefined,
-                ]),
-                owned_project_quota: faker.helpers.arrayElement([
-                    faker.helpers.arrayElement([
-                        {
-                            count: faker.number.int({ min: undefined, max: undefined }),
-                            limit: faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                        },
                         null,
                     ]),
                     undefined,
@@ -19134,19 +18963,6 @@ export const getUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatchRespons
         pending_email: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
-                null,
-            ]),
-            undefined,
-        ]),
-        owned_project_quota: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                {
-                    count: faker.number.int({ min: undefined, max: undefined }),
-                    limit: faker.helpers.arrayElement([
-                        faker.number.int({ min: undefined, max: undefined }),
-                        null,
-                    ]),
-                },
                 null,
             ]),
             undefined,

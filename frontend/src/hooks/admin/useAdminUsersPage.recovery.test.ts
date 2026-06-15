@@ -57,7 +57,6 @@ const base: AdminUser = {
     password_changed_at: '2026-01-01T00:00:00Z',
     last_login_at: '2026-05-01T00:00:00Z',
     pending_email: null,
-    owned_project_quota: null,
 };
 
 // ── Setup ─────────────────────────────────────────────────────────

@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ProjectMemberRead } from './projectMemberRead';
-import type { QuotaInfo } from './quotaInfo';
 
 /**
  * Schema for reading a project with members.
@@ -16,5 +15,4 @@ export interface ProjectRead {
     slug: string;
     created_at: string;
     members?: ProjectMemberRead[];
-    member_quota: QuotaInfo;
 }

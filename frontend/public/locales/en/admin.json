@@ -2116,14 +2116,6 @@
                         "copy_success": "Link copied to clipboard!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} seats used",
-                "quota_full_tooltip": "Member limit reached. Increase MAX_MEMBERS_PER_PROJECT or remove a member."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} owned projects",
-                "quota_full_tooltip": "You've reached your owned-project limit."
             }
         },
         "members": {

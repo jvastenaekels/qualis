@@ -13,12 +13,11 @@ from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.exceptions import QuotaExceeded, ServiceError
+from app.exceptions import ServiceError
 from app.limiter import limiter
 from app.middleware.errors import (
     global_exception_handler,
     http_exception_handler,
-    quota_exceeded_handler,
     service_exception_handler,
     sqlalchemy_exception_handler,
     validation_exception_handler,
@@ -143,7 +142,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler_wrappe
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(ServiceError, service_exception_handler)
-app.add_exception_handler(QuotaExceeded, quota_exceeded_handler)
 app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 

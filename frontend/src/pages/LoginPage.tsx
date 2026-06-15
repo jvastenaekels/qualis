@@ -109,7 +109,6 @@ const LoginPage = () => {
             email: user.email,
             full_name: user.full_name,
             is_superuser: user.is_superuser,
-            owned_project_quota: user.owned_project_quota,
         });
 
         toast.success(t('auth.login.welcome_back'));

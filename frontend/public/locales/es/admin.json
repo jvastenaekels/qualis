@@ -2114,14 +2114,6 @@
                         "copy_success": "¡Enlace copiado al portapapeles!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} plazas utilizadas",
-                "quota_full_tooltip": "Límite de miembros alcanzado. Aumente MAX_MEMBERS_PER_PROJECT o elimine un miembro."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} proyectos en propiedad",
-                "quota_full_tooltip": "Ha alcanzado su límite de proyectos en propiedad."
             }
         },
         "members": {
