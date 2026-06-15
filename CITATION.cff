@@ -11,7 +11,7 @@ abstract: >-
   transparency of analytical choices and integration of post-sort
   participant voice.
 version: "0.7.1" # x-release-please-version
-date-released: "2026-05-15" # update manually when merging the release PR
+date-released: "2026-06-12" # matches the v0.7.1 tag date; update on each release
 doi: "10.5281/zenodo.19985835"
 identifiers:
   - type: doi
@@ -20,11 +20,12 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.20199750"
     description: "Zenodo archive of Qualis v0.6.7"
-  # TODO (0.7.0 SoftwareX submission): after archiving v0.7.0 on Zenodo, add the
-  # version DOI below and update date-released + the manuscript C3/S3 capsule link.
+  # TODO (0.7.1 SoftwareX submission): once the GitHub release triggers the Zenodo
+  # archive for v0.7.1, replace the placeholder DOI below with the real version DOI
+  # and point the manuscript C3/S3 capsule link at it.
   #   - type: doi
   #     value: "10.5281/zenodo.XXXXXXXX"
-  #     description: "Zenodo archive of Qualis v0.7.0"
+  #     description: "Zenodo archive of Qualis v0.7.1"
 url: "https://github.com/jvastenaekels/qualis"
 repository-code: "https://github.com/jvastenaekels/qualis"
 license: "AGPL-3.0-or-later"
