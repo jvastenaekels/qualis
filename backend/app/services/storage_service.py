@@ -106,17 +106,34 @@ class StorageService:
                 "S3 configuration incomplete. Check S3_* environment variables."
             )
 
+        boto_config = BotoConfig(
+            s3={"addressing_style": settings.S3_ADDRESSING_STYLE},
+            request_checksum_calculation="when_required",
+            response_checksum_validation="when_required",
+        )
         self.s3_client = boto3.client(
             "s3",
             endpoint_url=settings.S3_ENDPOINT_URL,
             region_name=settings.S3_REGION,
             aws_access_key_id=settings.S3_ACCESS_KEY_ID,
             aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
-            config=BotoConfig(
-                request_checksum_calculation="when_required",
-                response_checksum_validation="when_required",
-            ),
+            config=boto_config,
         )
+        # Presigned URLs must be signed for a host the BROWSER can reach. When
+        # S3_PUBLIC_ENDPOINT_URL is set (e.g. MinIO behind Docker), sign against
+        # it with a dedicated client while put/get stay on the internal endpoint.
+        if settings.S3_PUBLIC_ENDPOINT_URL:
+            self.presign_client = boto3.client(
+                "s3",
+                endpoint_url=settings.S3_PUBLIC_ENDPOINT_URL,
+                region_name=settings.S3_REGION,
+                aws_access_key_id=settings.S3_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
+                config=boto_config,
+            )
+        else:
+            self.presign_client = self.s3_client
+
         # settings.S3_BUCKET_NAME is str | None; the all() guard above guarantees
         # it is non-None at this point. Use an explicit raise (not assert) so the
         # narrow holds even if Python is run with -O.
@@ -232,7 +249,7 @@ class StorageService:
             ServiceError: If URL generation fails
         """
         try:
-            url = self.s3_client.generate_presigned_url(
+            url = self.presign_client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self.bucket_name, "Key": s3_key},
                 ExpiresIn=expiration,

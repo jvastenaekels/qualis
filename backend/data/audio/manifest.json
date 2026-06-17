@@ -1,0 +1,44 @@
+{
+  "P01": {
+    "file": "P01_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "en",
+    "duration_seconds": 30.0
+  },
+  "P05": {
+    "file": "P05_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "en",
+    "duration_seconds": 44.4
+  },
+  "P07": {
+    "file": "P07_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "fr",
+    "duration_seconds": 11.3
+  },
+  "P09": {
+    "file": "P09_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "en",
+    "duration_seconds": 32.6
+  },
+  "P11": {
+    "file": "P11_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "fr",
+    "duration_seconds": 13.1
+  },
+  "P13": {
+    "file": "P13_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "en",
+    "duration_seconds": 43.0
+  },
+  "P15": {
+    "file": "P15_q_voice.mp3",
+    "question_key": "q_voice",
+    "language": "fr",
+    "duration_seconds": 23.0
+  }
+}

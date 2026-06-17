@@ -160,7 +160,9 @@ Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 | Email | `admin@example.com` |
 | Password | `admin123` |
 
-After seeding, the example participant flow is available at [http://localhost:3000/study/hemp-bioeconomy-futures](http://localhost:3000/study/hemp-bioeconomy-futures).
+`make demo-seed` loads the **Bioeconomy Futures** example end to end: the study design, a curated concourse (accepted / rejected / proposed candidate statements, with edit history and discussion comments), and 18 synthetic Q-sorts with pre-sort and post-sort answers — including a few spoken audio comments — that you can analyse straight away. After seeding, the example participant flow is available at [http://localhost:3000/study/bioeconomy-futures](http://localhost:3000/study/bioeconomy-futures).
+
+The Docker stack includes a MinIO object store for the audio comments (console at [http://localhost:9001](http://localhost:9001), login `qualis` / `qualis-demo-secret`).
 
 Stop the stack with:
 
@@ -212,7 +214,7 @@ cd backend && uv run python seed.py data/example-study.json && cd ..
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study, you can also visit `http://localhost:5173/study/hemp-bioeconomy-futures` to walk the participant flow.
+If you seeded the example study, you can also visit `http://localhost:5173/study/bioeconomy-futures` to walk the participant flow. (For the full demo — concourse plus filled Q-sorts — run `uv run python seed_demo.py` from `backend/` instead, with the backend running.)
 
 ### Verifying your setup
 

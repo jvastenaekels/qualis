@@ -1,27 +1,27 @@
 {
-  "slug": "hemp-bioeconomy-futures",
+  "slug": "bioeconomy-futures",
   "translations": {
     "en": {
-      "title": "Hemp Bioeconomy Futures",
-      "description": "A synthetic demo Q-study on competing futures for the hemp bioeconomy. It is inspired by research on public promises, territorial value chains, low-carbon materials, water protection, CBD regulation, and disappointed green-energy projects. 25 statements, bell-shaped forced distribution from -4 to +4.",
-      "subtitle": "Promises, equipment, territories, and disappointments",
-      "objective": "Explore competing viewpoints on how hemp futures should be made credible, funded, territorialized, regulated, and kept open.",
-      "instructions": "This study asks you to express your personal viewpoint through a sorting process. There are no right or wrong answers; the goal is to compare different ways of imagining the future of the hemp bioeconomy.",
-      "condition_of_instruction": "Please rank the following statements from those least like your view to those most like your view about the future of the hemp bioeconomy.",
+      "title": "Bioeconomy Futures",
+      "description": "A synthetic demo Q-study on competing futures for the European bioeconomy. It is inspired by the JRC foresight scenarios for the EU bioeconomy in 2050 (Fritsche et al., 2021) and by the debates that surround them: biomass scarcity and cascading use, bioenergy versus durable materials, industrial scale versus agroecology, growth versus ecological limits, justice and value capture, governance and green promises. 25 statements, bell-shaped forced distribution from -4 to +4.",
+      "subtitle": "Scarcity, scale, justice, and the promises of a bio-based transition",
+      "objective": "Explore the competing viewpoints people hold on how Europe's bioeconomy should be steered: what counts as sustainable, who should decide, who carries the costs, and how open the future should stay.",
+      "instructions": "This study asks you to express your personal viewpoint through a sorting process. There are no right or wrong answers; the goal is to compare different ways of imagining the future of the European bioeconomy.",
+      "condition_of_instruction": "Please rank the following statements from those least like your view to those most like your view about the future of the European bioeconomy.",
       "pre_instruction": "Based on your first reaction, divide the cards into three piles: those you tend to agree with, those you tend to disagree with, and those about which you are neutral or undecided.",
       "consent_title": "Demo consent",
-      "consent_description": "This is a synthetic demonstration study used to illustrate the Qualis workflow. By participating, you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded."
+      "consent_description": "This is a synthetic demonstration study used to illustrate the Qualis workflow. The statements and the example responses were authored for teaching purposes and do not represent real participants. By participating, you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded."
     },
     "fr": {
-      "title": "Futurs de la bioéconomie du chanvre",
-      "description": "Une étude Q synthétique de démonstration sur les futurs concurrents de la bioéconomie du chanvre. Elle s'inspire de recherches sur les promesses publiques, les chaînes de valeur territoriales, les matériaux bas carbone, la protection de l'eau, la régulation du CBD et les projets d'énergie verte désappointés. 25 énoncés, distribution forcée en cloche de -4 à +4.",
-      "subtitle": "Promesses, équipements, territoires et désappointements",
-      "objective": "Explorer des points de vue concurrents sur la manière de rendre les futurs du chanvre crédibles, financés, territorialisés, régulés et ouverts.",
-      "instructions": "Cette étude vous invite à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; l'objectif est de comparer différentes manières d'imaginer l'avenir de la bioéconomie du chanvre.",
-      "condition_of_instruction": "Veuillez classer les énoncés suivants de ceux qui correspondent le moins à votre point de vue à ceux qui correspondent le plus à votre point de vue sur l'avenir de la bioéconomie du chanvre.",
+      "title": "Futurs de la bioéconomie",
+      "description": "Une étude Q synthétique de démonstration sur les futurs concurrents de la bioéconomie européenne. Elle s'inspire des scénarios prospectifs du JRC pour la bioéconomie de l'UE à l'horizon 2050 (Fritsche et al., 2021) et des débats qui les entourent : rareté de la biomasse et usage en cascade, bioénergie contre matériaux durables, échelle industrielle contre agroécologie, croissance contre limites écologiques, justice et captation de la valeur, gouvernance et promesses vertes. 25 énoncés, distribution forcée en cloche de -4 à +4.",
+      "subtitle": "Rareté, échelle, justice et promesses d'une transition biosourcée",
+      "objective": "Explorer les points de vue concurrents sur la manière d'orienter la bioéconomie européenne : ce qui compte comme durable, qui doit décider, qui en porte les coûts, et à quel point l'avenir doit rester ouvert.",
+      "instructions": "Cette étude vous invite à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; l'objectif est de comparer différentes manières d'imaginer l'avenir de la bioéconomie européenne.",
+      "condition_of_instruction": "Veuillez classer les énoncés suivants de ceux qui correspondent le moins à votre point de vue à ceux qui correspondent le plus à votre point de vue sur l'avenir de la bioéconomie européenne.",
       "pre_instruction": "Selon votre première réaction, répartissez les cartes en trois piles : celles avec lesquelles vous avez tendance à être d'accord, celles avec lesquelles vous avez tendance à être en désaccord, et celles pour lesquelles votre avis est neutre ou indécis.",
       "consent_title": "Consentement de démonstration",
-      "consent_description": "Ceci est une étude synthétique de démonstration illustrant le workflow Qualis. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée."
+      "consent_description": "Ceci est une étude synthétique de démonstration illustrant le workflow Qualis. Les énoncés et les réponses d'exemple ont été rédigés à des fins pédagogiques et ne représentent pas de vrais participants. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée."
     }
   },
   "default_language": "en",
@@ -38,107 +38,140 @@
   ],
   "statements": [
     {"code": "S01", "translations": {
-      "en": "Hemp futures become credible only when they are attached to factories, contracts, standards, or public programmes.",
-      "fr": "Les futurs du chanvre deviennent crédibles seulement lorsqu'ils sont attachés à des usines, des contrats, des normes ou des programmes publics."
+      "en": "Europe has enough sustainably-produced biomass to supply food, materials, and energy at the same time.",
+      "fr": "L'Europe dispose de suffisamment de biomasse produite durablement pour approvisionner en même temps l'alimentation, les matériaux et l'énergie."
     }},
     {"code": "S02", "translations": {
-      "en": "Low-carbon construction should be the priority market for hemp, even if other outlets grow more quickly.",
-      "fr": "La construction bas carbone doit être le débouché prioritaire du chanvre, même si d'autres marchés progressent plus vite."
+      "en": "The order in which biomass is used — food first, then long-lived materials, and only then energy — should be written into binding law, not left to voluntary guidance.",
+      "fr": "L'ordre d'usage de la biomasse — d'abord l'alimentation, puis les matériaux durables, et seulement ensuite l'énergie — devrait être inscrit dans une loi contraignante, et non laissé à des recommandations volontaires."
     }},
     {"code": "S03", "translations": {
-      "en": "Hemp should first be developed where it can help protect water, soils, and crop rotations.",
-      "fr": "Le chanvre doit d'abord être développé là où il peut contribuer à protéger l'eau, les sols et les rotations agricoles."
+      "en": "Burning wood and crops for energy should no longer count as climate-neutral, because it releases carbon now and only pays it back over decades.",
+      "fr": "Brûler du bois et des cultures pour produire de l'énergie ne devrait plus être considéré comme neutre pour le climat, car cela rejette du carbone maintenant et ne le compense qu'au bout de décennies."
     }},
     {"code": "S04", "translations": {
-      "en": "A hemp bioeconomy is valuable only if processing and added value remain close to the producing territories.",
-      "fr": "Une bioéconomie du chanvre n'a de valeur que si la transformation et la valeur ajoutée restent proches des territoires producteurs."
+      "en": "Public money should reward bio-based products that store carbon for a long time, rather than fuels that burn it straight away.",
+      "fr": "L'argent public devrait récompenser les produits biosourcés qui stockent le carbone durablement, plutôt que les carburants qui le brûlent immédiatement."
     }},
     {"code": "S05", "translations": {
-      "en": "Public support for hemp should depend on measured evidence, not on the plant's green reputation.",
-      "fr": "Le soutien public au chanvre doit dépendre de preuves mesurées, et non de la réputation écologique de la plante."
+      "en": "The bioeconomy of the future will be built mainly on large biorefineries and advanced biotechnology, not on small local production.",
+      "fr": "La bioéconomie de demain reposera surtout sur de grandes bioraffineries et des biotechnologies avancées, et non sur une petite production locale."
     }},
     {"code": "S06", "translations": {
-      "en": "CBD and hemp flowers should be treated as legitimate agricultural futures, not as a distraction from industrial fibre.",
-      "fr": "Le CBD et les fleurs de chanvre doivent être traités comme des futurs agricoles légitimes, et non comme une distraction par rapport à la fibre industrielle."
+      "en": "An agriculture based on agroecology and food sovereignty is a realistic foundation for Europe's bioeconomy, not just a niche alternative.",
+      "fr": "Une agriculture fondée sur l'agroécologie et la souveraineté alimentaire est une base réaliste pour la bioéconomie européenne, et pas seulement une alternative de niche."
     }},
     {"code": "S07", "translations": {
-      "en": "The legal instability around CBD makes it too fragile to anchor the long-term hemp bioeconomy.",
-      "fr": "L'instabilité juridique autour du CBD rend ce débouché trop fragile pour ancrer la bioéconomie du chanvre à long terme."
+      "en": "Industrial scale is what turns good environmental ideas into real climate impact.",
+      "fr": "C'est l'échelle industrielle qui transforme de bonnes idées environnementales en un véritable effet sur le climat."
     }},
     {"code": "S08", "translations": {
-      "en": "Without harvesting machines, storage sites, and defibering capacity, hemp remains a promise more than a sector.",
-      "fr": "Sans machines de récolte, sites de stockage et capacités de défibrage, le chanvre reste davantage une promesse qu'une filière."
+      "en": "The bioeconomy can keep economies growing while staying within the planet's ecological limits.",
+      "fr": "La bioéconomie peut soutenir la croissance des économies tout en restant dans les limites écologiques de la planète."
     }},
     {"code": "S09", "translations": {
-      "en": "Cooperative supply chains are better suited than isolated start-ups to make hemp credible for farmers.",
-      "fr": "Les chaînes coopératives sont mieux placées que des start-up isolées pour rendre le chanvre crédible auprès des agriculteurs."
+      "en": "Wealthy European societies will have to consume less biomass-intensive goods overall; recycling and substitution will not be enough.",
+      "fr": "Les sociétés européennes aisées devront consommer globalement moins de biens gourmands en biomasse ; le recyclage et la substitution ne suffiront pas."
     }},
     {"code": "S10", "translations": {
-      "en": "Hemp needs industrial scale to move beyond niche experiments and become a serious bioeconomy material.",
-      "fr": "Le chanvre a besoin d'une échelle industrielle pour dépasser les expérimentations de niche et devenir un matériau sérieux de bioéconomie."
+      "en": "Replacing fossil and synthetic materials with bio-based ones is real climate progress in itself.",
+      "fr": "Remplacer les matériaux fossiles et synthétiques par des matériaux biosourcés constitue en soi un véritable progrès climatique."
     }},
     {"code": "S11", "translations": {
-      "en": "Scaling hemp too quickly could reproduce the extractive habits that the bioeconomy claims to replace.",
-      "fr": "Changer d'échelle trop vite pourrait reproduire les logiques extractives que la bioéconomie prétend remplacer."
+      "en": "Talk of green growth mostly serves to avoid the harder question of reducing how much we consume.",
+      "fr": "Le discours sur la croissance verte sert surtout à esquiver la question plus difficile de la réduction de notre consommation."
     }},
     {"code": "S12", "translations": {
-      "en": "Farmers will not commit to hemp without stable prices, contracts, and a clear place in the rotation.",
-      "fr": "Les agriculteurs ne s'engageront pas dans le chanvre sans prix stables, contrats et place claire dans la rotation."
+      "en": "Europe's bioeconomy quietly pushes its land and resource costs onto countries in the Global South.",
+      "fr": "La bioéconomie européenne reporte discrètement ses coûts en terres et en ressources sur les pays du Sud global."
     }},
     {"code": "S13", "translations": {
-      "en": "Public procurement should accept a higher price for hemp materials when it builds local capacity and lowers carbon.",
-      "fr": "La commande publique doit accepter un coût plus élevé pour les matériaux en chanvre lorsqu'ils construisent une capacité locale et réduisent le carbone."
+      "en": "A well-governed bio-based transition can spread its benefits widely and lift incomes for producers, including in supplier countries.",
+      "fr": "Une transition biosourcée bien gouvernée peut diffuser largement ses bénéfices et augmenter les revenus des producteurs, y compris dans les pays fournisseurs."
     }},
     {"code": "S14", "translations": {
-      "en": "Hemp should not be presented as a miracle crop; its limits must be visible from the start.",
-      "fr": "Le chanvre ne doit pas être présenté comme une plante miracle ; ses limites doivent être visibles dès le départ."
+      "en": "Who ends up owning and profiting from bio-based value chains matters as much as whether the products are renewable.",
+      "fr": "Savoir qui possède et tire profit des chaînes de valeur biosourcées importe autant que le caractère renouvelable des produits."
     }},
     {"code": "S15", "translations": {
-      "en": "Local industrial histories, such as textile regions, can give hemp futures a stronger public meaning.",
-      "fr": "Les histoires industrielles locales, comme celles des territoires textiles, peuvent donner un sens public plus fort aux futurs du chanvre."
+      "en": "Sustainability certificates and EU industrial funding tend to favour large, capital-rich companies over small producers and community projects.",
+      "fr": "Les certifications de durabilité et les financements industriels de l'UE tendent à favoriser les grandes entreprises bien capitalisées au détriment des petits producteurs et des projets collectifs."
     }},
     {"code": "S16", "translations": {
-      "en": "If hemp products depend on subsidies forever, they should not be called a durable bioeconomy.",
-      "fr": "Si les produits du chanvre dépendent indéfiniment des subventions, ils ne doivent pas être appelés une bioéconomie durable."
+      "en": "Clear standards, certification, and predictable funding matter more for a sustainable bioeconomy than grand political visions.",
+      "fr": "Des normes claires, des certifications et des financements prévisibles comptent davantage pour une bioéconomie durable que de grandes visions politiques."
     }},
     {"code": "S17", "translations": {
-      "en": "Energy projects based on hemp should receive support only after tariffs, infrastructure, and buyers are secured.",
-      "fr": "Les projets énergétiques fondés sur le chanvre ne doivent être soutenus qu'après sécurisation des tarifs, des infrastructures et des acheteurs."
+      "en": "Decisions about which bioeconomy to build should be made democratically, not handed to experts and industry.",
+      "fr": "Les décisions sur le type de bioéconomie à construire devraient être prises démocratiquement, et non confiées aux experts et à l'industrie."
     }},
     {"code": "S18", "translations": {
-      "en": "The most important future for hemp is not one sector, but a plural economy linking fibre, hurd, seed, flower, and waste streams.",
-      "fr": "Le futur le plus important du chanvre n'est pas un secteur unique, mais une économie plurielle reliant fibre, chènevotte, graine, fleur et coproduits."
+      "en": "Bioeconomy promises tend to follow a cycle of hype and disappointment, so betting public money on flagship biorefineries risks creating stranded assets.",
+      "fr": "Les promesses de la bioéconomie suivent souvent un cycle d'emballement puis de déception ; miser l'argent public sur des bioraffineries vitrines risque de créer des actifs échoués."
     }},
     {"code": "S19", "translations": {
-      "en": "Bio-based construction standards and insurance rules matter more for hemp adoption than public enthusiasm.",
-      "fr": "Les normes de construction biosourcée et les règles d'assurance comptent davantage pour l'adoption du chanvre que l'enthousiasme public."
+      "en": "Europe's latest bioeconomy strategy is a genuine shift toward sustainability, not just reassuring language that delays real change.",
+      "fr": "La dernière stratégie bioéconomie de l'Europe est un véritable tournant vers la durabilité, et non un discours rassurant qui retarde le changement réel."
     }},
     {"code": "S20", "translations": {
-      "en": "Hemp projects should be judged by who captures value, not only by whether the product is renewable.",
-      "fr": "Les projets chanvre doivent être jugés selon qui capte la valeur, et pas seulement selon le caractère renouvelable du produit."
+      "en": "The future of the bioeconomy should be kept open and plural, rather than locked early into one dominant model.",
+      "fr": "L'avenir de la bioéconomie devrait rester ouvert et pluriel, plutôt que d'être verrouillé trop tôt dans un modèle dominant unique."
     }},
     {"code": "S21", "translations": {
-      "en": "Small territorial experiments are more trustworthy than national claims about a single hemp transition.",
-      "fr": "Les petites expérimentations territoriales sont plus crédibles que les grands récits nationaux d'une transition unique par le chanvre."
+      "en": "Coherent top-down policy can drive the transition even if people do not change how they consume.",
+      "fr": "Une politique publique cohérente et descendante peut conduire la transition même si les gens ne changent pas leur manière de consommer."
     }},
     {"code": "S22", "translations": {
-      "en": "Hemp will remain marginal unless major builders, retailers, and public agencies create predictable demand.",
-      "fr": "Le chanvre restera marginal tant que les grands constructeurs, distributeurs et acteurs publics ne créeront pas une demande prévisible."
+      "en": "Real change will come from social movements and shifts in everyday consumption, not from government policy.",
+      "fr": "Le vrai changement viendra des mouvements sociaux et de l'évolution des consommations quotidiennes, et non des politiques publiques."
     }},
     {"code": "S23", "translations": {
-      "en": "Food, craft, and wellness uses deserve a place in the hemp future, even if they do not look industrial.",
-      "fr": "Les usages alimentaires, artisanaux et bien-être méritent une place dans le futur du chanvre, même s'ils ne semblent pas industriels."
+      "en": "Only a transition that changes both production and everyday consumption together can succeed.",
+      "fr": "Seule une transition qui change à la fois la production et la consommation quotidienne, ensemble, peut réussir."
     }},
     {"code": "S24", "translations": {
-      "en": "Conflicts around law, taxation, land use, and public funding should be made visible instead of hidden behind consensus language.",
-      "fr": "Les conflits autour du droit, de la fiscalité, de l'usage des terres et du financement public doivent être rendus visibles plutôt que masqués par un langage de consensus."
+      "en": "Given the trends of the last decades, Europe will most likely just muddle through and miss its climate targets.",
+      "fr": "Au vu des tendances des dernières décennies, l'Europe va très probablement se contenter de naviguer à vue et manquer ses objectifs climatiques."
     }},
     {"code": "S25", "translations": {
-      "en": "The future of hemp should stay open-ended; locking it too early into one market would make the sector weaker.",
-      "fr": "Le futur du chanvre doit rester ouvert ; le verrouiller trop tôt dans un seul marché rendrait la filière plus fragile."
+      "en": "New biotechnologies, including engineered organisms, are essential tools for a sustainable bioeconomy.",
+      "fr": "Les nouvelles biotechnologies, y compris les organismes modifiés, sont des outils indispensables à une bioéconomie durable."
     }}
   ],
-  "presort_config": {},
+  "presort_config": {
+    "enabled": true,
+    "fields": {
+      "familiarity": {
+        "type": "rating",
+        "label": {
+          "en": "Before you start: how familiar are you with debates about the future of the bioeconomy?",
+          "fr": "Avant de commencer : à quel point connaissez-vous les débats sur l'avenir de la bioéconomie ?"
+        },
+        "required": true,
+        "scale_points": 5,
+        "scale_labels": {
+          "left": {"en": "Not at all", "fr": "Pas du tout"},
+          "right": {"en": "Very familiar", "fr": "Très familier·ère"}
+        }
+      },
+      "sector": {
+        "type": "select",
+        "label": {
+          "en": "Which sector are you closest to?",
+          "fr": "De quel secteur êtes-vous le·la plus proche ?"
+        },
+        "required": true,
+        "options": [
+          {"value": "industry", "label": {"en": "Industry or biorefinery", "fr": "Industrie ou bioraffinerie"}},
+          {"value": "farming", "label": {"en": "Farming or forestry", "fr": "Agriculture ou foresterie"}},
+          {"value": "research", "label": {"en": "Research or analysis", "fr": "Recherche ou analyse"}},
+          {"value": "public", "label": {"en": "Policy or public authority", "fr": "Politique publique ou administration"}},
+          {"value": "civil_society", "label": {"en": "NGO or civil society", "fr": "ONG ou société civile"}},
+          {"value": "none", "label": {"en": "None of these", "fr": "Aucun de ceux-ci"}}
+        ]
+      }
+    }
+  },
   "rough_sort_enabled": true,
   "postsort_config": {
     "email_collection_enabled": false,
@@ -157,49 +190,58 @@
       "q_perspective": {
         "type": "select",
         "label": {
-          "en": "Which perspective best describes your relationship to the hemp bioeconomy?",
-          "fr": "Quelle perspective décrit le mieux votre lien avec la bioéconomie du chanvre ?"
+          "en": "Which perspective best describes your relationship to the bioeconomy?",
+          "fr": "Quelle perspective décrit le mieux votre lien avec la bioéconomie ?"
         },
         "required": true,
         "options": [
           {
+            "value": "industry",
+            "label": {"en": "Industry or biorefinery", "fr": "Industrie ou bioraffinerie"}
+          },
+          {
             "value": "farmer",
-            "label": { "en": "Farmer or grower", "fr": "Agriculteur·rice ou producteur·rice" }
-          },
-          {
-            "value": "processor",
-            "label": { "en": "Processor or cooperative", "fr": "Transformateur·rice ou coopérative" }
-          },
-          {
-            "value": "builder",
-            "label": { "en": "Builder or material user", "fr": "Constructeur·rice ou utilisateur·rice de matériaux" }
-          },
-          {
-            "value": "public_actor",
-            "label": { "en": "Public authority or agency", "fr": "Collectivité ou agence publique" }
+            "label": {"en": "Farmer or forester", "fr": "Agriculteur·rice ou forestier·ère"}
           },
           {
             "value": "researcher",
-            "label": { "en": "Researcher or student", "fr": "Chercheur·euse ou étudiant·e" }
+            "label": {"en": "Researcher or analyst", "fr": "Chercheur·euse ou analyste"}
+          },
+          {
+            "value": "public_actor",
+            "label": {"en": "Policy or public authority", "fr": "Politique publique ou administration"}
+          },
+          {
+            "value": "civil_society",
+            "label": {"en": "NGO or civil society", "fr": "ONG ou société civile"}
           },
           {
             "value": "citizen",
-            "label": { "en": "Interested citizen", "fr": "Citoyen·ne intéressé·e" }
+            "label": {"en": "Interested citizen", "fr": "Citoyen·ne intéressé·e"}
           }
         ]
       },
       "q_confidence": {
         "type": "rating",
         "label": {
-          "en": "How confident are you that your sort reflects your view of hemp futures?",
-          "fr": "Dans quelle mesure êtes-vous confiant·e que votre tri reflète votre point de vue sur les futurs du chanvre ?"
+          "en": "How confident are you that your sort reflects your view of bioeconomy futures?",
+          "fr": "Dans quelle mesure êtes-vous confiant·e que votre tri reflète votre point de vue sur les futurs de la bioéconomie ?"
         },
         "required": false,
         "scale_points": 5,
         "scale_labels": {
-          "left": { "en": "Not confident", "fr": "Peu confiant·e" },
-          "right": { "en": "Very confident", "fr": "Très confiant·e" }
+          "left": {"en": "Not confident", "fr": "Peu confiant·e"},
+          "right": {"en": "Very confident", "fr": "Très confiant·e"}
         }
+      },
+      "q_voice": {
+        "type": "text_audio",
+        "label": {
+          "en": "Optionally, record a short spoken comment about your sort.",
+          "fr": "Optionnel : enregistrez un bref commentaire audio sur votre tri."
+        },
+        "required": false,
+        "rows": 3
       }
     }
   }

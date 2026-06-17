@@ -27,10 +27,14 @@ from app.services.storage_service import StorageService
 
 
 def _make_service() -> tuple[StorageService, MagicMock]:
-    """Create a StorageService with a fully mocked s3_client."""
+    """Create a StorageService with a fully mocked s3_client.
+
+    By default presign_client mirrors s3_client (the no-public-endpoint case).
+    """
     svc = StorageService(skip_init=True)
     mock_client = MagicMock()
     svc.s3_client = mock_client
+    svc.presign_client = mock_client
     svc.bucket_name = "test-bucket"
     return svc, mock_client
 
@@ -251,6 +255,21 @@ def test_generate_presigned_url_client_error_raises_service_error():
 
     with pytest.raises(ServiceError, match="Failed to generate audio URL"):
         svc.generate_presigned_url("audio/study/x.webm")
+
+
+def test_generate_presigned_url_uses_dedicated_presign_client():
+    """When a public endpoint is configured, presigning uses presign_client
+    (signed for the browser-facing host), not the internal put/get client."""
+    svc, internal_client = _make_service()
+    presign_client = MagicMock()
+    svc.presign_client = presign_client  # simulates S3_PUBLIC_ENDPOINT_URL set
+    presign_client.generate_presigned_url.return_value = "https://localhost:9000/x?sig"
+
+    url = svc.generate_presigned_url("audio/study/x.webm", expiration=3600)
+
+    assert url == "https://localhost:9000/x?sig"
+    presign_client.generate_presigned_url.assert_called_once()
+    internal_client.generate_presigned_url.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
