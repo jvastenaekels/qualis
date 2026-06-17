@@ -88,7 +88,7 @@ scalingo --app qualis logs -n 100
 
 ## Docker
 
-A `docker-compose.yml` is provided at the repository root. For SoftwareX evaluation or local exploration, use the repository defaults through `make demo-up`; they start PostgreSQL, the backend, and the frontend at `http://localhost:3000` with the demo admin account documented in the README.
+A `docker-compose.yml` is provided at the repository root. For evaluation or local exploration, use the repository defaults through `make demo-up`; they start PostgreSQL, the backend, and the frontend at `http://localhost:3000` with the demo admin account documented in the README.
 
 For production-like Docker deployment, override the development defaults before launch. At minimum, set strong `SECRET_KEY` and `IP_HASH_SALT` values, set `ENVIRONMENT=production`, configure `ALLOWED_ORIGINS`, and point `DATABASE_URL` at the intended PostgreSQL database. See the [Configuration reference](../reference/configuration.md#environment--app-settings).
 

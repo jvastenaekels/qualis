@@ -1,7 +1,5 @@
-"""Owner role is set at project creation and cannot be assigned via API.
+"""Owner role is set at project creation and cannot be assigned via API."""
 
-Spec: docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §4.4.
-"""
 from __future__ import annotations
 
 import pytest

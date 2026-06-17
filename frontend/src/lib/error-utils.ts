@@ -48,8 +48,6 @@ export function parseApiErrorSync(error: unknown, defaultMessage: string): strin
  * Works with both raw ApiErrorPayload objects and ApiError instances
  * (which already have `.code` and `.message` as direct properties after
  * parseErrorBody runs in client.ts).
- *
- * Spec: docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §7.3.
  */
 
 export const ERROR_KEY: Record<string, string> = {

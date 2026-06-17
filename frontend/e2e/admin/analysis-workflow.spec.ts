@@ -1,7 +1,7 @@
 /**
  * E2E: Admin Q-method factor-analysis workflow
  *
- * Resolves audit finding F-04-006 (major, SoftwareX-tagged).
+ * Resolves audit finding F-04-006 (major).
  * Covers the scientifically central feature path:
  *   navigate → run analysis → verify all 4 result regions render
  *   → verify AnalysisRun history captures the run → history navigation.

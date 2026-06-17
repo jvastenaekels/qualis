@@ -6,8 +6,7 @@ Create Date: 2026-05-02 21:38:01.539550
 
 Renames `researcher` role to `member`, recreates the projectrole enum
 without the legacy value, and installs a partial unique index that enforces
-one Owner per project. See
-docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §9.
+one Owner per project (project-roles-refactor design, §9).
 """
 from typing import Sequence, Union
 

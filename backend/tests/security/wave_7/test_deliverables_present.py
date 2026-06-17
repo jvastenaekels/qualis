@@ -1,9 +1,11 @@
-"""Wave 7 regression test: assert all audit deliverables exist and contain expected sections.
+"""Regression test: assert the public security deliverables exist and contain
+their expected sections.
 
-Pinned by the closing commit of the 2026-05-03 comprehensive security audit;
-fails if a future cleanup deletes the threat model, GDPR memo, exec summary,
-SECURITY.md extension, or audit-history index.
+The detailed audit dossiers are kept outside this repository; this guards the
+two public-facing security documents that remain: SECURITY.md and the GDPR
+memo for self-hosters.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -11,14 +13,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3].parent
 
 DELIVERABLES = {
-    "threat_model": (
-        "docs/audits/2026-05-03-comprehensive-security-audit/08-threat-model.md",
-        ["STRIDE", "Top-10", "attack tree", "Trust boundaries"],
-    ),
-    "executive_summary": (
-        "docs/audits/2026-05-03-comprehensive-security-audit/00-executive-summary.md",
-        ["Audit scope", "Severity counts", "Risk delta", "Methodology"],
-    ),
     "gdpr_memo": (
         "docs/reference/gdpr-self-hosters.md",
         [
@@ -41,21 +35,13 @@ DELIVERABLES = {
             "2026-05-03",
         ],
     ),
-    "audits_index": (
-        "docs/audits/README.md",
-        ["2026-05-03", "2026-04-25", "Comprehensive security audit"],
-    ),
-    "action_backlog": (
-        "docs/audits/2026-05-03-comprehensive-security-audit/99-action-backlog.md",
-        ["Wave 1", "Wave 7", "Deferred items"],
-    ),
 }
 
 
 def test_all_deliverables_exist() -> None:
     for name, (path, _) in DELIVERABLES.items():
         full = REPO_ROOT / path
-        assert full.is_file(), f"Wave 7 deliverable missing: {name} at {path}"
+        assert full.is_file(), f"Security deliverable missing: {name} at {path}"
 
 
 def test_deliverables_contain_expected_sections() -> None:

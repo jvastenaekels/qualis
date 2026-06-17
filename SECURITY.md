@@ -70,20 +70,16 @@ These are not a guarantee of security but document the design choices reviewers 
 
 ## Audit history
 
-A multi-axis pre-submission code audit was conducted on **2026-04-25**.
-Findings at `docs/audits/2026-04-25-deep-audit/`.
-
-A seven-wave **comprehensive security audit** was conducted on
-**2026-05-03**, refreshing the prior audit and adding deep dives across
-auth-email flows, multi-tenant isolation, the consent and anonymisation
-pipeline, business-logic abuse, and supply chain. The audit also
-produced this SECURITY.md update, a threat model, an executive summary,
-and a GDPR memo for self-hosters. Materials at
-`docs/audits/2026-05-03-comprehensive-security-audit/`. Executive
-summary: `00-executive-summary.md`.
+A multi-axis pre-submission code audit was conducted on **2026-04-25**,
+followed by a seven-wave **comprehensive security audit** on
+**2026-05-03** with deep dives across auth-email flows, multi-tenant
+isolation, the consent and anonymisation pipeline, business-logic abuse,
+and supply chain. Those audits produced this SECURITY.md, the
+security-relevant practices listed above, a threat model, and the GDPR
+memo for self-hosters. The detailed audit dossiers are kept outside this
+repository; the security-relevant outcomes are summarised here and in the
+GDPR memo below.
 
 ## Related documentation
 
-- **Threat model:** `docs/audits/2026-05-03-comprehensive-security-audit/08-threat-model.md`
 - **GDPR memo for self-hosters:** `docs/reference/gdpr-self-hosters.md`
-- **Action backlog:** `docs/audits/2026-05-03-comprehensive-security-audit/99-action-backlog.md`

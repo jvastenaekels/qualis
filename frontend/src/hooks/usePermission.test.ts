@@ -1,6 +1,3 @@
-/*
- * Spec: docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §7.1
- */
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { usePermission } from './usePermission';

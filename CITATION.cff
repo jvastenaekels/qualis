@@ -20,7 +20,7 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.20199750"
     description: "Zenodo archive of Qualis v0.6.7"
-  # TODO (0.7.1 SoftwareX submission): once the GitHub release triggers the Zenodo
+  # TODO (0.7.1 release): once the GitHub release triggers the Zenodo
   # archive for v0.7.1, replace the placeholder DOI below with the real version DOI
   # and point the manuscript C3/S3 capsule link at it.
   #   - type: doi

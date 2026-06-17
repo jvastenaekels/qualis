@@ -1,7 +1,7 @@
 # Lychee link-checker config
 # Used by `.github/workflows/ci.yml` Documentation Links job.
 
-# Skip placeholders for the SoftwareX paper DOI and the Zenodo software-release
+# Skip placeholders for the paper DOI and the Zenodo software-release
 # DOI; both are filled in once the corresponding artefacts are published.
 # Skip the SAGE Methods URL — server returns a redirect loop on automated
 # checkers (works fine in browsers). Skip the Zenodo GitHub settings URL
