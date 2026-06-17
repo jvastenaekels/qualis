@@ -80,6 +80,13 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+      # On a cold first start the backend runs `uv sync` (dependency download)
+      # and Alembic migrations before serving /health — this can exceed the
+      # retry window (12 x 5s) on a fresh build. During start_period, failing
+      # probes do NOT mark the container unhealthy, so `make demo-up` no longer
+      # aborts the frontend on slow first boots. A probe that succeeds earlier
+      # flips the container healthy immediately.
+      start_period: 180s
 
   frontend:
     build: ./frontend
