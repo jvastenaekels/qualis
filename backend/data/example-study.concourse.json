@@ -1,0 +1,552 @@
+{
+  "title": "Bioeconomy Futures — statement concourse",
+  "description": "Synthetic demo concourse for the Bioeconomy Futures study. It illustrates how a Q-set is curated from a wider pool of candidate statements: items are drafted, discussed in comments, edited (with a recorded change history), and then accepted, rejected, or left under discussion. The 25 accepted items become the study Q-set. Candidate themes are inspired by the JRC foresight scenarios for the EU bioeconomy in 2050 (Fritsche et al., 2021) and the debates around them.",
+  "default_language": "en",
+  "items": [
+    {
+      "code": "S01",
+      "source": "JRC foresight 2050 (Fritsche et al. 2021); EC 2025 'enough sustainable biomass' claim vs EEB/EPN",
+      "create_status": "proposed",
+      "translations": {
+        "en": "There is plenty of biomass in Europe to cover food, materials and energy all at once.",
+        "fr": "Il y a largement assez de biomasse en Europe pour couvrir à la fois l'alimentation, les matériaux et l'énergie."
+      },
+      "revisions": [
+        {
+          "change_comment": "Specify 'sustainably-produced': the contested claim is about sustainable supply, not raw tonnage. Accepted for the Q-set.",
+          "status": "accepted",
+          "translations": {
+            "en": "Europe has enough sustainably-produced biomass to supply food, materials, and energy at the same time.",
+            "fr": "L'Europe dispose de suffisamment de biomasse produite durablement pour approvisionner en même temps l'alimentation, les matériaux et l'énergie."
+          }
+        }
+      ],
+      "comments": [
+        "This is the single most contested empirical claim in the 2025 strategy debate — it has to be in the set.",
+        "Agreed, but as first drafted it reads as a volume claim. The disagreement is about *sustainable* availability (imports, ecological limits). Rewording."
+      ]
+    },
+    {
+      "code": "S02",
+      "source": "EU cascading-use principle (non-binding guidance) vs calls for a binding hierarchy",
+      "create_status": "accepted",
+      "translations": {
+        "en": "The order in which biomass is used — food first, then long-lived materials, and only then energy — should be written into binding law, not left to voluntary guidance.",
+        "fr": "L'ordre d'usage de la biomasse — d'abord l'alimentation, puis les matériaux durables, et seulement ensuite l'énergie — devrait être inscrit dans une loi contraignante, et non laissé à des recommandations volontaires."
+      },
+      "revisions": [],
+      "comments": [
+        "Good — captures the 'cascading use as a fig leaf' critique without naming the regulation, so it stays sortable for a general panel."
+      ]
+    },
+    {
+      "code": "S03",
+      "source": "EASAC carbon-debt position vs transitional-renewable defence",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Bioenergy from wood and crops is not really carbon-neutral.",
+        "fr": "La bioénergie issue du bois et des cultures n'est pas vraiment neutre pour le climat."
+      },
+      "revisions": [
+        {
+          "change_comment": "Add the carbon-debt mechanism (releases now / pays back over decades) so it states a reason, not just an assertion.",
+          "translations": {
+            "en": "Burning wood and crops for energy releases carbon now and only pays it back over decades, so it should not count as climate-neutral.",
+            "fr": "Brûler du bois et des cultures pour l'énergie rejette du carbone maintenant et ne le compense qu'au bout de décennies, donc cela ne devrait pas être considéré comme neutre pour le climat."
+          }
+        },
+        {
+          "change_comment": "Lead with the policy claim and keep the mechanism as the reason; reads better as a stance. Accepted.",
+          "status": "accepted",
+          "translations": {
+            "en": "Burning wood and crops for energy should no longer count as climate-neutral, because it releases carbon now and only pays it back over decades.",
+            "fr": "Brûler du bois et des cultures pour produire de l'énergie ne devrait plus être considéré comme neutre pour le climat, car cela rejette du carbone maintenant et ne le compense qu'au bout de décennies."
+          }
+        }
+      ],
+      "comments": [
+        "Careful not to make this a factual quiz. Phrase it as a stance on how bioenergy *should be counted*, which is the live policy fight.",
+        "Two edits in and it now discriminates cleanly between the EASAC view and the residue/transitional-renewable defenders."
+      ]
+    },
+    {
+      "code": "S04",
+      "source": "NGO position: incentivise carbon-storing materials over combustion",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Public money should reward bio-based products that store carbon for a long time, rather than fuels that burn it straight away.",
+        "fr": "L'argent public devrait récompenser les produits biosourcés qui stockent le carbone durablement, plutôt que les carburants qui le brûlent immédiatement."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S05",
+      "source": "Hausknost 'Sustainable Capital' pole vs 'Eco-Retreat'; three-visions typology (Bugge 2016)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "The bioeconomy of the future will be built mainly on large biorefineries and advanced biotechnology, not on small local production.",
+        "fr": "La bioéconomie de demain reposera surtout sur de grandes bioraffineries et des biotechnologies avancées, et non sur une petite production locale."
+      },
+      "revisions": [],
+      "comments": [
+        "This is one of our cleanest discriminators between the industrial and the territorial voices — keep."
+      ]
+    },
+    {
+      "code": "S06",
+      "source": "Bio-ecology vision (lowest salience in strategies, Proestou et al. 2023)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "An agriculture based on agroecology and food sovereignty is a realistic foundation for Europe's bioeconomy, not just a niche alternative.",
+        "fr": "Une agriculture fondée sur l'agroécologie et la souveraineté alimentaire est une base réaliste pour la bioéconomie européenne, et pas seulement une alternative de niche."
+      },
+      "revisions": [],
+      "comments": [
+        "The '...not just a niche alternative' tail is doing real work — it forces sceptics to disagree rather than park it at neutral."
+      ]
+    },
+    {
+      "code": "S07",
+      "source": "Scale-as-impact argument (industrial green-growth voice)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Industrial scale is what turns good environmental ideas into real climate impact.",
+        "fr": "C'est l'échelle industrielle qui transforme de bonnes idées environnementales en un véritable effet sur le climat."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S08",
+      "source": "Green-growth / decoupling framing vs MAGNET per-capita-income finding (JRC118064)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "The bioeconomy can keep economies growing while staying within the planet's ecological limits.",
+        "fr": "La bioéconomie peut soutenir la croissance des économies tout en restant dans les limites écologiques de la planète."
+      },
+      "revisions": [],
+      "comments": [
+        "The growth-vs-limits axis is central; this is the positive pole of it."
+      ]
+    },
+    {
+      "code": "S09",
+      "source": "Strong-sustainability / sufficiency vs weak-sustainability substitution",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Rich countries simply have to consume less.",
+        "fr": "Les pays riches doivent tout simplement consommer moins."
+      },
+      "revisions": [
+        {
+          "change_comment": "Too blunt and too broad. Scope it to biomass-intensive goods and name the rival claim (recycling/substitution) so the disagreement is explicit. Accepted.",
+          "status": "accepted",
+          "translations": {
+            "en": "Wealthy European societies will have to consume less biomass-intensive goods overall; recycling and substitution will not be enough.",
+            "fr": "Les sociétés européennes aisées devront consommer globalement moins de biens gourmands en biomasse ; le recyclage et la substitution ne suffiront pas."
+          }
+        }
+      ],
+      "comments": [
+        "'Consume less' on its own is a slogan. The interesting claim is that efficiency and substitution are *insufficient* — let's make the statement carry that."
+      ]
+    },
+    {
+      "code": "S10",
+      "source": "Substitution-as-progress vs substitution-as-alibi",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Replacing fossil and synthetic materials with bio-based ones is real climate progress in itself.",
+        "fr": "Remplacer les matériaux fossiles et synthétiques par des matériaux biosourcés constitue en soi un véritable progrès climatique."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S11",
+      "source": "Eversberg 'economy of promises'; green-growth as deferral",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Talk of green growth mostly serves to avoid the harder question of reducing how much we consume.",
+        "fr": "Le discours sur la croissance verte sert surtout à esquiver la question plus difficile de la réduction de notre consommation."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S12",
+      "source": "Ramcilovic-Suominen 'green sacrifice zones'; green-grabbing critique",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Europe's bioeconomy quietly pushes its land and resource costs onto countries in the Global South.",
+        "fr": "La bioéconomie européenne reporte discrètement ses coûts en terres et en ressources sur les pays du Sud global."
+      },
+      "revisions": [],
+      "comments": [
+        "Keep 'quietly' — it carries the 'displacement is intrinsic, not incidental' point that the decolonial critique makes."
+      ]
+    },
+    {
+      "code": "S13",
+      "source": "Green-growth / shared-prosperity framing (EC competitiveness narrative); affirmative counter-pole to S12/S14",
+      "create_status": "accepted",
+      "translations": {
+        "en": "A well-governed bio-based transition can spread its benefits widely and lift incomes for producers, including in supplier countries.",
+        "fr": "Une transition biosourcée bien gouvernée peut diffuser largement ses bénéfices et augmenter les revenus des producteurs, y compris dans les pays fournisseurs."
+      },
+      "revisions": [],
+      "comments": [
+        "Deliberately the affirmative counter-pole to S12 and S14: the justice dimension needs an item the optimists can agree with, not only critical ones, otherwise the sort can't separate the 'who pays' sceptics from the 'shared benefits' believers."
+      ]
+    },
+    {
+      "code": "S14",
+      "source": "Value-capture critique (who owns the value chain)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Who ends up owning and profiting from bio-based value chains matters as much as whether the products are renewable.",
+        "fr": "Savoir qui possède et tire profit des chaînes de valeur biosourcées importe autant que le caractère renouvelable des produits."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S15",
+      "source": "Vogelpohl 2023: standards/finance as gatekeepers; BBI/CBE JU",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Certification favours big companies.",
+        "fr": "La certification favorise les grandes entreprises."
+      },
+      "revisions": [
+        {
+          "change_comment": "Name both mechanisms (certificates + EU industrial funding) and the groups disadvantaged (small producers, community projects). Accepted.",
+          "status": "accepted",
+          "translations": {
+            "en": "Sustainability certificates and EU industrial funding tend to favour large, capital-rich companies over small producers and community projects.",
+            "fr": "Les certifications de durabilité et les financements industriels de l'UE tendent à favoriser les grandes entreprises bien capitalisées au détriment des petits producteurs et des projets collectifs."
+          }
+        }
+      ],
+      "comments": [
+        "Originally just 'certification favours big companies' — too thin. The funding instruments are half the story, so let's name them."
+      ]
+    },
+    {
+      "code": "S16",
+      "source": "Standards-and-finance-first (pragmatic governance voice)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Clear standards, certification, and predictable funding matter more for a sustainable bioeconomy than grand political visions.",
+        "fr": "Des normes claires, des certifications et des financements prévisibles comptent davantage pour une bioéconomie durable que de grandes visions politiques."
+      },
+      "revisions": [],
+      "comments": [
+        "Deliberately the mirror image of S15 — one panel will read standards as the solution, another as the gatekeeping problem."
+      ]
+    },
+    {
+      "code": "S17",
+      "source": "Democratic / epistemic-justice governance (Ramcilovic-Suominen alternatives)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Decisions about which bioeconomy to build should be made democratically, not handed to experts and industry.",
+        "fr": "Les décisions sur le type de bioéconomie à construire devraient être prises démocratiquement, et non confiées aux experts et à l'industrie."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S18",
+      "source": "Sociology of expectations; cellulosic-ethanol lock-in / stranded assets",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Bioeconomy promises tend to follow a cycle of hype and disappointment, so betting public money on flagship biorefineries risks creating stranded assets.",
+        "fr": "Les promesses de la bioéconomie suivent souvent un cycle d'emballement puis de déception ; miser l'argent public sur des bioraffineries vitrines risque de créer des actifs échoués."
+      },
+      "revisions": [],
+      "comments": [
+        "Long, but the hype-cycle and the stranded-asset risk belong together — splitting them weakened both. Keeping as one item."
+      ]
+    },
+    {
+      "code": "S19",
+      "source": "EU 2025 strategy: genuine reorientation vs co-optation of critique (Eversberg-Koch)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Europe's latest bioeconomy strategy is a genuine and ambitious shift toward sustainability.",
+        "fr": "La dernière stratégie bioéconomie de l'Europe est un tournant véritable et ambitieux vers la durabilité."
+      },
+      "revisions": [
+        {
+          "change_comment": "Drop 'ambitious' (double-barrelled) and name the rival reading (reassuring language that delays change), so agree/disagree maps onto the genuine-vs-greenwash axis. Accepted.",
+          "status": "accepted",
+          "translations": {
+            "en": "Europe's latest bioeconomy strategy is a genuine shift toward sustainability, not just reassuring language that delays real change.",
+            "fr": "La dernière stratégie bioéconomie de l'Europe est un véritable tournant vers la durabilité, et non un discours rassurant qui retarde le changement réel."
+          }
+        }
+      ],
+      "comments": [
+        "'Genuine and ambitious' is two judgements. Keep one axis (genuine vs greenwashing) or the factor structure gets muddy."
+      ]
+    },
+    {
+      "code": "S20",
+      "source": "Openness/plurality of futures (anti-lock-in)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "The future of the bioeconomy should be kept open and plural, rather than locked early into one dominant model.",
+        "fr": "L'avenir de la bioéconomie devrait rester ouvert et pluriel, plutôt que d'être verrouillé trop tôt dans un modèle dominant unique."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S21",
+      "source": "JRC scenario 'Do it for us' (proactive policy, BAU consumption)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Coherent top-down policy can drive the transition even if people do not change how they consume.",
+        "fr": "Une politique publique cohérente et descendante peut conduire la transition même si les gens ne changent pas leur manière de consommer."
+      },
+      "revisions": [],
+      "comments": [
+        "We have one statement per JRC scenario (S21 'Do it for us', S22 'Do it ourselves', S23 'Do it together', S24 'Do what is unavoidable'). Nice symmetry, and they sort very differently."
+      ]
+    },
+    {
+      "code": "S22",
+      "source": "JRC scenario 'Do it ourselves' (bottom-up societal change, policy fails)",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Real change will come from social movements and shifts in everyday consumption, not from government policy.",
+        "fr": "Le vrai changement viendra des mouvements sociaux et de l'évolution des consommations quotidiennes, et non des politiques publiques."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S23",
+      "source": "JRC scenario 'Do it together' (integrative: supply + demand)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "We need to change both production and consumption.",
+        "fr": "Il faut changer à la fois la production et la consommation."
+      },
+      "revisions": [
+        {
+          "change_comment": "Recast as a contestable 'only ... together can succeed' claim — otherwise everyone agrees and it doesn't discriminate. Accepted.",
+          "status": "accepted",
+          "translations": {
+            "en": "Only a transition that changes both production and everyday consumption together can succeed.",
+            "fr": "Seule une transition qui change à la fois la production et la consommation quotidienne, ensemble, peut réussir."
+          }
+        }
+      ],
+      "comments": [
+        "As first written it was a motherhood statement. The 'only ... can succeed' framing is what makes the technocratic-integrative voice load on it."
+      ]
+    },
+    {
+      "code": "S24",
+      "source": "JRC scenario 'Do what is unavoidable' (reactive muddle-through, judged 'most realistic')",
+      "create_status": "accepted",
+      "translations": {
+        "en": "Given the trends of the last decades, Europe will most likely just muddle through and miss its climate targets.",
+        "fr": "Au vu des tendances des dernières décennies, l'Europe va très probablement se contenter de naviguer à vue et manquer ses objectifs climatiques."
+      },
+      "revisions": [],
+      "comments": [
+        "The JRC itself calls this scenario 'the most realistic given the last three decades', which is exactly why it's worth sorting."
+      ]
+    },
+    {
+      "code": "S25",
+      "source": "Biotechnology vision (Bugge 2016); precaution vs innovation",
+      "create_status": "accepted",
+      "translations": {
+        "en": "New biotechnologies, including engineered organisms, are essential tools for a sustainable bioeconomy.",
+        "fr": "Les nouvelles biotechnologies, y compris les organismes modifiés, sont des outils indispensables à une bioéconomie durable."
+      },
+      "revisions": [],
+      "comments": []
+    },
+    {
+      "code": "S26",
+      "source": "EASAC carbon-debt debate (overstated variant)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Bioenergy is always worse for the climate than fossil fuels.",
+        "fr": "La bioénergie est toujours pire pour le climat que les énergies fossiles."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: 'always' overstates the science and makes it a factual claim, not a viewpoint. The defensible version is S03.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Too absolute. Carbon-debt depends on feedstock and timescale; 'always' is indefensible and would just measure misinformation. Superseded by S03."
+      ]
+    },
+    {
+      "code": "S27",
+      "source": "Bioeconomy-as-rural-revitalisation promise (promotional framing)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "The bioeconomy will create green jobs and revitalise rural areas.",
+        "fr": "La bioéconomie créera des emplois verts et revitalisera les zones rurales."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: double-barrelled (jobs AND rural revitalisation) and reads like a brochure — too leading to sort honestly.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Two claims in one, and both are 'good things' nobody opposes as phrased. Drop."
+      ]
+    },
+    {
+      "code": "S28",
+      "source": "Crop-specific framing",
+      "create_status": "rejected",
+      "translations": {
+        "en": "Hemp and miscanthus should be Europe's priority bioeconomy crops.",
+        "fr": "Le chanvre et le miscanthus devraient être les cultures prioritaires de la bioéconomie européenne."
+      },
+      "revisions": [],
+      "comments": [
+        "Too crop-specific for a study pitched at the sector/EU level — narrows the concourse to one technical debate. Rejected up front."
+      ]
+    },
+    {
+      "code": "S29",
+      "source": "Anti-pellet framing (leading)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Obviously, destroying forests for wood pellets is unacceptable.",
+        "fr": "Évidemment, détruire des forêts pour des granulés de bois est inacceptable."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: leading wording ('obviously', 'unacceptable') — no one can disagree as phrased, so it carries no sorting information.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Classic leading item. If we care about the pellet/forest-sink issue, it's already carried by S03 and S04."
+      ]
+    },
+    {
+      "code": "S30",
+      "source": "Value-capture (redundant variant)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Multinationals capture most of the value in bio-based industries.",
+        "fr": "Les multinationales captent l'essentiel de la valeur dans les industries biosourcées."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: folds into S14 and S15. Keeping all three would over-weight the value-capture dimension in the sort.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Same dimension as S14/S15. Remove to avoid double-counting justice in the Q-set."
+      ]
+    },
+    {
+      "code": "S31",
+      "source": "Slogan / non-discriminating",
+      "create_status": "rejected",
+      "translations": {
+        "en": "The bioeconomy is the future.",
+        "fr": "La bioéconomie, c'est l'avenir."
+      },
+      "revisions": [],
+      "comments": [
+        "Too vague to place meaningfully — everyone parks it near neutral. Rejected."
+      ]
+    },
+    {
+      "code": "S32",
+      "source": "Technical-bottleneck framing (expert-only)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Lignin valorisation is the key technical bottleneck for biorefineries.",
+        "fr": "La valorisation de la lignine est le principal verrou technique des bioraffineries."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: a technical-fact judgement only specialists can hold — not a viewpoint a mixed panel can sort.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Interesting but it's expertise, not opinion. Out of scope for this panel."
+      ]
+    },
+    {
+      "code": "S33",
+      "source": "Import-ban prescription (compound / over-prescriptive)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Europe should ban all biomass imports to protect the Global South.",
+        "fr": "L'Europe devrait interdire toute importation de biomasse pour protéger le Sud global."
+      },
+      "revisions": [
+        {
+          "change_comment": "Reject: conflates the justice concern (already in S12) with one specific, extreme policy. Keep the concern, drop the prescription.",
+          "status": "rejected"
+        }
+      ],
+      "comments": [
+        "Agree the displacement concern matters — that's S12. A blanket import ban is a separate, contestable policy and bundling them muddies the item."
+      ]
+    },
+    {
+      "code": "S34",
+      "source": "Carbon farming / removal credits (CRCF, EU Buyers' Club, 2026 ETS review)",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Carbon farming and removal credits will do more harm than good by letting big emitters keep polluting.",
+        "fr": "L'agriculture de carbone et les crédits de séquestration feront plus de mal que de bien en laissant les gros émetteurs continuer à polluer."
+      },
+      "revisions": [],
+      "comments": [
+        "Strong discriminator, but it's tied to a 2025/2026 instrument that participants may not know. Leave proposed and decide after the pilot.",
+        "If we keep it, we may need a one-line gloss on 'removal credits'."
+      ]
+    },
+    {
+      "code": "S35",
+      "source": "Bio-based plastics: solution vs marketing",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Bio-based plastics are mostly a marketing story, not a real environmental solution.",
+        "fr": "Les plastiques biosourcés relèvent surtout du marketing, et non d'une véritable solution environnementale."
+      },
+      "revisions": [],
+      "comments": [
+        "Good item. Check it doesn't just duplicate S10 (substitution-as-progress) before we promote it.",
+        "It's narrower than S10 — about one product family — so it might add signal. Keep proposed pending the pilot."
+      ]
+    },
+    {
+      "code": "S36",
+      "source": "Supply sovereignty: domestic production vs certified imports",
+      "create_status": "proposed",
+      "translations": {
+        "en": "Europe should rely on imported certified biomass rather than try to maximise its own production.",
+        "fr": "L'Europe devrait s'appuyer sur de la biomasse importée certifiée plutôt que de chercher à maximiser sa propre production."
+      },
+      "revisions": [],
+      "comments": [
+        "Interesting supply-sovereignty angle that cuts across the other factors. Wording still a bit clunky — proposed for now."
+      ]
+    }
+  ]
+}

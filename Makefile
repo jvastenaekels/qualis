@@ -20,7 +20,7 @@ demo-up:
 	docker compose up --build -d
 
 demo-seed:
-	docker compose exec backend uv run python seed.py data/example-study.json --activate
+	docker compose exec backend uv run python seed_demo.py
 
 demo-lipset:
 	docker compose exec backend uv run python seed_lipset.py
@@ -31,7 +31,7 @@ validate-lipset:
 demo-smoke:
 	curl -fsS http://localhost:3000/ >/dev/null
 	curl -fsS http://localhost:3000/health >/dev/null
-	curl -fsS http://localhost:3000/api/study/hemp-bioeconomy-futures >/dev/null
+	curl -fsS http://localhost:3000/api/study/bioeconomy-futures >/dev/null
 
 demo-down:
 	docker compose down

@@ -74,10 +74,20 @@ class Settings(BaseSettings):
     S3_ENDPOINT_URL: str | None = (
         None  # e.g., https://cellar-c2.services.clever-cloud.com
     )
+    # Optional public-facing endpoint used ONLY to sign presigned URLs. Set this
+    # when object storage is reached internally at one host but must be served to
+    # browsers at another — e.g. MinIO in Docker, reached by the backend at
+    # http://minio:9000 (S3_ENDPOINT_URL) but played back by the browser at
+    # http://localhost:9000 (S3_PUBLIC_ENDPOINT_URL). Defaults to S3_ENDPOINT_URL.
+    S3_PUBLIC_ENDPOINT_URL: str | None = None
     S3_REGION: str = "us-east-1"
     S3_BUCKET_NAME: str | None = None
     S3_ACCESS_KEY_ID: str | None = None
     S3_SECRET_ACCESS_KEY: str | None = None
+    # boto3 S3 addressing style. Default "auto" preserves current behaviour for
+    # AWS / Cellar; set "path" for MinIO and other path-style-only stores
+    # (virtual-host style would resolve to bucket.<host>, which MinIO rejects).
+    S3_ADDRESSING_STYLE: str = "auto"
 
     # Email verification & password-reset token lifetimes
     EMAIL_VERIFICATION_REQUIRED: bool = True

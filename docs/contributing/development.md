@@ -97,7 +97,7 @@ cd backend && uv run python init_db.py && cd ..
 cd backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
-After seeding, you can walk the participant flow at <http://localhost:5173/study/hemp-bioeconomy-futures>.
+After seeding, you can walk the participant flow at <http://localhost:5173/study/bioeconomy-futures>. To seed the full demo (study design, a curated concourse, and 18 synthetic pre-/post-sort Q-sorts) run `uv run python seed_demo.py` from `backend/` instead, with the backend running.
 
 ### Run the dev servers
 
@@ -165,6 +165,8 @@ Two architecture fitness functions run in CI ([`.github/workflows/ci.yml`](../..
 | `make migration-new` | Generate a new revision after editing models. **Always review** — auto-generation against an out-of-sync DB will include unrelated tables. |
 | `make db-reset` | Drop and recreate all tables. **Destroys local data.** |
 | `cd backend && uv run python seed.py data/example-study.json` | Update or create a study from a JSON definition. Backend must be running. |
+| `cd backend && uv run python seed_demo.py` | Seed the full Bioeconomy Futures demo: study, curated concourse, and 18 synthetic pre-/post-sort Q-sorts (audio comments included when object storage is configured; skipped otherwise). Idempotent. Backend must be running. |
+| `cd backend && uv run --with edge-tts python scripts/generate_demo_audio.py` | Regenerate the synthetic spoken audio clips in `data/audio/` (needs network; `edge-tts` is not a runtime dependency). Re-run only to refresh the committed clips. |
 
 For the migration chain and conventions, see the "Database Migrations" section in [`CLAUDE.md`](../../CLAUDE.md).
 
