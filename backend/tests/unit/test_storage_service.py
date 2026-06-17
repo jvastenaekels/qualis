@@ -17,6 +17,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from botocore.exceptions import ClientError
 
+from app.core.config import settings
 from app.exceptions import NotFoundError, ServiceError
 from app.services.storage_service import StorageService
 
@@ -31,6 +32,8 @@ def _make_service() -> tuple[StorageService, MagicMock]:
     svc = StorageService(skip_init=True)
     mock_client = MagicMock()
     svc.s3_client = mock_client
+    # Default: one client serves both upload and presigning (no split endpoint).
+    svc.presign_client = mock_client
     svc.bucket_name = "test-bucket"
     return svc, mock_client
 
@@ -251,6 +254,60 @@ def test_generate_presigned_url_client_error_raises_service_error():
 
     with pytest.raises(ServiceError, match="Failed to generate audio URL"):
         svc.generate_presigned_url("audio/study/x.webm")
+
+
+# ---------------------------------------------------------------------------
+# split internal / public endpoint (S3_PUBLIC_ENDPOINT_URL)
+# ---------------------------------------------------------------------------
+
+
+def test_presign_client_uses_public_endpoint_when_set():
+    """When S3_PUBLIC_ENDPOINT_URL differs from the internal endpoint, a
+    *separate* boto3 client is built for presigning, pointed at the public
+    (browser-reachable) host. The MinIO docker-compose case.
+    """
+    internal_client = MagicMock(name="internal")
+    presign_client = MagicMock(name="presign")
+    built: list[str | None] = []
+
+    def _fake_client(_service: str, **kwargs: object):
+        built.append(kwargs.get("endpoint_url"))  # type: ignore[arg-type]
+        return internal_client if len(built) == 1 else presign_client
+
+    with (
+        patch("app.services.storage_service.boto3.client", side_effect=_fake_client),
+        patch.object(settings, "S3_ENDPOINT_URL", "http://minio:9000"),
+        patch.object(settings, "S3_PUBLIC_ENDPOINT_URL", "http://localhost:9000"),
+        patch.object(settings, "S3_BUCKET_NAME", "qualis-audio"),
+        patch.object(settings, "S3_ACCESS_KEY_ID", "key"),
+        patch.object(settings, "S3_SECRET_ACCESS_KEY", "secret"),
+    ):
+        svc = StorageService()
+
+    assert built == ["http://minio:9000", "http://localhost:9000"]
+    assert svc.s3_client is internal_client
+    assert svc.presign_client is presign_client
+
+
+def test_presign_client_aliases_main_client_when_public_endpoint_unset():
+    """With no S3_PUBLIC_ENDPOINT_URL, presigning reuses the single client —
+    no redundant second client is constructed (normal deployments)."""
+    only_client = MagicMock(name="only")
+
+    with (
+        patch(
+            "app.services.storage_service.boto3.client", return_value=only_client
+        ) as mk,
+        patch.object(settings, "S3_ENDPOINT_URL", "https://cellar.example.com"),
+        patch.object(settings, "S3_PUBLIC_ENDPOINT_URL", None),
+        patch.object(settings, "S3_BUCKET_NAME", "qualis-audio"),
+        patch.object(settings, "S3_ACCESS_KEY_ID", "key"),
+        patch.object(settings, "S3_SECRET_ACCESS_KEY", "secret"),
+    ):
+        svc = StorageService()
+
+    assert mk.call_count == 1
+    assert svc.presign_client is svc.s3_client is only_client
 
 
 # ---------------------------------------------------------------------------
