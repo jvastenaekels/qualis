@@ -215,7 +215,7 @@ pygments==2.20.0
     #   rich
 pyjwt==2.13.0
     # via qualis-backend
-pyotp==2.9.0
+pyotp==2.10.0
     # via qualis-backend
 pyparsing==3.3.2
     # via pip-requirements-parser
