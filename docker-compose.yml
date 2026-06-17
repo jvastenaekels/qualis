@@ -72,10 +72,12 @@ services:
       minio-init:
         condition: service_completed_successfully
     healthcheck:
+      # Use the baked venv directly; a bare `uv run` here would also trigger a
+      # dev re-sync on the first probe (see backend/Dockerfile CMD).
       test:
         [
           "CMD-SHELL",
-          "uv run python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()\"",
+          ".venv/bin/python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()\"",
         ]
       interval: 5s
       timeout: 3s

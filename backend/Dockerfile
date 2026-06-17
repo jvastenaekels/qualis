@@ -26,7 +26,12 @@ RUN groupadd --system app \
     && chown -R app:app /app
 USER app
 
-# Run migrations and seed, then start the server
-CMD ["sh", "-c", "uv run python init_db.py && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Run migrations and seed, then start the server.
+# Call the baked virtualenv directly instead of `uv run`: a bare `uv run`
+# re-syncs the FULL dev environment (ruff/mypy/deptry/…) on first container
+# start, because the image was built with --no-dev. That cold-start download
+# took ~2-3 minutes. The venv from `uv sync --frozen --no-dev` already has every
+# runtime dependency, so `.venv/bin/...` starts in seconds.
+CMD ["sh", "-c", ".venv/bin/python init_db.py && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"]
 
 EXPOSE 8000
