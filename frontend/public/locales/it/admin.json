@@ -17,10 +17,7 @@
             "reset_success_banner": "Password aggiornata. Ora può accedere con la nuova password.",
             "two_factor_title": "Autenticazione a due fattori",
             "two_factor_app_prompt": "Inserisca il codice a 6 cifre dalla sua app di autenticazione.",
-            "two_factor_email_prompt": "Abbiamo inviato un codice a 6 cifre alla sua e-mail. Lo inserisca qui sotto.",
             "two_factor_submit": "Verifica",
-            "two_factor_resend": "Invia di nuovo il codice",
-            "two_factor_resend_cooldown": "Nuovo invio disponibile tra {{seconds}}s",
             "two_factor_invalid": "Codice non valido. Riprovi.",
             "lost_2fa_link": "Ha perso l'accesso al suo 2FA?"
         },
@@ -293,13 +290,7 @@
                 "disabled_success": "Autenticazione a due fattori disabilitata",
                 "secret_copied": "Segreto copiato",
                 "invalid_token": "Codice di verifica non valido",
-                "disable_error": "Disabilitazione del 2FA non riuscita",
-                "channel_select_label": "Come desidera ricevere i codici 2FA?",
-                "channel_app": "App di autenticazione (consigliata)",
-                "channel_email": "E-mail",
-                "channel_email_desc": "Le invieremo un codice a 6 cifre ogni volta che accede. Utile se non può installare un'app di autenticazione.",
-                "enable_email_btn": "Abilita 2FA via e-mail",
-                "enable_email_pending": "Attivazione in corso…"
+                "disable_error": "Disabilitazione del 2FA non riuscita"
             },
             "password": {
                 "title": "Gestione password",

@@ -71,7 +71,6 @@ from .analysis import AnalysisRun as AnalysisRun
 from .memo import MemoComment as MemoComment
 from .memo import MemoEntry as MemoEntry
 from .email_token import ConsumedEmailToken as ConsumedEmailToken
-from .twofa_email_otp import TwoFAEmailOTPCode as TwoFAEmailOTPCode
 
 # Computed column properties (defined after all models to avoid circular references)
 # Study.participant_count references Participant, so it must be set here after

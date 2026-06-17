@@ -803,15 +803,10 @@ export function useSetupTotpApiMe2faSetupGet<
 }
 
 /**
- * Enable 2FA on the chosen channel ('app' or 'email').
+ * Enable TOTP authenticator-app 2FA.
 
-For channel='app': caller must have already called /me/2fa/setup to seed
-the TOTP secret and must provide a valid TOTP token in payload.token.
-
-For channel='email': no token required; the user is enrolled directly.
-The email-OTP flow exercises itself at first login (T15 deliberately
-accepts the simpler one-step enrollment over a two-step "issue OTP /
-confirm channel works" path — see plan trade-off note).
+Caller must have already called /me/2fa/setup to seed the TOTP secret
+and must provide a valid TOTP token in payload.token.
  * @summary Enable Totp
  */
 export const enableTotpApiMe2faEnablePost = (
@@ -15282,10 +15277,6 @@ export const getLoginForAccessTokenApiTokenPostResponseMock = (
     requires_2fa: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     temp_token: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
-    channel: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.helpers.arrayElement(['app', 'email'] as const), null]),
         undefined,
     ]),
     ...overrideResponse,

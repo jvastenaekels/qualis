@@ -79,17 +79,6 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY_ID: str | None = None
     S3_SECRET_ACCESS_KEY: str | None = None
 
-    # 2FA — Email OTP channel
-    TWOFA_EMAIL_OTP_EXPIRE_MINUTES: int = 5
-    TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: int = 30
-    # Per-account brute-force ceiling: total wrong OTP attempts allowed
-    # in a rolling 24h window before verification is locked out for the
-    # account. 30 wrong / day caps the daily brute-force success
-    # probability at 30 / 10^6 = 0.003 %. The window is rolling — once
-    # the oldest contributing rows pass 24h the user can verify again,
-    # no admin intervention required.
-    TWOFA_OTP_WRONG_ATTEMPT_CAP_24H: int = Field(default=30, ge=1)
-
     # Email verification & password-reset token lifetimes
     EMAIL_VERIFICATION_REQUIRED: bool = True
     EMAIL_VERIFY_TOKEN_EXPIRE_HOURS: int = 24

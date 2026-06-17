@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useReadUsersMeApiMeGet, listProjectsApiAdminProjectsGet } from '@/api/generated';
 import type { Token } from '@/api/model/token';
-import type { TokenChannel } from '@/api/model/tokenChannel';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
 import { customInstance } from '@/api/mutator';
@@ -19,8 +18,6 @@ import { ApiError } from '@/api/client';
 
 type LoginStage = 'credentials' | 'two_factor';
 
-const RESEND_COOLDOWN_SECONDS = 30;
-
 const LoginPage = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
@@ -33,21 +30,13 @@ const LoginPage = () => {
     const setAuth = useAuthStore((state) => state.setAuth);
 
     const [stage, setStage] = useState<LoginStage>('credentials');
-    const [channel, setChannel] = useState<TokenChannel>(null);
     const [otp, setOtp] = useState('');
     const [isCredentialsPending, setIsCredentialsPending] = useState(false);
     const [isOtpPending, setIsOtpPending] = useState(false);
-    const [resendCooldown, setResendCooldown] = useState(0);
 
     const { refetch: fetchMe } = useReadUsersMeApiMeGet({
         query: { enabled: false },
     });
-
-    useEffect(() => {
-        if (resendCooldown <= 0) return;
-        const id = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
-        return () => clearTimeout(id);
-    }, [resendCooldown]);
 
     /**
      * Submit credentials. Optionally include an `x-totp-token` header to satisfy
@@ -123,12 +112,8 @@ const LoginPage = () => {
 
             // Backend signals 2FA required → switch to OTP stage; do NOT touch auth store.
             if (tokenResponse.requires_2fa) {
-                setChannel(tokenResponse.channel ?? 'app');
                 setStage('two_factor');
                 setOtp('');
-                if ((tokenResponse.channel ?? 'app') === 'email') {
-                    setResendCooldown(RESEND_COOLDOWN_SECONDS);
-                }
                 return;
             }
 
@@ -171,22 +156,9 @@ const LoginPage = () => {
         }
     };
 
-    const handleResend = async () => {
-        if (resendCooldown > 0) return;
-        try {
-            await submitCredentials(); // re-issues an email OTP server-side
-            setResendCooldown(RESEND_COOLDOWN_SECONDS);
-        } catch (error: unknown) {
-            const message = parseApiErrorSync(error, t('auth.login.error_generic'));
-            toast.error(message);
-        }
-    };
-
     const handleBackToCredentials = () => {
         setStage('credentials');
-        setChannel(null);
         setOtp('');
-        setResendCooldown(0);
     };
 
     return (
@@ -344,15 +316,10 @@ const LoginPage = () => {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-slate-700">
-                                    {channel === 'email'
-                                        ? t(
-                                              'auth.login.two_factor_email_prompt',
-                                              'We sent a 6-digit code to your email. Enter it below.'
-                                          )
-                                        : t(
-                                              'auth.login.two_factor_app_prompt',
-                                              'Enter the 6-digit code from your authenticator app.'
-                                          )}
+                                    {t(
+                                        'auth.login.two_factor_app_prompt',
+                                        'Enter the 6-digit code from your authenticator app.'
+                                    )}
                                 </p>
                                 <div className="space-y-2">
                                     <Label htmlFor="otp" className="sr-only">
@@ -373,22 +340,6 @@ const LoginPage = () => {
                                         autoFocus
                                     />
                                 </div>
-                                {channel === 'email' && (
-                                    <button
-                                        type="button"
-                                        onClick={handleResend}
-                                        disabled={resendCooldown > 0}
-                                        className="text-xs text-slate-800 hover:text-slate-900 underline disabled:opacity-100 disabled:cursor-not-allowed"
-                                    >
-                                        {resendCooldown > 0
-                                            ? t(
-                                                  'auth.login.two_factor_resend_cooldown',
-                                                  'Resend available in {{seconds}}s',
-                                                  { seconds: resendCooldown }
-                                              )
-                                            : t('auth.login.two_factor_resend', 'Resend code')}
-                                    </button>
-                                )}
                             </CardContent>
                             <CardFooter className="pt-2 flex flex-col gap-3">
                                 <Button

@@ -1,24 +1,20 @@
 """Authentication and TOTP schemas."""
 
-from typing import Literal
-
 from pydantic import BaseModel, EmailStr, Field
 
 
 class Token(BaseModel):
     """Schema for returning an access token or 2FA requirement.
 
-    The optional `channel` field is populated when `requires_2fa=True`
-    so the frontend knows whether to render the authenticator-app
-    prompt ('app') or the email-OTP prompt ('email'). It stays None
-    on a successful access-token response.
+    `requires_2fa=True` (with no access token) signals the frontend to
+    prompt for the authenticator-app code; a successful response carries
+    the access token instead.
     """
 
     access_token: str | None = None
     token_type: str | None = None
     requires_2fa: bool = False
     temp_token: str | None = None
-    channel: Literal["app", "email"] | None = None
 
 
 class TokenData(BaseModel):
@@ -43,12 +39,10 @@ class TOTPVerify(BaseModel):
 class TwoFAEnableRequest(BaseModel):
     """Body of POST /me/2fa/enable.
 
-    The `token` field is required only for channel='app' (the existing
-    TOTP flow). channel='email' enrolls the user without a TOTP token;
-    the email-OTP delivery is exercised at first login.
+    `token` is the 6-digit TOTP code from the authenticator app, verified
+    against the secret seeded by /me/2fa/setup.
     """
 
-    channel: Literal["app", "email"]
     token: str | None = None
 
 

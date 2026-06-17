@@ -259,7 +259,7 @@
           "auth"
         ],
         "summary": "Enable Totp",
-        "description": "Enable 2FA on the chosen channel ('app' or 'email').\n\nFor channel='app': caller must have already called /me/2fa/setup to seed\nthe TOTP secret and must provide a valid TOTP token in payload.token.\n\nFor channel='email': no token required; the user is enrolled directly.\nThe email-OTP flow exercises itself at first login (T15 deliberately\naccepts the simpler one-step enrollment over a two-step \"issue OTP /\nconfirm channel works\" path \u2014 see plan trade-off note).",
+        "description": "Enable TOTP authenticator-app 2FA.\n\nCaller must have already called /me/2fa/setup to seed the TOTP secret\nand must provide a valid TOTP token in payload.token.",
         "operationId": "enable_totp_api_me_2fa_enable_post",
         "requestBody": {
           "content": {
@@ -12617,37 +12617,14 @@
               }
             ],
             "title": "Temp Token"
-          },
-          "channel": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "app",
-                  "email"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Channel"
           }
         },
         "type": "object",
         "title": "Token",
-        "description": "Schema for returning an access token or 2FA requirement.\n\nThe optional `channel` field is populated when `requires_2fa=True`\nso the frontend knows whether to render the authenticator-app\nprompt ('app') or the email-OTP prompt ('email'). It stays None\non a successful access-token response."
+        "description": "Schema for returning an access token or 2FA requirement.\n\n`requires_2fa=True` (with no access token) signals the frontend to\nprompt for the authenticator-app code; a successful response carries\nthe access token instead."
       },
       "TwoFAEnableRequest": {
         "properties": {
-          "channel": {
-            "type": "string",
-            "enum": [
-              "app",
-              "email"
-            ],
-            "title": "Channel"
-          },
           "token": {
             "anyOf": [
               {
@@ -12661,11 +12638,8 @@
           }
         },
         "type": "object",
-        "required": [
-          "channel"
-        ],
         "title": "TwoFAEnableRequest",
-        "description": "Body of POST /me/2fa/enable.\n\nThe `token` field is required only for channel='app' (the existing\nTOTP flow). channel='email' enrolls the user without a TOTP token;\nthe email-OTP delivery is exercised at first login."
+        "description": "Body of POST /me/2fa/enable.\n\n`token` is the 6-digit TOTP code from the authenticator app, verified\nagainst the secret seeded by /me/2fa/setup."
       },
       "UserAdminUpdate": {
         "properties": {

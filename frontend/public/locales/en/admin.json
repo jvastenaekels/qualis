@@ -17,10 +17,7 @@
             "reset_success_banner": "Password updated. You can now sign in with your new password.",
             "two_factor_title": "Two-factor authentication",
             "two_factor_app_prompt": "Enter the 6-digit code from your authenticator app.",
-            "two_factor_email_prompt": "We sent a 6-digit code to your email. Enter it below.",
             "two_factor_submit": "Verify",
-            "two_factor_resend": "Resend code",
-            "two_factor_resend_cooldown": "Resend available in {{seconds}}s",
             "two_factor_invalid": "Invalid code. Try again.",
             "lost_2fa_link": "Lost access to your 2FA?"
         },
@@ -293,13 +290,7 @@
                 "disabled_success": "Two-factor authentication disabled",
                 "secret_copied": "Secret copied",
                 "invalid_token": "Invalid verification code",
-                "disable_error": "Failed to disable 2FA",
-                "channel_select_label": "How should we deliver your 2FA codes?",
-                "channel_app": "Authenticator app (recommended)",
-                "channel_email": "Email",
-                "channel_email_desc": "We'll email you a 6-digit code each time you log in. Useful if you can't install an authenticator app.",
-                "enable_email_btn": "Enable email-based 2FA",
-                "enable_email_pending": "Enabling…"
+                "disable_error": "Failed to disable 2FA"
             },
             "password": {
                 "title": "Password management",
