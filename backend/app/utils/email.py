@@ -316,26 +316,3 @@ def send_email_change_notification(
         html_content=html_content,
         label="email-change-notification",
     )
-
-
-def send_twofa_login_otp(email_to: str, code: str) -> None:
-    subject = "Your Qualis login code"
-    html_content = f"""
-    <html>
-        <body>
-            <h2>Login code</h2>
-            <p>Your Qualis login verification code:</p>
-            <p style="font-size:28px;letter-spacing:4px;font-weight:bold">{code}</p>
-            <p>This code expires in 5 minutes.</p>
-            <p>If you did not just try to log in, change your password immediately.</p>
-            <br>
-            <p>L'équipe Qualis</p>
-        </body>
-    </html>
-    """
-    _send_or_log(
-        email_to=email_to,
-        subject=subject,
-        html_content=html_content,
-        label="2fa-login-otp",
-    )

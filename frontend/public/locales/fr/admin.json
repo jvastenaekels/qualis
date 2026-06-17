@@ -17,10 +17,7 @@
             "reset_success_banner": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
             "two_factor_title": "Authentification à deux facteurs",
             "two_factor_app_prompt": "Saisissez le code à 6 chiffres de votre application d'authentification.",
-            "two_factor_email_prompt": "Nous avons envoyé un code à 6 chiffres à votre adresse e-mail. Saisissez-le ci-dessous.",
             "two_factor_submit": "Vérifier",
-            "two_factor_resend": "Renvoyer le code",
-            "two_factor_resend_cooldown": "Renvoi disponible dans {{seconds}} s",
             "two_factor_invalid": "Code invalide. Réessayez.",
             "lost_2fa_link": "Vous avez perdu l'accès à votre 2FA ?"
         },
@@ -205,13 +202,7 @@
                 "enabled_success": "Authentification à deux facteurs activée",
                 "disabled_success": "Authentification à deux facteurs désactivée",
                 "invalid_token": "Code de vérification invalide",
-                "disable_error": "Impossible de désactiver le 2FA",
-                "channel_select_label": "Comment souhaitez-vous recevoir vos codes 2FA ?",
-                "channel_app": "Application d'authentification (recommandé)",
-                "channel_email": "E-mail",
-                "channel_email_desc": "Nous vous enverrons un code à 6 chiffres par e-mail à chaque connexion. Utile si vous ne pouvez pas installer une application d'authentification.",
-                "enable_email_btn": "Activer la 2FA par e-mail",
-                "enable_email_pending": "Activation…"
+                "disable_error": "Impossible de désactiver le 2FA"
             },
             "password": {
                 "title": "Mot de passe",

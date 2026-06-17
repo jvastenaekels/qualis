@@ -17,10 +17,7 @@
             "reset_success_banner": "Palavra-passe atualizada. Pode agora iniciar sessão com a sua nova palavra-passe.",
             "two_factor_title": "Autenticação de dois fatores",
             "two_factor_app_prompt": "Introduza o código de 6 dígitos da sua aplicação autenticadora.",
-            "two_factor_email_prompt": "Enviámos um código de 6 dígitos para o seu email. Introduza-o abaixo.",
             "two_factor_submit": "Verificar",
-            "two_factor_resend": "Reenviar código",
-            "two_factor_resend_cooldown": "Reenvio disponível em {{seconds}}s",
             "two_factor_invalid": "Código inválido. Tente novamente.",
             "lost_2fa_link": "Perdeu o acesso à sua autenticação de dois fatores?"
         },
@@ -293,13 +290,7 @@
                 "disabled_success": "Autenticação de dois fatores desativada",
                 "secret_copied": "Segredo copiado",
                 "invalid_token": "Código de verificação inválido",
-                "disable_error": "Falha ao desativar a 2FA",
-                "channel_select_label": "Como deve receber os seus códigos 2FA?",
-                "channel_app": "Aplicação autenticadora (recomendado)",
-                "channel_email": "Email",
-                "channel_email_desc": "Enviaremos um código de 6 dígitos por email em cada início de sessão. Útil se não puder instalar uma aplicação autenticadora.",
-                "enable_email_btn": "Ativar 2FA por email",
-                "enable_email_pending": "A ativar…"
+                "disable_error": "Falha ao desativar a 2FA"
             },
             "password": {
                 "title": "Gestão de palavra-passe",

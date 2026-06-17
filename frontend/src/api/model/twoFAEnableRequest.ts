@@ -4,17 +4,14 @@
  * Qualis API
  * OpenAPI spec version: 0.1.0
  */
-import type { TwoFAEnableRequestChannel } from './twoFAEnableRequestChannel';
 import type { TwoFAEnableRequestToken } from './twoFAEnableRequestToken';
 
 /**
  * Body of POST /me/2fa/enable.
 
-The `token` field is required only for channel='app' (the existing
-TOTP flow). channel='email' enrolls the user without a TOTP token;
-the email-OTP delivery is exercised at first login.
+`token` is the 6-digit TOTP code from the authenticator app, verified
+against the secret seeded by /me/2fa/setup.
  */
 export interface TwoFAEnableRequest {
-    channel: TwoFAEnableRequestChannel;
     token?: TwoFAEnableRequestToken;
 }

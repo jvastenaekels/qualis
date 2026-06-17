@@ -355,7 +355,7 @@ min_defining_sorts
 has_empty_factor
 preview_range
 
-# --- auth-email-flows (verification, password reset, 2FA email-OTP, 2FA disable) ---
+# --- auth-email-flows (verification, password reset, 2FA disable) ---
 # FastAPI route endpoints registered via @router.post; slowapi key_func referenced
 # from decorator kwargs; TypedDict keys consumed at the JWT wire boundary; service
 # helpers consumed by the cleanup-cron / future call sites vulture cannot follow.
@@ -372,6 +372,10 @@ email_change_cancel
 get_last_email
 requires_email_verification
 is_jti_consumed
+# users.totp_channel: retained (frozen to 'app'/NULL) after the email-OTP
+# channel removal. Still written on enable/disable for forensic continuity
+# but no longer read in app logic, so vulture sees it as write-only.
+totp_channel
 cleanup_consumed
 iss
 aud

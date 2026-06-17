@@ -17,10 +17,7 @@
             "reset_success_banner": "Passwort aktualisiert. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.",
             "two_factor_title": "Zwei-Faktor-Authentifizierung",
             "two_factor_app_prompt": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.",
-            "two_factor_email_prompt": "Wir haben einen 6-stelligen Code an Ihre E-Mail-Adresse gesendet. Geben Sie ihn unten ein.",
             "two_factor_submit": "Verifizieren",
-            "two_factor_resend": "Code erneut senden",
-            "two_factor_resend_cooldown": "Erneutes Senden verfügbar in {{seconds}}s",
             "two_factor_invalid": "Ungültiger Code. Bitte versuchen Sie es erneut.",
             "lost_2fa_link": "Keinen Zugriff mehr auf Ihre 2FA?"
         },
@@ -293,13 +290,7 @@
                 "disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
                 "secret_copied": "Secret kopiert",
                 "invalid_token": "Ungültiger Bestätigungscode",
-                "disable_error": "2FA konnte nicht deaktiviert werden",
-                "channel_select_label": "Wie sollen Ihre 2FA-Codes zugestellt werden?",
-                "channel_app": "Authenticator-App (empfohlen)",
-                "channel_email": "E-Mail",
-                "channel_email_desc": "Wir senden Ihnen bei jeder Anmeldung einen 6-stelligen Code per E-Mail. Nützlich, wenn Sie keine Authenticator-App installieren können.",
-                "enable_email_btn": "E-Mail-basierte 2FA aktivieren",
-                "enable_email_pending": "Wird aktiviert..."
+                "disable_error": "2FA konnte nicht deaktiviert werden"
             },
             "password": {
                 "title": "Passwortverwaltung",

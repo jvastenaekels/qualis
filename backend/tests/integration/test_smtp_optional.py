@@ -6,8 +6,6 @@ import pytest
 
 from app.core.config import settings
 
-from tests.conftest import TEST_PASSWORD
-
 
 @pytest.mark.asyncio
 class TestPublicConfig:
@@ -46,9 +44,7 @@ class TestRecoveryLink:
         )
         assert r.status_code == 404
 
-    async def test_returns_usable_reset_link(
-        self, client, superuser_token, test_user
-    ):
+    async def test_returns_usable_reset_link(self, client, superuser_token, test_user):
         headers = {"Authorization": f"Bearer {superuser_token}"}
         r = await client.post(
             f"/api/admin/users/{test_user.id}/recovery-link",
@@ -66,9 +62,7 @@ class TestRecoveryLink:
         )
         assert confirm.status_code == 200
 
-    async def test_emits_audit_entry(
-        self, client, superuser_token, test_user, caplog
-    ):
+    async def test_emits_audit_entry(self, client, superuser_token, test_user, caplog):
         """Minting a recovery link is security-sensitive and the service
         docstring claims it is audit-logged on every call. Pin that here.
 
@@ -91,9 +85,7 @@ class TestRecoveryLink:
             for rec in audit_records
         ), f"Expected recovery_link_revealed audit entry; got: {audit_records}"
 
-    async def test_does_not_rotate_password(
-        self, client, superuser_token, test_user
-    ):
+    async def test_does_not_rotate_password(self, client, superuser_token, test_user):
         headers = {"Authorization": f"Bearer {superuser_token}"}
         await client.post(
             f"/api/admin/users/{test_user.id}/recovery-link",
@@ -108,86 +100,11 @@ class TestRecoveryLink:
 
 
 @pytest.mark.asyncio
-class TestEmail2FAEnrolmentGuard:
-    async def test_email_channel_rejected_without_smtp(
-        self, client, test_user, monkeypatch
-    ):
-        monkeypatch.setattr(settings, "SMTP_HOST", None)
-        monkeypatch.setattr(settings, "SMTP_USER", None)
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
-        login = await client.post(
-            "/api/token",
-            data={"username": test_user.email, "password": TEST_PASSWORD},
-        )
-        access = login.json()["access_token"]
-        r = await client.post(
-            "/api/me/2fa/enable",
-            headers={"Authorization": f"Bearer {access}"},
-            json={"channel": "email"},
-        )
-        assert r.status_code == 400
-        # The errors middleware reshapes HTTPException(detail=...) into the
-        # StandardError envelope: the string lands in ["message"], not
-        # ["detail"] (documented house convention — see
-        # test_admin_user_guards.py module docstring).
-        assert r.json()["message"] == "email_2fa_unavailable"
-
-    async def test_email_channel_allowed_with_smtp(
-        self, client, test_user, monkeypatch
-    ):
-        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
-        monkeypatch.setattr(settings, "SMTP_USER", "user")
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pw")
-        login = await client.post(
-            "/api/token",
-            data={"username": test_user.email, "password": TEST_PASSWORD},
-        )
-        access = login.json()["access_token"]
-        r = await client.post(
-            "/api/me/2fa/enable",
-            headers={"Authorization": f"Bearer {access}"},
-            json={"channel": "email"},
-        )
-        assert r.status_code == 200
-        assert r.json()["status"] == "enabled"
-
-
-class TestLegacyEmail2FALogin:
-    @pytest.mark.asyncio
-    async def test_login_blocked_when_smtp_manual(self, client, db, monkeypatch):
-        monkeypatch.setattr(settings, "SMTP_HOST", None)
-        monkeypatch.setattr(settings, "SMTP_USER", None)
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
-
-        from datetime import datetime, timezone
-
-        from app.models import User
-        from app.utils.security import get_password_hash
-
-        u = User(
-            email="legacy2fa@example.com",
-            hashed_password=get_password_hash("testpassword"),
-            is_active=True,
-            email_verified_at=datetime.now(timezone.utc),
-            is_totp_enabled=True,
-            totp_channel="email",
-            password_changed_at=datetime.now(timezone.utc),
-        )
-        db.add(u)
-        await db.commit()
-
-        r = await client.post(
-            "/api/token",
-            data={"username": "legacy2fa@example.com", "password": "testpassword"},
-        )
-        assert r.status_code == 503
-        assert r.json()["message"] == "email_2fa_unavailable"
-
-    @pytest.mark.asyncio
+class TestApp2FALoginSmtpOptional:
     async def test_app_channel_2fa_unaffected_when_smtp_manual(
         self, client, db, monkeypatch
     ):
-        # App-channel 2FA users must STILL get the normal requires_2fa
+        # App (TOTP) 2FA users must STILL get the normal requires_2fa
         # response even when SMTP is manual (regression guard).
         monkeypatch.setattr(settings, "SMTP_HOST", None)
         monkeypatch.setattr(settings, "SMTP_USER", None)
@@ -218,54 +135,6 @@ class TestLegacyEmail2FALogin:
         assert r.status_code == 200
         body = r.json()
         assert body["requires_2fa"] is True
-        assert body["channel"] == "app"
-
-    @pytest.mark.asyncio
-    async def test_email_channel_2fa_works_when_smtp_configured(
-        self, client, db, monkeypatch
-    ):
-        # Closes the guard's truth table symmetrically: manual->503,
-        # configured->200. With SMTP "configured" but no real server,
-        # the OTP send falls back to logging (_send_or_log); the
-        # endpoint still returns Token(requires_2fa=True, channel="email").
-        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
-        monkeypatch.setattr(settings, "SMTP_USER", "user")
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pw")
-        # With SMTP "configured", _send_or_log no longer falls back to
-        # logging and would attempt a real socket connection; stub the
-        # OTP dispatch (we assert the guard's response, not delivery).
-        monkeypatch.setattr(
-            "app.routers.auth.send_twofa_login_otp", lambda *a, **k: None
-        )
-
-        from datetime import datetime, timezone
-
-        from app.models import User
-        from app.utils.security import get_password_hash
-
-        u = User(
-            email="email2fa-ok@example.com",
-            hashed_password=get_password_hash("testpassword"),
-            is_active=True,
-            email_verified_at=datetime.now(timezone.utc),
-            is_totp_enabled=True,
-            totp_channel="email",
-            password_changed_at=datetime.now(timezone.utc),
-        )
-        db.add(u)
-        await db.commit()
-
-        r = await client.post(
-            "/api/token",
-            data={
-                "username": "email2fa-ok@example.com",
-                "password": "testpassword",
-            },
-        )
-        assert r.status_code == 200
-        body = r.json()
-        assert body["requires_2fa"] is True
-        assert body["channel"] == "email"
 
 
 class TestAdminSetEmail:

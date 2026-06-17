@@ -17,10 +17,7 @@
       "reset_success_banner": "Hasło zostało zaktualizowane. Można teraz zalogować się nowym hasłem.",
       "two_factor_title": "Weryfikacja dwuetapowa",
       "two_factor_app_prompt": "Proszę wpisać 6-cyfrowy kod z aplikacji uwierzytelniającej.",
-      "two_factor_email_prompt": "Wysłaliśmy 6-cyfrowy kod na podany adres e-mail. Proszę wpisać go poniżej.",
       "two_factor_submit": "Zweryfikuj",
-      "two_factor_resend": "Wyślij kod ponownie",
-      "two_factor_resend_cooldown": "Ponowne wysłanie dostępne za {{seconds}} s",
       "two_factor_invalid": "Nieprawidłowy kod. Proszę spróbować ponownie.",
       "lost_2fa_link": "Brak dostępu do weryfikacji dwuetapowej?"
     },
@@ -293,13 +290,7 @@
         "disabled_success": "Weryfikacja dwuetapowa wyłączona",
         "secret_copied": "Sekret skopiowany",
         "invalid_token": "Nieprawidłowy kod weryfikacyjny",
-        "disable_error": "Nie udało się wyłączyć weryfikacji dwuetapowej",
-        "channel_select_label": "Jak dostarczać kody weryfikacji dwuetapowej?",
-        "channel_app": "Aplikacja uwierzytelniająca (zalecane)",
-        "channel_email": "E-mail",
-        "channel_email_desc": "Będziemy wysyłać 6-cyfrowy kod e-mailem przy każdym logowaniu. Przydatne, gdy nie można zainstalować aplikacji uwierzytelniającej.",
-        "enable_email_btn": "Włącz weryfikację dwuetapową przez e-mail",
-        "enable_email_pending": "Włączanie…"
+        "disable_error": "Nie udało się wyłączyć weryfikacji dwuetapowej"
       },
       "password": {
         "title": "Zarządzanie hasłem",

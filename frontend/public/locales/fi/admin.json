@@ -17,10 +17,7 @@
             "reset_success_banner": "Salasana päivitetty. Voit nyt kirjautua sisään uudella salasanallasi.",
             "two_factor_title": "Kaksivaiheinen tunnistautuminen",
             "two_factor_app_prompt": "Syötä todennussovelluksen 6-numeroinen koodi.",
-            "two_factor_email_prompt": "Lähetimme 6-numeroisen koodin sähköpostiisi. Syötä se alle.",
             "two_factor_submit": "Vahvista",
-            "two_factor_resend": "Lähetä koodi uudelleen",
-            "two_factor_resend_cooldown": "Uudelleenlähetys käytettävissä {{seconds}} s kuluttua",
             "two_factor_invalid": "Virheellinen koodi. Yritä uudelleen.",
             "lost_2fa_link": "Onko 2FA-pääsysi kadonnut?"
         },
@@ -205,13 +202,7 @@
                 "disabled_success": "Kaksivaiheinen todennus poistettu käytöstä",
                 "secret_copied": "Salaisuus kopioitu",
                 "invalid_token": "Virheellinen vahvistuskoodi",
-                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui",
-                "channel_select_label": "Miten haluat saada 2FA-koodit?",
-                "channel_app": "Todennussovellus (suositus)",
-                "channel_email": "Sähköposti",
-                "channel_email_desc": "Lähetämme sinulle 6-numeroisen koodin sähköpostitse jokaisella kirjautumiskerralla. Hyödyllinen, jos et voi asentaa todennussovellusta.",
-                "enable_email_btn": "Ota sähköpostipohjainen 2FA käyttöön",
-                "enable_email_pending": "Otetaan käyttöön…"
+                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui"
             },
             "password": {
                 "title": "Salasanan hallinta",

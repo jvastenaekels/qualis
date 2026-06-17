@@ -72,29 +72,6 @@ class TestAuthEmailFlowModels:
         assert row.consumed_at is not None  # server_default applied
 
     @pytest.mark.asyncio
-    async def test_twofa_email_otp_code_defaults(self, db, test_user):
-        """TwoFAEmailOTPCode defaults attempts=0 and applies server-default created_at."""
-        from datetime import datetime, timedelta, timezone
-        from app.models import TwoFAEmailOTPCode
-        from sqlalchemy import select
-
-        code = TwoFAEmailOTPCode(
-            user_id=test_user.id,
-            code_hash="bcrypt$dummy",
-            expires_at=datetime.now(timezone.utc) + timedelta(minutes=5),
-        )
-        db.add(code)
-        await db.commit()
-
-        result = await db.execute(
-            select(TwoFAEmailOTPCode).where(TwoFAEmailOTPCode.user_id == test_user.id)
-        )
-        row = result.scalar_one()
-        assert row.attempts == 0  # server_default
-        assert row.used_at is None
-        assert row.created_at is not None  # server_default
-
-    @pytest.mark.asyncio
     async def test_user_password_changed_at_defaults_to_now(self, db):
         """User.password_changed_at server_default fires on insert."""
         from app.models import User

@@ -17,10 +17,7 @@
             "reset_success_banner": "Wachtwoord bijgewerkt. U kunt nu inloggen met uw nieuwe wachtwoord.",
             "two_factor_title": "Tweestapsverificatie",
             "two_factor_app_prompt": "Voer de 6-cijferige code in uit uw authenticator-app.",
-            "two_factor_email_prompt": "We hebben een 6-cijferige code naar uw e-mail gestuurd. Voer deze hieronder in.",
             "two_factor_submit": "Verifiëren",
-            "two_factor_resend": "Code opnieuw sturen",
-            "two_factor_resend_cooldown": "Opnieuw sturen beschikbaar over {{seconds}}s",
             "two_factor_invalid": "Ongeldige code. Probeer opnieuw.",
             "lost_2fa_link": "Geen toegang meer tot uw 2FA?"
         },
@@ -293,13 +290,7 @@
                 "disabled_success": "Tweestapsverificatie uitgeschakeld",
                 "secret_copied": "Geheim gekopieerd",
                 "invalid_token": "Ongeldige verificatiecode",
-                "disable_error": "2FA uitschakelen mislukt",
-                "channel_select_label": "Hoe wilt u uw 2FA-codes ontvangen?",
-                "channel_app": "Authenticator-app (aanbevolen)",
-                "channel_email": "E-mail",
-                "channel_email_desc": "We sturen u elke keer dat u inlogt een 6-cijferige code per e-mail. Handig als u geen authenticator-app kunt installeren.",
-                "enable_email_btn": "E-mailgebaseerde 2FA inschakelen",
-                "enable_email_pending": "Inschakelen…"
+                "disable_error": "2FA uitschakelen mislukt"
             },
             "password": {
                 "title": "Wachtwoordbeheer",

@@ -184,12 +184,12 @@ class Test2FA:
         secret = setup_data["secret"]
         assert secret is not None
 
-        # 2. Enable 2FA (channel='app' since this is the authenticator-app flow)
+        # 2. Enable 2FA (authenticator-app flow)
         totp = pyotp.TOTP(secret)
         valid_token = totp.now()
         response = await client.post(
             "/api/me/2fa/enable",
-            json={"channel": "app", "token": valid_token},
+            json={"token": valid_token},
             headers=headers,
         )
         assert response.status_code == 200
@@ -450,6 +450,7 @@ async def test_rate_limiting_login(client: AsyncClient):
 class TestEmailVerify:
     async def _new_unverified(self, db: AsyncSession, email: str) -> User:
         from app.utils.security import get_password_hash
+
         u = User(
             email=email,
             hashed_password=get_password_hash("pass"),
@@ -514,7 +515,9 @@ class TestEmailVerify:
         r = await client.post("/api/email/verify", json={"token": token})
         assert r.status_code == 200
 
-    async def test_resend_unknown_email_returns_200_anti_enum(self, client: AsyncClient):
+    async def test_resend_unknown_email_returns_200_anti_enum(
+        self, client: AsyncClient
+    ):
         r = await client.post(
             "/api/email/verify/resend", json={"email": "ghost@example.com"}
         )
@@ -537,6 +540,7 @@ class TestEmailVerify:
     ):
         # test_user has email_verified_at set (per T10 fixture update; if not yet, set it)
         from datetime import datetime, timezone
+
         if test_user.email_verified_at is None:
             test_user.email_verified_at = datetime.now(timezone.utc)
             await db.commit()
@@ -585,6 +589,7 @@ class TestLoginVerificationGuard:
     ):
         # test_user fixture must now set email_verified_at — otherwise all auth tests fail
         from tests.conftest import TEST_PASSWORD
+
         r = await client.post(
             "/api/token",
             data={"username": test_user.email, "password": TEST_PASSWORD},
@@ -657,6 +662,7 @@ class TestSMTPUnconfiguredFallback:
     ):
         # Force SMTP-unconfigured state regardless of test env
         from app.core.config import settings
+
         monkeypatch.setattr(settings, "SMTP_HOST", None)
         monkeypatch.setattr(settings, "SMTP_USER", None)
         monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
@@ -670,7 +676,9 @@ class TestSMTPUnconfiguredFallback:
         # No verification flag — the app behaves as if verification is off
         assert body["requires_email_verification"] is False
 
-        result = await db.execute(select(User).where(User.email == "smtpoff@example.com"))
+        result = await db.execute(
+            select(User).where(User.email == "smtpoff@example.com")
+        )
         user = result.scalar_one()
         assert user.is_active is True
         assert user.email_verified_at is not None
@@ -757,6 +765,7 @@ class TestPasswordReset:
         # Loose bound (CI variance) — the test is qualitative: both paths
         # do roughly the same amount of work (one bcrypt either way).
         import time
+
         t0 = time.perf_counter()
         await client.post(
             "/api/password/reset/request", json={"email": "ghost@example.com"}
@@ -779,7 +788,8 @@ class TestPasswordReset:
         await db.refresh(test_user)
         original_pca = test_user.password_changed_at
         token = create_email_token(
-            test_user.email, "password_reset",
+            test_user.email,
+            "password_reset",
             expires_delta=timedelta(hours=1),
             password_changed_at=original_pca,
         )
@@ -802,7 +812,8 @@ class TestPasswordReset:
 
         await db.refresh(test_user)
         token = create_email_token(
-            test_user.email, "password_reset",
+            test_user.email,
+            "password_reset",
             expires_delta=timedelta(hours=1),
             password_changed_at=test_user.password_changed_at,
         )
@@ -818,8 +829,10 @@ class TestPasswordReset:
         )
         assert r2.status_code == 400
         # Specifically the pwa-mismatch path
-        assert "consumed" in r2.json()["message"].lower() or \
-               "invalid" in r2.json()["message"].lower()
+        assert (
+            "consumed" in r2.json()["message"].lower()
+            or "invalid" in r2.json()["message"].lower()
+        )
 
     async def test_confirm_expired_token_returns_400(
         self, client: AsyncClient, db: AsyncSession, test_user: User
@@ -830,7 +843,8 @@ class TestPasswordReset:
         await db.refresh(test_user)
         # F-03-012: expiry must exceed JWT_LEEWAY_SECONDS (default 30s).
         token = create_email_token(
-            test_user.email, "password_reset",
+            test_user.email,
+            "password_reset",
             expires_delta=timedelta(seconds=-60),
             password_changed_at=test_user.password_changed_at,
         )
@@ -845,7 +859,8 @@ class TestPasswordReset:
         from app.utils.security import create_email_token
 
         token = create_email_token(
-            "ghost@example.com", "password_reset",
+            "ghost@example.com",
+            "password_reset",
             expires_delta=timedelta(hours=1),
             password_changed_at=datetime.now(timezone.utc),
         )
@@ -855,131 +870,9 @@ class TestPasswordReset:
         )
         assert r.status_code == 400
 
-    async def test_confirm_invalidates_active_otps(
-        self, client: AsyncClient, db: AsyncSession, test_user: User
-    ):
-        from datetime import timedelta
-        from app.models import TwoFAEmailOTPCode
-        from app.services.email_otp_service import issue_otp
-        from app.utils.security import create_email_token
-        from sqlalchemy import select
-
-        # Issue an OTP (simulating an in-flight 2FA login attempt)
-        await issue_otp(db, test_user)
-        await db.commit()
-        await db.refresh(test_user)
-
-        token = create_email_token(
-            test_user.email, "password_reset",
-            expires_delta=timedelta(hours=1),
-            password_changed_at=test_user.password_changed_at,
-        )
-        r = await client.post(
-            "/api/password/reset/confirm",
-            json={"token": token, "new_password": "newone123"},
-        )
-        assert r.status_code == 200
-
-        # All previously-active OTPs are now used_at-stamped
-        result = await db.execute(
-            select(TwoFAEmailOTPCode).where(
-                TwoFAEmailOTPCode.user_id == test_user.id,
-                TwoFAEmailOTPCode.used_at.is_(None),
-            )
-        )
-        assert result.scalar_one_or_none() is None
-
 
 @pytest.mark.asyncio
-class TestTwoFAEmailOTP:
-    async def _enable_email_2fa(self, db: AsyncSession, user: User) -> None:
-        """Helper: directly flip a user to email-channel 2FA in the DB."""
-        user.is_totp_enabled = True
-        user.totp_channel = "email"
-        user.totp_secret = None
-        await db.commit()
-        await db.refresh(user)
-
-    async def test_login_email_channel_no_header_issues_otp(
-        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog,
-        monkeypatch,
-    ):
-        from tests.conftest import TEST_PASSWORD
-        from app.core.config import settings
-
-        # Email-channel OTP issuance at login is only reachable when SMTP
-        # can actually deliver the code. With SMTP unconfigured the login
-        # endpoint now returns a distinct 503 (SMTP-optional mode) instead
-        # of silently issuing an OTP that only lands in the logs.
-        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
-        monkeypatch.setattr(settings, "SMTP_USER", "user")
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
-
-        # Stub the SMTP sender (no real network in tests) but keep the
-        # log line the assertion below greps for, matching the
-        # established _fake_send pattern used elsewhere in this module.
-        import logging
-
-        from app.routers import auth as auth_router
-
-        sender_log = logging.getLogger("app.utils.email")
-
-        def _fake_send_otp(email_to: str, code: str) -> None:
-            sender_log.info(f"MOCK 2fa-login-otp to {email_to}")
-
-        monkeypatch.setattr(auth_router, "send_twofa_login_otp", _fake_send_otp)
-        await self._enable_email_2fa(db, test_user)
-
-        with caplog.at_level("INFO", logger="app.utils.email"):
-            r = await client.post(
-                "/api/token",
-                data={"username": test_user.email, "password": TEST_PASSWORD},
-            )
-        assert r.status_code == 200
-        body = r.json()
-        assert body["requires_2fa"] is True
-        assert body["channel"] == "email"
-        # Email logged
-        assert any("2fa-login-otp" in rec.message for rec in caplog.records)
-
-    async def test_login_email_channel_with_correct_otp_issues_token(
-        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
-    ):
-        from tests.conftest import TEST_PASSWORD
-        from app.services.email_otp_service import issue_otp
-        await self._enable_email_2fa(db, test_user)
-
-        # Trigger an OTP via the service (simulates the "first call" path)
-        code = await issue_otp(db, test_user)
-        await db.commit()
-
-        r = await client.post(
-            "/api/token",
-            data={"username": test_user.email, "password": TEST_PASSWORD},
-            headers={"x-totp-token": code},
-        )
-        assert r.status_code == 200
-        body = r.json()
-        assert "access_token" in body
-        assert body["token_type"] == "bearer"
-
-    async def test_login_email_channel_wrong_otp_returns_401(
-        self, client: AsyncClient, db: AsyncSession, test_user: User
-    ):
-        from tests.conftest import TEST_PASSWORD
-        from app.services.email_otp_service import issue_otp
-        await self._enable_email_2fa(db, test_user)
-
-        await issue_otp(db, test_user)
-        await db.commit()
-
-        r = await client.post(
-            "/api/token",
-            data={"username": test_user.email, "password": TEST_PASSWORD},
-            headers={"x-totp-token": "000000"},
-        )
-        assert r.status_code == 401
-
+class TestTwoFAApp:
     async def test_login_app_channel_unchanged(
         self, client: AsyncClient, db: AsyncSession, test_user: User
     ):
@@ -994,14 +887,13 @@ class TestTwoFAEmailOTP:
         test_user.totp_channel = "app"
         await db.commit()
 
-        # No header → 200 with requires_2fa, channel='app'
+        # No header → 200 with requires_2fa
         r = await client.post(
             "/api/token",
             data={"username": test_user.email, "password": TEST_PASSWORD},
         )
         assert r.status_code == 200
         assert r.json()["requires_2fa"] is True
-        assert r.json()["channel"] == "app"
 
         # With header → 200 access_token
         valid_token = pyotp.TOTP(secret).now()
@@ -1013,47 +905,10 @@ class TestTwoFAEmailOTP:
         assert r2.status_code == 200
         assert "access_token" in r2.json()
 
-    async def test_enable_email_channel_does_not_require_totp_token(
-        self, client: AsyncClient, db: AsyncSession, test_user: User,
-        monkeypatch,
-    ):
-        """The /me/2fa/enable endpoint with channel='email' enables 2FA
-        without needing a TOTP token (since the user is enrolling for email,
-        not authenticator-app)."""
-        from tests.conftest import TEST_PASSWORD
-        from app.core.config import settings
-
-        # Email-channel enrolment is only permitted when SMTP can deliver
-        # the codes; with SMTP unconfigured the endpoint now rejects it
-        # (SMTP-optional mode). This test pins the SMTP-configured path.
-        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
-        monkeypatch.setattr(settings, "SMTP_USER", "user")
-        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
-
-        # Get an access token first
-        login = await client.post(
-            "/api/token",
-            data={"username": test_user.email, "password": TEST_PASSWORD},
-        )
-        access = login.json()["access_token"]
-
-        # Enable with channel='email'
-        r = await client.post(
-            "/api/me/2fa/enable",
-            headers={"Authorization": f"Bearer {access}"},
-            json={"channel": "email"},
-        )
-        assert r.status_code == 200
-
-        await db.refresh(test_user)
-        assert test_user.is_totp_enabled is True
-        assert test_user.totp_channel == "email"
-        assert test_user.totp_secret is None
-
-    async def test_enable_app_channel_still_requires_token(
+    async def test_enable_requires_valid_token(
         self, client: AsyncClient, db: AsyncSession, test_user: User
     ):
-        """The existing TOTP-app enable path still requires a valid TOTP token."""
+        """The TOTP-app enable path requires a valid TOTP token."""
         from tests.conftest import TEST_PASSWORD
         from app.utils.security import generate_totp_secret
         import pyotp
@@ -1069,12 +924,12 @@ class TestTwoFAEmailOTP:
         test_user.totp_secret = secret
         await db.commit()
 
-        # Then enable with channel='app' + valid token
+        # Then enable with a valid token
         valid = pyotp.TOTP(secret).now()
         r = await client.post(
             "/api/me/2fa/enable",
             headers={"Authorization": f"Bearer {access}"},
-            json={"channel": "app", "token": valid},
+            json={"token": valid},
         )
         assert r.status_code == 200
 
@@ -1083,7 +938,7 @@ class TestTwoFAEmailOTP:
         assert test_user.totp_channel == "app"
         assert test_user.totp_secret == secret  # preserved
 
-    async def test_enable_app_channel_without_token_rejected(
+    async def test_enable_without_token_rejected(
         self, client: AsyncClient, db: AsyncSession, test_user: User
     ):
         from tests.conftest import TEST_PASSWORD
@@ -1097,7 +952,7 @@ class TestTwoFAEmailOTP:
         r = await client.post(
             "/api/me/2fa/enable",
             headers={"Authorization": f"Bearer {access}"},
-            json={"channel": "app"},  # no token
+            json={},  # no token
         )
         assert r.status_code == 400
 
@@ -1188,9 +1043,7 @@ class TestTwoFADisableRecovery:
         assert user.totp_secret is None
         assert user.totp_channel is None
         # Post-action notification email logged
-        assert any(
-            "2fa-disabled-notification" in rec.message for rec in caplog.records
-        )
+        assert any("2fa-disabled-notification" in rec.message for rec in caplog.records)
 
     async def test_confirm_replay_returns_409(
         self, client: AsyncClient, db: AsyncSession
