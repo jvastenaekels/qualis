@@ -1,7 +1,7 @@
 # GDPR memo for Qualis self-hosters
 
 **Date:** 2026-05-03
-**Audit ref:** `docs/audits/2026-05-03-comprehensive-security-audit/`
+**Audit ref:** comprehensive security audit, 2026-05-03 (dossier kept outside this repository)
 **Status:** Reference document for operators deploying Qualis. Not legal advice.
 
 > **About this document.** Qualis is open-source software. The
@@ -493,8 +493,8 @@ IDs (`app.audit` correlates by timestamp, actor, action, resource).
 - `participants.anonymised_at`, `submitted_at` — temporal scoping.
 - Wave 6 `security-scans.yml` — historical CI evidence of supply-chain
   hygiene at the time of the incident.
-- This audit dossier (`docs/audits/2026-05-03-comprehensive-security-audit/`)
-  — show the regulator that you ran a multi-wave audit.
+- The comprehensive security audit (Waves 1-7, 2026-05-03) — show the
+  regulator that you ran a multi-wave audit.
 
 ---
 
@@ -682,7 +682,7 @@ column names verbatim.
 ## Security measures
 - Cite GDPR memo §7 (Art. 32 checklist).
 - Cite SECURITY.md "Security-relevant practices".
-- Cite the wave audit dossier `docs/audits/2026-05-03-comprehensive-security-audit/`.
+- Cite the comprehensive security audit (Waves 1-7, 2026-05-03).
 
 ## Last reviewed
 - <YYYY-MM-DD> by <DPO name>.
@@ -738,11 +738,12 @@ controller / vendor relationship):
   mitigation within 30 days (`SECURITY.md` "Reporting a vulnerability").
 - **CVE coordination.** Severity follows CVSS; embargo period negotiated
   with reporters; release notes link the CVE on the relevant version.
-- **Audit history.** This audit dossier (Waves 1-7) and the prior
-  2026-04-25 audit are public at `docs/audits/`.
+- **Audit history.** A seven-wave comprehensive security audit (2026-05-03)
+  and a prior multi-axis audit (2026-04-25) were conducted; their
+  security-relevant outcomes are summarised in `SECURITY.md`.
 - **Audit cadence.** No fixed annual cadence committed; audits run when
-  scope warrants (typically before a SoftwareX-style submission or major
-  release). Operators can fund additional audit work via their DPA with
+  scope warrants (typically before a major release). Operators can fund
+  additional audit work via their DPA with
   the institution that maintains Qualis.
 - **No SaaS layer in the request path.** Qualis is self-hosted by design;
   no traffic flows through any maintainer-operated endpoint at request

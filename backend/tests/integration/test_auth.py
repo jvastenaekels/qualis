@@ -322,8 +322,7 @@ class TestRegistrationEmailVerification:
     async def test_register_with_invitation_still_requires_verification_when_smtp_active(
         self, client: AsyncClient, db: AsyncSession, test_project, monkeypatch, caplog
     ):
-        """Invitation grants project membership but does NOT skip the email-verification gate.
-        Spec: docs/superpowers/specs/2026-05-02-auth-email-flows-design.md (amendment)."""
+        """Invitation grants project membership but does NOT skip the email-verification gate."""
         from app.core.config import settings
         from app.routers import auth as auth_router
 

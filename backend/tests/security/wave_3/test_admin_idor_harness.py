@@ -168,8 +168,7 @@ _STUDY_IMPORT_BODY = {"config": {"version": "1.0"}, "new_slug": "x-imported-cros
 
 # --- The 89 routes ----------------------------------------------------------
 #
-# Mirrors the inventory in
-# ``docs/audits/2026-05-03-comprehensive-security-audit/04-multi-tenant-isolation.md``.
+# Mirrors the multi-tenant-isolation route inventory from the security audit.
 # Routes flagged with ``CROSS_TENANT_NOT_APPLICABLE`` in
 # :data:`SKIPPED_ROUTES` below are top-level enumerations or unauth endpoints
 # whose isolation is not a cross-tenant IDOR (they have no project-B target).
@@ -752,7 +751,7 @@ ROUTES: list[Route] = [
 ]
 
 
-# Routes excluded from the cross-tenant harness — see :mod:`docs/audits/...`.
+# Routes excluded from the cross-tenant harness.
 # Either they have no project-B target (top-level enumeration / superuser /
 # unauth) or their isolation is verified by another harness.
 SKIPPED_ROUTES: list[tuple[str, str, str]] = [

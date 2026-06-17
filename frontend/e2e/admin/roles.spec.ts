@@ -1,8 +1,7 @@
 /**
  * E2E: roles
  *
- * Covers Task 14 of the project-roles-refactor plan
- * (docs/superpowers/plans/2026-05-02-project-roles-refactor.md). The spec
+ * Covers Task 14 of the project-roles-refactor work. The spec
  * exercises role-gated UI/API behaviour (owner / member / viewer).
  *
  * The legacy-researcher rejection scenario hits the public

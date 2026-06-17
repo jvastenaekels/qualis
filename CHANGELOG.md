@@ -38,7 +38,7 @@
 ### Bug fixes
 
 * **deps:** pin mando&lt;0.8 to resolve radon conflict breaking Scalingo deploy ([#203](https://github.com/jvastenaekels/qualis/issues/203)) ([af65271](https://github.com/jvastenaekels/qualis/commit/af652717aab5aa1130e31fe7d576898af459a32f))
-* SoftwareX submission-readiness fixes (slugs, validation, docs) ([#211](https://github.com/jvastenaekels/qualis/issues/211)) ([100c467](https://github.com/jvastenaekels/qualis/commit/100c46720853a5acb0b43e96d8f721699aa45c26))
+* submission-readiness fixes (slugs, validation, docs) ([#211](https://github.com/jvastenaekels/qualis/issues/211)) ([100c467](https://github.com/jvastenaekels/qualis/commit/100c46720853a5acb0b43e96d8f721699aa45c26))
 * **spa:** unify stale-chunk recovery; stop silent post-deploy freeze ([6f07495](https://github.com/jvastenaekels/qualis/commit/6f0749550b51c34ebd9d62e540b5a338b18e4362))
 * surface centroid non-convergence + document reliability/bootstrap assumptions (F-06-010, F-06-004) ([#214](https://github.com/jvastenaekels/qualis/issues/214)) ([6f08f40](https://github.com/jvastenaekels/qualis/commit/6f08f40294383575bfad8e16b410c17800646cea))
 * **test:** configure S3 for audio security suites under the new guard ([9b79ba5](https://github.com/jvastenaekels/qualis/commit/9b79ba5cff737dc49c11c26c146bce0f0bf01f8b))
@@ -54,7 +54,7 @@
 
 ### Documentation
 
-* align with SoftwareX angle and resync doc/code accuracy ([#209](https://github.com/jvastenaekels/qualis/issues/209)) ([dff4e57](https://github.com/jvastenaekels/qualis/commit/dff4e57b4c63820b7b571b7fe9e6df906f10ddea))
+* align project framing and resync doc/code accuracy ([#209](https://github.com/jvastenaekels/qualis/issues/209)) ([dff4e57](https://github.com/jvastenaekels/qualis/commit/dff4e57b4c63820b7b571b7fe9e6df906f10ddea))
 * **guides:** running Qualis without SMTP — capability matrix ([04da211](https://github.com/jvastenaekels/qualis/commit/04da211bf74ac917fa6e5bee298fb1eb271909b5))
 * **guides:** running without S3 / object storage ([ec1266b](https://github.com/jvastenaekels/qualis/commit/ec1266b35380c3fe6d773dc62b15cd6f9204e1d6))
 * last-superuser shell escape; audit docstring PII carve-out. ([a99dd31](https://github.com/jvastenaekels/qualis/commit/a99dd31307d3dab339b9ebf3b758f3aec1c3b59b))
