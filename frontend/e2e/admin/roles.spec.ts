@@ -1,17 +1,9 @@
 /**
- * E2E: roles-and-quotas
+ * E2E: roles
  *
  * Covers Task 14 of the project-roles-refactor plan
  * (docs/superpowers/plans/2026-05-02-project-roles-refactor.md). The spec
- * exercises role-gated UI/API behaviour (owner / member / viewer) and
- * quota enforcement (member quota, owned-project quota).
- *
- * Quota scenarios are skipped under SKIP_QUOTA_E2E because the existing
- * Playwright `webServer` block boots one backend per CI run with default
- * quotas (MAX_*_PROJECT/OWNER = 0, i.e. unlimited). Re-running with
- * MAX_MEMBERS_PER_PROJECT=2 + E2E_MAX_MEMBERS=2 (or
- * MAX_PROJECTS_AS_OWNER=N + E2E_MAX_OWNED=N) and SKIP_QUOTA_E2E unset
- * exposes them.
+ * exercises role-gated UI/API behaviour (owner / member / viewer).
  *
  * The legacy-researcher rejection scenario hits the public
  * `POST /admin/projects/{slug}/invitations` endpoint with `role=researcher`,
@@ -478,46 +470,6 @@ test.describe('owner cannot self-remove', () => {
         // Owner's own remove button is disabled (gated by `member.user_id === currentUser?.id`).
         const removeBtn = ownerRow.getByRole('button', { name: /remove/i });
         await expect(removeBtn).toBeDisabled();
-    });
-});
-
-test.describe('member quota blocks invite at limit', () => {
-    test.skip(
-        Boolean(process.env.SKIP_QUOTA_E2E) || !process.env.E2E_MAX_MEMBERS,
-        'Set MAX_MEMBERS_PER_PROJECT and E2E_MAX_MEMBERS to a low value (e.g. 2) and unset SKIP_QUOTA_E2E to run this test'
-    );
-
-    test('invite button disabled and counter visible at quota', async ({ page, testDb }) => {
-        await testDb.loginToAdminUI(page);
-        const projectSlug = testDb.getWorkspaceSlug();
-        const limit = Number(process.env.E2E_MAX_MEMBERS || '2');
-
-        // Fill the project up to the limit (we already have the owner = 1).
-        for (let i = 1; i < limit; i++) {
-            const fillIdentity = await seedIdentity(`quota-${i}`);
-            await addProjectMember(fillIdentity.email, projectSlug, 'member');
-        }
-
-        await page.goto(`/app/${projectSlug}/members`);
-        await expect(
-            page.getByText(new RegExp(`${limit}\\s*/\\s*${limit}\\s*seats used`, 'i'))
-        ).toBeVisible();
-        await expect(page.getByRole('button', { name: /invite collaborator/i })).toBeDisabled();
-    });
-});
-
-test.describe('owner-project quota blocks creation', () => {
-    test.skip(
-        Boolean(process.env.SKIP_QUOTA_E2E) || !process.env.E2E_MAX_OWNED,
-        'Set MAX_PROJECTS_AS_OWNER and E2E_MAX_OWNED and unset SKIP_QUOTA_E2E to run this test'
-    );
-
-    test('create button disabled when owned-project quota is full', async ({ page, testDb }) => {
-        await testDb.loginToAdminUI(page);
-        await page.goto(`/admin/projects/new`);
-
-        const createBtn = page.getByRole('button', { name: /create/i }).last();
-        await expect(createBtn).toBeDisabled();
     });
 });
 

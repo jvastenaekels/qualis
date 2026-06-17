@@ -136,8 +136,6 @@
         "github_aria": "Visualizza il codice sorgente su GitHub"
     },
     "errors": {
-        "member_limit_reached": "Raggiunto il limite di membri del progetto.",
-        "owner_project_limit_reached": "Non è possibile essere proprietario di altri progetti.",
         "owner_role_immutable": "Il ruolo di proprietario può essere assegnato solo alla creazione del progetto.",
         "access_denied_title": "Accesso negato",
         "access_denied_description": "Non dispone dell'autorizzazione per eseguire questa azione.",

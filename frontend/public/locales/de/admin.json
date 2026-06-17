@@ -2114,14 +2114,6 @@
                         "copy_success": "Link in die Zwischenablage kopiert!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} Plätze belegt",
-                "quota_full_tooltip": "Mitgliederlimit erreicht. Erhöhen Sie MAX_MEMBERS_PER_PROJECT oder entfernen Sie ein Mitglied."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} eigene Projekte",
-                "quota_full_tooltip": "Sie haben Ihr Limit für eigene Projekte erreicht."
             }
         },
         "members": {

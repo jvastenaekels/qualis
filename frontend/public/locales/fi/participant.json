@@ -448,8 +448,6 @@
         "github_aria": "Katso lähdekoodi GitHubissa"
     },
     "errors": {
-        "member_limit_reached": "Projektin jäsenraja saavutettu.",
-        "owner_project_limit_reached": "Et voi omistaa enempää projekteja.",
         "owner_role_immutable": "Omistajarooli voidaan määrittää vain projektin luonnin yhteydessä.",
         "access_denied_title": "Käyttö estetty",
         "access_denied_description": "Sinulla ei ole oikeutta suorittaa tätä toimintoa.",

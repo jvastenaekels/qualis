@@ -448,8 +448,6 @@
         "github_aria": "Quellcode auf GitHub ansehen"
     },
     "errors": {
-        "member_limit_reached": "Limit für Projektmitglieder erreicht.",
-        "owner_project_limit_reached": "Sie können keine weiteren Projekte besitzen.",
         "owner_role_immutable": "Die Eigentümer-Rolle kann nur bei der Projekterstellung vergeben werden.",
         "access_denied_title": "Zugriff verweigert",
         "access_denied_description": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",

@@ -2026,14 +2026,6 @@
                         "copy_success": "Lien copié dans le presse-papier !"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} places utilisées",
-                "quota_full_tooltip": "Limite de membres atteinte. Augmentez MAX_MEMBERS_PER_PROJECT ou retirez un membre."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} projets possédés",
-                "quota_full_tooltip": "Vous avez atteint votre limite de projets possédés."
             }
         },
         "members": {

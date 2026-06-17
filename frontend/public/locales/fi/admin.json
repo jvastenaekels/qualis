@@ -1972,14 +1972,6 @@
                         "copy_success": "Linkki kopioitu leikepöydälle!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} paikkaa käytössä",
-                "quota_full_tooltip": "Jäsenraja saavutettu. Kasvata MAX_MEMBERS_PER_PROJECT-arvoa tai poista jäsen."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} omistettua projektia",
-                "quota_full_tooltip": "Olet saavuttanut omistamiesi projektien rajan."
             }
         },
         "members": {

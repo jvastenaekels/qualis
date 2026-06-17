@@ -24,10 +24,8 @@ from app.schemas import (
     ProjectInvitationCreate,
     InvitationLink,
     ProjectWithRole,
-    QuotaInfo,
 )
 from app.schemas.common import PaginatedResponse
-from app.services.quotas import get_member_quota_state
 from app.utils.audit import log_admin_action
 from app.utils.security import create_invitation_token
 from app.utils.email import send_invitation_email
@@ -65,12 +63,10 @@ async def list_projects(
 
     items: list[ProjectWithRole] = []
     for project, role in rows:
-        quota = await get_member_quota_state(db, project.id, current_user)
         items.append(
             ProjectWithRole(
                 **project.__dict__,
                 user_role=role,
-                member_quota=QuotaInfo(**quota),
             )
         )
 
@@ -101,11 +97,6 @@ async def create_project(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Project with this slug already exists",
         )
-
-    # Quota gate: enforce MAX_PROJECTS_AS_OWNER (T5)
-    from app.services.quotas import assert_can_create_owned_project
-
-    await assert_can_create_owned_project(db, current_user)
 
     try:
         # Create Project
@@ -149,10 +140,8 @@ async def create_project(
     result = await db.execute(query)
     project = result.scalar_one()
 
-    quota = await get_member_quota_state(db, project.id, current_user)
     project_data = {**project.__dict__}
     project_data["members"] = project.members
-    project_data["member_quota"] = QuotaInfo(**quota)
     return ProjectRead.model_validate(project_data)
 
 
@@ -184,11 +173,9 @@ async def get_project(
         )
 
     project, role = row
-    quota = await get_member_quota_state(db, project.id, current_user)
     return ProjectWithRole(
         **project.__dict__,
         user_role=role,
-        member_quota=QuotaInfo(**quota),
     )
 
 
@@ -243,10 +230,8 @@ async def update_project(
     )
     result = await db.execute(query)
     project = result.scalar_one()
-    quota = await get_member_quota_state(db, project.id, current_user)
     project_data = {**project.__dict__}
     project_data["members"] = project.members
-    project_data["member_quota"] = QuotaInfo(**quota)
     return ProjectRead.model_validate(project_data)
 
 
@@ -464,11 +449,6 @@ async def create_invitation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="OWNER_ROLE_IMMUTABLE",
         )
-
-    # Quota gate: enforce MAX_MEMBERS_PER_PROJECT (T5)
-    from app.services.quotas import assert_can_add_member
-
-    await assert_can_add_member(db, project.id, current_user)
 
     token = create_invitation_token(
         email=invitation_in.email,

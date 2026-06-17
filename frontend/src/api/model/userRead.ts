@@ -6,7 +6,6 @@
  */
 import type { UserReadFullName } from './userReadFullName';
 import type { UserReadPendingEmail } from './userReadPendingEmail';
-import type { UserReadOwnedProjectQuota } from './userReadOwnedProjectQuota';
 
 /**
  * Schema for reading user details.
@@ -19,5 +18,4 @@ export interface UserRead {
     is_superuser: boolean;
     is_totp_enabled: boolean;
     pending_email?: UserReadPendingEmail;
-    owned_project_quota?: UserReadOwnedProjectQuota;
 }

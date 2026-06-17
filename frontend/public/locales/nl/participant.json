@@ -448,8 +448,6 @@
         "github_aria": "Broncode bekijken op GitHub"
     },
     "errors": {
-        "member_limit_reached": "Limiet voor projectleden bereikt.",
-        "owner_project_limit_reached": "U kunt geen eigenaar zijn van nog meer projecten.",
         "owner_role_immutable": "De eigenaaarsrol kan alleen worden toegewezen bij het aanmaken van het project.",
         "access_denied_title": "Toegang geweigerd",
         "access_denied_description": "U heeft geen toestemming om deze actie uit te voeren.",

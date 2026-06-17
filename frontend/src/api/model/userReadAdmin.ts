@@ -6,7 +6,6 @@
  */
 import type { UserReadAdminFullName } from './userReadAdminFullName';
 import type { UserReadAdminPendingEmail } from './userReadAdminPendingEmail';
-import type { UserReadAdminOwnedProjectQuota } from './userReadAdminOwnedProjectQuota';
 import type { UserReadAdminEmailVerifiedAt } from './userReadAdminEmailVerifiedAt';
 import type { UserReadAdminLastLoginAt } from './userReadAdminLastLoginAt';
 
@@ -25,7 +24,6 @@ export interface UserReadAdmin {
     is_superuser: boolean;
     is_totp_enabled: boolean;
     pending_email?: UserReadAdminPendingEmail;
-    owned_project_quota?: UserReadAdminOwnedProjectQuota;
     email_verified_at?: UserReadAdminEmailVerifiedAt;
     password_changed_at: string;
     last_login_at?: UserReadAdminLastLoginAt;

@@ -448,8 +448,6 @@
         "github_aria": "Wyświetl kod źródłowy na GitHub"
     },
     "errors": {
-        "member_limit_reached": "Osiągnięto limit członków projektu.",
-        "owner_project_limit_reached": "Nie można posiadać więcej projektów.",
         "owner_role_immutable": "Rola właściciela może być przypisana wyłącznie podczas tworzenia projektu.",
         "access_denied_title": "Odmowa dostępu",
         "access_denied_description": "Brak uprawnień do wykonania tej czynności.",

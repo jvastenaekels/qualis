@@ -448,8 +448,6 @@
         "github_aria": "View source on GitHub"
     },
     "errors": {
-        "member_limit_reached": "Project member limit reached.",
-        "owner_project_limit_reached": "You can't own any more projects.",
         "owner_role_immutable": "The Owner role can only be assigned at project creation.",
         "access_denied_title": "Access denied",
         "access_denied_description": "You do not have permission to perform this action.",

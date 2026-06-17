@@ -40,7 +40,6 @@ export function parseApiErrorSync(error: unknown, defaultMessage: string): strin
  * Backend wire format: { code: string, message: string, details: object | null }.
  * Different code paths put the stable error code in different fields:
  * - HTTPException(detail="X") (e.g. OWNER_ROLE_IMMUTABLE) → code="error", message="X"
- * - QuotaExceeded(code="X", message="...") (T5) → code="X", message="<human-readable>"
  *
  * resolveApiErrorKey checks `code` first, then `message`, returning either an
  * i18n key or null. The fallback string is the server's `message` so the user
@@ -54,8 +53,6 @@ export function parseApiErrorSync(error: unknown, defaultMessage: string): strin
  */
 
 export const ERROR_KEY: Record<string, string> = {
-    MEMBER_LIMIT_REACHED: 'errors.member_limit_reached',
-    OWNER_PROJECT_LIMIT_REACHED: 'errors.owner_project_limit_reached',
     OWNER_ROLE_IMMUTABLE: 'errors.owner_role_immutable',
 };
 

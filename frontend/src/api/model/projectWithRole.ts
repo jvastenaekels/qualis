@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ProjectMemberRead } from './projectMemberRead';
-import type { QuotaInfo } from './quotaInfo';
 import type { ProjectRole } from './projectRole';
 
 /**
@@ -17,6 +16,5 @@ export interface ProjectWithRole {
     slug: string;
     created_at: string;
     members?: ProjectMemberRead[];
-    member_quota: QuotaInfo;
     user_role: ProjectRole;
 }

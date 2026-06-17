@@ -44,7 +44,6 @@ from app.services.email_otp_service import (
 from app.services.email_token_consume_service import mark_jti_consumed
 from app.utils.audit import log_admin_action
 from app.schemas import (
-    QuotaInfo,
     Token,
     UserRead,
     UserCreate,
@@ -77,15 +76,9 @@ _LOGIN_DECOY_HASH = "$2b$12$OVGfAcV/ZbLQp6LJiJlMaOR324VnwW6bO.HTcA6VVP4ryk1FnXvY
 @router.get("/me", response_model=UserRead)
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_user)],
-    db: AsyncSession = Depends(get_db),
 ) -> UserRead:
-    """Get current active user, including owner-project quota state."""
-    from app.services.quotas import get_owned_project_quota_state
-
-    quota = await get_owned_project_quota_state(db, current_user)
-    user_read = UserRead.model_validate(current_user)
-    user_read.owned_project_quota = QuotaInfo(**quota)
-    return user_read
+    """Get current active user."""
+    return UserRead.model_validate(current_user)
 
 
 @router.post("/token", response_model=Token)
@@ -266,7 +259,6 @@ def _build_anti_enum_register_response(
         is_superuser=False,
         is_totp_enabled=False,
         pending_email=None,
-        owned_project_quota=None,
     )
     return UserCreateResponse(
         user=placeholder,

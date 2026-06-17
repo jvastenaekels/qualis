@@ -5,7 +5,6 @@ const project = {
     title: 'Responsive Project',
     slug: 'responsive-project',
     created_at: '2026-05-11T00:00:00Z',
-    member_quota: { count: 1, limit: 10 },
     user_role: 'owner',
 };
 
@@ -16,7 +15,6 @@ const user = {
     is_active: true,
     is_superuser: false,
     is_totp_enabled: false,
-    owned_project_quota: { count: 1, limit: 10 },
 };
 
 const study = {

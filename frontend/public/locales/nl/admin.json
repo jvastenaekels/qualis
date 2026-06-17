@@ -2114,14 +2114,6 @@
                         "copy_success": "Link gekopieerd naar klembord!"
                     }
                 }
-            },
-            "members": {
-                "quota": "{{count}}/{{limit}} plaatsen in gebruik",
-                "quota_full_tooltip": "Ledenlimiet bereikt. Verhoog MAX_MEMBERS_PER_PROJECT of verwijder een lid."
-            },
-            "create": {
-                "quota": "{{count}}/{{limit}} eigen projecten",
-                "quota_full_tooltip": "U heeft uw limiet voor eigen projecten bereikt."
             }
         },
         "members": {

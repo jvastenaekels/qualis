@@ -37,16 +37,3 @@ class ForbiddenError(ServiceError):
 
 class ConcurrencyError(ServiceError):
     """Raised on race conditions or concurrency failures (HTTP 500)."""
-
-
-class QuotaExceeded(Exception):
-    """Raised when a deployment-level quota would be exceeded.
-
-    `code` is a stable string used as the FastAPI `detail` field so the
-    frontend can map it to a translation key.
-    """
-
-    def __init__(self, code: str, message: str) -> None:
-        self.code = code
-        self.message = message
-        super().__init__(message)

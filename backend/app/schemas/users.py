@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from .common import QuotaInfo, validate_non_empty_string
+from .common import validate_non_empty_string
 
 
 class UserBase(BaseModel):
@@ -40,9 +40,6 @@ class UserRead(UserBase):
     # NULL when no change is in flight. Frontend uses it to surface a
     # "Pending: <new>" hint and offer a "cancel" / "resend" action.
     pending_email: str | None = None
-    # Populated by /auth/me; absent (None) elsewhere — nested UserRead
-    # objects (e.g. inside ProjectMemberRead.user) don't need to carry it.
-    owned_project_quota: QuotaInfo | None = None
     model_config = ConfigDict(from_attributes=True)
 
 
