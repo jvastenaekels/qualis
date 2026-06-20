@@ -89,6 +89,25 @@ describe('useFineSortDrag', () => {
         expect(onSelectionChange).toHaveBeenCalledWith(null);
     });
 
+    it('keeps the selection when handleSlotClick is a no-op (own slot)', () => {
+        const onSelectionChange = vi.fn();
+        const { result } = renderHook(() =>
+            useFineSortDrag({
+                ...defaultProps,
+                // The selected card already occupies slot (0,0): clicking it is a
+                // no-op, so the selection must be preserved (not cleared).
+                responses: { qsort: [{ statementId: 1, col: 0, row: 0 }] },
+                gridColumns: [{ capacity: 1 }],
+                selectedId: 1,
+                onSelectionChange,
+            } as unknown as UseFineSortDragProps)
+        );
+
+        result.current.handleSlotClick(0, 0);
+
+        expect(onSelectionChange).not.toHaveBeenCalled();
+    });
+
     it('handles Return to Pile (Deck Drop) correctly', () => {
         const { result } = renderHook(() =>
             useFineSortDrag(defaultProps as unknown as UseFineSortDragProps)
