@@ -249,6 +249,123 @@ class TestAudioUpload:
         assert all_recordings[0].s3_key == "audio/test-study/test-token/123_card_1.webm"
 
     @patch("app.routers.audio.magic.from_buffer")
+    async def test_successful_reupload_deletes_old_object_after_commit(
+        self,
+        mock_magic,
+        client: AsyncClient,
+        db: AsyncSession,
+        participant_token: tuple[uuid.UUID, Participant],
+        mock_storage_service,
+    ):
+        """Happy-path complement to the atomicity fix: a SUCCESSFUL re-upload
+        must still delete the old S3 object (now deferred to after the commit),
+        so deferring the delete does not leak orphans. The new recording must
+        be present and point at the new key."""
+        mock_magic.return_value = "audio/webm"
+
+        token, participant = participant_token
+
+        existing = AudioRecording(
+            participant_id=participant.id,
+            question_key="card_123",
+            s3_bucket="old-bucket",
+            s3_key="old-key",
+            file_size_bytes=500,
+            mime_type="audio/webm",
+        )
+        db.add(existing)
+        await db.commit()
+
+        audio_data = b"new audio data"
+        files = {"file": ("new.webm", BytesIO(audio_data), "audio/webm")}
+        data = {"session_token": str(token), "question_key": "card_123"}
+
+        response = await client.post("/api/audio/upload", files=files, data=data)
+        assert response.status_code == 200
+
+        # Old object deleted exactly once, with the OLD key (not the new one).
+        mock_storage_service.delete_audio.assert_called_once_with("old-key")
+
+        # Exactly one recording survives, pointing at the new key.
+        stmt = select(AudioRecording).where(
+            AudioRecording.participant_id == participant.id,
+            AudioRecording.question_key == "card_123",
+        )
+        recordings = await db.execute(stmt)
+        all_recordings = recordings.scalars().all()
+        assert len(all_recordings) == 1
+        assert all_recordings[0].s3_key == "audio/test-study/test-token/123_card_1.webm"
+
+    @patch("app.routers.audio.magic.from_buffer")
+    async def test_failed_reupload_preserves_existing_recording(
+        self,
+        mock_magic,
+        client: AsyncClient,
+        db: AsyncSession,
+        participant_token: tuple[uuid.UUID, Participant],
+        mock_storage_service,
+    ):
+        """Re-upload atomicity: if the NEW upload fails, the participant must
+        keep their PREVIOUS audio. The old S3 object must NOT be deleted and
+        the old DB row must survive (the request fails, but no data is lost).
+
+        Regression guard for the non-atomic re-upload bug (#5): the handler
+        used to delete the old S3 object *before* uploading the new one, so a
+        failed new upload left the DB row pointing at a now-missing object."""
+        mock_magic.return_value = "audio/webm"
+
+        token, participant = participant_token
+
+        # Existing recording for this question
+        existing = AudioRecording(
+            participant_id=participant.id,
+            question_key="card_123",
+            s3_bucket="old-bucket",
+            s3_key="old-key",
+            file_size_bytes=500,
+            mime_type="audio/webm",
+        )
+        db.add(existing)
+        await db.commit()
+        await db.refresh(existing)
+        existing_id = existing.id
+
+        # The NEW upload fails (e.g. S3 transient error)
+        mock_storage_service.upload_audio = AsyncMock(
+            side_effect=RuntimeError("S3 upload failed")
+        )
+
+        audio_data = b"new audio data"
+        files = {"file": ("new.webm", BytesIO(audio_data), "audio/webm")}
+        data = {"session_token": str(token), "question_key": "card_123"}
+
+        # The new upload raises, so the request fails (the ASGI transport
+        # re-raises unhandled exceptions). That is the expected outcome — what
+        # matters is that the participant's previous audio is left intact.
+        with pytest.raises(RuntimeError, match="S3 upload failed"):
+            await client.post("/api/audio/upload", files=files, data=data)
+
+        # INVARIANT 1: the old S3 object was NOT deleted. This is the core of
+        # the fix — pre-fix the handler deleted "old-key" *before* the (now
+        # failing) new upload, so the object was already permanently gone.
+        mock_storage_service.delete_audio.assert_not_called()
+
+        # INVARIANT 2: the old DB row still exists and is unchanged.
+        #
+        # In production each request owns its own session and `get_db`'s
+        # `async with SessionLocal()` rolls back automatically when the handler
+        # raises, restoring the (flushed-but-uncommitted) delete of the old
+        # row. The integration test shares one session with the handler, so we
+        # model that transaction boundary explicitly with rollback() before
+        # asserting the post-rollback state.
+        await db.rollback()
+        stmt = select(AudioRecording).where(AudioRecording.id == existing_id)
+        result = await db.execute(stmt)
+        survivor = result.scalar_one_or_none()
+        assert survivor is not None
+        assert survivor.s3_key == "old-key"
+
+    @patch("app.routers.audio.magic.from_buffer")
     async def test_upload_after_submission_fails(
         self,
         mock_magic,
