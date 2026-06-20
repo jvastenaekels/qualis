@@ -333,12 +333,18 @@ async def run_factor_analysis(
                 factor_mean_se=bootstrap_raw["factor_mean_se"],
             )
         except (ValueError, np.linalg.LinAlgError) as e:
-            # Non-fatal: log and continue. The regular result is still
-            # returned without bootstrap data.
+            # Non-fatal: log and continue. The regular result is still returned
+            # without bootstrap data — but record the attempt in the persisted
+            # warnings so a failed bootstrap is distinguishable from one that was
+            # never requested (audit G3).
             logger.warning(
                 "Bootstrap failed for study=%s: %s — returning result without bootstrap.",
                 study.slug,
                 e,
+            )
+            result["warnings"].append(
+                f"Bootstrap stability ({body.bootstrap_iterations} iterations) "
+                f"could not be computed and was skipped: {e}"
             )
 
     analysis_result = AnalysisResult(
@@ -382,9 +388,11 @@ async def run_factor_analysis(
         notes=None,
         factor_notes={},
         manual_rotations=manual_rotations_payload,
-        bootstrap_iterations=body.bootstrap_iterations
-        if bootstrap_payload is not None
-        else None,
+        # Persist the REQUESTED iteration count unconditionally so an attempted-
+        # but-failed bootstrap (count set, result null) is distinguishable from
+        # one never requested (both null) — audit G3. bootstrap_result stays
+        # guarded (null when the bootstrap failed or was not requested).
+        bootstrap_iterations=body.bootstrap_iterations,
         bootstrap_result=bootstrap_payload.model_dump(mode="json")
         if bootstrap_payload is not None
         else None,

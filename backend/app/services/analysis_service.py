@@ -1127,6 +1127,17 @@ def run_analysis(
     warnings: list[str] = []
     if extraction == "pca":
         unrotated = extract_pca(cor_mat, n_factors)
+        # Detect degenerate (zero-variance) factor columns: requesting more
+        # factors than the data rank clamps eigenvalues to ~0, yielding all-zero
+        # loading columns, NaN z-scores and variance_explained=0 with no signal.
+        # PCA previously emitted no warning here, unlike the centroid path (G4).
+        for f in range(unrotated.shape[1]):
+            if not np.any(np.abs(unrotated[:, f]) > 1e-9):
+                warnings.append(
+                    f"Factor {f + 1} is degenerate (near-zero variance) — the data "
+                    f"likely supports fewer than {n_factors} factors; consider "
+                    f"requesting fewer."
+                )
     elif extraction == "centroid":
         unrotated, warnings = extract_centroid(cor_mat, n_factors)
     else:

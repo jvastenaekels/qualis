@@ -447,6 +447,22 @@ class TestRunAnalysis:
         with pytest.raises(ValueError, match="cannot exceed"):
             run_analysis(dataset, n_factors=10)
 
+    def test_pca_over_factorization_warns_on_degenerate_factor(self):
+        """Audit G4: PCA over-factorization must surface a degeneracy warning
+        (the centroid path already does; PCA was silent)."""
+        # 4 participants forming 2 collinear pairs → correlation matrix rank 2.
+        # Requesting 3 factors leaves factor 3 with ~zero variance (degenerate).
+        v = np.array([-2, -1, 0, 1, 2, 0], dtype=float)
+        w = np.array([2, 1, 0, -1, -2, 0], dtype=float)
+        dataset = np.column_stack([v, v, w, w])  # (6 statements, 4 participants)
+
+        result = run_analysis(dataset, n_factors=3, extraction="pca", rotation="none")
+
+        assert any("degenerate" in msg.lower() for msg in result["warnings"]), (
+            f"expected a degeneracy warning for the over-factorized PCA run; "
+            f"got warnings={result['warnings']}"
+        )
+
     def test_invalid_extraction_raises(self, dataset):
         with pytest.raises(ValueError, match="Unknown extraction"):
             run_analysis(dataset, n_factors=2, extraction="invalid")
