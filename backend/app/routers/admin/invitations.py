@@ -1,3 +1,4 @@
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -20,30 +21,42 @@ async def verify_invitation(
     token: str, db: AsyncSession = Depends(get_db)
 ) -> dict[str, object]:
     """Verify an invitation token and return details including project name."""
+    # Only the decode is inside the try: a token problem is a 400, but a DB
+    # failure below must surface as a 500 (a real fault to investigate), not be
+    # masked as a misleading "invalid token". Never leak str(e) to the client.
     try:
         payload = decode_invitation_token(token)
-        project_id = payload.get("project_id") or payload.get("workspace_id")
-
-        project_name = "Unknown Project"
-        if project_id:
-            from app.models import Project
-
-            result = await db.execute(select(Project).where(Project.id == project_id))
-            project = result.scalar_one_or_none()
-            if project:
-                project_name = project.title
-
-        return {
-            "email": payload["sub"],
-            "project_id": project_id,
-            "project_name": project_name,
-            "role": payload["role"],
-        }
-    except Exception as e:
+    except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid or expired invitation token: {str(e)}",
+            detail="Invalid or expired invitation token",
         )
+
+    email = payload.get("sub")
+    role = payload.get("role")
+    if not email or not role:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid invitation token payload",
+        )
+
+    project_id = payload.get("project_id") or payload.get("workspace_id")
+
+    project_name = "Unknown Project"
+    if project_id:
+        from app.models import Project
+
+        result = await db.execute(select(Project).where(Project.id == project_id))
+        project = result.scalar_one_or_none()
+        if project:
+            project_name = project.title
+
+    return {
+        "email": email,
+        "project_id": project_id,
+        "project_name": project_name,
+        "role": role,
+    }
 
 
 class InvitationAccept(BaseModel):
@@ -64,10 +77,10 @@ async def accept_invitation(
     """
     try:
         payload = decode_invitation_token(data.token)
-    except Exception as e:
+    except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid token: {str(e)}",
+            detail="Invalid or expired invitation token",
         )
 
     # Verify email match

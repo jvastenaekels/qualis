@@ -134,9 +134,15 @@ class TestImportPartial:
         test_user: User,
         test_project,
         auth_token_factory,
+        db,
     ):
-        """
-        Test that we can actually create the study with missing description (defaults to empty string).
+        """A translation with a missing description imports fine; it defaults to "".
+
+        The study must otherwise be valid: /import now enforces the same
+        structural checks as /validate-import (audit Wave B / B2), so an
+        empty-statements payload — which used to create a silently-broken
+        study — is rejected. This test therefore uses a valid minimal study
+        and asserts the description actually defaulted.
         """
         auth_headers = auth_token_factory(test_user)
         auth_headers["X-Project-ID"] = str(test_project.id)
@@ -151,11 +157,18 @@ class TestImportPartial:
                         {
                             "language_code": "en",
                             "title": "Title Only",
-                            # Description missing
+                            # Description missing -> should default to ""
                         }
                     ],
-                    "statements": [],
-                    "grid_config": [],
+                    "statements": [
+                        {
+                            "code": "S1",
+                            "translations": [
+                                {"language_code": "en", "text": "Statement 1"}
+                            ],
+                        }
+                    ],
+                    "grid_config": [{"score": 0, "capacity": 1}],
                 },
             },
             "new_slug": "partial-import-create-123",
@@ -166,3 +179,17 @@ class TestImportPartial:
         )
 
         assert response.status_code == 200, response.text
+
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+
+        from app.models import Study
+
+        study = (
+            await db.execute(
+                select(Study)
+                .where(Study.slug == "partial-import-create-123")
+                .options(selectinload(Study.translations))
+            )
+        ).scalar_one()
+        assert study.translations[0].description == ""
