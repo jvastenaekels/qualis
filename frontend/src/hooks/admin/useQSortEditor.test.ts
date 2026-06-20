@@ -304,7 +304,7 @@ describe('useQSortEditor — edit-state machine', () => {
 // The oracle (QSortEditor.test.tsx) snapshots ['s1','s1','s5'] for this input;
 // we assert the same result at hook level.
 describe('useQSortEditor — import-mode selection (append)', () => {
-    it('append mode with explicit existing code produces duplicate code (oracle-locked quirk)', async () => {
+    it('append mode disambiguates an explicit code that collides with an existing one (audit D1)', async () => {
         const { result } = renderHook(() => useQSortEditor({}));
         if (!result.current) throw new Error('hook returned null with a seeded draft');
 
@@ -330,11 +330,12 @@ describe('useQSortEditor — import-mode selection (append)', () => {
             result.current?.bulk.handleBulkSave();
         });
 
-        // Oracle-locked quirk: append pushes both parsed items regardless of code
-        // collision — de-dup is sync-only. Result: original s1 + appended s1 + s5.
+        // Audit D1: append still pushes both parsed items (de-dup/merge is
+        // sync-only), but a code that collides with an existing one is now
+        // disambiguated rather than duplicated — 's1' → 's1-2', 's5' is free.
         const afterStatements = useStudyDesigner.getState().draft?.statements;
         const codes = afterStatements?.map((s) => (s as { code: string }).code);
-        expect(codes).toEqual(['s1', 's1', 's5']);
+        expect(codes).toEqual(['s1', 's1-2', 's5']);
 
         // bulkText cleared after save
         expect(result.current.bulk.bulkText).toBe('');

@@ -36,6 +36,7 @@ import {
     applyCapacityDelta,
     computeAutoShapedCapacities,
     mergeParsedItemIntoStatements,
+    uniqueStatementCode,
 } from './QSortEditor.helpers';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
@@ -78,7 +79,7 @@ interface SortableStatementItemProps {
     isEditing: boolean;
     editingCode: string;
     editingText: string;
-    setEditingIndex: (idx: number | null) => void;
+    setEditingId: (code: string | null) => void;
     setEditingCode: (code: string) => void;
     setEditingText: (text: string) => void;
     handleSaveStatement: () => void;
@@ -99,7 +100,7 @@ function SortableStatementItem({
     isEditing,
     editingCode,
     editingText,
-    setEditingIndex,
+    setEditingId,
     setEditingCode,
     setEditingText,
     handleSaveStatement,
@@ -170,7 +171,7 @@ function SortableStatementItem({
                             if (e.key === 'Enter') {
                                 handleSaveStatement();
                             } else if (e.key === 'Escape') {
-                                setEditingIndex(null);
+                                setEditingId(null);
                             }
                         }}
                     />
@@ -186,7 +187,7 @@ function SortableStatementItem({
                         <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setEditingIndex(null)}
+                            onClick={() => setEditingId(null)}
                             className="h-9 w-9 text-slate-400 hover:bg-slate-50 rounded-xl"
                         >
                             <AlertCircle className="h-4 w-4" />
@@ -204,13 +205,13 @@ function SortableStatementItem({
                         )}
                         onClick={() => {
                             if (readOnly) return;
-                            setEditingIndex(idx);
+                            setEditingId(item.code);
                             setEditingText(item.text);
                             setEditingCode(item.code);
                         }}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
-                                setEditingIndex(idx);
+                                setEditingId(item.code);
                                 setEditingText(item.text);
                                 setEditingCode(item.code);
                                 e.preventDefault();
@@ -431,7 +432,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
     }, [draft, updateDraft]);
 
     const [importMode, setImportMode] = useState<'replace' | 'append' | 'sync'>('replace');
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [editingText, setEditingText] = useState('');
     const [editingCode, setEditingCode] = useState('');
 
@@ -670,7 +671,11 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
 
     const handleSaveStatement = () => {
         updateDraft((d) => {
-            const statement = d.statements?.[editingIndex as number];
+            // Locate the edited statement by its stable code, not a positional
+            // index: a drag-reorder or an earlier-row delete while editing would
+            // make a stored index point at the wrong statement (audit D4). Codes
+            // are unique (audit D1) and are the dnd-kit ids.
+            const statement = d.statements?.find((s) => s.code === editingId);
             if (statement) {
                 // Update code
                 statement.code = editingCode;
@@ -683,7 +688,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                 }
             }
         });
-        setEditingIndex(null);
+        setEditingId(null);
         toast.success(t('admin.design.qsort.set.updated'));
     };
 
@@ -866,11 +871,22 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => {
+                                            let newCode = '';
                                             updateDraft((d) => {
                                                 if (!d.statements) d.statements = [];
-                                                const newIdx = d.statements.length + 1;
+                                                const existingCodes = new Set<string>(
+                                                    d.statements.map((s) => s.code)
+                                                );
+                                                // Collision-free code (audit D1): a plain
+                                                // `s${length + 1}` would reuse an in-use code
+                                                // after a delete/import left a gap.
+                                                newCode = uniqueStatementCode(
+                                                    null,
+                                                    existingCodes,
+                                                    d.statements.length + 1
+                                                );
                                                 d.statements.push({
-                                                    code: `s${newIdx}`,
+                                                    code: newCode,
                                                     translations: (d.translations || []).map(
                                                         (t: StudyTranslationCreate) => ({
                                                             language_code: t.language_code,
@@ -879,12 +895,11 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                     ),
                                                 });
                                             });
-                                            // Set editing state for the new statement
-                                            // We use the current length as the index for the new element
-                                            const newIdx = statements.length;
-                                            setEditingIndex(newIdx);
+                                            // Open the new statement for editing, keyed by its
+                                            // (collision-free) code, not a positional index (D4).
+                                            setEditingId(newCode);
                                             setEditingText('');
-                                            setEditingCode(`s${newIdx + 1}`);
+                                            setEditingCode(newCode);
                                         }}
                                         className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
                                     >
@@ -996,10 +1011,10 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                 item={item}
                                                 idx={idx}
                                                 statement={statement}
-                                                isEditing={editingIndex === idx}
+                                                isEditing={editingId === item.code}
                                                 editingCode={editingCode}
                                                 editingText={editingText}
-                                                setEditingIndex={setEditingIndex}
+                                                setEditingId={setEditingId}
                                                 setEditingCode={setEditingCode}
                                                 setEditingText={setEditingText}
                                                 handleSaveStatement={handleSaveStatement}

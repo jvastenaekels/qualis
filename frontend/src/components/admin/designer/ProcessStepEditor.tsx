@@ -411,17 +411,23 @@ export function ProcessStepEditor({
                 if (translation.language_code === activeLocale) {
                     translation.process_steps[index] = data;
                 } else {
-                    // Sync non-translatable fields (id, icon)
-                    if (translation.process_steps[index]) {
-                        translation.process_steps[index].id = data.id;
-                        translation.process_steps[index].icon = data.icon;
+                    // Sync non-translatable fields (id, icon) into NON-active locales
+                    // by stable id, not the active-locale index: once a locale's step
+                    // order diverges (a reorder, or a locale seeded in default order),
+                    // a shared index writes onto the wrong step and silently corrupts
+                    // the multi-language config (audit D2).
+                    const target = translation.process_steps.find((s) => s.id === data.id);
+                    if (target) {
+                        target.id = data.id;
+                        target.icon = data.icon;
                     } else {
-                        // This should technically not happen if they are always synced
-                        translation.process_steps[index] = {
+                        // The structural-sync effect normally seeds every locale; this
+                        // is a defensive fallback if a step is missing in this locale.
+                        translation.process_steps.push({
                             ...data,
                             title: '',
                             description: '',
-                        };
+                        });
                     }
                 }
             });
@@ -429,10 +435,17 @@ export function ProcessStepEditor({
     };
 
     const deleteStep = (index: number) => {
+        // Capture the target's stable id from the active locale BEFORE mutating,
+        // then delete it by id in every locale. Splicing by the active-locale index
+        // would remove the wrong step from locales whose order diverged (audit D2).
+        const targetId = steps[index]?.id;
+        if (targetId === undefined) return;
         updateDraft((d) => {
             d.translations?.forEach((translation) => {
-                if (translation.process_steps) {
-                    translation.process_steps.splice(index, 1);
+                if (!translation.process_steps) return;
+                const targetIdx = translation.process_steps.findIndex((s) => s.id === targetId);
+                if (targetIdx !== -1) {
+                    translation.process_steps.splice(targetIdx, 1);
                 }
             });
         });

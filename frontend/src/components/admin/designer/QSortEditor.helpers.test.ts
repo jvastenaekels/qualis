@@ -3,6 +3,7 @@ import {
     applyCapacityDelta,
     computeAutoShapedCapacities,
     mergeParsedItemIntoStatements,
+    uniqueStatementCode,
 } from './QSortEditor.helpers';
 
 describe('computeAutoShapedCapacities', () => {
@@ -248,6 +249,55 @@ describe('mergeParsedItemIntoStatements', () => {
         );
         expect(statements[0]?.translations).toHaveLength(2);
         expect(statements[0]?.translations[1]).toEqual({ language_code: 'fr', text: 'nouveau' });
+    });
+});
+
+describe('uniqueStatementCode (audit D1)', () => {
+    it('keeps a free user-supplied code unchanged', () => {
+        expect(uniqueStatementCode('S3', new Set(['S1', 'S2']))).toBe('S3');
+    });
+
+    it('disambiguates a colliding user-supplied code with a numeric suffix', () => {
+        expect(uniqueStatementCode('S1', new Set(['S1']))).toBe('S1-2');
+        expect(uniqueStatementCode('S1', new Set(['S1', 'S1-2']))).toBe('S1-3');
+    });
+
+    it('auto-generates the first free s{n}, skipping an in-use code after a delete gap', () => {
+        // 5 statements existed, s3 was deleted → length 4 but s5 still present.
+        // A naive `s${length + 1}` would regenerate the in-use s5.
+        const existing = new Set(['s1', 's2', 's4', 's5']);
+        expect(uniqueStatementCode(null, existing, 5)).toBe('s6');
+    });
+
+    it('auto-generates s{startIndex} when free', () => {
+        expect(uniqueStatementCode(null, new Set(['s1', 's2']), 3)).toBe('s3');
+    });
+});
+
+describe('mergeParsedItemIntoStatements — code collisions (audit D1)', () => {
+    const draftLangs = [{ language_code: 'en' }];
+
+    it('append: a new auto-code skips an in-use code left by a delete gap', () => {
+        // s2 was deleted → [s1, s3]; length is 2 so the old `s${length + 1}`
+        // would emit s3 again (collision). The fix emits the first free code.
+        const statements = [
+            { code: 's1', translations: [] },
+            { code: 's3', translations: [] },
+        ];
+        mergeParsedItemIntoStatements({ text: 'New' }, statements, draftLangs, 'append', 'en');
+        expect(statements.map((s) => s.code)).toEqual(['s1', 's3', 's4']);
+    });
+
+    it('append: a user-supplied code that collides is disambiguated, never duplicated', () => {
+        const statements = [{ code: 's1', translations: [] }];
+        mergeParsedItemIntoStatements(
+            { code: 's1', text: 'dup' },
+            statements,
+            draftLangs,
+            'append',
+            'en'
+        );
+        expect(statements.map((s) => s.code)).toEqual(['s1', 's1-2']);
     });
 });
 

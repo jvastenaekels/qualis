@@ -148,6 +148,36 @@ interface DraftTranslationLite {
 }
 
 /**
+ * Generate a statement code that collides with no existing code.
+ *
+ * - A user-supplied `desired` code is kept when free, else disambiguated with a
+ *   numeric suffix (`code`, `code-2`, `code-3`, …).
+ * - When no code is supplied, returns the first free `s{n}` from `startIndex`
+ *   (defaults to `existingCodes.size + 1`). This is what fixes the historical
+ *   `s${statements.length + 1}` bug: after a delete/import left a gap (e.g. 5
+ *   statements, delete one → length 4 → would regenerate the still-present
+ *   `s5`), the loop skips any in-use code.
+ *
+ * Codes are dnd-kit sortable ids AND React keys, so a collision breaks drag
+ * targeting and corrupts downstream sort/analysis that keys on `code`.
+ */
+export function uniqueStatementCode(
+    desired: string | null | undefined,
+    existingCodes: Set<string>,
+    startIndex?: number
+): string {
+    if (desired) {
+        if (!existingCodes.has(desired)) return desired;
+        let n = 2;
+        while (existingCodes.has(`${desired}-${n}`)) n++;
+        return `${desired}-${n}`;
+    }
+    let n = startIndex ?? existingCodes.size + 1;
+    while (existingCodes.has(`s${n}`)) n++;
+    return `s${n}`;
+}
+
+/**
  * Apply one parsed bulk-import item to the statements array. Mutates
  * `statements` in place. In `'sync'` mode, items whose `code` matches an
  * existing statement update that statement's translations rather than
@@ -170,7 +200,8 @@ export function mergeParsedItemIntoStatements(
         return;
     }
 
-    const code = item.code || `s${statements.length + 1}`;
+    const existingCodes = new Set<string>(statements.map((s) => s.code));
+    const code = uniqueStatementCode(item.code, existingCodes, statements.length + 1);
     const translations = draftTranslations.map(({ language_code }) => {
         const headerT = item.translations?.find((ht) => ht.language_code === language_code);
         if (headerT) return { language_code, text: headerT.text };
