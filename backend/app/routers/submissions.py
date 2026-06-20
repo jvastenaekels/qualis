@@ -64,9 +64,13 @@ async def submit_study(
             f"Unexpected error during submission (study={data.study_slug}): {e}",
             exc_info=True,
         )
+        # Do NOT leak str(e) to the client: /submit is an unauthenticated,
+        # participant-facing endpoint and the exception text can disclose
+        # internal variable/key names or truncated SQL. The full detail is
+        # already captured server-side via logger.error(exc_info=True) above.
         raise HTTPException(
             status_code=500,
-            detail=f"Unexpected error during submission: {str(e)}",
+            detail="An unexpected error occurred while processing your submission.",
         )
 
 

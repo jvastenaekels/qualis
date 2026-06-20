@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -385,20 +386,22 @@ def _build_validation_summary(
         return None, [f"Error building summary: {str(e)}"]
 
 
-@router.post("/validate-import", response_model=ValidationResult)
-@limiter.limit("30/minute")
-async def validate_study_import(
-    request: Request,
+def _run_import_checks(
     config: dict[str, Any],
-    current_user: User = Depends(get_current_user),
-    project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
-    db: AsyncSession = Depends(get_db),
-) -> "ValidationResult":
-    """Validate an imported study payload without creating the study.
+) -> tuple[
+    list[str],
+    list[str],
+    dict[str, Any],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    Any,
+]:
+    """Run every structural ``_check_*`` validator on an import payload.
 
-    Each section is checked by a dedicated `_check_*` helper that returns
-    its own error / warning lists; this orchestrator aggregates them and
-    builds the summary.
+    Shared by ``/validate-import`` (advisory) and ``/import`` (enforcing) so
+    the two can never drift: ``/import`` is reachable directly, so it must run
+    the same structural checks the advisory endpoint does. Returns
+    ``(errors, warnings, study_data, translations, statements, grid_config)``.
     """
     errors: list[str] = []
     warnings: list[str] = []
@@ -440,6 +443,28 @@ async def validate_study_import(
     warnings.extend(_check_import_branding(study_data.get("branding") or {}))
     errors.extend(_check_import_recruitment_links(study_data))
 
+    return errors, warnings, study_data, translations, statements, grid_config
+
+
+@router.post("/validate-import", response_model=ValidationResult)
+@limiter.limit("30/minute")
+async def validate_study_import(
+    request: Request,
+    config: dict[str, Any],
+    current_user: User = Depends(get_current_user),
+    project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
+    db: AsyncSession = Depends(get_db),
+) -> "ValidationResult":
+    """Validate an imported study payload without creating the study.
+
+    Each section is checked by a dedicated `_check_*` helper that returns
+    its own error / warning lists; this orchestrator aggregates them and
+    builds the summary.
+    """
+    errors, warnings, study_data, translations, statements, grid_config = (
+        _run_import_checks(config)
+    )
+
     summary: ValidationSummary | None = None
     if not errors:
         summary, extra_errors = _build_validation_summary(
@@ -455,6 +480,30 @@ async def validate_study_import(
 # ------------------------------------------------------------------
 # Import
 # ------------------------------------------------------------------
+
+
+# Canonical StudyTranslation fields accepted on import — mirrors the exporter's
+# translation key set in export_study_config. Spreading raw import JSON as
+# **kwargs would let an unknown/cross-version key raise TypeError (caught as a
+# leaky 500) and would allow id/study_id override attempts.
+_STUDY_TRANSLATION_IMPORT_FIELDS = frozenset(
+    {
+        "language_code",
+        "title",
+        "subtitle",
+        "description",
+        "objective",
+        "instructions",
+        "condition_of_instruction",
+        "pre_instruction",
+        "consent_title",
+        "consent_description",
+        "ui_labels",
+        "process_steps",
+        "methodology_tips",
+        "step_help",
+    }
+)
 
 
 class StudyImportRequest(BaseModel):
@@ -510,6 +559,20 @@ async def import_study_config(
             detail=f"Study with slug '{import_data.new_slug}' already exists",
         )
 
+    # Structurally validate the payload BEFORE touching the DB. /import is
+    # reachable directly (the /validate-import endpoint is advisory and
+    # skippable), so without this a malformed payload would 500 with leaked
+    # driver/exception text instead of a clean, actionable 400.
+    validation_errors, _, _, _, _, _ = _run_import_checks(config)
+    if validation_errors:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "Invalid study configuration",
+                "errors": validation_errors,
+            },
+        )
+
     study_data = config.get("study", {}).copy()
 
     # Create Study in DRAFT
@@ -539,12 +602,17 @@ async def import_study_config(
         db.add(db_study)
         await db.flush()
 
-        # Translations
+        # Translations — build from a whitelisted field set; never spread raw
+        # import JSON as **kwargs (an unknown/cross-version key would 500, and
+        # id/study_id could be overridden). See _STUDY_TRANSLATION_IMPORT_FIELDS.
         for t_data in study_data.get("translations", []):
-            # Ensure required non-nullable fields have defaults
-            if "description" not in t_data or t_data["description"] is None:
-                t_data["description"] = ""
-            db.add(StudyTranslation(study_id=db_study.id, **t_data))
+            t_fields = {
+                k: v for k, v in t_data.items() if k in _STUDY_TRANSLATION_IMPORT_FIELDS
+            }
+            # description is non-nullable; ensure a default.
+            if t_fields.get("description") is None:
+                t_fields["description"] = ""
+            db.add(StudyTranslation(study_id=db_study.id, **t_fields))
 
         # Statements
         for idx, s_data in enumerate(study_data.get("statements", [])):
@@ -580,12 +648,22 @@ async def import_study_config(
             )
 
         await db.commit()
-    except Exception as e:
+    except (IntegrityError, ValueError) as e:
+        # Structurally-plausible payload that slipped past pre-validation
+        # (e.g. a malformed date string → ValueError, or a DB constraint hit →
+        # IntegrityError). Surface a clean 400; never leak str(e) to the client.
         await db.rollback()
-        logger.error(f"Error during study import: {e}", exc_info=True)
+        logger.warning("Study import rejected (bad payload): %s", e, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The study configuration could not be imported. Check the file and try again.",
+        )
+    except Exception:
+        await db.rollback()
+        logger.error("Unexpected error during study import", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to import study: {str(e)}",
+            detail="An unexpected error occurred while importing the study.",
         )
 
     return StudyImportResponse(
