@@ -35,9 +35,7 @@ class RecruitmentLinkBase(BaseModel):
         of believing they capped sign-ups when the link is actually unlimited.
         """
         if self.type == RecruitmentLinkType.public and self.capacity is not None:
-            raise ValueError(
-                "capacity cannot be set for public (unlimited) links"
-            )
+            raise ValueError("capacity cannot be set for public (unlimited) links")
         return self
 
 
