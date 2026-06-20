@@ -11,7 +11,10 @@ exclude = [
     "doi\\.org/10\\.5281/zenodo\\.XXXXXXX",
     "doi\\.org/10\\.4135/9781446251911",
     "zenodo\\.org/account/settings/github/",
-    "localhost:3000",
+    # Local dev-stack URLs (Vite :5173, API :8000, MinIO console :9001, …) are
+    # never reachable from CI and are never legitimate published links, so
+    # exclude every localhost reference rather than enumerating ports.
+    "localhost",
     # Commercial Q-software vendor site cited in the README comparison table;
     # resolves in browsers/curl but bot-protection can block automated checkers.
     "qmethodsoftware\\.com",
