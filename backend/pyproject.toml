@@ -9,7 +9,7 @@ dependencies = [
     "asyncpg==0.31.0",
     "pydantic==2.13.3",
     "sqlalchemy[asyncio]==2.0.45",
-    "pydantic-settings>=2.6.0",
+    "pydantic-settings>=2.14.2",
     "aiofiles>=24.1.0",
     "slowapi>=0.1.9",
     "bcrypt>=4.1.0",
