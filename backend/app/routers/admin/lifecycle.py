@@ -11,7 +11,7 @@ enforcement. Designed to support the GDPR data-minimisation principle
 """
 
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
@@ -166,8 +166,12 @@ async def get_data_inventory(
     t_row = (await db.execute(timeline_q)).one()
 
     now = datetime.now(UTC)
-    cutoff_1y = now.replace(year=now.year - 1)
-    cutoff_2y = now.replace(year=now.year - 2)
+    # timedelta (not now.replace(year=...)) so this read-only endpoint does not
+    # crash on Feb 29, where replacing the year lands on a non-existent date
+    # (audit E4). A ~1-day drift near leap years is immaterial for these
+    # "older than ~1y / ~2y" retention counts.
+    cutoff_1y = now - timedelta(days=365)
+    cutoff_2y = now - timedelta(days=730)
 
     older_q = select(
         func.count(Participant.id)
@@ -294,8 +298,20 @@ async def bulk_anonymise_old_participants(
         if p.anonymised_at is not None:
             skipped += 1
             continue
+        participant_id = p.id
         await StudyDataService.anonymise_participant(db, p)
         anonymised += 1
+        # Per-row audit: anonymise_participant commits each row independently, so
+        # a mid-loop failure must not lose the trail of erasures already done.
+        # Mirrors the admin-mediated erase_personal_data path (F-05-008; audit E2).
+        log_admin_action(
+            actor_user_id=current_user.id,
+            action="erase_personal_data",
+            resource="participant",
+            resource_id=participant_id,
+            study_slug=study.slug,
+            mode="bulk_anonymise",
+        )
 
     log_admin_action(
         actor_user_id=current_user.id,

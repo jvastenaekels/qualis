@@ -200,6 +200,34 @@ class ConcourseService:
 
     @staticmethod
     async def _attach_tags(db: AsyncSession, item_id: int, tag_ids: list[int]) -> None:
+        # Reject tag ids that don't belong to this item's project (audit E5):
+        # without this, a member of project A could attach — and, via the item
+        # response, read the name of — a tag from project B (cross-project IDOR).
+        # The project is derived from the item's concourse, so callers (which have
+        # already verified the concourse belongs to their project) need no change.
+        if tag_ids:
+            project_id = (
+                await db.execute(
+                    select(Concourse.project_id)
+                    .join(ConcourseItem, ConcourseItem.concourse_id == Concourse.id)
+                    .where(ConcourseItem.id == item_id)
+                )
+            ).scalar_one()
+            valid_ids = set(
+                (
+                    await db.execute(
+                        select(ConcourseTag.id).where(
+                            ConcourseTag.id.in_(tag_ids),
+                            ConcourseTag.project_id == project_id,
+                        )
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            if valid_ids != set(tag_ids):
+                raise NotFoundError("ConcourseTag")
+
         await db.execute(
             delete(ConcourseItemTag).where(ConcourseItemTag.item_id == item_id)
         )

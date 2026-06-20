@@ -354,6 +354,11 @@ async def sync_all_stale_statements(
                 db, study, entry["statement_id"]
             )
         except Exception:
+            # Roll back this statement's partial DML so the AsyncSession is clean
+            # for the next iteration; otherwise the next execute() raises
+            # PendingRollbackError and aborts the whole best-effort batch (audit
+            # E3). Already-synced statements are durable via their own commit.
+            await db.rollback()
             logger.warning("Failed to sync statement %s", entry["statement_id"])
 
     # Return refreshed study
