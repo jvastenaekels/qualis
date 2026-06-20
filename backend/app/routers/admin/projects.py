@@ -413,6 +413,30 @@ async def delete_project(
     deleted_id = project.id
     deleted_slug = project.slug
     try:
+        # Concourse memos are polymorphic on (parent_type, parent_id) with NO DB
+        # foreign key, so the ON DELETE CASCADE that removes this project's
+        # concourses leaves orphan memo entries/comments behind — escaping GDPR
+        # cleanup (audit E1). Run the Python cleanup for each concourse first, in
+        # this same transaction. Query ids explicitly: project.concourses is
+        # lazy='raise'. (Study memos can't exist here — deletion is blocked above
+        # while any study remains.)
+        from app.models import Concourse, MemoParentType
+        from app.services.memo_service import MemoService
+
+        concourse_ids = (
+            (
+                await db.execute(
+                    select(Concourse.id).where(Concourse.project_id == project.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        for concourse_id in concourse_ids:
+            await MemoService.cleanup_for_parent(
+                db, parent_type=MemoParentType.concourse, parent_id=concourse_id
+            )
+
         await db.delete(project)
         await db.commit()
     except Exception as e:
