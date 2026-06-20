@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.3](https://github.com/jvastenaekels/qualis/compare/v0.7.2...v0.7.3) (2026-06-20)
+
+
+### Bug fixes
+
+* audit Wave A — security & data-integrity quick wins (4 findings) ([#241](https://github.com/jvastenaekels/qualis/issues/241)) ([f0b3fde](https://github.com/jvastenaekels/qualis/commit/f0b3fdeb01383e097ee397522bc49c08f4fa9037))
+* audit Wave B — API error hygiene & info-leak hardening (4 findings) ([#242](https://github.com/jvastenaekels/qualis/issues/242)) ([884c849](https://github.com/jvastenaekels/qualis/commit/884c849100fb3f05176b4d1e31a87702616fc110))
+* audit Wave C — participant-flow correctness (4 findings) ([#243](https://github.com/jvastenaekels/qualis/issues/243)) ([27a9652](https://github.com/jvastenaekels/qualis/commit/27a965281b74cda265b7dc5d6a88de68ea2b66aa))
+* audit Wave D — admin designer integrity (D1, D2, D4) ([#244](https://github.com/jvastenaekels/qualis/issues/244)) ([57098ed](https://github.com/jvastenaekels/qualis/commit/57098edc0c1c6ac421bcf3b9221d0c8c9e2f2ec2))
+* correctness lot — audio atomicity, analysis NaN, races, validation (6 findings) ([#239](https://github.com/jvastenaekels/qualis/issues/239)) ([9d349f2](https://github.com/jvastenaekels/qualis/commit/9d349f2acfbdf1ccefe3ad6bd7093963465709a5))
+
 ## [0.7.2](https://github.com/jvastenaekels/qualis/compare/v0.7.1...v0.7.2) (2026-06-20)
 
 
