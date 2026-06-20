@@ -31,12 +31,16 @@ e1b309997a92fa5e3d67547bdf5e3ebc42d11ff7:backend/tests/integration/test_consent_
 06c9d0aa4110c21466715de97e455c88bd3b2a43:frontend/src/layouts/AdminLayout.helpers.test.ts:generic-api-key:64
 
 # Audit-waves false positives (generic-api-key). Both are benign:
-#  - audio.py: `s3_key = recording.s3_key` is a local-variable assignment of an
-#    ORM attribute, not a credential (Wave A / A4 atomicity fix).
-#  - test_api_error_hygiene.py: a non-secret sentinel string used to assert that
-#    /submit does NOT leak exception text (Wave B / B1). Fingerprints cover the
-#    squash-merge commits on main plus the pre-squash branch commits.
+#  - audio.py:353 binds the recording's S3 object key to a local variable
+#    (Wave A / A4 atomicity fix); it is not a credential.
+#  - test_api_error_hygiene.py:59 is a non-secret sentinel string asserting
+#    that /submit does not leak exception text (Wave B / B1).
+# (Prose only here — quoting the flagged line verbatim would re-trip the rule
+# on this very file.) Fingerprints cover the squash-merge and branch commits,
+# plus the earlier ignore-file commits whose comment quoted the line.
 f0b3fdeb01383e097ee397522bc49c08f4fa9037:backend/app/routers/audio.py:generic-api-key:353
 652b668ba508dd1229b318b193a47c99895105ec:backend/app/routers/audio.py:generic-api-key:353
 884c849100fb3f05176b4d1e31a87702616fc110:backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
 f24b53762abfb2f3952a5538aa8809f206ad3498:backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
+070c67d0cadf553d87abce8b43bf6b6b3c059ca2:.gitleaksignore:generic-api-key:34
+323f1cada0cc7cf0adc9621e3804b8b731ea65bc:.gitleaksignore:generic-api-key:34
