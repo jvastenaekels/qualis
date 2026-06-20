@@ -241,6 +241,7 @@
             "label": "Grid controls"
         },
         "grid": {
+            "cards_moved_to_neutral": "Some cards could not be kept on the grid and were moved back to the unsorted pile. Please re-place them.",
             "label": "Q-Sort grid",
             "column": "Column",
             "slot": "Slot",

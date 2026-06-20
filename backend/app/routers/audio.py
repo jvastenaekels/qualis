@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from uuid import UUID
 from datetime import datetime, timedelta, UTC
+import logging
 import re
 import magic
 
@@ -18,6 +19,8 @@ from app.schemas import AudioUploadResponse, AudioRecordingRead
 from app.services.storage_service import storage_service
 from app.core.config import settings
 from app.limiter import limiter
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/audio", tags=["audio"])
 
@@ -224,11 +227,21 @@ async def upload_audio(
     )
     existing_recording = existing.scalar_one_or_none()
 
-    # Delete old recording if exists (replace functionality)
+    # Re-upload atomicity (#5): when replacing an existing recording we must
+    # NOT delete the old S3 object before the new one is durably committed —
+    # otherwise a failed new upload (or a failed commit) would roll back the
+    # DB row while the old object is already permanently gone, destroying the
+    # participant's audio with no replacement.
+    #
+    # We still remove the old DB row inside the successful transaction (the
+    # uq_participant_question_audio unique constraint forbids two rows for the
+    # same participant+question), but we defer the old *object's* S3 deletion
+    # until after the new recording has been committed.
+    old_s3_object: str | None = None
     if existing_recording:
-        await storage_service.delete_audio(existing_recording.s3_key)
+        old_s3_object = existing_recording.s3_key
         await db.delete(existing_recording)
-        await db.flush()  # Flush deletion before creating new record
+        await db.flush()  # Free the unique slot before inserting the new row
 
     # Upload to S3
     s3_metadata = await storage_service.upload_audio(
@@ -257,6 +270,25 @@ async def upload_audio(
         await storage_service.delete_audio(s3_metadata["s3_key"])
         raise
     await db.refresh(audio_recording)
+
+    # The new recording is now durably committed; only now is it safe to
+    # delete the OLD object from S3 (replace functionality). This is
+    # best-effort: a failure to delete the now-orphaned old object must not
+    # fail the request — the new audio is already saved and a 500 here would
+    # wrongly tell the participant their replacement was lost. Worst case is a
+    # harmless orphan object that storage lifecycle/cleanup can reap.
+    if old_s3_object is not None and old_s3_object != audio_recording.s3_key:
+        try:
+            await storage_service.delete_audio(old_s3_object)
+        except Exception:
+            logger.warning(
+                "Failed to delete orphaned old audio object %s after successful "
+                "re-upload for participant %s question %s",
+                old_s3_object,
+                participant.id,
+                question_key,
+                exc_info=True,
+            )
 
     # Generate presigned URL for immediate playback
     presigned_url = storage_service.generate_presigned_url(audio_recording.s3_key)

@@ -68,19 +68,23 @@ def test_recruitment_link_validation():
     rl = RecruitmentLinkBase(name="  Valid Name  ")
     assert rl.name == "Valid Name"
 
-    # Capacity must be > 0
+    # Capacity must be > 0 (use a non-public type so capacity is allowed)
     with pytest.raises(ValidationError):
-        RecruitmentLinkBase(capacity=0)
+        RecruitmentLinkBase(type="limited", capacity=0)
 
     with pytest.raises(ValidationError):
-        RecruitmentLinkBase(capacity=-1)
+        RecruitmentLinkBase(type="limited", capacity=-1)
 
-    rl = RecruitmentLinkBase(capacity=1)
+    rl = RecruitmentLinkBase(type="limited", capacity=1)
     assert rl.capacity == 1
 
     # Capacity is optional (None is valid)
     rl = RecruitmentLinkBase(capacity=None)
     assert rl.capacity is None
+
+    # Public links are unlimited: a capacity here is rejected, not silently dropped
+    with pytest.raises(ValidationError):
+        RecruitmentLinkBase(type="public", capacity=10)
 
 
 def test_recruitment_link_create_excludes_server_fields():

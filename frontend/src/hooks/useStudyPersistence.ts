@@ -29,7 +29,6 @@ export function useStudyPersistence() {
     } = useStudyDesigner();
 
     const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
-    const abortControllerRef = useRef<AbortController | null>(null);
 
     // Track the last draft we successfully sent to avoid redundant saves
     const lastSavedDraftRef = useRef<string | null>(null);
@@ -148,8 +147,6 @@ export function useStudyPersistence() {
     // Handles errors from the save mutation.
     const handleSaveError = useCallback(
         (error: unknown) => {
-            if (error instanceof Error && error.name === 'AbortError') return;
-
             const apiError = error as ApiError & { details: { server_state: StudyRead } };
 
             if (apiError?.status === 409 && apiError.details?.server_state) {
@@ -173,11 +170,6 @@ export function useStudyPersistence() {
         if (!draft || !effectiveSlug || syncStatus === 'saving') return;
 
         const draftJson = JSON.stringify(draft);
-
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-        }
-        abortControllerRef.current = new AbortController();
 
         setSyncStatus('saving');
 

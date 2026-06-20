@@ -229,6 +229,7 @@
             "label": "Controles de la cuadrícula"
         },
         "grid": {
+            "cards_moved_to_neutral": "Algunas tarjetas no pudieron mantenerse en la cuadrícula y se devolvieron a la pila sin ordenar. Vuelva a colocarlas.",
             "label": "Cuadrícula de clasificación Q",
             "column": "Columna",
             "slot": "Posición",

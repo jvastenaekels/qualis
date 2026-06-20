@@ -408,3 +408,7 @@ email_delivery
 # Pydantic field read only at the JSON wire boundary; vulture can't see it.
 audio_storage
 require_audio_storage
+
+# --- app/schemas/recruitment.py (#24: public-link capacity validator) ---
+# Pydantic @model_validator invoked by the framework, not called directly.
+reject_capacity_on_public

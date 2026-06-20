@@ -167,7 +167,10 @@ describe('ResumePage', () => {
             draft_responses: {
                 presort: { q1: 'yes' },
                 rough: { agree: [1], disagree: [2], neutral: [3], history: [] },
-                qsort: [[1], [2]],
+                qsort: [
+                    { statementId: 1, col: 0, row: 0 },
+                    { statementId: 2, col: 1, row: 0 },
+                ],
                 postsort: { feedback: 'good' },
             },
             resume_code: 'brave-tiger-42',
@@ -185,7 +188,10 @@ describe('ResumePage', () => {
             expect(mocks.setState).toHaveBeenCalledWith({
                 presort: { q1: 'yes' },
                 rough: { agree: [1], disagree: [2], neutral: [3], history: [] },
-                qsort: [[1], [2]],
+                qsort: [
+                    { statementId: 1, col: 0, row: 0 },
+                    { statementId: 2, col: 1, row: 0 },
+                ],
                 postsort: { feedback: 'good' },
             });
             expect(mocks.navigate).toHaveBeenCalledWith('/study/test-study/rough-sort', {

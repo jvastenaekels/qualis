@@ -818,6 +818,90 @@ class TestClassifyWithNaN:
         assert len(cons) == 4
 
 
+class TestClassifyWithNonFiniteSED:
+    """Bug #17: a factor with <2 defining sorts yields NaN std-error → NaN SED.
+
+    ``np.std(..., ddof=1)`` returns NaN with fewer than 2 values, so a factor
+    flagged on a single sort produces a NaN ``se`` and NaN SED entries. A pair
+    with NaN SED is insufficient data to decide significance, so the statement
+    must be EXCLUDED from the significance test for that pair — never silently
+    counted as a confident non-distinguishing (consensus) result.
+    """
+
+    def test_nan_sed_pair_is_skipped_not_consensus(self):
+        """A clearly-distinguishing z-diff with NaN SED must not be classified.
+
+        The real z-score difference is huge (6.0), so on a finite SED this would
+        be strongly distinguishing. With a NaN SED the pair is undecidable: the
+        statement must NOT land in ``distinguishing`` (no finite test passed)
+        AND must NOT be counted as a confident consensus result.
+        """
+        # One statement, two factors, a large genuine difference.
+        z_scores = np.array([[3.0, -3.0]])
+        # SED is NaN (factor 2 flagged on a single sort → ddof=1 std == NaN).
+        sed = np.array([[0.0, np.nan], [np.nan, 0.0]])
+        dist, cons = classify_statements(z_scores, sed, n_factors=2)
+        # Not distinguishing: no finite significance test could pass.
+        assert dist == []
+        # And NOT a confident consensus: the only pair was undecidable, so the
+        # statement is excluded from the significance decision entirely.
+        assert cons == []
+
+    def test_finite_factor_still_classifies_when_other_sed_is_nan(self):
+        """A well-determined pair must classify EXACTLY as before, even when an
+        unrelated pair in the same SED matrix is NaN."""
+        # Three factors. Pair (1,2) is finite; pairs touching factor 3 are NaN
+        # (factor 3 has a single defining sort → NaN se).
+        z_scores = np.array(
+            [
+                [3.0, -3.0, 0.0],  # huge finite 1-2 diff → distinguishing on 1-2
+                [0.0, 0.0, 0.0],  # no difference anywhere → consensus
+            ]
+        )
+        sed = np.array(
+            [
+                [0.0, 0.3, np.nan],
+                [0.3, 0.0, np.nan],
+                [np.nan, np.nan, 0.0],
+            ]
+        )
+        dist, cons = classify_statements(z_scores, sed, n_factors=3)
+        # Statement 0 distinguishes on the finite 1-2 pair.
+        assert len(dist) == 1
+        assert dist[0]["statement_idx"] == 0
+        assert dist[0]["significance"]["1-2"] == "p<0.000001"
+        # NaN pairs (1-3, 2-3) must not appear in the significance dict.
+        assert "1-3" not in dist[0]["significance"]
+        assert "2-3" not in dist[0]["significance"]
+        # Statement 1 has no finite distinguishing pair → consensus (only the
+        # finite 1-2 pair was testable, and it showed no difference).
+        assert len(cons) == 1
+        assert cons[0]["statement_idx"] == 1
+
+    def test_fewer_than_two_zscores_yields_nonfinite_se_end_to_end(self):
+        """End-to-end through ``compute_factor_characteristics``: a factor whose
+        z-score column has fewer than 2 non-NaN values makes ``np.std(ddof=1)``
+        return NaN, so its SE and the cross-factor SED are non-finite, and
+        ``classify_statements`` must exclude the undecidable pair rather than
+        silently classifying the statement as consensus."""
+        loadings = np.array([[0.9, 0.2], [0.85, 0.1]])
+        flagged = np.array([[True, True], [True, True]])
+        # A single-statement factor column → ddof=1 std over 1 value == NaN se.
+        # A large genuine z-difference (2.5 vs -2.5) would distinguish on a
+        # finite SED; here the SED is NaN, so the pair is undecidable.
+        z_scores = np.array([[2.5, -2.5]])
+        chars, _, sed = compute_factor_characteristics(loadings, flagged, z_scores)
+        # Both factors' SE are non-finite (NaN) because ddof=1 needs >= 2 values.
+        assert not np.isfinite(chars[0]["se_factor_scores"])
+        assert not np.isfinite(chars[1]["se_factor_scores"])
+        # The cross-factor SED is therefore non-finite too.
+        assert not np.isfinite(sed[0, 1])
+        dist, cons = classify_statements(z_scores, sed, n_factors=2)
+        # The undecidable pair means the statement is excluded from both lists.
+        assert dist == []
+        assert cons == []
+
+
 class TestNFactorsZero:
     """Test n_factors=0 raises ValueError."""
 

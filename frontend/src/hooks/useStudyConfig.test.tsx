@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
@@ -160,6 +161,87 @@ describe('useStudyConfig', () => {
     // populate the store with the wrong slug, the slug-guard would fire a
     // reset, the refetch would replay, and the loop would exhaust the heap.
     // See `useStudyConfig.ts:246-253` for the rationale comment.
+    // ── Issue #30: uncancelled async test-mode load races on unmount ─────────
+    // The test-mode loading effect runs an async loadFromStorage() chain that
+    // awaits i18n.changeLanguage (via syncConfigLanguage) before calling
+    // setConfig. If the component unmounts (or the slug changes) mid-load, the
+    // chain must be cancelled — it must NOT fire setConfig with the stale
+    // study's data after unmount. Without a cancellation flag the deferred
+    // resolution writes the config post-unmount (a stale-study flash +
+    // setState-after-unmount).
+    it('does NOT write the test config after unmount when the async load resolves late', async () => {
+        // Force test mode via URL.
+        vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) => {
+            if (key === 'mode') return 'test';
+            return null;
+        });
+
+        // Make i18n believe the current UI language differs from the draft so
+        // syncConfigLanguage takes the `await i18n.changeLanguage(...)` branch.
+        // @ts-expect-error mocked module
+        i18n.language = 'en';
+
+        // Deferred control over the awaited changeLanguage promise: the load
+        // chain will suspend here until we resolve it.
+        let resolveChangeLanguage: () => void = () => {};
+        const changeLanguageGate = new Promise<void>((resolve) => {
+            resolveChangeLanguage = resolve;
+        });
+        vi.mocked(i18n.changeLanguage).mockReturnValue(
+            // biome-ignore lint/suspicious/noExplicitAny: i18n.changeLanguage returns a TFunction promise we don't use
+            changeLanguageGate as any
+        );
+
+        // Seed a draft for the pinned slug whose language differs from 'en'.
+        localStorage.clear();
+        localStorage.setItem(
+            'qualis-test-draft-test-study',
+            JSON.stringify({
+                slug: 'test-study',
+                statements: [],
+                translations: [
+                    {
+                        language_code: 'fr',
+                        title: 'Stale Test Study',
+                        ui_labels: {},
+                        process_steps: [],
+                    },
+                ],
+            })
+        );
+
+        // The query hook is disabled in test mode; provide an inert stub.
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: null,
+            refetch: vi.fn(),
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        } as any);
+
+        const { unmount } = renderHook(() => useStudyConfig());
+
+        // Wait until the chain has reached (and is suspended on) changeLanguage.
+        await waitFor(() => {
+            expect(i18n.changeLanguage).toHaveBeenCalledWith('fr');
+        });
+
+        // Config must still be unwritten — the await has not resolved yet.
+        expect(useConfigStore.getState().config).toBeNull();
+
+        // Unmount BEFORE the deferred await resolves.
+        unmount();
+
+        // Now resolve the late await: the cancelled chain must NOT call setConfig.
+        resolveChangeLanguage();
+        await changeLanguageGate;
+        // Flush any pending microtasks the chain might schedule.
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(useConfigStore.getState().config).toBeNull();
+    });
+
     it('does NOT write a config response whose slug mismatches the URL slug', async () => {
         // The router mock pins the URL slug to 'test-study'. Mock the API
         // hook to return a response with a different slug — this is exactly

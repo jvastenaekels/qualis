@@ -751,14 +751,25 @@ def compute_factor_characteristics(
         else:
             reliability = 0.0
 
-        # Standard error of factor scores
-        if not np.all(np.isnan(z_scores[:, f])):
+        # Standard error of factor scores.
+        # ddof=1 needs >= 2 non-NaN z-scores; with fewer, np.std returns NaN and
+        # emits a "Degrees of freedom <= 0" RuntimeWarning. Such a column means
+        # the factor has too few defining sorts to estimate a standard error, so
+        # we set ``se`` to NaN explicitly (skipping the warning-y path). The NaN
+        # then flows into the SED matrix, and classify_statements excludes the
+        # undecidable pair rather than silently treating it as consensus.
+        n_zscores = int(np.sum(~np.isnan(z_scores[:, f])))
+        if n_zscores >= 2:
             clamped_rel = min(reliability, 1.0)
             se = float(
                 np.std(z_scores[:, f], ddof=1) * np.sqrt(max(1 - clamped_rel, 0.0))
             )
-        else:
+        elif n_zscores == 0:
+            # No data at all for this factor — preserve the historical 0.0 so an
+            # entirely-empty factor column behaves as before (consensus path).
             se = 0.0
+        else:
+            se = float("nan")
         se_scores[f] = se
 
         characteristics.append(
@@ -844,6 +855,8 @@ def classify_statements(
     for s in range(n_statements):
         sig_pairs: dict[str, str] = {}
         any_significant = False
+        any_decidable = False
+        any_nonfinite_sed = False
 
         for i, j in pairs:
             if np.isnan(z_scores[s, i]) or np.isnan(z_scores[s, j]):
@@ -852,8 +865,20 @@ def classify_statements(
             diff = abs(z_scores[s, i] - z_scores[s, j])
             sed_val = sed[i, j]
 
-            if sed_val <= 0:
+            # A non-finite SED (NaN/inf) means we cannot test this pair: it
+            # arises when a factor has fewer than 2 defining sorts, so its
+            # standard error is undefined (np.std(ddof=1) over <2 values is
+            # NaN). Treat it exactly like sed_val <= 0 — skip it. NaN must be
+            # caught explicitly because ``NaN <= 0`` is False, which would
+            # otherwise let ``diff > NaN`` (always False) silently mark the
+            # statement as a confident non-distinguishing (consensus) result.
+            if not np.isfinite(sed_val) or sed_val <= 0:
+                if not np.isfinite(sed_val):
+                    any_nonfinite_sed = True
                 continue
+
+            # A real significance test ran for this pair (finite, positive SED).
+            any_decidable = True
 
             pair_key = f"{i + 1}-{j + 1}"
 
@@ -875,6 +900,12 @@ def classify_statements(
 
         if any_significant:
             distinguishing.append(entry)
+        elif any_nonfinite_sed and not any_decidable:
+            # Every pair that could have decided this statement had a non-finite
+            # SED (insufficient defining sorts). The data cannot support either
+            # verdict, so exclude the statement from both lists rather than
+            # defaulting it to consensus.
+            continue
         else:
             consensus.append(entry)
 

@@ -241,6 +241,7 @@
             "label": "Sterowanie siatką"
         },
         "grid": {
+            "cards_moved_to_neutral": "Niektórych kart nie udało się zachować na siatce i zostały przeniesione z powrotem do nieposortowanego stosu. Umieść je ponownie.",
             "label": "Siatka sortowania Q",
             "column": "Kolumna",
             "slot": "Miejsce",
