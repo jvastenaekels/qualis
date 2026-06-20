@@ -757,7 +757,11 @@ const RecruitmentPage = () => {
                                                         id="count"
                                                         type="number"
                                                         min="1"
-                                                        max="500"
+                                                        // individual maps to backend `count` (capped at 100);
+                                                        // limited maps to per-link `capacity` (no backend cap).
+                                                        max={
+                                                            newLinkType === 'individual' ? 100 : 500
+                                                        }
                                                         value={newLinkCount}
                                                         onChange={(e) =>
                                                             setNewLinkCount(

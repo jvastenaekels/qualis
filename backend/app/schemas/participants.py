@@ -114,11 +114,19 @@ class SubmissionInput(BaseModel):
 
 
 class ParticipantRead(BaseModel):
-    """Schema for reading a participant."""
+    """Schema for reading a participant.
+
+    Security: the raw ``session_token`` is the participant's bearer credential
+    and is deliberately NOT exposed here — this schema is reachable by the
+    lowest (viewer) role via the study participant list. Only the truncated,
+    non-reversible ``code`` (session_token[:8]) is surfaced for display.
+    ``recruitment_token`` and ``user_agent`` are research metadata, not
+    credentials, and remain available.
+    """
 
     id: int
     study_id: int
-    session_token: UUID
+    code: str
     language_used: str
     status: ParticipantStatus
     created_at: datetime

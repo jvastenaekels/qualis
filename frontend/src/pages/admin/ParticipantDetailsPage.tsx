@@ -151,7 +151,7 @@ export default function ParticipantDetailsPage() {
             // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
             audio_recordings?: Record<string, any>;
         } = {
-            id: participant.session_token,
+            id: participant.code,
             db_id: participant.id,
             duration_seconds:
                 participant.submitted_at && participant.created_at
@@ -255,7 +255,7 @@ export default function ParticipantDetailsPage() {
                 <div className="flex items-center justify-between gap-4">
                     <StudyPageHeader
                         title={t('admin.data.detail.participant_n', 'Participant {{code}}', {
-                            code: participant.session_token.substring(0, 8).toUpperCase(),
+                            code: participant.code,
                         })}
                         icon={User}
                     />

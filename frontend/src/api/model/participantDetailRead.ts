@@ -22,7 +22,7 @@ import type { AudioRecordingRead } from './audioRecordingRead';
 export interface ParticipantDetailRead {
     id: number;
     study_id: number;
-    session_token: string;
+    code: string;
     language_used: string;
     status: ParticipantStatus;
     created_at: string;

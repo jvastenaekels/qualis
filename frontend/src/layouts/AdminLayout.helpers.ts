@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 interface BreadcrumbParticipant {
-    session_token?: string;
+    code?: string;
 }
 
 const SEGMENT_LABEL_KEYS: Record<string, [string, string?]> = {
@@ -27,8 +27,8 @@ const SEGMENT_LABEL_KEYS: Record<string, [string, string?]> = {
  * Detail routes:
  *  - `/concourses/:id` (digit-only id) → "Concourse"
  *  - `/participants/:id` (digit-only id) → "Participant <CODE>" where CODE is
- *    the first 8 chars of session_token uppercased; falls back to the URL id
- *    while the fetch is in flight.
+ *    the participant's short display code (session_token[:8], computed
+ *    server-side); falls back to the URL id while the fetch is in flight.
  */
 export function resolveBreadcrumbLabel(
     pathname: string,
@@ -49,7 +49,7 @@ export function resolveBreadcrumbLabel(
         return t('admin.breadcrumbs.concourse', 'Concourse');
     }
     if (prev === 'participants' && /^\d+$/.test(last)) {
-        const code = breadcrumbParticipant?.session_token?.substring(0, 8).toUpperCase() ?? last;
+        const code = breadcrumbParticipant?.code ?? last;
         return t('admin.breadcrumbs.participant_n', 'Participant {{code}}', { code });
     }
 

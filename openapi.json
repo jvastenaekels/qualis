@@ -9800,10 +9800,9 @@
             "type": "integer",
             "title": "Study Id"
           },
-          "session_token": {
+          "code": {
             "type": "string",
-            "format": "uuid",
-            "title": "Session Token"
+            "title": "Code"
           },
           "language_used": {
             "type": "string",
@@ -9919,7 +9918,7 @@
         "required": [
           "id",
           "study_id",
-          "session_token",
+          "code",
           "language_used",
           "status",
           "created_at",
@@ -10035,10 +10034,9 @@
             "type": "integer",
             "title": "Study Id"
           },
-          "session_token": {
+          "code": {
             "type": "string",
-            "format": "uuid",
-            "title": "Session Token"
+            "title": "Code"
           },
           "language_used": {
             "type": "string",
@@ -10129,7 +10127,7 @@
         "required": [
           "id",
           "study_id",
-          "session_token",
+          "code",
           "language_used",
           "status",
           "created_at",
@@ -10139,7 +10137,7 @@
           "user_agent"
         ],
         "title": "ParticipantRead",
-        "description": "Schema for reading a participant."
+        "description": "Schema for reading a participant.\n\nSecurity: the raw ``session_token`` is the participant's bearer credential\nand is deliberately NOT exposed here \u2014 this schema is reachable by the\nlowest (viewer) role via the study participant list. Only the truncated,\nnon-reversible ``code`` (session_token[:8]) is surfaced for display.\n``recruitment_token`` and ``user_agent`` are research metadata, not\ncredentials, and remain available."
       },
       "ParticipantStatus": {
         "type": "string",

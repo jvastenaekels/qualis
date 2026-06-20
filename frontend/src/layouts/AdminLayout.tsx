@@ -28,7 +28,7 @@ export default function AdminLayout() {
     const { project: adminProject, study: adminStudy } = useAdminContext();
     const { t } = useTranslation();
 
-    // Resolve the participant code (session_token[:8]) for the breadcrumb
+    // Resolve the participant's short display `code` for the breadcrumb
     // when on /participants/:participantId. The fetch is gated to that route
     // and shares the React Query cache with ParticipantDetailsPage, so the
     // page render and the breadcrumb dedupe to a single network call.

@@ -56,12 +56,12 @@ describe('resolveBreadcrumbLabel', () => {
         );
     });
 
-    it('handles /participants/:id detail route with session_token code', () => {
+    it('handles /participants/:id detail route with the participant code', () => {
         expect(
             resolveBreadcrumbLabel(
                 '/app/proj1/studies/study/participants/7',
                 null,
-                { session_token: 'abcdef0123456789' },
+                { code: 'ABCDEF01' },
                 t
             )
         ).toBe('Participant ABCDEF01');
