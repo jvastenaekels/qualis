@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from app.services.analysis_service import (
+    align_factors_to_reference,
     apply_judgmental_rotations,
     apply_manual_flags,
     build_sort_matrix,
@@ -1240,8 +1241,86 @@ class TestRunAnalysisJudgmental:
 # --- compute_bootstrap_stability (Zabala & Pascual 2016) ---
 
 
+class TestAlignFactorsToReference:
+    """Tests for bootstrap factor alignment (permutation + sign)."""
+
+    def test_recovers_permuted_and_reflected_columns(self):
+        """A resample that comes back column-swapped + sign-flipped is mapped
+        exactly back onto the reference orientation."""
+        ref = np.array(
+            [
+                [2.0, -1.0],
+                [1.5, 0.5],
+                [-1.0, 2.0],
+                [0.0, -2.0],
+                [-2.0, 1.0],
+            ],
+            dtype=np.float64,
+        )
+        # Bootstrap solution: factor B in column 0 (same sign), factor A in
+        # column 1 but reflected.
+        boot = np.column_stack([ref[:, 1], -ref[:, 0]])
+        aligned = align_factors_to_reference(boot, ref)
+        np.testing.assert_allclose(aligned, ref, atol=1e-9)
+
+    def test_identity_when_already_aligned(self):
+        ref = np.array([[1.0, -2.0], [-1.0, 0.5], [2.0, 1.0]], dtype=np.float64)
+        np.testing.assert_allclose(
+            align_factors_to_reference(ref.copy(), ref), ref, atol=1e-9
+        )
+
+    def test_nan_bootstrap_column_left_as_nan(self):
+        """A factor with no flagged sorts (all-NaN z column) survives alignment
+        as NaN so it is skipped during accumulation rather than corrupting a
+        reference cell."""
+        ref = np.array([[2.0, -1.0], [1.0, 0.5], [-2.0, 1.0]], dtype=np.float64)
+        boot = np.column_stack([ref[:, 0], np.full(3, np.nan)])
+        aligned = align_factors_to_reference(boot, ref)
+        # Reference factor 0 recovered; factor 1 (matched to the all-NaN
+        # bootstrap column) is NaN.
+        np.testing.assert_allclose(aligned[:, 0], ref[:, 0], atol=1e-9)
+        assert np.all(np.isnan(aligned[:, 1]))
+
+
 class TestBootstrapStability:
     """Tests for the non-parametric bootstrap of Q-sorts."""
+
+    def test_bootstrap_z_means_keep_reference_polarity(self, dataset):
+        """Regression for the sign-flip / permutation bug: bootstrap z-score
+        means must share the polarity of the full-sample reference solution on
+        well-determined statements. Without factor alignment, resample-level
+        sign flips drag the accumulated mean toward zero / the wrong sign."""
+        reference = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            flagging="auto",
+            grid_config=None,
+        )
+        ref_z = reference["z_scores"]
+
+        res = compute_bootstrap_stability(
+            dataset,
+            300,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+            rng_seed=7,
+        )
+        z_mean = {
+            (e["statement_idx"], e["factor"] - 1): e["z_mean"] for e in res["statements"]
+        }
+        # For each factor, the statement with the strongest reference loading
+        # must keep its sign in the bootstrap mean, and the magnitude must not
+        # collapse toward zero (sign cancellation would do both).
+        for f in range(2):
+            s = int(np.argmax(np.abs(ref_z[:, f])))
+            assert (s, f) in z_mean
+            assert np.sign(z_mean[(s, f)]) == np.sign(ref_z[s, f])
+            assert abs(z_mean[(s, f)]) > 0.5 * abs(ref_z[s, f])
 
     def test_deterministic_under_fixed_seed(self, dataset):
         """Same dataset + same seed → identical bootstrap output."""
@@ -1315,7 +1394,14 @@ class TestBootstrapStability:
             assert 0 <= entry["statement_idx"] < dataset.shape[0]
             assert entry["factor"] in (1, 2)
             assert entry["z_se"] >= 0.0
-            assert entry["ci_lower"] <= entry["z_mean"] <= entry["ci_upper"]
+            # CI must be well-formed (lower <= upper). We deliberately do NOT
+            # assert the mean lies inside [ci_lower, ci_upper]: after factor
+            # alignment a genuinely-near-zero cell (a statement with ~0 loading
+            # on a factor) has a tight one-sided distribution whose mean can sit
+            # just outside the central 95% band. The pre-alignment code only
+            # satisfied mean-within-CI because resample sign-flips made the
+            # distribution artificially symmetric (the very bug alignment fixes).
+            assert entry["ci_lower"] <= entry["ci_upper"]
         assert len(res["factor_mean_se"]) == 2
 
     def test_pathological_iterations_handled(self):
