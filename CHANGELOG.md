@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.7.2](https://github.com/jvastenaekels/qualis/compare/v0.7.1...v0.7.2) (2026-06-20)
+
+
+### Features
+
+* **demo:** rebrand example study to Bioeconomy Futures with concourse, Q-sorts, and audio ([#232](https://github.com/jvastenaekels/qualis/issues/232)) ([d940a84](https://github.com/jvastenaekels/qualis/commit/d940a84e075144a92293d7880a39c386229bd4a1))
+
+
+### Bug fixes
+
+* **analysis:** align bootstrap factors to a reference orientation, fixing corrupted per-statement SE/CI from resample sign-flips and factor permutations ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* **fine-sort:** prevent Q-sort card duplication when a placed card is dropped onto its own slot in a full column ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* bug-hunt quick wins — admin-logout cross-session data leak, CSV audio-URL 24h TTL, reject zero-duration audio, correct `get_study_full_dump` docstring ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* **demo:** give the backend healthcheck a start_period so `make demo-up` survives cold starts ([#233](https://github.com/jvastenaekels/qualis/issues/233)) ([e04cafe](https://github.com/jvastenaekels/qualis/commit/e04cafe59efc8ed208b806c90088bf2bc99001e3))
+* **deps:** bump starlette to &gt;=1.3.1 for CVE-2026-54282/54283 ([#230](https://github.com/jvastenaekels/qualis/issues/230)) ([91801ba](https://github.com/jvastenaekels/qualis/commit/91801bae72046fef13aa3b8f5a1d75d662b0d099))
+
+
+### Performance
+
+* avoid double-loading every participant in the research-package export; granular Zustand selectors in the post-sort flow ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* **demo:** start the backend from the baked venv to cut cold start ~147s to ~6s ([#234](https://github.com/jvastenaekels/qualis/issues/234)) ([b55117d](https://github.com/jvastenaekels/qualis/commit/b55117dd3b0092f76d329e5e6c40d41d2bc13945))
+
+
+### Refactor
+
+* remove email-OTP 2FA channel, keep TOTP app only (YAGNI) ([#227](https://github.com/jvastenaekels/qualis/issues/227)) ([4d25759](https://github.com/jvastenaekels/qualis/commit/4d257593e76be3ce58449bb7bdceee4552dcf451))
+* remove unused project quota feature (YAGNI) ([#226](https://github.com/jvastenaekels/qualis/issues/226)) ([7c97eaf](https://github.com/jvastenaekels/qualis/commit/7c97eaf487c3a460e181cfe59381a266ad9b5488))
+
 ## [0.7.1](https://github.com/jvastenaekels/qualis/compare/v0.7.0...v0.7.1) (2026-06-12)
 
 
