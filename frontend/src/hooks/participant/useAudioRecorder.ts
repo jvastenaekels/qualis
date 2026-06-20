@@ -310,8 +310,27 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
             clearIntervalRef(permissionCheckIntervalRef);
             cancelAnimationFrameRef(animationFrameRef);
             closeAudioContextRef(audioContextRef);
+            // Detach the recorder's handlers BEFORE stopping the stream: ending
+            // the tracks can auto-fire `onstop`, which would run a fire-and-forget
+            // upload after the component has unmounted (an invisible orphan
+            // recording). Nulling the handlers neutralises that.
+            const recorder = mediaRecorderRef.current;
+            if (recorder) {
+                recorder.onstop = null;
+                recorder.ondataavailable = null;
+                recorder.onerror = null;
+            }
+            // Pause live playback before revoking the object URL: revokeObjectURL
+            // does NOT halt an in-flight <audio> element, so ghost audio would
+            // otherwise keep playing after the UI has moved on.
+            detachAudioPlayer(audioPlayerRef.current);
             stopStreamRef(streamRef);
             revokeBlobPlayerSource(audioPlayerRef.current);
+            // Also revoke the tracked blob URL (the player's src may differ from,
+            // or be unset relative to, the last-created object URL).
+            if (audioUrlRef.current?.startsWith('blob:')) {
+                URL.revokeObjectURL(audioUrlRef.current);
+            }
         };
     }, []); // Empty deps - only run on mount/unmount
 

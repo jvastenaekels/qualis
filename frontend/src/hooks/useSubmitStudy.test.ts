@@ -209,4 +209,28 @@ describe('useSubmitStudy', () => {
         expect(result.current.isLoading).toBe(false);
         expect(result.current.isSuccess).toBe(true);
     });
+
+    it('a started autosave does not release the submitting guard held by a completed submit', async () => {
+        server.use(
+            http.post('/api/submit', () =>
+                HttpResponse.json({ success: true, confirmation_code: 'X' })
+            )
+        );
+
+        // Simulate a completed submission already in flight: it holds the guard.
+        useSessionStore.getState().setSubmitting(true);
+
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
+
+        await act(async () => {
+            // A concurrent non-completed autosave finishing mid-completion must
+            // NOT reset the guard (which would re-enable draft-autosave / allow a
+            // second completion while the final submission is still running).
+            await result.current.submit('started', { silent: true });
+        });
+
+        expect(useSessionStore.getState().isSubmitting).toBe(true);
+    });
 });

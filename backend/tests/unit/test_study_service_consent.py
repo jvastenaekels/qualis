@@ -50,7 +50,9 @@ async def test_record_consent_new_participant(db, seed_study):
 
 @pytest.mark.asyncio
 async def test_record_consent_existing_participant(db, seed_study):
-    """Should update existing participant on re-consent."""
+    """Re-consent updates language/ip/ua, but consent_hash and consented_at are
+    first-consent-wins (audit C1): they must not change on a re-POST, so the
+    duration-metric anchor and legal consent record stay stable and coherent."""
     session_token = uuid.uuid4()
 
     # 1. First consent
@@ -72,6 +74,6 @@ async def test_record_consent_existing_participant(db, seed_study):
     res = await db.execute(stmt)
     p = res.scalar_one()
 
-    assert p.language_used == language
-    assert p.consent_hash == consent_hash
+    assert p.language_used == language  # mutable: still updated on re-consent
+    assert p.consent_hash == "hash-1"  # first-consent-wins: NOT overwritten
     assert p.ip_address is not None
