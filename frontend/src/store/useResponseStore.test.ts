@@ -130,6 +130,20 @@ describe('useResponseStore', () => {
         expect(c2).toEqual({ statementId: 2, col: 0, row: 0 });
     });
 
+    it('swapCardsInGrid is a no-op for a self-swap (never duplicates the card)', () => {
+        // Dropping a placed card back onto its own occupied slot in a full
+        // column routes handlePlacement into swapCardsInGrid(id, id). The naive
+        // swap re-appends the same card, duplicating it in qsort — which is then
+        // submitted as two entries for the same statement.
+        useResponseStore.setState({ qsort: [{ statementId: 1, col: 0, row: 0 }] });
+
+        useResponseStore.getState().swapCardsInGrid(1, 1);
+
+        const state = useResponseStore.getState();
+        expect(state.qsort).toHaveLength(1);
+        expect(state.qsort[0]).toEqual({ statementId: 1, col: 0, row: 0 });
+    });
+
     it('should reset state', () => {
         const store = useResponseStore.getState();
         store.categorizeCard(1, 'agree');

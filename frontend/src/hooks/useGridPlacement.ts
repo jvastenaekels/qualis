@@ -83,8 +83,17 @@ export const useGridPlacement = ({
     );
 
     const handlePlacement = useCallback(
-        (cardId: number, col: number, targetRow: number) => {
+        (cardId: number, col: number, targetRow: number): boolean => {
             const existingCard = responses.qsort.find((c) => c.col === col && c.row === targetRow);
+
+            // Dropping a card back onto the slot it already occupies is a no-op.
+            // Without this guard a full column routes into
+            // swapCardsInGrid(cardId, cardId) — which duplicates the card in
+            // qsort — and a non-full column needlessly shuffles it to another
+            // row. Returning false lets the caller keep the card selected.
+            if (existingCard && existingCard.statementId === cardId) {
+                return false;
+            }
 
             let finalRow = targetRow;
             let shouldSwap = false;
@@ -114,6 +123,7 @@ export const useGridPlacement = ({
                     actions.placeCardInGrid(cardId, col, finalRow);
                 }
             }
+            return true;
         },
         [responses.qsort, findClosestEmptyRow, actions]
     );

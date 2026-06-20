@@ -231,6 +231,11 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
 
             swapCardsInGrid: (id1, id2) => {
+                // A self-swap (id1 === id2) would re-append the same card and
+                // duplicate it in qsort. This happens when a placed card is
+                // dropped back onto its own occupied slot in a full column
+                // (handlePlacement routes that into swapCardsInGrid(id, id)).
+                if (id1 === id2) return;
                 const state = get();
                 const card1 = state.qsort.find((p) => p.statementId === id1);
                 const card2 = state.qsort.find((p) => p.statementId === id2);
