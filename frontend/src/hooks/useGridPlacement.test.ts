@@ -86,6 +86,51 @@ describe('useGridPlacement', () => {
         expect(mockActions.unplaceCard).not.toHaveBeenCalled();
     });
 
+    it('is a no-op when a card is dropped onto its own slot in a full column', () => {
+        // Card 1 sits at 0,0 in a full column (0,0 + 0,1 occupied). Dropping it
+        // back onto 0,0 must NOT route into swapCardsInGrid(1, 1), which would
+        // duplicate the card in qsort.
+        const responses = {
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 0, row: 1 },
+            ],
+        };
+        const { result } = renderHook(() =>
+            useGridPlacement({ responses, gridColumns, actions: mockActions })
+        );
+
+        const placed = result.current.handlePlacement(1, 0, 0);
+
+        expect(placed).toBe(false);
+        expect(mockActions.swapCardsInGrid).not.toHaveBeenCalled();
+        expect(mockActions.moveCardInGrid).not.toHaveBeenCalled();
+        expect(mockActions.placeCardInGrid).not.toHaveBeenCalled();
+    });
+
+    it('is a no-op when a card is dropped onto its own slot in a non-full column', () => {
+        // Card 1 alone at 0,0 (column not full). Dropping it back onto 0,0 must
+        // not shuffle it to another row.
+        const responses = { qsort: [{ statementId: 1, col: 0, row: 0 }] };
+        const { result } = renderHook(() =>
+            useGridPlacement({ responses, gridColumns, actions: mockActions })
+        );
+
+        const placed = result.current.handlePlacement(1, 0, 0);
+
+        expect(placed).toBe(false);
+        expect(mockActions.moveCardInGrid).not.toHaveBeenCalled();
+    });
+
+    it('returns true when a card is actually placed', () => {
+        const responses = { qsort: [] };
+        const { result } = renderHook(() =>
+            useGridPlacement({ responses, gridColumns, actions: mockActions })
+        );
+
+        expect(result.current.handlePlacement(1, 0, 0)).toBe(true);
+    });
+
     // --- Free distribution mode: placement past declared capacity ---
 
     it('finds an empty row past declared capacity in free mode (overflow placement)', () => {

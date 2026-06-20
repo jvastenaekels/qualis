@@ -179,10 +179,11 @@ class ExportService:
             # Build audio recordings map by question_key
             audio_map: dict[str, _AudioMapEntry] = {}
             for audio_rec in p.audio_recordings:
-                # Generate fresh presigned URL (valid for 24 hours)
+                # Generate fresh presigned URL (valid for 24 hours, matching
+                # the bulk dump export in study_data_service.py).
                 try:
                     presigned_url = storage_service.generate_presigned_url(
-                        audio_rec.s3_key, expiration=3600
+                        audio_rec.s3_key, expiration=86400
                     )
                     audio_map[audio_rec.question_key] = _AudioMapEntry(
                         url=presigned_url,

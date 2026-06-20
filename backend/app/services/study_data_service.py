@@ -1,6 +1,7 @@
 """Service for study data export, statistics, and participant management."""
 
 import logging
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -211,35 +212,55 @@ class StudyDataService:
         )
 
     @staticmethod
-    async def get_study_full_dump(db: AsyncSession, study_id: int) -> StudyDump:
-        """Extracts complete study data and valid participant sorts for export."""
-        # 1. Get Study with statements (ordered by ID for consistency)
-        stmt = (
-            select(Study)
-            .where(Study.id == study_id)
-            .options(
-                selectinload(Study.statements).selectinload(Statement.translations),
-                selectinload(Study.translations),
-            )
-        )
-        result = await db.execute(stmt)
-        study = result.scalar_one_or_none()
-        if not study:
-            raise NotFoundError("Study")
+    async def get_study_full_dump(
+        db: AsyncSession, study_id: int, *, study: Study | None = None
+    ) -> StudyDump:
+        """Extracts complete study data and all participant sorts for export.
 
-        # 2. Get all non-discarded completed participants with their Q-sort entries and audio
-        p_stmt = (
-            select(Participant)
-            .where(
-                Participant.study_id == study_id,
+        Returns every participant regardless of ``is_discarded`` status; the
+        callers (``/dump``, per-participant export, research package) apply
+        their own discard/anonymisation filtering as appropriate for each
+        export type.
+
+        When ``study`` is supplied it must already have ``statements`` (+
+        translations), ``translations`` and ``participants`` (+ each
+        participant's ``qsort_entries`` / ``audio_recordings``) eager-loaded;
+        the dump is then built from that ORM graph instead of re-querying the
+        same rows. The research-package export passes the study it already
+        holds; the other callers omit it and take the query path.
+        """
+        if study is None:
+            # 1. Get Study with statements (ordered by ID for consistency)
+            stmt = (
+                select(Study)
+                .where(Study.id == study_id)
+                .options(
+                    selectinload(Study.statements).selectinload(Statement.translations),
+                    selectinload(Study.translations),
+                )
             )
-            .options(
-                selectinload(Participant.qsort_entries),
-                selectinload(Participant.audio_recordings),
+            result = await db.execute(stmt)
+            loaded = result.scalar_one_or_none()
+            if loaded is None:
+                raise NotFoundError("Study")
+            study = loaded
+
+            # 2. Get all participants (including discarded — callers filter per
+            #    export type) with their Q-sort entries and audio
+            p_stmt = (
+                select(Participant)
+                .where(
+                    Participant.study_id == study_id,
+                )
+                .options(
+                    selectinload(Participant.qsort_entries),
+                    selectinload(Participant.audio_recordings),
+                )
             )
-        )
-        p_result = await db.execute(p_stmt)
-        participants = p_result.scalars().all()
+            p_result = await db.execute(p_stmt)
+            participants: Sequence[Participant] = p_result.scalars().all()
+        else:
+            participants = study.participants
 
         # 3. Build Export Structure
         # PQMethod and others need a fixed reference for statement order.

@@ -35,7 +35,9 @@ interface Step2Props {
 export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, isLoading }) => {
     const { t, i18n } = useTranslation();
     const config = useConfigStore((state) => state.config);
-    const { postsort } = useResponseStore((state) => ({ postsort: state.postsort }));
+    // Granular selector: a fresh `{ postsort }` object on every store update
+    // would defeat Zustand's referential equality and re-render the form.
+    const postsort = useResponseStore((state) => state.postsort);
     const setPostSortResponse = useResponseStore((state) => state.setPostSortResponse);
     const setAudioRecording = useResponseStore((state) => state.setAudioRecording);
     const deleteAudioRecordingStore = useResponseStore((state) => state.deleteAudioRecording);

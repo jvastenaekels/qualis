@@ -181,8 +181,12 @@ export const useFineSortDrag = ({
     const handleSlotClick = useCallback(
         (col: number, row: number) => {
             if (selectedId === null || selectedId === undefined) return;
-            handlePlacement(selectedId, col, row);
-            onSelectionChange?.(null);
+            // Only clear the selection when the card was actually (re)placed.
+            // A no-op (e.g. clicking the slot the selected card already occupies)
+            // keeps it selected so the participant can pick a different slot.
+            if (handlePlacement(selectedId, col, row)) {
+                onSelectionChange?.(null);
+            }
         },
         [selectedId, handlePlacement, onSelectionChange]
     );

@@ -193,7 +193,7 @@ async def upload_audio(
     max_allowed = audio_config.get(
         "max_duration_seconds", settings.AUDIO_MAX_DURATION_SECONDS
     )
-    if duration_seconds is not None and duration_seconds < 0:
+    if duration_seconds is not None and duration_seconds <= 0:
         raise HTTPException(status_code=400, detail="Invalid duration")
     if duration_seconds is not None and duration_seconds > max_allowed:
         raise HTTPException(

@@ -1174,6 +1174,85 @@ def run_analysis(
     )
 
 
+def _safe_corr(a: NDArray[np.float64], b: NDArray[np.float64]) -> float:
+    """Pearson correlation over the entries where both vectors are finite.
+
+    Returns ``0.0`` when fewer than two paired finite values remain or either
+    side has zero variance — such a pair carries no orientation information.
+    """
+    mask = np.isfinite(a) & np.isfinite(b)
+    if int(mask.sum()) < 2:
+        return 0.0
+    av = a[mask] - a[mask].mean()
+    bv = b[mask] - b[mask].mean()
+    denom = float(np.sqrt(float(np.dot(av, av)) * float(np.dot(bv, bv))))
+    if denom == 0.0:
+        return 0.0
+    return float(np.dot(av, bv)) / denom
+
+
+def align_factors_to_reference(
+    z_scores: NDArray[np.float64],
+    reference_z: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Permute and sign-flip ``z_scores`` columns to match ``reference_z``.
+
+    Each bootstrap resample re-runs PCA + varimax + sign standardisation
+    independently, so a factor can come back **permuted** (eigenvalue ranks
+    swap between near-equal factors) or **reflected** (``standardize_factor_signs``
+    keys on the largest-|loading| participant, which differs across resamples).
+    Both are arbitrary re-orientations of the *same* latent factor; accumulating
+    raw column indices across iterations therefore mixes opposite-signed or
+    altogether-different factors and corrupts the per-cell SE/CI
+    (Zabala & Pascual 2016).
+
+    Factor order and the loading-based sign convention are fixed *before*
+    flagging in ``run_analysis``, so the auto-flagged full-sample reference
+    shares the orientation of the solution the analyst saw (manual flagging
+    changes z-score magnitudes, not factor order/polarity). Alignment matches
+    on the z-score vectors (indexed by statement, hence comparable across
+    iterations): each reference factor is greedily paired with the bootstrap
+    factor whose z-scores correlate most strongly with it, in descending
+    |correlation| order, and reflected when that correlation is negative.
+
+    Args:
+        z_scores: One iteration's z-scores (n_statements x n_factors).
+        reference_z: Full-sample reference z-scores (n_statements x n_factors).
+
+    Returns:
+        A re-oriented copy of ``z_scores`` whose column ``f`` corresponds to
+        reference factor ``f``.
+    """
+    n_factors = reference_z.shape[1]
+    corr: list[list[float]] = [
+        [_safe_corr(reference_z[:, r], z_scores[:, b]) for b in range(n_factors)]
+        for r in range(n_factors)
+    ]
+
+    pairs = sorted(
+        ((abs(corr[r][b]), r, b) for r in range(n_factors) for b in range(n_factors)),
+        reverse=True,
+    )
+    ref_to_boot: dict[int, int] = {}
+    used_ref: set[int] = set()
+    used_boot: set[int] = set()
+    for _, r, b in pairs:
+        if r in used_ref or b in used_boot:
+            continue
+        ref_to_boot[r] = b
+        used_ref.add(r)
+        used_boot.add(b)
+
+    aligned: NDArray[np.float64] = np.full(
+        (z_scores.shape[0], n_factors), np.nan, dtype=np.float64
+    )
+    for r in range(n_factors):
+        b = ref_to_boot[r]
+        sign = 1.0 if corr[r][b] >= 0.0 else -1.0
+        aligned[:, r] = sign * z_scores[:, b]
+    return aligned
+
+
 def compute_bootstrap_stability(
     dataset: NDArray[np.float64],
     n_iterations: int,
@@ -1233,6 +1312,31 @@ def compute_bootstrap_stability(
     ]
     n_converged = 0
 
+    # Reference orientation: run the full sample once with the same pipeline
+    # settings used per iteration, so every resample can be permuted/reflected
+    # back onto a single fixed factor order + polarity before its z-scores are
+    # accumulated. Without this, PCA factor-order swaps and sign-standardisation
+    # flips across resamples mix opposite-signed / different factors into the
+    # same cell and corrupt the SE/CI (Zabala & Pascual 2016). Scope the same
+    # divide/invalid errstate as the loop so a degenerate full sample fails
+    # gracefully (reference_z=None → identity alignment, prior behaviour).
+    reference_z: NDArray[np.float64] | None
+    try:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            reference_z = run_analysis(
+                dataset,
+                n_factors=n_factors,
+                extraction=extraction,
+                rotation=rotation,
+                flagging="auto",
+                manual_flags_matrix=None,
+                manual_rotations=manual_rotations,
+                grid_config=grid_config,
+                distribution_mode=distribution_mode,
+            )["z_scores"]
+    except (ValueError, np.linalg.LinAlgError):
+        reference_z = None
+
     for _ in range(n_iterations):
         cols = rng.integers(0, n_participants, size=n_participants)
         boot = dataset[:, cols]
@@ -1261,6 +1365,10 @@ def compute_bootstrap_stability(
             continue
         n_converged += 1
         z = res["z_scores"]
+        # Re-orient this resample onto the reference factor order + polarity
+        # before accumulating, so each cell aggregates the *same* factor.
+        if reference_z is not None:
+            z = align_factors_to_reference(z, reference_z)
         for s in range(n_statements):
             for f in range(n_factors):
                 value = z[s, f]
