@@ -382,3 +382,55 @@ async def test_get_study_full_dump(db, active_study):
     # scores should be [-1, 0, 0, 1]
     assert p_data["scores"] == [-1, 0, 0, 1]
     assert "placements" in p_data
+
+
+@pytest.mark.asyncio
+async def test_get_study_full_dump_preloaded_matches_query_path(db, active_study):
+    """The optional pre-loaded `study=` path (used by the research-package
+    export to avoid a second fetch of every participant/Q-sort/audio row) must
+    produce the same dump as the query path."""
+    from datetime import datetime
+    from app.models import QSortEntry, Statement, Study
+
+    p = Participant(
+        study_id=active_study.id,
+        session_token=uuid.uuid4(),
+        status=ParticipantStatus.completed,
+        language_used="en",
+        submitted_at=datetime.now(),
+        consented_at=datetime.now(),
+    )
+    db.add(p)
+    await db.commit()
+    db.add_all(
+        [
+            QSortEntry(
+                participant_id=p.id,
+                statement_id=active_study.statements[i].id,
+                grid_score=score,
+            )
+            for i, score in enumerate([-1, 0, 0, 1])
+        ]
+    )
+    await db.commit()
+
+    # Query path
+    query_dump = await StudyService.get_study_full_dump(db, active_study.id)
+
+    # Pre-loaded path: same eager-load graph the research-package endpoint holds.
+    stmt = (
+        select(Study)
+        .where(Study.id == active_study.id)
+        .options(
+            selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants).selectinload(Participant.qsort_entries),
+            selectinload(Study.participants).selectinload(Participant.audio_recordings),
+            selectinload(Study.translations),
+        )
+    )
+    full_study = (await db.execute(stmt)).scalar_one()
+    preloaded_dump = await StudyService.get_study_full_dump(
+        db, active_study.id, study=full_study
+    )
+
+    assert preloaded_dump == query_dump
