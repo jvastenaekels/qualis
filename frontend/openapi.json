@@ -8950,6 +8950,8 @@
         "properties": {
           "score": {
             "type": "integer",
+            "maximum": 10.0,
+            "minimum": -10.0,
             "title": "Score"
           },
           "capacity": {

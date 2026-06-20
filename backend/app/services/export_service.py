@@ -25,6 +25,22 @@ class _AudioMapEntry(TypedDict):
     size_kb: float
 
 
+def _csv_safe(value: str) -> str:
+    """Neutralize spreadsheet formula injection in a free-text CSV cell.
+
+    A cell beginning with ``= + - @`` (or a leading tab / carriage return) is
+    interpreted as a formula by Excel / Google Sheets; prefixing it with an
+    apostrophe forces it to be read as text. Applied ONLY to participant- or
+    admin-controlled FREE-TEXT cells (card comments, presort/postsort answers,
+    discard reasons, statement text) — NOT to numeric / system cells such as
+    Q-sort scores, which legitimately start with '-' and must stay numeric for
+    downstream analysis (audit F1).
+    """
+    if value and value[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + value
+    return value
+
+
 class ExportService:
     """Service for exporting study results."""
 
@@ -168,13 +184,15 @@ class ExportService:
                 p.ip_address or "",
                 p.user_agent or "",
                 "True" if p.is_discarded else "False",
-                p.discard_reason or "",
+                _csv_safe(p.discard_reason or ""),
             ]
 
             # Presort
             for k in presort_keys:
                 val = p.presort_answers.get(k)
-                row.append(get_value_label(presort_fields, k, val, header_lang))
+                row.append(
+                    _csv_safe(get_value_label(presort_fields, k, val, header_lang))
+                )
 
             # Build audio recordings map by question_key
             audio_map: dict[str, _AudioMapEntry] = {}
@@ -191,11 +209,19 @@ class ExportService:
                         size_kb=round(audio_rec.file_size_bytes / 1024, 2),
                     )
                 except Exception as e:
-                    # Log error but don't fail export
+                    # Log but don't fail the export. Still record a sentinel entry
+                    # so a fetch failure (URL unavailable) is distinguishable from a
+                    # genuine "no recording" empty cell (audit F3) — the row keeps
+                    # the known duration/size.
                     logger.warning(
                         "Failed to generate presigned URL for %s: %s",
                         audio_rec.s3_key,
                         e,
+                    )
+                    audio_map[audio_rec.question_key] = _AudioMapEntry(
+                        url="ERROR_URL_UNAVAILABLE",
+                        duration=audio_rec.duration_seconds,
+                        size_kb=round(audio_rec.file_size_bytes / 1024, 2),
                     )
 
             # Build card comments map from qsort_entries
@@ -213,9 +239,9 @@ class ExportService:
                 score = scores_map.get(s.id)
                 row.append(str(score) if score is not None else "")
 
-                # Text Comment
+                # Text Comment (participant free text — neutralise formulas)
                 comment = comments_map.get(s.id, "")
-                row.append(comment)
+                row.append(_csv_safe(comment))
 
                 # Audio (URL, Duration, FileSize)
                 audio_key = f"card_{s.id}"
@@ -232,7 +258,9 @@ class ExportService:
             # Postsort
             for k in postsort_keys:
                 val = p.postsort_answers.get(k)
-                row.append(get_value_label(postsort_fields, k, val, header_lang))
+                row.append(
+                    _csv_safe(get_value_label(postsort_fields, k, val, header_lang))
+                )
 
             # Postsort Audio (missing_statement, etc.)
             if audio_enabled:
@@ -522,13 +550,13 @@ class ExportService:
         writer.writerow(header)
 
         for statement in sorted(study.statements, key=lambda x: x.display_order):
-            row = [statement.code]
+            row = [_csv_safe(statement.code)]
             trans_map = {
                 trans.language_code: trans.text.replace("\n", " ")
                 for trans in statement.translations
             }
             for lang_code in langs:
-                row.append(trans_map.get(lang_code, ""))
+                row.append(_csv_safe(trans_map.get(lang_code, "")))
             writer.writerow(row)
 
         return output.getvalue()
@@ -602,12 +630,11 @@ class ExportService:
                         s.id,
                     )
                     score = 0
-                # We use 2 chars per score
-                # If score is positive, add a space. If negative, it has the minus.
-                if score >= 0:
-                    scores_str += f" {score}"
-                else:
-                    scores_str += str(score)
+                # Fixed 3-char field per score so PQMethod's column-offset parse
+                # stays aligned across the full +-10 grid_score range (audit F2):
+                # the old 2-char format produced a 3-char field for |score| >= 10,
+                # silently shifting every subsequent column.
+                scores_str += f"{score:>3d}"
 
             body_lines.append(f"{pid}{scores_str}")
 
