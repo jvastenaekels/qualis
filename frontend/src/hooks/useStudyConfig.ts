@@ -168,6 +168,34 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (!isTestMode || !slug) return;
 
+        // Per-load cancellation guard (issue #30). The async loadFromStorage
+        // chain awaits i18n.changeLanguage / refetch before calling setState;
+        // if the slug changes or the component unmounts mid-load, the in-flight
+        // chain must not fire setState with the previous study's data (a stale
+        // study flash + setState-after-unmount). Cleanup flips this flag, and
+        // every awaited continuation below checks it before touching state.
+        // The storage listener also re-enters loadFromStorage, so gating on this
+        // single effect-scoped flag covers both the initial load and any late
+        // storage-triggered reload: once cancelled, neither can write state.
+        let cancelled = false;
+
+        // Cancellation-aware `setLoading(false)` for the load chain's finally
+        // blocks: a no-op once the effect has been torn down.
+        const finishLoading = (): void => {
+            if (!cancelled) setConfigLoading(false);
+        };
+
+        // Cancellation-aware commit of a resolved config + its UI overrides.
+        // Called only on the happy path after every await guard has passed.
+        const commitConfig = (resolved: StudyConfig): void => {
+            if (cancelled) return;
+            if (resolved.ui_labels) {
+                applyStudyOverrides(resolved.language || 'en', resolved.ui_labels);
+            }
+            setConfig(resolved);
+            setConfigError(null);
+        };
+
         const loadFromLocalDraft = async (
             draftJson: string | null,
             legacyJson: string | null
@@ -178,32 +206,37 @@ export const useStudyConfig = () => {
                     : (JSON.parse(legacyJson as string) as StudyConfig);
 
                 await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
-                if (config.ui_labels) {
-                    applyStudyOverrides(config.language || 'en', config.ui_labels);
-                }
-
-                setConfig(config);
-                setConfigError(null);
+                if (cancelled) return;
+                commitConfig(config);
             } catch (e) {
+                if (cancelled) return;
                 console.error('Failed to parse test config from localStorage', e);
                 setConfigError('common.errors.validation');
             } finally {
-                setConfigLoading(false);
+                finishLoading();
             }
+        };
+
+        // Sync i18n + session language to the server data's resolved language.
+        // Returns false when the load was cancelled mid-await (caller must abort).
+        const syncServerLang = async (serverData: StudyConfig): Promise<boolean> => {
+            const langChanged =
+                !sessionLanguage ||
+                (serverData.language && sessionLanguage !== serverData.language);
+            if (!langChanged) return true;
+            const newLang = serverData.language || 'en';
+            await i18n.changeLanguage(newLang);
+            if (cancelled) return false;
+            setLanguage(newLang);
+            return true;
         };
 
         const applyServerData = async (serverData: StudyConfig): Promise<void> => {
             if (serverData.ui_labels) {
                 applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
             }
-            const langChanged =
-                !sessionLanguage ||
-                (serverData.language && sessionLanguage !== serverData.language);
-            if (langChanged) {
-                const newLang = serverData.language || 'en';
-                await i18n.changeLanguage(newLang);
-                setLanguage(newLang);
-            }
+            if (!(await syncServerLang(serverData))) return;
+            if (cancelled) return;
             setConfig(serverData);
             setConfigError(null);
         };
@@ -217,14 +250,16 @@ export const useStudyConfig = () => {
                 if (!serverData) throw new Error('Server returned no data');
                 await applyServerData(serverData);
             } catch (err) {
+                if (cancelled) return;
                 console.error('[useStudyConfig] Server fallback failed', err);
                 setConfigError('common.errors.not_found');
             } finally {
-                setConfigLoading(false);
+                finishLoading();
             }
         };
 
         const loadFromStorage = async () => {
+            if (cancelled) return;
             resetConfig(); // Clear previous study config
             setConfigLoading(true);
 
@@ -250,13 +285,17 @@ export const useStudyConfig = () => {
 
         // Listen for changes from other tabs (Designer)
         const handleStorageChange = (e: StorageEvent) => {
+            if (cancelled) return;
             if (e.key === `qualis-test-draft-${slug}` || e.key === `qualis-pilot-reset-${slug}`) {
                 loadFromStorage();
             }
         };
 
         window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        return () => {
+            cancelled = true;
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, [
         isTestMode,
         slug,
