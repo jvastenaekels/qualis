@@ -15451,7 +15451,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),
@@ -15736,7 +15736,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 { length: faker.number.int({ min: 1, max: 10 }) },
                 (_, i) => i + 1
             ).map(() => ({
-                score: faker.number.int({ min: undefined, max: undefined }),
+                score: faker.number.int({ min: -10, max: 10 }),
                 capacity: faker.number.int({ min: undefined, max: undefined }),
             })),
             presort_config: {},
@@ -16045,7 +16045,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),
@@ -16326,7 +16326,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),
@@ -16610,7 +16610,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),
@@ -16891,7 +16891,7 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),
@@ -17196,7 +17196,7 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             { length: faker.number.int({ min: 1, max: 10 }) },
             (_, i) => i + 1
         ).map(() => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })),
         presort_config: {},
@@ -17488,7 +17488,7 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     ]),
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
-            score: faker.number.int({ min: undefined, max: undefined }),
+            score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int({ min: undefined, max: undefined }),
         })
     ),

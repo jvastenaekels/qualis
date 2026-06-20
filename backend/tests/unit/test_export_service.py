@@ -146,9 +146,9 @@ class TestRosettaStone:
         pos_0 = scores_section.find(" 0")
         pos_neg1 = scores_section.find("-1")
         pos_1 = scores_section.rfind(" 1")  # Use rfind to get the last " 1"
-        assert (
-            pos_0 < pos_neg1 < pos_1
-        ), f"Scores not in definition order: 0@{pos_0}, -1@{pos_neg1}, 1@{pos_1}"
+        assert pos_0 < pos_neg1 < pos_1, (
+            f"Scores not in definition order: 0@{pos_0}, -1@{pos_neg1}, 1@{pos_1}"
+        )
 
     def test_sta_file_uses_statement_definition_order(self):
         """
@@ -288,6 +288,72 @@ class TestSymmetry:
             assert "test-export.ans" in file_list
 
 
+class TestExportHardening:
+    """Audit Wave F — CSV formula injection (F1), .dat width (F2), audio sentinel (F3)."""
+
+    def test_f1_free_text_formula_neutralized_but_scores_not(self):
+        statements = [MockStatement(id=1, code="s1", display_order=0)]
+        entry = MockQSortEntry(statement_id=1, grid_score=-1)
+        entry.card_comment = "=SUM(A1:A9)"  # spreadsheet-formula injection attempt
+        participant = MockParticipant([entry])
+        study = MockStudy(statements)
+
+        csv_content = ExportService.generate_csv(study, [participant])
+
+        # The participant free-text cell is prefixed with ' (forced to text).
+        assert "'=SUM(A1:A9)" in csv_content
+        # The negative Q-sort score is a number, NOT escaped — stays analysable.
+        assert "'-1" not in csv_content
+
+    def test_f2_dat_uses_constant_3char_field_for_double_digit_scores(self):
+        statements = [
+            MockStatement(id=1, code="s1", display_order=0),
+            MockStatement(id=2, code="s2", display_order=1),
+            MockStatement(id=3, code="s3", display_order=2),
+        ]
+        entries = [
+            MockQSortEntry(statement_id=1, grid_score=10),
+            MockQSortEntry(statement_id=2, grid_score=-10),
+            MockQSortEntry(statement_id=3, grid_score=1),
+        ]
+        participant = MockParticipant(entries)
+        study = MockStudy(statements)
+        sorted_statements = sorted(statements, key=lambda s: s.display_order)
+
+        dat = ExportService._generate_dat(study, [participant], sorted_statements)
+        scores_section = dat.strip().split("\n")[1][8:]  # after the 8-char PID
+
+        # Constant 3-char field per score keeps PQMethod's column offsets aligned
+        # even at the +-10 extremes (which the old 2-char format broke).
+        assert scores_section == " 10-10  1"
+        assert len(scores_section) == 9
+
+    def test_f3_audio_url_failure_emits_sentinel_not_blank(self, monkeypatch):
+        from app.services import export_service as export_mod
+
+        statements = [MockStatement(id=5, code="s5", display_order=0)]
+        participant = MockParticipant([MockQSortEntry(statement_id=5, grid_score=0)])
+        audio = MagicMock()
+        audio.question_key = "card_5"
+        audio.s3_key = "audio/x.webm"
+        audio.duration_seconds = 12.5
+        audio.file_size_bytes = 2048
+        participant.audio_recordings = [audio]
+        study = MockStudy(statements)
+
+        # Force presigned-URL generation to fail.
+        monkeypatch.setattr(
+            export_mod.storage_service,
+            "generate_presigned_url",
+            MagicMock(side_effect=Exception("boom")),
+        )
+
+        csv_content = ExportService.generate_csv(study, [participant])
+
+        # A fetch failure is distinguishable from a genuine "no recording" blank.
+        assert "ERROR_URL_UNAVAILABLE" in csv_content
+
+
 class TestRenderMemoMd:
     """Unit tests for ExportService.render_memo_md (pure function, no DB required)."""
 
@@ -375,7 +441,11 @@ class TestRenderMemoMd:
         assert "## Limitations" in result
         # The body line should NOT appear (body is empty)
         lines = result.split("\n")
-        body_lines = [ln for ln in lines if ln and ln not in ("## Limitations\n", "## Limitations")]
+        body_lines = [
+            ln
+            for ln in lines
+            if ln and ln not in ("## Limitations\n", "## Limitations")
+        ]
         # There should be no line between the ## heading and the blank separator
         # containing arbitrary user-supplied text — only the header, blank sep, footer.
         assert not any(ln.strip() == "" and "Forced" in ln for ln in lines)
@@ -528,7 +598,10 @@ class TestRenderMemoDiscussionMd:
         result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})
 
         assert "[resolved]" in result
-        assert "- alice@example.com · 2026-04-15 10:00 [resolved]: Agreed, closing." in result
+        assert (
+            "- alice@example.com · 2026-04-15 10:00 [resolved]: Agreed, closing."
+            in result
+        )
 
     def test_deleted_comment_shows_placeholder(self) -> None:
         """A deleted comment renders as '[deleted comment]' regardless of its body."""
@@ -652,7 +725,8 @@ class TestRenderMemoDiscussionMd:
             comments=[comment],
         )
         memo = MemoRead(
-            parent_type="study", parent_id=1,
+            parent_type="study",
+            parent_id=1,
             entries=[entry_no_comments, entry_with_comment],
         )
         result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})

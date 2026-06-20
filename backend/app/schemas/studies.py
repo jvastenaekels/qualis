@@ -163,7 +163,10 @@ class StatementUpdate(BaseModel):
 class GridColumn(BaseModel):
     """Schema defining a column in the sorting grid."""
 
-    score: int
+    # Bounded to match the participant-side grid_score (QSortEntryInput, +-10),
+    # so the grid can't declare a score the .dat export's 3-char field (audit F2)
+    # — or downstream analysis — can't represent.
+    score: int = Field(ge=-10, le=10)
     capacity: int
 
 
