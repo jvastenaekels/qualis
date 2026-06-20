@@ -241,6 +241,7 @@
             "label": "Controlos da grelha"
         },
         "grid": {
+            "cards_moved_to_neutral": "Alguns cartões não puderam ser mantidos na grelha e foram movidos de volta para a pilha não ordenada. Por favor, volte a colocá-los.",
             "label": "Grelha de classificação Q",
             "column": "Coluna",
             "slot": "Posição",

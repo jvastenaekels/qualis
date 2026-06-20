@@ -229,6 +229,7 @@
             "label": "Controlli della griglia"
         },
         "grid": {
+            "cards_moved_to_neutral": "Alcune carte non sono potute rimanere sulla griglia e sono state riportate nel mazzo non ordinato. Riposizionale.",
             "label": "Griglia di classificazione Q",
             "column": "Colonna",
             "slot": "Posizione",

@@ -58,6 +58,31 @@ interface ValidatedDraft {
 }
 
 /**
+ * Validates a single `qsort` placement element. A well-formed element is a
+ * non-null object whose `statementId`, `col` and `row` are all finite numbers
+ * with `statementId > 0`, `col >= 0` and `row >= 0`. The per-mode upper-bound
+ * (`row < capacity`) is intentionally NOT checked here: it depends on
+ * `gridColumns` (absent at this pure boundary) and `row` may legitimately
+ * exceed capacity in free/flexible distribution modes. Overflow is caught later
+ * by `useGridSanity`, which has the grid context.
+ */
+function isQsortElementShape(el: unknown): boolean {
+    if (!el || typeof el !== 'object' || Array.isArray(el)) return false;
+    const { statementId, col, row } = el as Record<string, unknown>;
+    return (
+        typeof statementId === 'number' &&
+        Number.isFinite(statementId) &&
+        statementId > 0 &&
+        typeof col === 'number' &&
+        Number.isFinite(col) &&
+        col >= 0 &&
+        typeof row === 'number' &&
+        Number.isFinite(row) &&
+        row >= 0
+    );
+}
+
+/**
  * Per-key shape validation of a `draft_responses` payload. Each key falls
  * back to `initialResponses.<key>` independently when its shape is wrong, so
  * a corrupted slice cannot poison neighbouring slices.
@@ -80,7 +105,7 @@ export function validateDraftResponses(draft: unknown): ValidatedDraft | null {
         Array.isArray(roughObj.neutral) &&
         Array.isArray(roughObj.history);
 
-    const isQsortShape = Array.isArray(d.qsort);
+    const isQsortShape = Array.isArray(d.qsort) && d.qsort.every(isQsortElementShape);
 
     const isPostsortShape =
         d.postsort && typeof d.postsort === 'object' && !Array.isArray(d.postsort);

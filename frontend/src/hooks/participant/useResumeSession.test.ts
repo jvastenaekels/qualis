@@ -63,7 +63,10 @@ describe('validateDraftResponses', () => {
         const draft = {
             presort: { q1: 'yes' },
             rough: { agree: [1], disagree: [2], neutral: [3], history: ['drag-1'] },
-            qsort: [[1], [2]],
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 1, row: 0 },
+            ],
             postsort: { feedback: 'good' },
         };
         const result = validateDraftResponses(draft);
@@ -74,16 +77,81 @@ describe('validateDraftResponses', () => {
         const draft = {
             presort: { q1: 'yes' }, // valid
             rough: { agree: 'not-an-array' }, // invalid
-            qsort: [[1]], // valid
+            qsort: [{ statementId: 1, col: 0, row: 0 }], // valid
             postsort: 'not-an-object', // invalid
         };
         const result = validateDraftResponses(draft);
         expect(result).toEqual({
             presort: { q1: 'yes' },
             rough: initialResponses.rough,
-            qsort: [[1]],
+            qsort: [{ statementId: 1, col: 0, row: 0 }],
             postsort: initialResponses.postsort,
         });
+    });
+
+    it('accepts an empty qsort (early-step resume before any placement)', () => {
+        const draft = {
+            presort: { q1: 'yes' },
+            rough: { agree: [], disagree: [], neutral: [], history: [] },
+            qsort: [],
+            postsort: {},
+        };
+        const result = validateDraftResponses(draft);
+        expect(result?.qsort).toEqual([]);
+        expect(result?.presort).toEqual({ q1: 'yes' });
+    });
+
+    it('rejects malformed qsort elements while preserving a valid sibling slice', () => {
+        const draft = {
+            presort: { q1: 'yes' }, // valid sibling — must be preserved
+            qsort: [
+                { statementId: 1, col: 0, row: 0 }, // valid
+                { col: 0, row: 0 }, // missing statementId
+                { statementId: 'x', col: 0, row: 0 }, // wrong statementId type
+                { statementId: 1, col: 'x', row: 0 }, // wrong col type
+            ],
+        };
+        const result = validateDraftResponses(draft);
+        // The whole qsort is malformed → fall back to the empty array.
+        expect(result?.qsort).toEqual([]);
+        // The valid sibling slice is untouched.
+        expect(result?.presort).toEqual({ q1: 'yes' });
+    });
+
+    it('rejects qsort elements with negative col or row', () => {
+        const negCol = validateDraftResponses({
+            qsort: [{ statementId: 1, col: -1, row: 0 }],
+        });
+        expect(negCol?.qsort).toEqual([]);
+
+        const negRow = validateDraftResponses({
+            qsort: [{ statementId: 1, col: 0, row: -1 }],
+        });
+        expect(negRow?.qsort).toEqual([]);
+    });
+
+    it('rejects qsort elements with a non-positive statementId', () => {
+        const zeroId = validateDraftResponses({
+            qsort: [{ statementId: 0, col: 0, row: 0 }],
+        });
+        expect(zeroId?.qsort).toEqual([]);
+
+        const negId = validateDraftResponses({
+            qsort: [{ statementId: -3, col: 0, row: 0 }],
+        });
+        expect(negId?.qsort).toEqual([]);
+    });
+
+    it('rejects qsort elements with non-finite numbers', () => {
+        const nan = validateDraftResponses({
+            qsort: [{ statementId: 1, col: Number.NaN, row: 0 }],
+        });
+        expect(nan?.qsort).toEqual([]);
+
+        const inf = validateDraftResponses({
+            qsort: [{ statementId: 1, col: 0, row: Number.POSITIVE_INFINITY }],
+        });
+        expect(inf?.qsort).toEqual([]);
     });
 
     it('falls back to initialResponses on every malformed slice', () => {

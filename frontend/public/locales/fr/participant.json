@@ -241,6 +241,7 @@
             "label": "Contrôles de la grille"
         },
         "grid": {
+            "cards_moved_to_neutral": "Certaines cartes n'ont pas pu être conservées sur la grille et ont été replacées dans la pile non triée. Veuillez les replacer.",
             "label": "Grille Q-Sort",
             "column": "Colonne",
             "slot": "Emplacement",

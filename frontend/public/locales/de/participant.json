@@ -241,6 +241,7 @@
             "label": "Rastersteuerung"
         },
         "grid": {
+            "cards_moved_to_neutral": "Einige Karten konnten nicht auf dem Raster bleiben und wurden zurück in den unsortierten Stapel verschoben. Bitte platzieren Sie sie erneut.",
             "label": "Q-Sortierungs-Raster",
             "column": "Spalte",
             "slot": "Position",

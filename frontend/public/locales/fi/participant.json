@@ -241,6 +241,7 @@
             "label": "Ruudukon hallinta"
         },
         "grid": {
+            "cards_moved_to_neutral": "Joitakin kortteja ei voitu säilyttää ruudukossa, ja ne siirrettiin takaisin lajittelemattomaan pinoon. Aseta ne uudelleen.",
             "label": "Q-lajitteluruudukko",
             "column": "Sarake",
             "slot": "Paikka",

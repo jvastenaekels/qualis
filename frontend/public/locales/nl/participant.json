@@ -241,6 +241,7 @@
             "label": "Rasterbesturing"
         },
         "grid": {
+            "cards_moved_to_neutral": "Sommige kaarten konden niet op het raster blijven en zijn teruggeplaatst in de ongesorteerde stapel. Plaats ze opnieuw.",
             "label": "Q-sortering raster",
             "column": "Kolom",
             "slot": "Positie",

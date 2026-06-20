@@ -1,6 +1,15 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { toast } from 'sonner';
 import { useGridSanity } from './useGridSanity';
+
+vi.mock('sonner', () => ({
+    toast: {
+        warning: vi.fn(),
+        success: vi.fn(),
+        error: vi.fn(),
+    },
+}));
 
 describe('useGridSanity', () => {
     const mockUnplaceCard = vi.fn();
@@ -168,5 +177,44 @@ describe('useGridSanity', () => {
 
         expect(unplaceCard).toHaveBeenCalledWith(2);
         expect(unplaceCard).not.toHaveBeenCalledWith(1);
+    });
+
+    it('shows a toast when cards are removed (no longer silent)', () => {
+        vi.mocked(toast.warning).mockClear();
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [
+            { statementId: 1, col: 0, row: 5 }, // out of bounds (capacity 2, forced)
+        ];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+            })
+        );
+
+        expect(unplaceCard).toHaveBeenCalledWith(1);
+        expect(toast.warning).toHaveBeenCalled();
+    });
+
+    it('does not show a toast when the grid is valid', () => {
+        vi.mocked(toast.warning).mockClear();
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [{ statementId: 1, col: 0, row: 0 }];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+            })
+        );
+
+        expect(toast.warning).not.toHaveBeenCalled();
     });
 });

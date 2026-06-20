@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { toast } from 'sonner';
+import i18n from '../i18n';
 
 interface GridColumn {
     capacity: number;
@@ -67,6 +69,15 @@ export const useGridSanity = ({
                 unplaceCard(id);
                 categorizeCard(id, 'neutral');
             });
+            // Surface the removal so the participant is not silently surprised
+            // by vanished cards (bug #42). The cards are moved to the neutral
+            // pile and can be re-placed.
+            toast.warning(
+                i18n.t(
+                    'grid.cards_moved_to_neutral',
+                    'Some cards could not be kept on the grid and were moved back to the unsorted pile. Please re-place them.'
+                )
+            );
         }
     }, [qsort, gridColumns, unplaceCard, categorizeCard, distributionMode]);
 };
