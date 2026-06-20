@@ -26,13 +26,12 @@ interface PostSortPageProps {
 const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey }) => {
     // Hooks
     const setStep = useSessionStore((state) => state.setStep);
-    const session = useSessionStore((state) => ({
-        isCompleted: state.isCompleted,
-        confirmationCode: state.confirmationCode,
-    }));
-    const responses = useResponseStore((state) => ({
-        qsort: state.qsort,
-    }));
+    // Granular selectors: object-literal selectors return a fresh reference on
+    // every store update, defeating Zustand's referential equality check and
+    // re-rendering this page (and its postsort children) needlessly.
+    const isCompleted = useSessionStore((state) => state.isCompleted);
+    const confirmationCode = useSessionStore((state) => state.confirmationCode);
+    const qsort = useResponseStore((state) => state.qsort);
 
     // Step State (Internal to this page's wizard)
     // We default to step 1. If we wanted persistence we could store 'postSortStep' in session store.
@@ -54,8 +53,8 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         confirmationCode: submitConfirmationCode,
     } = useSubmitStudy();
 
-    const isSuccess = isSubmitSuccess || session.isCompleted;
-    const finalConfirmationCode = session.confirmationCode || submitConfirmationCode;
+    const isSuccess = isSubmitSuccess || isCompleted;
+    const finalConfirmationCode = confirmationCode || submitConfirmationCode;
 
     // Ref to prevent the 'started' silent submit from re-firing when submit identity changes
     const startedSentRef = useRef(false);
@@ -73,9 +72,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     // Completeness Guard: Ensure qsort is full before allowing post-sort
     React.useEffect(() => {
-        if (session.isCompleted) return;
+        if (isCompleted) return;
 
-        if (config && responses.qsort.length !== config.statements.length) {
+        if (config && qsort.length !== config.statements.length) {
             navigate(`/study/${slug}/fine-sort${location.search}`, { replace: true });
         } else if (!startedSentRef.current) {
             // Send a single silent 'started' status update on first mount
@@ -85,15 +84,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [
-        config,
-        responses.qsort.length,
-        navigate,
-        slug,
-        session.isCompleted,
-        submit,
-        location.search,
-    ]);
+    }, [config, qsort.length, navigate, slug, isCompleted, submit, location.search]);
 
     // --- Render ---
 

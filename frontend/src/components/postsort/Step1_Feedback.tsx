@@ -32,10 +32,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     const config = useConfigStore((state) => state.config);
     const token = useSessionStore((state) => state.token);
-    const { qsort, postsort } = useResponseStore((state) => ({
-        qsort: state.qsort,
-        postsort: state.postsort,
-    }));
+    // Granular selectors avoid a fresh object reference on every store update
+    // (which would defeat Zustand's referential equality and re-render this
+    // feedback step needlessly).
+    const qsort = useResponseStore((state) => state.qsort);
+    const postsort = useResponseStore((state) => state.postsort);
     const setPostSortResponse = useResponseStore((state) => state.setPostSortResponse);
     const setAudioRecording = useResponseStore((state) => state.setAudioRecording);
     const deleteAudioRecording = useResponseStore((state) => state.deleteAudioRecording);

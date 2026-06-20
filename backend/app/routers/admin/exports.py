@@ -413,10 +413,13 @@ async def get_research_package(
     result = await db.execute(stmt)
     full_study = result.scalar_one()
 
-    # Get the official JSON dump for inclusion in the package
+    # Get the official JSON dump for inclusion in the package. Reuse the
+    # already-loaded ORM graph (full_study) so the dump is built in memory
+    # instead of re-fetching every participant + Q-sort + audio row a second
+    # time.
     from ...services.study_service import StudyService
 
-    full_dump = await StudyService.get_study_full_dump(db, study.id)
+    full_dump = await StudyService.get_study_full_dump(db, study.id, study=full_study)
 
     # Fetch memo and render markdown for inclusion in the package
     from ...models import MemoParentType, User
