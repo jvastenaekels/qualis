@@ -166,6 +166,55 @@ describe('useStudyPersistence', () => {
         expect(mockSetSyncStatus).toHaveBeenCalledWith('modified');
     });
 
+    it('should serialise saves: a second save while one is in flight does not re-invoke the mutation', async () => {
+        // Characterization test for the syncStatus === 'saving' guard at the top of save().
+        // It is the ACTUAL protection against concurrent/out-of-order saves (the AbortController
+        // was dead code — its signal was never wired to the mutation). This test locks the
+        // serialization contract: while a save is in flight, a second save() short-circuits.
+        const draft = { slug: 'test-study', statements: [] };
+
+        // First render: syncStatus 'modified' → save() proceeds and starts an in-flight mutation
+        // whose resolution we control, so the save stays "in flight" across the second call.
+        let resolveMutation: (value: unknown) => void = () => {};
+        mockMutateAsync.mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveMutation = resolve;
+            })
+        );
+
+        mockStoreState({ draft, syncStatus: 'modified' });
+        const first = renderHook(() => useStudyPersistence());
+
+        let firstSave: Promise<void> = Promise.resolve();
+        act(() => {
+            firstSave = first.result.current.save();
+        });
+
+        // The in-flight save invoked the mutation exactly once.
+        expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+
+        // Re-render with syncStatus now 'saving' — this is the state the store would be in while
+        // the mutation is pending. A second save() under this state must short-circuit on the
+        // guard and return WITHOUT invoking the mutation again.
+        mockStoreState({ draft, syncStatus: 'saving' });
+        const second = renderHook(() => useStudyPersistence());
+
+        await act(async () => {
+            await second.result.current.save();
+        });
+
+        // Still exactly one invocation: the second call returned early on the guard.
+        expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+
+        // Let the first (in-flight) save finish cleanly.
+        await act(async () => {
+            resolveMutation({ slug: 'test-study' });
+            await firstSave;
+        });
+
+        expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+    });
+
     it('should warn user before unload when changes are unsaved', () => {
         const draft = { slug: 'test-study', statements: ['statement1'] };
 
