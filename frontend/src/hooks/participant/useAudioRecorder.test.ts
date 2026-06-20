@@ -326,6 +326,38 @@ describe('useAudioRecorder — play() wrapper', () => {
     });
 });
 
+describe('useAudioRecorder — unmount cleanup (C2)', () => {
+    beforeEach(setupWebApiMocks);
+
+    it('detaches the MediaRecorder handlers on unmount so an auto-fired onstop cannot upload', async () => {
+        const onRecordingComplete = vi.fn().mockResolvedValue(undefined);
+        const { result, unmount } = renderHook(() =>
+            useAudioRecorder(makeProps({ onRecordingComplete }))
+        );
+
+        await act(async () => {
+            result.current.recording.start();
+            await Promise.resolve();
+        });
+
+        expect(result.current.status.state).toBe('recording');
+        expect(capturedMediaRecorder).not.toBeNull();
+        expect(capturedMediaRecorder?.onstop).not.toBeNull();
+
+        // Unmount while still recording.
+        unmount();
+
+        // The cleanup must null the recorder handlers so a browser-auto-fired
+        // onstop (which fires when the stream tracks end) cannot run the
+        // fire-and-forget upload after the component is gone. With the bug the
+        // handler stayed attached and the orphan upload could fire.
+        expect(capturedMediaRecorder?.onstop).toBeNull();
+        expect(capturedMediaRecorder?.ondataavailable).toBeNull();
+        expect(capturedMediaRecorder?.onerror).toBeNull();
+        expect(onRecordingComplete).not.toHaveBeenCalled();
+    });
+});
+
 describe('useAudioRecorder — setPlaybackSpeed wrapper', () => {
     beforeEach(setupWebApiMocks);
 

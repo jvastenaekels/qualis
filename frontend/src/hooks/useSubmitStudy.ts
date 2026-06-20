@@ -242,8 +242,15 @@ export const useSubmitStudy = () => {
                 console.error(err);
                 setError(extractErrorMessage(err));
             } finally {
-                isSubmittingRef.current = false;
-                setSubmitting(false);
+                // Only release the concurrency guard for the status that
+                // acquired it (completed). A concurrent non-completed autosave
+                // finishing mid-completion must NOT reset the guard while the
+                // final submission is still in flight — that would re-enable
+                // draft-autosave / allow a second completion.
+                if (status === 'completed') {
+                    isSubmittingRef.current = false;
+                    setSubmitting(false);
+                }
                 if (!options?.silent) setIsLoading(false);
             }
         },

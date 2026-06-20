@@ -331,10 +331,11 @@ async def test_record_consent_idempotent_for_existing_participant(
     ).scalars().all()
     assert len(rows) == 1
 
-    # language_used was updated
+    # language_used is still updated on re-consent
     assert rows[0].language_used == "fr"
-    # consent_hash was updated
-    assert rows[0].consent_hash == "hash-v2"
+    # consent_hash is first-consent-wins (gated with consented_at, audit C1):
+    # it must NOT change on re-consent so the hash and timestamp can't desync.
+    assert rows[0].consent_hash == "hash-v1"
 
 
 @pytest.mark.asyncio

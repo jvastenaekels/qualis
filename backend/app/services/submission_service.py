@@ -126,8 +126,15 @@ class SubmissionService:
 
         # If we fell through (update existing)
         if participant and participant not in db.new:
-            participant.consented_at = datetime.now(timezone.utc)
-            participant.consent_hash = consent_hash
+            # First-consent-wins: never overwrite the original consent timestamp
+            # or hash on a re-POST (re-mount, retry, back-nav). consented_at is
+            # the duration metric's start anchor — resetting it yields
+            # artificially short or negative durations (negatives are silently
+            # dropped, skewing the median) — and it is the legal record of when
+            # consent was given. Gate the hash with it so the two can't desync.
+            if not participant.consented_at:
+                participant.consented_at = datetime.now(timezone.utc)
+                participant.consent_hash = consent_hash
             participant.language_used = language_code
             participant.ip_address = hashed_ip
             participant.user_agent = hashed_ua
@@ -521,6 +528,32 @@ class SubmissionService:
             )
             if not link:
                 raise ForbiddenError("Invalid, expired, or full recruitment link")
+
+        # C4: an already-completed participant re-POSTing must idempotently get
+        # its stored confirmation back — even if the grid was edited since, which
+        # would make the old Q-sort fail validate_distribution below. Short-
+        # circuit BEFORE qsort/distribution validation, using a read-only lookup
+        # (no lock, no creation, no link-usage increment — those stay in
+        # _find_or_create_participant). The study_id guard preserves the
+        # "token belongs to this study" invariant that _find_or_create enforces.
+        already_completed = (
+            await db.execute(
+                select(Participant).where(
+                    Participant.session_token == data.session_token
+                )
+            )
+        ).scalar_one_or_none()
+        if (
+            already_completed is not None
+            and already_completed.study_id == study.id
+            and already_completed.status == ParticipantStatus.completed
+        ):
+            return {
+                "confirmation_code": already_completed.confirmation_code
+                or str(already_completed.session_token)[:8].upper(),
+                "id": already_completed.id,
+                "already_submitted": True,
+            }
 
         # 3-4. Validate Q-sort payload (presence, statement ownership, distribution)
         SubmissionService._validate_qsort_payload(study, data)
