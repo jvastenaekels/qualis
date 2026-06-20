@@ -346,12 +346,27 @@ async def delete_audio_recording(
     if participant.submitted_at:
         raise HTTPException(status_code=400, detail="Cannot delete after submission")
 
-    # Delete from S3
-    await storage_service.delete_audio(recording.s3_key)
+    # Commit the DB delete FIRST, then remove the S3 object. If we deleted from
+    # S3 first and the commit then failed, the object would be permanently gone
+    # while the AudioRecording row survived (a 404 on get_audio_url/export) —
+    # the same atomicity bug already fixed on the re-upload path (commit 9d349f2a).
+    s3_key = recording.s3_key
 
-    # Delete from database
     await db.delete(recording)
     await db.commit()
+
+    # Best-effort S3 cleanup: the row is already durably deleted, so a storage
+    # failure must not 500 the request. Worst case is a harmless orphan object
+    # that storage lifecycle/cleanup can reap.
+    try:
+        await storage_service.delete_audio(s3_key)
+    except Exception:
+        logger.warning(
+            "Failed to delete S3 object %s after deleting AudioRecording %s",
+            s3_key,
+            recording_id,
+            exc_info=True,
+        )
 
     return {"message": "Audio deleted successfully"}
 

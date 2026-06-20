@@ -124,6 +124,19 @@ class Participant(Base):
             return self.presort_answers.get("_recruitment_token")
         return None
 
+    @property
+    def code(self) -> str:
+        """Short, non-sensitive display code for the admin UI.
+
+        The full ``session_token`` is the participant's bearer credential
+        (resume, draft read, submission, GDPR self-erasure) and must never be
+        serialised to clients — exposing it lets even a viewer impersonate any
+        participant. This truncated, non-reversible 8-char prefix is exactly
+        what the admin UI already rendered, and matches the dump/export
+        ``str(session_token)[:8].upper()`` convention.
+        """
+        return str(self.session_token)[:8].upper()
+
 
 class QSortEntry(Base):
     """SQLAlchemy model for individual Q-sort card placements."""

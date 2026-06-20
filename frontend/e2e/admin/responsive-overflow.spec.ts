@@ -75,7 +75,10 @@ const participants = {
         {
             id: 1,
             study_id: 1,
-            session_token: 'responsive-session-token',
+            // ParticipantRead now exposes the non-sensitive `code` (session_token[:8]
+            // uppercased), not the raw session_token (audit A1). RecentActivityCard
+            // reads participant.code, so the fixture must provide it.
+            code: 'RESPONSI',
             language_used: 'en',
             status: 'completed',
             created_at: '2026-05-11T00:00:00Z',

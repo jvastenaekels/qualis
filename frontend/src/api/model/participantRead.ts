@@ -14,11 +14,18 @@ import type { ParticipantReadRecruitmentToken } from './participantReadRecruitme
 
 /**
  * Schema for reading a participant.
+
+Security: the raw ``session_token`` is the participant's bearer credential
+and is deliberately NOT exposed here — this schema is reachable by the
+lowest (viewer) role via the study participant list. Only the truncated,
+non-reversible ``code`` (session_token[:8]) is surfaced for display.
+``recruitment_token`` and ``user_agent`` are research metadata, not
+credentials, and remain available.
  */
 export interface ParticipantRead {
     id: number;
     study_id: number;
-    session_token: string;
+    code: string;
     language_used: string;
     status: ParticipantStatus;
     created_at: string;

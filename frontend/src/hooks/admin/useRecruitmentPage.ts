@@ -265,13 +265,23 @@ export function useRecruitmentPage(): RecruitmentPageApi {
     // ── Handlers ─────────────────────────────────────────────────
     const handleCreate = useCallback(() => {
         if (!slug) return;
+        // The single numeric input (newLinkCount) means different things per type:
+        //  - individual: how many one-shot links to generate (count=N, capacity=1)
+        //  - limited:    submission cap for ONE link        (count=1, capacity=N)
+        //  - public:     one uncapped link                  (count=1, capacity=∞)
+        // Mapping it explicitly per type avoids the bug where a "limited" link
+        // capped at N produced N *unlimited* links, and guards against a stale
+        // newLinkCount leaking into the public/limited count.
+        const count = newLinkType === 'individual' ? newLinkCount : 1;
+        const capacity =
+            newLinkType === 'individual' ? 1 : newLinkType === 'limited' ? newLinkCount : undefined; // public → uncapped
         createMutation.mutate({
             slug,
-            params: { count: newLinkCount },
+            params: { count },
             data: {
                 type: newLinkType,
                 name: newLinkName || undefined,
-                capacity: newLinkType === 'individual' ? 1 : undefined,
+                capacity,
             },
         });
     }, [slug, newLinkCount, newLinkType, newLinkName, createMutation]);

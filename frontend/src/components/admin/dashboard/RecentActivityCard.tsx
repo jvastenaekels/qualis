@@ -77,7 +77,7 @@ function ParticipantRow({
     onView,
 }: ParticipantRowProps) {
     const { t } = useTranslation();
-    const colors = getParticipantColor(participant.session_token);
+    const colors = getParticipantColor(participant.code);
     const isCompleted = participant.status === 'completed';
     const activityTime = getActivityTime(participant);
     const ua = parseUA(participant.user_agent as string | undefined);
@@ -104,14 +104,14 @@ function ParticipantRow({
                     color: colors.text,
                 }}
             >
-                {participant.session_token.substring(0, 2).toUpperCase()}
+                {participant.code.substring(0, 2)}
             </div>
 
             <div className="flex-1 min-w-0 space-y-0.5">
                 {/* Line 1: token + recruitment badge */}
                 <div className="flex items-center gap-1.5 min-w-0">
                     <span className="text-xs font-mono font-bold text-slate-800 shrink-0">
-                        {participant.session_token.substring(0, 8)}
+                        {participant.code}
                     </span>
                     {participant.recruitment_token && (
                         <Badge

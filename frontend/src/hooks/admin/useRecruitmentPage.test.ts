@@ -211,7 +211,7 @@ describe('useRecruitmentPage', () => {
         });
     });
 
-    it('handleCreate omits capacity for non-individual link types and name when blank', () => {
+    it('handleCreate maps the input to capacity (not count) for a limited link', () => {
         const mutate = vi.fn();
         mockCreateMutationHook.mockReturnValue({ mutate, isPending: false });
 
@@ -228,11 +228,45 @@ describe('useRecruitmentPage', () => {
             result.current.handleCreate();
         });
 
+        // A "limited" link capped at 20 must be ONE link with capacity 20 —
+        // not 20 uncapped links (the regression this guards against).
         expect(mutate).toHaveBeenCalledWith({
             slug: 'demo-study',
-            params: { count: 20 },
+            params: { count: 1 },
             data: {
                 type: 'limited',
+                name: undefined,
+                capacity: 20,
+            },
+        });
+    });
+
+    it('handleCreate forces count:1 / uncapped for a public link, ignoring a stale count', () => {
+        const mutate = vi.fn();
+        mockCreateMutationHook.mockReturnValue({ mutate, isPending: false });
+
+        const { result } = renderHook(() => useRecruitmentPage(), {
+            wrapper: AllTheProviders,
+        });
+
+        // Simulate a stale newLinkCount left over from a previous type selection.
+        act(() => {
+            result.current.setNewLinkType('individual');
+            result.current.setNewLinkCount(7);
+        });
+        act(() => {
+            result.current.setNewLinkType('public');
+        });
+
+        act(() => {
+            result.current.handleCreate();
+        });
+
+        expect(mutate).toHaveBeenCalledWith({
+            slug: 'demo-study',
+            params: { count: 1 },
+            data: {
+                type: 'public',
                 name: undefined,
                 capacity: undefined,
             },

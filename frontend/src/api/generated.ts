@@ -17766,7 +17766,7 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseM
         () => ({
             id: faker.number.int({ min: undefined, max: undefined }),
             study_id: faker.number.int({ min: undefined, max: undefined }),
-            session_token: faker.string.uuid(),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
             language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
             status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
             created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -17817,7 +17817,7 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetRespons
 ): ParticipantDetailRead => ({
     id: faker.number.int({ min: undefined, max: undefined }),
     study_id: faker.number.int({ min: undefined, max: undefined }),
-    session_token: faker.string.uuid(),
+    code: faker.string.alpha({ length: { min: 10, max: 20 } }),
     language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
     status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
@@ -17902,7 +17902,7 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
     (overrideResponse: Partial<ParticipantRead> = {}): ParticipantRead => ({
         id: faker.number.int({ min: undefined, max: undefined }),
         study_id: faker.number.int({ min: undefined, max: undefined }),
-        session_token: faker.string.uuid(),
+        code: faker.string.alpha({ length: { min: 10, max: 20 } }),
         language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
         status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
         created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
