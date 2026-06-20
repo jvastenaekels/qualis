@@ -51,6 +51,68 @@ const otherStep = {
     icon: 'Circle',
 };
 
+describe('ProcessStepEditor — cross-locale step addressing (audit D2)', () => {
+    it('deletes a step by id from every locale even when locale orders diverge', async () => {
+        const user = userEvent.setup();
+        // en (active): [custom, rough]; fr: [rough, custom] — same ids, divergent
+        // order. The structural-sync effect is order-insensitive, so the
+        // divergence persists. rough_sort_enabled:false surfaces the banner whose
+        // Remove button calls deleteStep(activeLocaleIndex). With the old
+        // index-based splice, fr would lose the WRONG step.
+        const draft = {
+            slug: 'test-study',
+            state: 'draft',
+            default_language: 'en',
+            rough_sort_enabled: false,
+            presort_config: { enabled: true, fields: {} },
+            translations: [
+                {
+                    language_code: 'en',
+                    title: 'EN',
+                    process_steps: [
+                        {
+                            id: 'step_custom_1',
+                            title: 'Custom EN',
+                            description: '',
+                            icon: 'Circle',
+                        },
+                        { id: 'rough', title: 'Rough EN', description: '', icon: 'Hand' },
+                    ],
+                },
+                {
+                    language_code: 'fr',
+                    title: 'FR',
+                    process_steps: [
+                        { id: 'rough', title: 'Rough FR', description: '', icon: 'Hand' },
+                        {
+                            id: 'step_custom_1',
+                            title: 'Custom FR',
+                            description: '',
+                            icon: 'Circle',
+                        },
+                    ],
+                },
+            ],
+            // biome-ignore lint/suspicious/noExplicitAny: minimal draft mock
+        } as any;
+
+        renderWithStore(<ProcessStepEditor />, { initialState: { draft, activeLocale: 'en' } });
+
+        const banner = screen.getByTestId('process-steps-inconsistent-banner');
+        await user.click(within(banner).getByRole('button', { name: /remove/i }));
+
+        const translations = useStudyDesigner.getState().draft?.translations ?? [];
+        const byLang = (lang: string) =>
+            (translations.find((t) => t.language_code === lang)?.process_steps ?? []).map(
+                (s) => s.id
+            );
+
+        // 'rough' removed from BOTH locales, 'step_custom_1' survives in both.
+        expect(byLang('en')).toEqual(['step_custom_1']);
+        expect(byLang('fr')).toEqual(['step_custom_1']);
+    });
+});
+
 describe('ProcessStepEditor — inconsistent feature flags banner', () => {
     it('renders the banner when rough_sort_enabled is false and a rough step exists', () => {
         const draft = buildDraft([otherStep, roughStep], { rough_sort_enabled: false });
