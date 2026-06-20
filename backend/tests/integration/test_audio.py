@@ -333,6 +333,31 @@ class TestAudioValidation:
         assert response.status_code == 400
         assert "empty" in response.json()["message"].lower()
 
+    @pytest.mark.parametrize("bad_duration", ["0", "0.0", "-1", "-5.5"])
+    @patch("app.routers.audio.magic.from_buffer")
+    async def test_upload_rejects_non_positive_duration(
+        self,
+        mock_magic,
+        client: AsyncClient,
+        participant_token: tuple[uuid.UUID, Participant],
+        bad_duration: str,
+    ):
+        """Zero- and negative-duration recordings are semantically invalid and
+        must be rejected (audio with duration <= 0 cannot exist)."""
+        mock_magic.return_value = "audio/webm"
+        token, _ = participant_token
+        audio_data = b"fake webm audio data" * 50
+        files = {"file": ("recording.webm", BytesIO(audio_data), "audio/webm")}
+        data = {
+            "session_token": str(token),
+            "question_key": "card_1",
+            "duration_seconds": bad_duration,
+        }
+
+        response = await client.post("/api/audio/upload", files=files, data=data)
+        assert response.status_code == 400
+        assert "duration" in response.json()["message"].lower()
+
     @patch("app.routers.audio.magic.from_buffer")
     async def test_upload_file_too_large(
         self,
