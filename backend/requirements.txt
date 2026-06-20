@@ -59,7 +59,7 @@ colorama==0.4.6
     #   uvicorn
 coverage==7.14.1
     # via pytest-cov
-cyclonedx-python-lib==11.9.0
+cyclonedx-python-lib==11.10.0
     # via pip-audit
 defusedxml==0.7.1
     # via py-serializable
