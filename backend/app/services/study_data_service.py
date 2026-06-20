@@ -212,7 +212,13 @@ class StudyDataService:
 
     @staticmethod
     async def get_study_full_dump(db: AsyncSession, study_id: int) -> StudyDump:
-        """Extracts complete study data and valid participant sorts for export."""
+        """Extracts complete study data and all participant sorts for export.
+
+        Returns every participant regardless of ``is_discarded`` status; the
+        callers (``/dump``, per-participant export, research package) apply
+        their own discard/anonymisation filtering as appropriate for each
+        export type.
+        """
         # 1. Get Study with statements (ordered by ID for consistency)
         stmt = (
             select(Study)
@@ -227,7 +233,8 @@ class StudyDataService:
         if not study:
             raise NotFoundError("Study")
 
-        # 2. Get all non-discarded completed participants with their Q-sort entries and audio
+        # 2. Get all participants (including discarded — callers filter per
+        #    export type) with their Q-sort entries and audio
         p_stmt = (
             select(Participant)
             .where(

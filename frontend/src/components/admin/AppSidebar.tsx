@@ -19,6 +19,7 @@ import {
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { FocusModeHeader } from './FocusModeHeader';
 import { UserAvatar } from './UserAvatar';
+import { resetAllStores } from '@/utils/sessionReset';
 import {
     Sidebar,
     SidebarContent,
@@ -109,6 +110,10 @@ function NavUser({
 
     const handleLogout = () => {
         logout();
+        // Clear persisted Zustand stores + query cache so a subsequent admin
+        // login on the same browser cannot see the previous session's data.
+        // Mirrors the logout flow in CommandMenu.tsx.
+        resetAllStores({ skipConfig: true });
         navigate('/login');
     };
 
