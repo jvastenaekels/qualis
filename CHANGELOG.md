@@ -10,12 +10,16 @@
 
 ### Bug fixes
 
+* **analysis:** align bootstrap factors to a reference orientation, fixing corrupted per-statement SE/CI from resample sign-flips and factor permutations ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* **fine-sort:** prevent Q-sort card duplication when a placed card is dropped onto its own slot in a full column ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
+* bug-hunt quick wins — admin-logout cross-session data leak, CSV audio-URL 24h TTL, reject zero-duration audio, correct `get_study_full_dump` docstring ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
 * **demo:** give the backend healthcheck a start_period so `make demo-up` survives cold starts ([#233](https://github.com/jvastenaekels/qualis/issues/233)) ([e04cafe](https://github.com/jvastenaekels/qualis/commit/e04cafe59efc8ed208b806c90088bf2bc99001e3))
 * **deps:** bump starlette to &gt;=1.3.1 for CVE-2026-54282/54283 ([#230](https://github.com/jvastenaekels/qualis/issues/230)) ([91801ba](https://github.com/jvastenaekels/qualis/commit/91801bae72046fef13aa3b8f5a1d75d662b0d099))
 
 
 ### Performance
 
+* avoid double-loading every participant in the research-package export; granular Zustand selectors in the post-sort flow ([#237](https://github.com/jvastenaekels/qualis/issues/237)) ([1b6f782](https://github.com/jvastenaekels/qualis/commit/1b6f782816ade694128f4c7a8efb76538f88209c))
 * **demo:** start the backend from the baked venv to cut cold start ~147s to ~6s ([#234](https://github.com/jvastenaekels/qualis/issues/234)) ([b55117d](https://github.com/jvastenaekels/qualis/commit/b55117dd3b0092f76d329e5e6c40d41d2bc13945))
 
 
