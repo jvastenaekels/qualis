@@ -2,7 +2,13 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from app.models import RecruitmentLinkType, ProjectRole
 
@@ -20,6 +26,19 @@ class RecruitmentLinkBase(BaseModel):
     @classmethod
     def validate_name(cls, v: str | None) -> str | None:
         return validate_non_empty_string(v)
+
+    @model_validator(mode="after")
+    def reject_capacity_on_public(self) -> "RecruitmentLinkBase":
+        """Public links are unlimited; a capacity here would be silently dropped.
+
+        Reject it at the API boundary so the operator gets a clear 422 instead
+        of believing they capped sign-ups when the link is actually unlimited.
+        """
+        if self.type == RecruitmentLinkType.public and self.capacity is not None:
+            raise ValueError(
+                "capacity cannot be set for public (unlimited) links"
+            )
+        return self
 
 
 class RecruitmentLinkCreate(RecruitmentLinkBase):

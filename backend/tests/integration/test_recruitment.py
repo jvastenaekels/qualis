@@ -79,6 +79,86 @@ class TestRecruitment:
         )
         assert response.status_code == 422
 
+    async def test_public_link_with_capacity_is_rejected(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """A public (unlimited) link must reject an operator-supplied capacity.
+
+        Previously the service silently dropped the capacity, so an operator
+        could believe they had capped sign-ups when the link was unlimited.
+        The capacity must now be rejected at the API boundary (422).
+        """
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public", "capacity": 10},
+            headers=headers,
+        )
+        assert response.status_code == 422
+        body = response.text.lower()
+        assert "capacity" in body
+        assert "public" in body
+
+    async def test_public_link_without_capacity_succeeds(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """Control: a public link without capacity must still succeed (unlimited)."""
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public", "name": "Social Media"},
+            headers=headers,
+        )
+        assert response.status_code == 200
+        links = response.json()
+        assert len(links) == 1
+        assert links[0]["capacity"] is None
+
+    async def test_limited_link_with_capacity_succeeds(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """Control: a non-public (limited) link must still accept capacity."""
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "limited", "capacity": 20},
+            headers=headers,
+        )
+        assert response.status_code == 200
+        links = response.json()
+        assert len(links) == 1
+        assert links[0]["capacity"] == 20
+
     async def test_create_excludes_server_controlled_fields(
         self,
         client: AsyncClient,
