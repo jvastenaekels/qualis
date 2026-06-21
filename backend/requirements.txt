@@ -95,7 +95,7 @@ filelock==3.29.4
     #   cachecontrol
     #   python-discovery
     #   virtualenv
-greenlet==3.5.1
+greenlet==3.5.2
     # via sqlalchemy
 grimp==3.14
     # via import-linter
