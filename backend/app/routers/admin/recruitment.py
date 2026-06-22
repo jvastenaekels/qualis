@@ -8,8 +8,7 @@ from app.limiter import limiter
 from app.dependencies import (
     check_study_permission,
     get_current_user,
-    ROLE_MAP,
-    STUDY_ROLE_HIERARCHY,
+    study_role_satisfies_via_project,
 )
 from app.models import Study, StudyRole, RecruitmentLink, ProjectMember, User
 from app.schemas import RecruitmentLinkCreate, RecruitmentLinkRead  # noqa: F401 (used in response_model)
@@ -87,8 +86,7 @@ async def revoke_recruitment_link(
     link, study, member = row
 
     # Check Permission (Editor required)
-    effective_role = ROLE_MAP.get(member.role, StudyRole.viewer)
-    if STUDY_ROLE_HIERARCHY[effective_role] < STUDY_ROLE_HIERARCHY[StudyRole.editor]:
+    if not study_role_satisfies_via_project(member.role, StudyRole.editor):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
         )

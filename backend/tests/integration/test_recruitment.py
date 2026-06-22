@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import RecruitmentLink, User
+from app.models import ProjectRole, RecruitmentLink, User
 
 
 @pytest.mark.asyncio
@@ -273,6 +273,84 @@ class TestRecruitment:
         if response.status_code == 200:
             links = response.json()
             assert links[0]["is_active"] is True
+
+    async def test_revoke_link_succeeds(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """Owner can revoke a recruitment link via DELETE /api/admin/recruitment/links/{id}."""
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        # Create a link
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public"},
+            headers=headers,
+        )
+        assert response.status_code == 200
+        link_id = response.json()[0]["id"]
+
+        # Delete the link
+        response = await client.delete(
+            f"/api/admin/recruitment/links/{link_id}",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        assert response.json() == {"status": "revoked"}
+
+        # Confirm it is gone
+        list_response = await client.get(
+            f"/api/admin/recruitment/{study.slug}/links",
+            headers=headers,
+        )
+        assert list_response.status_code == 200
+        ids = [link["id"] for link in list_response.json()]
+        assert link_id not in ids
+
+    async def test_revoke_link_rejected_for_viewer(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+        user_factory,
+    ):
+        """A viewer-role member must receive 403 when attempting to revoke a link."""
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        owner_headers = auth_token_factory(test_user)
+
+        # Owner creates a link
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public"},
+            headers=owner_headers,
+        )
+        assert response.status_code == 200
+        link_id = response.json()[0]["id"]
+
+        # Add a viewer to the project
+        viewer = await user_factory()
+        await project_member_factory(ws, viewer, ProjectRole.viewer)
+        viewer_headers = auth_token_factory(viewer)
+
+        # Viewer tries to revoke — must be rejected
+        response = await client.delete(
+            f"/api/admin/recruitment/links/{link_id}",
+            headers=viewer_headers,
+        )
+        assert response.status_code == 403
 
 
 @pytest.mark.asyncio

@@ -71,16 +71,6 @@ class RecruitmentService:
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def delete_link(db: AsyncSession, link_id: int) -> bool:
-        """Delete/revoke a recruitment link."""
-        link = await db.get(RecruitmentLink, link_id)
-        if link:
-            await db.delete(link)
-            await db.commit()
-            return True
-        return False
-
-    @staticmethod
     async def increment_usage(db: AsyncSession, link_id: int) -> bool:
         """Atomically check capacity and increment usage count.
 

@@ -166,6 +166,20 @@ PROJECT_ROLE_HIERARCHY = {
 }
 
 
+def project_role_satisfies(user_role: ProjectRole, required: ProjectRole) -> bool:
+    """True if user_role ranks at or above required in the project hierarchy."""
+    return PROJECT_ROLE_HIERARCHY[user_role] >= PROJECT_ROLE_HIERARCHY[required]
+
+
+def study_role_satisfies_via_project(
+    user_project_role: ProjectRole, required: StudyRole
+) -> bool:
+    """True if a project role, mapped to its effective study role, ranks at or
+    above the required study role."""
+    effective = ROLE_MAP.get(user_project_role, StudyRole.viewer)
+    return STUDY_ROLE_HIERARCHY[effective] >= STUDY_ROLE_HIERARCHY[required]
+
+
 async def check_superuser(
     current_user: User = Depends(get_current_user),
 ) -> User:
@@ -190,10 +204,8 @@ def require_project_role(
         project_ctx: tuple["Project", ProjectMember] = Depends(get_current_project),
     ) -> tuple["Project", ProjectMember]:
         _, member = project_ctx
-        required_level = PROJECT_ROLE_HIERARCHY[required_role]
-        user_level = PROJECT_ROLE_HIERARCHY[member.role]
 
-        if user_level < required_level:
+        if not project_role_satisfies(member.role, required_role):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Insufficient permissions. Required: {required_role.value}",
@@ -235,11 +247,7 @@ def check_project_permission(
 
         project, member = row
 
-        # Check Role Hierarchy
-        required_level = PROJECT_ROLE_HIERARCHY[required_role]
-        user_level = PROJECT_ROLE_HIERARCHY[member.role]
-
-        if user_level < required_level:
+        if not project_role_satisfies(member.role, required_role):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Insufficient permissions. Required: {required_role.value}",
@@ -282,18 +290,7 @@ def check_study_permission(
 
         study, member = row
 
-        # Map ProjectRole to StudyRole equivalent for hierarchy check
-        # We use strict mapping or hierarchy
-        # Project Owner/Admin -> Study Owner
-        # Project Researcher -> Study Editor
-        # Project Viewer -> Study Viewer
-
-        effective_study_role = ROLE_MAP.get(member.role, StudyRole.viewer)
-
-        required_level = STUDY_ROLE_HIERARCHY[required_role]
-        user_level = STUDY_ROLE_HIERARCHY[effective_study_role]
-
-        if user_level < required_level:
+        if not study_role_satisfies_via_project(member.role, required_role):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Insufficient permissions. Required: {required_role.value} (via Project Role)",
