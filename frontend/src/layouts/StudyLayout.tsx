@@ -353,7 +353,10 @@ const StudyLayoutContent: React.FC = () => {
     const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
         (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
     );
-    const isEntryPage = ['/welcome', '/consent'].some((path) => location.pathname.endsWith(path));
+    // Entry attribution footer: welcome only. The consent page has a denser
+    // layout (mobile especially) where the footer collides with the consent
+    // controls, so it is omitted there.
+    const showEntryFooter = location.pathname.endsWith('/welcome');
 
     return (
         <div
@@ -904,11 +907,11 @@ const StudyLayoutContent: React.FC = () => {
                     </ComponentErrorBoundary>
                 </div>
 
-                {/* Entry attribution footer — only shown before the task starts.
-                    Lives inside <main> so it scrolls with content rather than being pinned
-                    to the viewport. min-h-full on the wrapper above pushes it below the fold
-                    when content is short. */}
-                {isEntryPage && <Footer />}
+                {/* Entry attribution footer — only on the welcome page (before the task
+                    starts). Lives inside <main> so it scrolls with content rather than being
+                    pinned to the viewport. min-h-full on the wrapper above pushes it below the
+                    fold when content is short. Omitted on /consent (layout collision on mobile). */}
+                {showEntryFooter && <Footer />}
             </main>
 
             {/* Mobile Footer (Primary Action) */}

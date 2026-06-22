@@ -701,7 +701,7 @@ describe('Layout Global Footer', () => {
         ).toBeInTheDocument();
     });
 
-    it('renders the global Footer on /consent', () => {
+    it('does not render the global Footer on /consent', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug/consent" element={<StudyLayout />} />
@@ -709,8 +709,8 @@ describe('Layout Global Footer', () => {
             { initialEntries: ['/study/slug/consent'] }
         );
         expect(
-            screen.getByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
-        ).toBeInTheDocument();
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
     });
 
     it('hides the global Footer on /presort', () => {
