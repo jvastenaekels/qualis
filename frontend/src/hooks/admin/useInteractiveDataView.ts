@@ -232,17 +232,23 @@ export function useInteractiveDataView({
 
     const liveParticipants = useMemo(() => effectiveParticipants, [effectiveParticipants]);
 
-    const liveCount = liveParticipants.length;
-    const newsletterCount = liveParticipants.filter(
-        (p) => p.postsort.newsletter_consent && p.postsort.email
-    ).length;
-    const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
-    const completedCount = liveParticipants.filter(
-        (p) => getDisplayStatus(p) === 'completed'
-    ).length;
-    const inProgressCount = liveParticipants.filter(
-        (p) => getDisplayStatus(p) === 'in_progress'
-    ).length;
+    // Compute the four header counts in one memo (audit H4): each was an O(n)
+    // filter re-run on every keystroke/render though they depend only on the
+    // stable liveParticipants array.
+    const { liveCount, newsletterCount, interviewCount, completedCount, inProgressCount } = useMemo(
+        () => ({
+            liveCount: liveParticipants.length,
+            newsletterCount: liveParticipants.filter(
+                (p) => p.postsort.newsletter_consent && p.postsort.email
+            ).length,
+            interviewCount: liveParticipants.filter((p) => p.postsort.interview_consent).length,
+            completedCount: liveParticipants.filter((p) => getDisplayStatus(p) === 'completed')
+                .length,
+            inProgressCount: liveParticipants.filter((p) => getDisplayStatus(p) === 'in_progress')
+                .length,
+        }),
+        [liveParticipants]
+    );
     const submittedParticipants = useMemo(
         () => liveParticipants.filter((p) => p.status === 'completed'),
         [liveParticipants]

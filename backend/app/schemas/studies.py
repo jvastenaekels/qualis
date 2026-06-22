@@ -260,6 +260,30 @@ class StudyRead(StudyBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class StudyListRead(StudyBase):
+    """Lighter Study read for the list endpoint.
+
+    Omits the heavy ``statements`` and ``recruitment_links`` collections (and
+    their nested translation rows) that the study list never renders. Declaring
+    them on ``StudyRead`` forces SQLAlchemy to materialise them at serialization
+    time — thousands of rows for a 50-study page — even though only the title /
+    language badge / counts are shown (audit H1). ``translations`` is kept (the
+    list shows a per-study language badge).
+    """
+
+    id: int
+    project_id: int
+    project: ProjectBrief | None = None
+    created_at: datetime
+    updated_at: datetime
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    translations: list[StudyTranslationRead] = []
+    requires_password: bool = False
+    participant_count: int = 0
+    model_config = ConfigDict(from_attributes=True)
+
+
 class StudyStatsRead(BaseModel):
     """Schema for study statistics."""
 

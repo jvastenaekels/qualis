@@ -10,7 +10,7 @@ from typing import cast
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import lazyload, selectinload
 
 from app.database import get_db
 from app.dependencies import (
@@ -32,7 +32,7 @@ from app.models import (
     ProjectMember,
     ProjectRole,
 )
-from app.schemas import StudyCreate, StudyRead, StudyUpdate
+from app.schemas import StudyCreate, StudyListRead, StudyRead, StudyUpdate
 from app.schemas.concourses import ConcourseImportToStudy, StaleStatementRead
 from app.schemas.common import PaginatedResponse
 from app.services.concourse_service import StaleStatementEntry
@@ -61,13 +61,13 @@ async def create_study(
     return await StudyService.create_study(db, study, project.id)
 
 
-@router.get("", response_model=PaginatedResponse[StudyRead])
+@router.get("", response_model=PaginatedResponse[StudyListRead])
 async def list_studies(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-) -> PaginatedResponse[StudyRead]:
+) -> PaginatedResponse[StudyListRead]:
     """List studies in the active project with pagination."""
     project, _ = project_ctx
 
@@ -76,8 +76,17 @@ async def list_studies(
     count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar() or 0
 
+    # The list renders only title / language badge / counts, so suppress the
+    # model's default selectin-load of statements + recruitment_links (and their
+    # nested rows) — StudyListRead doesn't declare them, so nothing accesses them
+    # and lazyload never fires a follow-up query (audit H1). translations stays
+    # eager (the language badge needs it).
     query = (
-        base.options(selectinload(Study.project))
+        base.options(
+            selectinload(Study.project),
+            lazyload(Study.statements),
+            lazyload(Study.recruitment_links),
+        )
         .order_by(Study.created_at.desc())
         .limit(pagination.limit)
         .offset(pagination.offset)
@@ -85,9 +94,9 @@ async def list_studies(
     result = await db.execute(query)
     items = list(result.scalars().all())
 
-    # FastAPI serialises Study → StudyRead via response_model; cast aligns mypy.
+    # FastAPI serialises Study → StudyListRead via response_model; cast aligns mypy.
     return cast(
-        PaginatedResponse[StudyRead],
+        PaginatedResponse[StudyListRead],
         PaginatedResponse(
             items=items, total=total, limit=pagination.limit, offset=pagination.offset
         ),
