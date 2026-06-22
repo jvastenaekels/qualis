@@ -219,7 +219,7 @@ pyotp==2.9.0
     # via qualis-backend
 pyparsing==3.3.2
     # via pip-requirements-parser
-pytest==9.0.3
+pytest==9.1.1
     # via
     #   pytest-asyncio
     #   pytest-cov
