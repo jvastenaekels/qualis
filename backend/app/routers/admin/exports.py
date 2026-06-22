@@ -1,5 +1,6 @@
 """API router for study data exports."""
 
+import asyncio
 import io
 import json
 import logging
@@ -330,7 +331,10 @@ async def export_participant_audio(
     zip_buffer = io.BytesIO()
     metadata_entries = []
 
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+    # ZIP_STORED, not DEFLATE: the payload is already-compressed audio
+    # (webm/mp4/mp3), so deflating it burns CPU on the event loop for near-zero
+    # size gain (audit H3).
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_STORED) as zf:
         for recording in recordings:
             ext = _mime_to_extension(recording.mime_type)
             filename = f"{recording.question_key}{ext}"
@@ -453,7 +457,11 @@ async def get_research_package(
 
     analysis_participants = [p for p in full_study.participants if not p.is_discarded]
 
-    zip_content = ExportService.generate_research_package(
+    # Off the event loop: building the package serialises the full study graph
+    # to CSV/JSON and DEFLATE-zips it — CPU-bound work that would otherwise stall
+    # concurrent requests for its duration (audit H3).
+    zip_content = await asyncio.to_thread(
+        ExportService.generate_research_package,
         full_study,
         analysis_participants,
         full_dump=full_dump,

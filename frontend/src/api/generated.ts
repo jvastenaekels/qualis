@@ -136,7 +136,7 @@ import type {
     PaginatedResponseParticipantRead,
     PaginatedResponseProjectMemberRead,
     PaginatedResponseProjectWithRole,
-    PaginatedResponseStudyRead,
+    PaginatedResponseStudyListRead,
     PaginatedResponseUserReadAdmin,
     ParticipantAudioRecording,
     ParticipantCardComment,
@@ -1807,7 +1807,7 @@ export const listStudiesApiAdminStudiesGet = (
     params?: ListStudiesApiAdminStudiesGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<PaginatedResponseStudyRead>({
+    return customInstance<PaginatedResponseStudyListRead>({
         url: `/api/admin/studies`,
         method: 'GET',
         params,
@@ -15723,8 +15723,8 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
 });
 
 export const getListStudiesApiAdminStudiesGetResponseMock = (
-    overrideResponse: Partial<PaginatedResponseStudyRead> = {}
-): PaginatedResponseStudyRead => ({
+    overrideResponse: Partial<PaginatedResponseStudyListRead> = {}
+): PaginatedResponseStudyListRead => ({
     items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({
             slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
@@ -15937,87 +15937,6 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                         ]),
                         id: faker.number.int({ min: undefined, max: undefined }),
                         study_id: faker.number.int({ min: undefined, max: undefined }),
-                    })
-                ),
-                undefined,
-            ]),
-            statements: faker.helpers.arrayElement([
-                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                    () => ({
-                        code: faker.string.alpha({ length: { min: 10, max: 50 } }),
-                        id: faker.number.int({ min: undefined, max: undefined }),
-                        display_order: faker.helpers.arrayElement([
-                            faker.number.int({ min: undefined, max: undefined }),
-                            undefined,
-                        ]),
-                        translations: faker.helpers.arrayElement([
-                            Array.from(
-                                { length: faker.number.int({ min: 1, max: 10 }) },
-                                (_, i) => i + 1
-                            ).map(() => ({
-                                language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                                text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
-                                id: faker.number.int({ min: undefined, max: undefined }),
-                                statement_id: faker.number.int({ min: undefined, max: undefined }),
-                            })),
-                            undefined,
-                        ]),
-                        source_concourse_item_id: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                            undefined,
-                        ]),
-                        source_imported_at: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                `${faker.date.past().toISOString().split('.')[0]}Z`,
-                                null,
-                            ]),
-                            undefined,
-                        ]),
-                    })
-                ),
-                undefined,
-            ]),
-            recruitment_links: faker.helpers.arrayElement([
-                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-                    () => ({
-                        name: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                null,
-                            ]),
-                            undefined,
-                        ]),
-                        type: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
-                            undefined,
-                        ]),
-                        capacity: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                faker.number.int({ min: undefined, max: undefined }),
-                                null,
-                            ]),
-                            undefined,
-                        ]),
-                        id: faker.number.int({ min: undefined, max: undefined }),
-                        study_id: faker.number.int({ min: undefined, max: undefined }),
-                        token: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        usage_count: faker.number.int({ min: undefined, max: undefined }),
-                        start_count: faker.number.int({ min: undefined, max: undefined }),
-                        expires_at: faker.helpers.arrayElement([
-                            faker.helpers.arrayElement([
-                                `${faker.date.past().toISOString().split('.')[0]}Z`,
-                                null,
-                            ]),
-                            undefined,
-                        ]),
-                        is_active: faker.helpers.arrayElement([
-                            faker.datatype.boolean(),
-                            undefined,
-                        ]),
-                        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
                     })
                 ),
                 undefined,
@@ -20441,10 +20360,10 @@ export const getCreateStudyApiAdminStudiesPostMockHandler = (
 
 export const getListStudiesApiAdminStudiesGetMockHandler = (
     overrideResponse?:
-        | PaginatedResponseStudyRead
+        | PaginatedResponseStudyListRead
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<PaginatedResponseStudyRead> | PaginatedResponseStudyRead),
+          ) => Promise<PaginatedResponseStudyListRead> | PaginatedResponseStudyListRead),
     options?: RequestHandlerOptions
 ) => {
     return http.get(

@@ -163,7 +163,14 @@ class TestStudyAdmin:
         }
         response = await client.get("/api/admin/studies", headers=headers)
         assert response.status_code == 200
-        assert any(s["slug"] == seed_study.slug for s in response.json()["items"])
+        items = response.json()["items"]
+        item = next(s for s in items if s["slug"] == seed_study.slug)
+        # Audit H1: the list uses the lighter StudyListRead — it keeps the
+        # language badge's translations but omits the heavy statements /
+        # recruitment_links collections it never renders (and never materialises).
+        assert "translations" in item
+        assert "statements" not in item
+        assert "recruitment_links" not in item
 
     async def test_update_study(
         self,
@@ -241,4 +248,3 @@ class TestStudyLifecycle:
         )
         assert response.status_code == 200
         assert response.json()["state"] == "paused"
-

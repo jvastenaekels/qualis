@@ -806,7 +806,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse_StudyRead_"
+                  "$ref": "#/components/schemas/PaginatedResponse_StudyListRead_"
                 }
               }
             }
@@ -9577,11 +9577,11 @@
         ],
         "title": "PaginatedResponse[ProjectWithRole]"
       },
-      "PaginatedResponse_StudyRead_": {
+      "PaginatedResponse_StudyListRead_": {
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/StudyRead"
+              "$ref": "#/components/schemas/StudyListRead"
             },
             "type": "array",
             "title": "Items"
@@ -9606,7 +9606,7 @@
           "limit",
           "offset"
         ],
-        "title": "PaginatedResponse[StudyRead]"
+        "title": "PaginatedResponse[StudyListRead]"
       },
       "PaginatedResponse_UserReadAdmin_": {
         "properties": {
@@ -11578,6 +11578,181 @@
           "message"
         ],
         "title": "StudyImportResponse"
+      },
+      "StudyListRead": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StudyState",
+            "default": "draft"
+          },
+          "grid_config": {
+            "items": {
+              "$ref": "#/components/schemas/GridColumn"
+            },
+            "type": "array",
+            "title": "Grid Config"
+          },
+          "presort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Presort Config"
+          },
+          "postsort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Postsort Config"
+          },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "default_language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Language"
+          },
+          "show_statement_codes": {
+            "type": "boolean",
+            "title": "Show Statement Codes",
+            "default": false
+          },
+          "randomize_statement_order": {
+            "type": "boolean",
+            "title": "Randomize Statement Order",
+            "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
+          "rough_sort_enabled": {
+            "type": "boolean",
+            "title": "Rough Sort Enabled",
+            "description": "Enable the rough-sort step (3-pile triage). When False, participants go directly from pre-sort to fine-sort.",
+            "default": true
+          },
+          "distribution_mode": {
+            "$ref": "#/components/schemas/DistributionMode",
+            "default": "forced"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "data_retention_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 240.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Retention Months"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "integer",
+            "title": "Project Id"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StudyTranslationRead"
+            },
+            "type": "array",
+            "title": "Translations",
+            "default": []
+          },
+          "requires_password": {
+            "type": "boolean",
+            "title": "Requires Password",
+            "default": false
+          },
+          "participant_count": {
+            "type": "integer",
+            "title": "Participant Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "grid_config",
+          "presort_config",
+          "postsort_config",
+          "id",
+          "project_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "StudyListRead",
+        "description": "Lighter Study read for the list endpoint.\n\nOmits the heavy ``statements`` and ``recruitment_links`` collections (and\ntheir nested translation rows) that the study list never renders. Declaring\nthem on ``StudyRead`` forces SQLAlchemy to materialise them at serialization\ntime \u2014 thousands of rows for a 50-study page \u2014 even though only the title /\nlanguage badge / counts are shown (audit H1). ``translations`` is kept (the\nlist shows a per-study language badge)."
       },
       "StudyRead": {
         "properties": {
