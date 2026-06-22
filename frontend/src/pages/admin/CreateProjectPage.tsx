@@ -23,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
-import ApiClient from '@/api/client';
+import { createProjectApiAdminProjectsPost } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { ProjectWithRole } from '@/api/model/projectWithRole';
 
@@ -68,9 +68,7 @@ export default function CreateProjectPage() {
     const onSubmit = async (data: z.infer<typeof schema>) => {
         setIsSubmitting(true);
         try {
-            // Manual API call with updated shim
-            const response = await ApiClient.post('/admin/projects', data);
-            const newProject = response.data as ProjectWithRole;
+            const newProject = (await createProjectApiAdminProjectsPost(data)) as ProjectWithRole;
 
             // Allow immediate access by adding to store
             // Note: backend response might not include user_role because we just created it.

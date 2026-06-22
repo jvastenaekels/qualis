@@ -197,7 +197,6 @@ SchemaValidationError
 
 # --- app/services/ ---
 _.start_count
-delete_link
 get_storage_service
 get_study_sort_data
 

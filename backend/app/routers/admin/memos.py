@@ -18,9 +18,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.dependencies import (
-    PROJECT_ROLE_HIERARCHY,
     get_current_user,
     get_db,
+    project_role_satisfies,
 )
 from app.limiter import limiter
 from app.models import (
@@ -97,7 +97,7 @@ async def _check_member(
     ).scalar_one_or_none()
     if row is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project access denied")
-    if PROJECT_ROLE_HIERARCHY[row.role] < PROJECT_ROLE_HIERARCHY[required]:
+    if not project_role_satisfies(row.role, required):
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             detail=f"Insufficient permissions. Required: {required.value}",

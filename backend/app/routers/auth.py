@@ -15,6 +15,8 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.utils.security import (
+    EmailTokenPayload,
+    EmailTokenPurpose,
     create_access_token,
     create_email_token,
     decode_email_token,
@@ -63,6 +65,21 @@ logger = logging.getLogger(__name__)
 # row carries it). Generated once with ``bcrypt.hashpw(b"do-not-use-
 # this-password-it-is-a-decoy", bcrypt.gensalt())``.
 _LOGIN_DECOY_HASH = "$2b$12$OVGfAcV/ZbLQp6LJiJlMaOR324VnwW6bO.HTcA6VVP4ryk1FnXvYS"
+
+
+def _decode_email_token_or_400(
+    token: str, purpose: EmailTokenPurpose
+) -> EmailTokenPayload:
+    """Decode an auth-email JWT, raising HTTPException(400) on any failure.
+
+    Consolidates the identical decode/except block shared by the five
+    email-token consume endpoints (audit J3). Behaviour is unchanged: a
+    ValueError from decode_email_token surfaces as 400 with its message.
+    """
+    try:
+        return decode_email_token(token, expected_purpose=purpose)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/me", response_model=UserRead)
@@ -580,10 +597,7 @@ async def verify_email(
     Idempotent: re-verifying an already-verified account returns 200 silently.
     Anti-enum: a valid JWT whose email matches no user also returns 200.
     """
-    try:
-        claims = decode_email_token(payload.token, expected_purpose="email_verify")
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    claims = _decode_email_token_or_400(payload.token, "email_verify")
 
     result = await db.execute(select(User).where(User.email == claims["sub"]))
     user = result.scalar_one_or_none()
@@ -693,10 +707,7 @@ async def password_reset_confirm(
     itself is the secret, and an attacker cannot guess valid ones, so a
     specific status here does not enable enumeration.
     """
-    try:
-        claims = decode_email_token(payload.token, expected_purpose="password_reset")
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    claims = _decode_email_token_or_400(payload.token, "password_reset")
 
     result = await db.execute(select(User).where(User.email == claims["sub"]))
     user = result.scalar_one_or_none()
@@ -748,12 +759,7 @@ async def email_change_confirm(
     change is not a credential rotation, so existing access tokens
     remain valid.
     """
-    try:
-        claims = decode_email_token(
-            payload.token, expected_purpose="email_change_confirm"
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    claims = _decode_email_token_or_400(payload.token, "email_change_confirm")
 
     result = await db.execute(select(User).where(User.email == claims["sub"]))
     user = result.scalar_one_or_none()
@@ -803,12 +809,7 @@ async def email_change_cancel(
     change still returns 200 — the desired end-state (no pending
     request) is already reached.
     """
-    try:
-        claims = decode_email_token(
-            payload.token, expected_purpose="email_change_cancel"
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    claims = _decode_email_token_or_400(payload.token, "email_change_cancel")
 
     result = await db.execute(select(User).where(User.email == claims["sub"]))
     user = result.scalar_one_or_none()
@@ -888,10 +889,7 @@ async def twofa_disable_confirm(
     somehow obtained a token cannot probe for valid email addresses by
     replaying it; whether or not the user exists, the token is burned.
     """
-    try:
-        claims = decode_email_token(payload.token, expected_purpose="twofa_disable")
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    claims = _decode_email_token_or_400(payload.token, "twofa_disable")
 
     jti = claims["jti"]
 
