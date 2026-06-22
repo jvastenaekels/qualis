@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.7.4](https://github.com/jvastenaekels/qualis/compare/v0.7.3...v0.7.4) (2026-06-22)
+
+
+### Bug fixes
+
+* audit Wave E — lifecycle & cross-entity integrity (5 findings) ([#247](https://github.com/jvastenaekels/qualis/issues/247)) ([c2d7f1c](https://github.com/jvastenaekels/qualis/commit/c2d7f1cafdb6cbea7ddc207f27436d157dc7bd34))
+* audit Wave F — export hardening (3 findings) ([#249](https://github.com/jvastenaekels/qualis/issues/249)) ([7a93c76](https://github.com/jvastenaekels/qualis/commit/7a93c764faf57d71ba37fc9a1551e83c7e4c3b40))
+* audit Wave G — analysis audit-trail & degeneracy warnings (G3, G4) ([#250](https://github.com/jvastenaekels/qualis/issues/250)) ([b53a1c7](https://github.com/jvastenaekels/qualis/commit/b53a1c7f130ad3ea7d4990eb4ad5cf00e1fefc8e))
+* audit Wave H — list_studies eager-load + export perf (H1, H3, H4a) ([#258](https://github.com/jvastenaekels/qualis/issues/258)) ([add9d44](https://github.com/jvastenaekels/qualis/commit/add9d442d9f7b81741f68e4ae11a57f2457a8f3a))
+* **deps:** resync requirements.txt with uv.lock (unbreak Scalingo build) ([336e66d](https://github.com/jvastenaekels/qualis/commit/336e66d67b04157b0220f30d9838d733faf40c3a))
+* **study:** drop Qualis footer on the consent page ([d092a16](https://github.com/jvastenaekels/qualis/commit/d092a16a4af7beaf484ae1f3dae784e760c3aa10))
+
+
+### Refactor
+
+* audit Wave J — maintainability dedup (J1–J4) ([#260](https://github.com/jvastenaekels/qualis/issues/260)) ([8a7f4c2](https://github.com/jvastenaekels/qualis/commit/8a7f4c2b6376b9159935c4ecc9b132edc4b17056))
+
+
+### Documentation
+
+* refine contributor acknowledgments wording ([c6f0069](https://github.com/jvastenaekels/qualis/commit/c6f0069980cf48c10a854fcb67dc70931c45a561))
+
 ## [0.7.3](https://github.com/jvastenaekels/qualis/compare/v0.7.2...v0.7.3) (2026-06-20)
 
 
