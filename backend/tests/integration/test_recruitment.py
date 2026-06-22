@@ -1,10 +1,13 @@
 """Consolidated integration tests for recruitment links and collaborator invitations."""
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import User
+from app.models import RecruitmentLink, User
 
 
 @pytest.mark.asyncio
@@ -158,6 +161,93 @@ class TestRecruitment:
         links = response.json()
         assert len(links) == 1
         assert links[0]["capacity"] == 20
+
+    async def test_revoked_link_is_rejected(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """A deactivated (is_active=False) link must be denied at the study handler.
+
+        Regression net for the ``not link.is_active`` branch in
+        validate_link_token (audit I) — previously only the cross-study and
+        capacity branches had coverage.
+        """
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public"},
+            headers=headers,
+        )
+        token = response.json()[0]["token"]
+
+        # Control: the active link is accepted.
+        ok = await client.get(f"/api/study/{study.slug}?link_token={token}")
+        assert ok.status_code == 200
+
+        # Revoke the link server-side (is_active is not settable via the API).
+        result = await db.execute(
+            select(RecruitmentLink).where(RecruitmentLink.token == token)
+        )
+        link = result.scalar_one()
+        link.is_active = False
+        await db.commit()
+
+        denied = await client.get(f"/api/study/{study.slug}?link_token={token}")
+        assert denied.status_code == 403
+        assert "recruitment link" in denied.text.lower()
+
+    async def test_expired_link_is_rejected(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_user: User,
+        auth_token_factory,
+        study_factory,
+        project_factory,
+        project_member_factory,
+    ):
+        """A link whose expires_at is in the past must be denied at the handler.
+
+        Regression net for the ``expires_at < now`` branch in
+        validate_link_token (audit I).
+        """
+        ws = await project_factory(owner=test_user)
+        study = await study_factory(project=ws, owner=test_user)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/recruitment/{study.slug}/links?count=1",
+            json={"type": "public"},
+            headers=headers,
+        )
+        token = response.json()[0]["token"]
+
+        # Backdate expiry server-side (expires_at is not settable via the API).
+        result = await db.execute(
+            select(RecruitmentLink).where(RecruitmentLink.token == token)
+        )
+        link = result.scalar_one()
+        link.expires_at = datetime.now(timezone.utc) - timedelta(days=1)
+        await db.commit()
+
+        denied = await client.get(f"/api/study/{study.slug}?link_token={token}")
+        assert denied.status_code == 403
+        assert "recruitment link" in denied.text.lower()
+
+        # Control: a future expiry is still accepted.
+        link.expires_at = datetime.now(timezone.utc) + timedelta(days=1)
+        await db.commit()
+        ok = await client.get(f"/api/study/{study.slug}?link_token={token}")
+        assert ok.status_code == 200
 
     async def test_create_excludes_server_controlled_fields(
         self,
