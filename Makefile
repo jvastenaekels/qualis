@@ -51,6 +51,13 @@ check-api: generate-api
 	@echo "Checking if API client is up to date..."
 	git diff --exit-code frontend/src/api/generated.ts frontend/openapi.json
 
+check-requirements:
+	@echo "Checking uv.lock is in sync with pyproject.toml..."
+	cd backend && uv lock --check
+	@echo "Checking requirements.txt matches uv.lock..."
+	cd backend && uv export --no-hashes --format requirements-txt --output-file requirements.txt
+	git diff --exit-code backend/requirements.txt
+
 # -------------------------
 # Quality & Verification
 # -------------------------
@@ -77,6 +84,7 @@ check:
 	cd backend && uv run python -m app.schema_validation
 	python3 backend/scripts/check_relationships.py
 	python3 scripts/check_installation_docs.py
+	$(MAKE) check-requirements
 	$(MAKE) check-api
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check

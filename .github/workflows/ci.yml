@@ -66,6 +66,17 @@ jobs:
         run: cd backend && uv run deptry app
       - name: Dead Code (Vulture)
         run: cd backend && uv run vulture app vulture_whitelist.py --min-confidence 60
+      - name: Dependency Sync (requirements.txt ↔ uv.lock)
+        # backend/requirements.txt is a generated `uv export` of uv.lock that the
+        # Scalingo buildpack installs with pip. Dependabot edits it directly; a lone
+        # transitive bump can desync the pin set (e.g. pydantic-core vs pydantic),
+        # breaking the buildpack install while CI stays green. Assert the lock matches
+        # pyproject and the export matches the lock.
+        run: |
+          cd backend
+          uv lock --check
+          uv export --no-hashes --format requirements-txt --output-file requirements.txt
+          git diff --exit-code requirements.txt
 
   backend-tests:
     name: Backend Tests
