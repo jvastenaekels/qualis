@@ -44,8 +44,7 @@ authors:
 #   J. Vastenaekels — software design, implementation, documentation, maintenance,
 #                     methodological design, testing, conceptual feedback
 #   C. Dedinger     — methodological design, testing, conceptual feedback
-#                     (no direct code contribution)
-# This distinction is documented in the README ## Acknowledgments section.
+# The contribution distribution is documented in the README ## Acknowledgments section.
 keywords:
   - "Q methodology"
   - "factor analysis"
