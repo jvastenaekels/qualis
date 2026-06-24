@@ -281,7 +281,7 @@ six==1.17.0
     # via
     #   mando
     #   python-dateutil
-slowapi==0.1.9
+slowapi==0.1.10
     # via qualis-backend
 sortedcontainers==2.4.0
     # via
