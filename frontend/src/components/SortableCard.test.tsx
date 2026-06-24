@@ -188,4 +188,54 @@ describe('SortableCard', () => {
         const textContainer = screen.getByTestId('card-123').querySelector('.line-clamp-4');
         expect(textContainer).toBeTruthy();
     });
+
+    // --------------------------------------------------------------------
+    // ResizeObserver guard regression test (W4b retro-fix)
+    //
+    // The dynamic line-clamp useLayoutEffect attaches a ResizeObserver
+    // ONLY when `dimensions` is undefined ("only CSS-sized cards need an
+    // observer; Grid cards recompute via dimensions?.height dependency
+    // instead"). The conditional `if (dimensions) return;` is load-bearing
+    // for both correctness (RO fires synchronously on attach + re-render
+    // loop risk) and perf (38+ grid cards each attaching their own RO).
+    //
+    // Without these tests, a future `useDynamicLineClamp` hook extract
+    // could silently drop the guard and pass CI.
+    // --------------------------------------------------------------------
+    describe('ResizeObserver guard (W4b invariant)', () => {
+        let instanceCount = 0;
+
+        class CountingResizeObserver {
+            observe = vi.fn();
+            unobserve = vi.fn();
+            disconnect = vi.fn();
+            constructor() {
+                instanceCount++;
+            }
+        }
+
+        beforeEach(() => {
+            instanceCount = 0;
+            vi.stubGlobal('ResizeObserver', CountingResizeObserver);
+        });
+
+        afterEach(() => {
+            vi.unstubAllGlobals();
+        });
+
+        it('does NOT instantiate ResizeObserver when dimensions are provided', () => {
+            render(<SortableCard {...defaultProps} dimensions={{ width: 100, height: 150 }} />);
+            expect(instanceCount).toBe(0);
+        });
+
+        it('DOES instantiate ResizeObserver when dimensions are NOT provided (CSS-sized card)', () => {
+            render(<SortableCard {...defaultProps} />);
+            expect(instanceCount).toBe(1);
+        });
+
+        it('does NOT instantiate ResizeObserver when allowScroll is true (early return)', () => {
+            render(<SortableCard {...defaultProps} allowScroll={true} />);
+            expect(instanceCount).toBe(0);
+        });
+    });
 });
