@@ -689,7 +689,7 @@ describe('Layout Global Footer', () => {
         });
     });
 
-    it('renders the global Footer on /welcome', () => {
+    it('does not render the global Footer on /welcome', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug/welcome" element={<StudyLayout />} />
@@ -697,8 +697,8 @@ describe('Layout Global Footer', () => {
             { initialEntries: ['/study/slug/welcome'] }
         );
         expect(
-            screen.getByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
-        ).toBeInTheDocument();
+            screen.queryByRole('link', { name: /Powered by Qualis|footer.powered_by/i })
+        ).not.toBeInTheDocument();
     });
 
     it('does not render the global Footer on /consent', () => {

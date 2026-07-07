@@ -48,7 +48,6 @@ import { useStudyLocaleSync } from '../hooks/study/useStudyLocaleSync';
 import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
 import type { StudyStatusType } from '../pages/StudyStatusPage';
-import { Footer } from '@/components/Footer';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -348,15 +347,10 @@ const StudyLayoutContent: React.FC = () => {
 
     // The two immersive Q-sort screens need <main> locked to the viewport so
     // GridSort's h-full children resolve. Everywhere else, let main scroll
-    // naturally so the entry footer scrolls with content instead of being
-    // pinned to the bottom of the viewport.
+    // naturally with content.
     const isImmersiveSort = ['/rough-sort', '/fine-sort'].some(
         (path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')
     );
-    // Entry attribution footer: welcome only. The consent page has a denser
-    // layout (mobile especially) where the footer collides with the consent
-    // controls, so it is omitted there.
-    const showEntryFooter = location.pathname.endsWith('/welcome');
 
     return (
         <div
@@ -906,12 +900,6 @@ const StudyLayoutContent: React.FC = () => {
                         </Suspense>
                     </ComponentErrorBoundary>
                 </div>
-
-                {/* Entry attribution footer — only on the welcome page (before the task
-                    starts). Lives inside <main> so it scrolls with content rather than being
-                    pinned to the viewport. min-h-full on the wrapper above pushes it below the
-                    fold when content is short. Omitted on /consent (layout collision on mobile). */}
-                {showEntryFooter && <Footer />}
             </main>
 
             {/* Mobile Footer (Primary Action) */}
