@@ -876,7 +876,7 @@ const StudyLayoutContent: React.FC = () => {
             <main
                 id="main-scroll-container"
                 ref={mainRef}
-                className={`flex-1 w-full mx-auto relative isolate flex flex-col bg-slate-50 custom-scrollbar ${isImmersiveSort ? 'overflow-hidden' : 'overflow-y-auto'}`}
+                className={`flex-1 min-h-0 w-full mx-auto relative isolate flex flex-col bg-slate-50 custom-scrollbar ${isImmersiveSort ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
                 {/* Transition Overlay / Dimming */}
                 <div

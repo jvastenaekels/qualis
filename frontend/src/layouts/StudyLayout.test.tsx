@@ -219,6 +219,7 @@ describe('Layout Scroll Behavior', () => {
             { initialEntries: ['/study/slug/welcome'] }
         );
         const main = container.querySelector('main');
+        expect(main).toHaveClass('min-h-0');
         expect(main).toHaveClass('overflow-y-auto');
         expect(main).not.toHaveClass('overflow-hidden');
     });
