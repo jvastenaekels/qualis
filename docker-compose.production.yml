@@ -1,0 +1,61 @@
+name: qualis-production
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: qualis
+      POSTGRES_USER: qualis
+      POSTGRES_PASSWORD: ${QUALIS_DB_PASSWORD:?Set QUALIS_DB_PASSWORD in .env.production}
+    volumes:
+      - qualis-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qualis -d qualis"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://qualis:${QUALIS_DB_PASSWORD:?Set QUALIS_DB_PASSWORD in .env.production}@db:5432/qualis
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env.production}
+      IP_HASH_SALT: ${IP_HASH_SALT:?Set IP_HASH_SALT in .env.production}
+      FRONTEND_URL: ${FRONTEND_URL:?Set FRONTEND_URL in .env.production}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set ALLOWED_ORIGINS in .env.production}
+      ENVIRONMENT: production
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in .env.production}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env.production}
+      # The backend is reachable only through the frontend nginx service on this
+      # private Compose network, so its forwarded client headers are trusted.
+      TRUSTED_PROXIES: "*"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          ".venv/bin/python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()\"",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      QUALIS_ALLOWED_HOST_PATTERN: ${QUALIS_ALLOWED_HOST_PATTERN:?Set QUALIS_ALLOWED_HOST_PATTERN in .env.production}
+    ports:
+      # Bind locally; terminate public TLS with Caddy, Traefik, or nginx.
+      - "127.0.0.1:${QUALIS_HTTP_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  qualis-pgdata:

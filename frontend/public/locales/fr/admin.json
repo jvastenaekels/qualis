@@ -885,7 +885,7 @@
             "step_configure": "Configurer le parcours participant",
             "step_configure_desc": "Rédigez les consignes, le presort et les questions postsort.",
             "step_launch": "Lancer le recrutement",
-            "step_launch_desc": "Générez des liens de participation et partagez-les.",
+            "step_launch_desc": "Testez et activez l'étude, puis générez les liens de participation.",
             "go_to_concourse": "Ouvrir le concours",
             "go_to_qset": "Ouvrir le Q-set",
             "concourse": "Concours",

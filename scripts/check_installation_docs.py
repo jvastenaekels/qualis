@@ -47,8 +47,13 @@ def check_readme_demo_path() -> list[str]:
         "bioeconomy-futures",
         "admin@example.com",
         "admin123",
+        "Docker with the `docker compose` plugin",
+        "GNU Make",
+        "Your First Study",
     ]
-    return [f"README.md is missing {token!r}" for token in required if token not in readme]
+    return [
+        f"README.md is missing {token!r}" for token in required if token not in readme
+    ]
 
 
 def check_local_seed_order() -> list[str]:
@@ -61,17 +66,107 @@ def check_local_seed_order() -> list[str]:
     if seed_index == -1:
         return ["README.md is missing the example seed command"]
     if seed_index < backend_index:
-        return ["README.md documents seed.py before backend startup; seed.py requires the API"]
+        return [
+            "README.md documents seed.py before backend startup; seed.py requires the API"
+        ]
     return []
+
+
+def check_local_database_setup() -> list[str]:
+    errors: list[str] = []
+    for path in ("README.md", "docs/contributing/development.md"):
+        source = _read(path)
+        if "CREATE DATABASE qualis_dev OWNER qualis_user" not in source:
+            errors.append(f"{path} does not make qualis_user the database owner")
+        if "GRANT ALL PRIVILEGES ON DATABASE qualis_dev" in source:
+            errors.append(
+                f"{path} still documents the PostgreSQL 15-incomplete GRANT recipe"
+            )
+        if "SECRET_KEY=$(" in source or "IP_HASH_SALT=$(" in source:
+            errors.append(
+                f"{path} puts a non-executable shell expression in dotenv syntax"
+            )
+    return errors
+
+
+def check_production_bootstrap_docs() -> list[str]:
+    deployment = _read("docs/guides/deployment.md")
+    production_compose = _read("docker-compose.production.yml")
+    production_env = _read(".env.production.example")
+    errors: list[str] = []
+
+    if "DATABASE_URL=$SCALINGO_POSTGRESQL_URL" in deployment:
+        errors.append(
+            "Scalingo instructions still overwrite its managed DATABASE_URL alias"
+        )
+    for token in (
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+        "docker-compose.production.yml",
+        "The root `docker-compose.yml` is deliberately a **local demo**",
+    ):
+        if token not in deployment:
+            errors.append(f"docs/guides/deployment.md is missing {token!r}")
+
+    for token in (
+        "ENVIRONMENT: production",
+        "${SECRET_KEY:?",
+        "${ADMIN_PASSWORD:?",
+        "127.0.0.1:${QUALIS_HTTP_PORT:-3000}:80",
+    ):
+        if token not in production_compose:
+            errors.append(f"docker-compose.production.yml is missing {token!r}")
+    for unsafe in ("admin123", "docker-dev-secret", "qualis-demo-secret"):
+        if unsafe in production_compose:
+            errors.append(
+                f"docker-compose.production.yml contains demo value {unsafe!r}"
+            )
+
+    for key in (
+        "QUALIS_DB_PASSWORD",
+        "SECRET_KEY",
+        "IP_HASH_SALT",
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+    ):
+        if f"{key}=\n" not in production_env:
+            errors.append(f".env.production.example must leave {key} empty")
+    return errors
+
+
+def check_tutorial_ui_labels() -> list[str]:
+    tutorial = _read("docs/tutorials/your-first-study.md")
+    errors: list[str] = []
+    required = [
+        "**New project**",
+        "**Create study**",
+        "**Test run**",
+        "**Methodology memo**",
+        "final **Interface** tab",
+    ]
+    errors.extend(
+        f"docs/tutorials/your-first-study.md is missing {token!r}"
+        for token in required
+        if token not in tutorial
+    )
+    if "**Key:** `overall_thoughts`" in tutorial:
+        errors.append("tutorial asks users to edit a field key that the UI generates")
+    if "**Preview** button" in tutorial:
+        errors.append("tutorial still names the Test run button Preview")
+    return errors
 
 
 def check_no_raw_database_url_logging() -> list[str]:
     source = _read("backend/app/main.py")
     errors: list[str] = []
     if "settings.DATABASE_URL" in source:
-        errors.append("backend/app/main.py still references settings.DATABASE_URL directly")
+        errors.append(
+            "backend/app/main.py still references settings.DATABASE_URL directly"
+        )
     if "DATABASE_URL is" in source:
-        errors.append("backend/app/main.py still contains the raw DATABASE_URL log message")
+        errors.append(
+            "backend/app/main.py still contains the raw DATABASE_URL log message"
+        )
     return errors
 
 
@@ -80,6 +175,9 @@ def main() -> int:
         *check_frontend_lock_version(),
         *check_readme_demo_path(),
         *check_local_seed_order(),
+        *check_local_database_setup(),
+        *check_production_bootstrap_docs(),
+        *check_tutorial_ui_labels(),
         *check_no_raw_database_url_logging(),
     ]
     if errors:

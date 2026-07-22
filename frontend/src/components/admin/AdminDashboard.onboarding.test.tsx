@@ -27,8 +27,8 @@ function ConcoursePage() {
     return <div data-testid="concourse-list">concourses</div>;
 }
 
-describe('AdminDashboard onboarding step 3', () => {
-    it('navigates to the concourse list when the Q-set button is clicked', async () => {
+describe('AdminDashboard onboarding', () => {
+    it('navigates to the concourse list from the statement-collection step', async () => {
         renderWithProviders(
             <Routes>
                 <Route path="/app/:projectSlug/dashboard" element={<AdminDashboard />} />
@@ -37,7 +37,7 @@ describe('AdminDashboard onboarding step 3', () => {
             { initialEntries: ['/app/demo/dashboard'] }
         );
 
-        const button = await screen.findByRole('button', { name: /open q-set/i });
+        const button = await screen.findByRole('button', { name: /open concourse/i });
         await userEvent.click(button);
         expect(await screen.findByTestId('concourse-list')).toBeInTheDocument();
     });

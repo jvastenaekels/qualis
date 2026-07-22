@@ -140,9 +140,11 @@ This is the recommended path for evaluation and first-time use. It starts Postgr
 
 > The first `make demo-up` **builds the backend and frontend images from source** (no pre-built image is pulled), so the initial run compiles the stack and may take a few minutes; subsequent runs reuse the cached layers. Qualis is self-hosted by design — there is no third-party-hosted instance, which is the point: participant data stays on infrastructure you control.
 
-Prerequisite:
+Prerequisites:
 
+- Git
 - Docker with the `docker compose` plugin
+- GNU Make and `curl` (included by default on most Linux/macOS systems; use WSL on Windows)
 
 ```bash
 git clone https://github.com/jvastenaekels/qualis.git
@@ -162,6 +164,15 @@ Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
 `make demo-seed` loads the **Bioeconomy Futures** example end to end: the study design, a curated concourse (accepted / rejected / proposed candidate statements, with edit history and discussion comments), and 18 synthetic Q-sorts with pre-sort and post-sort answers — including a few spoken audio comments — that you can analyse straight away. After seeding, the example participant flow is available at [http://localhost:3000/study/bioeconomy-futures](http://localhost:3000/study/bioeconomy-futures).
 
+For a useful first tour after login:
+
+1. Open **Bioeconomy Futures**, then **Analysis**, to inspect results that are
+   already populated.
+2. Open the participant link above in a private window to experience the study
+   from the respondent side.
+3. Follow [Your First Study](docs/tutorials/your-first-study.md) to build and
+   activate a small study of your own.
+
 The Docker stack includes a MinIO object store for the audio comments (console at [http://localhost:9001](http://localhost:9001), login `qualis` / `qualis-demo-secret`).
 
 Stop the stack with:
@@ -176,6 +187,8 @@ Use this path when you want hot reload, local tests, or direct backend/frontend 
 
 #### Prerequisites
 
+- Git and GNU Make
+- Python 3.13+
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - [Node.js](https://nodejs.org/) v24+
 - PostgreSQL 15+ (running locally or reachable by URL)
@@ -187,28 +200,36 @@ Use this path when you want hot reload, local tests, or direct backend/frontend 
 git clone https://github.com/jvastenaekels/qualis.git
 cd qualis
 
-# 2. Configure environment
+# 2. Create the local database and make the application role its owner
+psql -U postgres
+# In psql:
+CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
+CREATE DATABASE qualis_dev OWNER qualis_user;
+\q
+
+# 3. Configure environment
 cp .env.example .env
 # Edit .env to set:
-#   - DATABASE_URL  (your local Postgres connection string)
+#   - DATABASE_URL=postgresql+asyncpg://qualis_user:qualis_pass@localhost:5432/qualis_dev
 #   - SECRET_KEY    (generate: python3 -c 'import secrets; print(secrets.token_urlsafe(48))')
 #   - IP_HASH_SALT  (same generation as SECRET_KEY)
+#   - ADMIN_EMAIL and ADMIN_PASSWORD (your first local admin account)
 #   - ENVIRONMENT=development  (enables tutorial / E2E test routes)
 
-# 3. Install dependencies (Python via uv, Node via npm lockfile)
+# 4. Install dependencies (Python via uv, Node via npm lockfile)
 make install
 
-# 4. Create the database schema
+# 5. Apply database migrations
 make migrate
 
-# 5. Initialize the database (creates an admin user from ADMIN_EMAIL/PASSWORD)
+# 6. Initialize the database (creates an admin user from ADMIN_EMAIL/PASSWORD)
 cd backend && uv run python init_db.py && cd ..
 
-# 6. Run the app (two terminals)
+# 7. Run the app (two terminals)
 make run-backend     # Terminal 1: FastAPI on :8000
 make run-frontend    # Terminal 2: Vite dev server on :5173
 
-# 7. Optional: seed an example study after the backend is running
+# 8. Optional: seed an example study after the backend is running
 cd backend && uv run python seed.py data/example-study.json && cd ..
 ```
 

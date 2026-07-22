@@ -17,6 +17,56 @@ from app.database import SessionLocal, engine
 from app.models import User
 
 
+DEMO_ADMIN_EMAIL = "admin@example.com"
+DEMO_ADMIN_PASSWORD = "admin123"
+INSECURE_PRODUCTION_PASSWORDS = {
+    DEMO_ADMIN_PASSWORD,
+    "change-me-on-first-login",
+    "CHANGEME-insecure-dev-only",
+}
+
+
+def resolve_admin_credentials() -> tuple[str, str]:
+    """Return bootstrap credentials, refusing demo defaults in production.
+
+    Development keeps the convenient demo account used by Docker and local
+    fixtures. A fresh production database must receive explicit credentials;
+    otherwise the well-known demo account would become a superuser.
+    """
+    environment = os.getenv("ENVIRONMENT", "production").strip().lower()
+    configured_email = os.getenv("ADMIN_EMAIL")
+    configured_password = os.getenv("ADMIN_PASSWORD")
+
+    if environment == "production":
+        missing = [
+            name
+            for name, value in (
+                ("ADMIN_EMAIL", configured_email),
+                ("ADMIN_PASSWORD", configured_password),
+            )
+            if not value
+        ]
+        if missing:
+            joined = ", ".join(missing)
+            raise RuntimeError(
+                f"Production bootstrap requires explicit {joined}. "
+                "Set them before the first deployment."
+            )
+        if (
+            configured_password in INSECURE_PRODUCTION_PASSWORDS
+            or configured_password.upper().startswith("CHANGEME")
+        ):
+            raise RuntimeError(
+                "ADMIN_PASSWORD uses a documented demo value. "
+                "Generate a unique production password before the first deployment."
+            )
+
+    return (
+        configured_email or DEMO_ADMIN_EMAIL,
+        configured_password or DEMO_ADMIN_PASSWORD,
+    )
+
+
 async def reset_schema():
     """Drop and recreate public schema (required for clean PostgreSQL reset)."""
     print("DEBUG: Starting reset_schema...")
@@ -78,8 +128,7 @@ async def seed_data():
         # 1. Create Initial Admin User
         from app.utils.security import get_password_hash
 
-        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-        admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+        admin_email, admin_password = resolve_admin_credentials()
 
         owner = User(
             email=admin_email,
@@ -112,7 +161,9 @@ async def seed_data():
         print(f"3. Superuser created: {admin_email}")
         print("   (Project Owner role assigned)")
         print(f"4. Default project created: {default_project.title}")
-        print("\nNote: To seed a study, use: uv run python seed.py data/example-study.json")
+        print(
+            "\nNote: To seed a study, use: uv run python seed.py data/example-study.json"
+        )
         print("--- Initialization Complete ---")
     await engine.dispose()
 

@@ -11,7 +11,7 @@ For the canonical list of environment variables (with types and defaults), see [
 | Platform | Difficulty | Status |
 | -------- | ---------- | ------ |
 | **Scalingo** | Easy | Documented below; primary supported target. |
-| **Docker (self-host)** | Medium | `docker-compose.yml` in repo root; see [Docker](#docker). |
+| **Docker (self-host)** | Medium | `docker-compose.production.yml` in repo root; see [Docker](#docker). |
 | **Render** | Easy | Generic Python + Postgres app; same env vars as Scalingo. |
 | **Heroku** | Medium | Generic Python buildpack; same env vars and `Procfile` apply. |
 
@@ -55,13 +55,28 @@ graph LR
 
 3. **Set environment variables**
 
+   Choose the email for the first owner account and generate a password. Save
+   the printed password in your password manager before continuing: it is the
+   credential you will use for the first login.
+
    ```bash
-   scalingo --app qualis env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
+   QUALIS_ADMIN_EMAIL="you@institution.example" # replace with your email
+   QUALIS_ADMIN_PASSWORD="$(openssl rand -base64 24)"
+   printf 'Initial Qualis password: %s\n' "$QUALIS_ADMIN_PASSWORD"
+
    scalingo --app qualis env-set SECRET_KEY=$(openssl rand -hex 32)
    scalingo --app qualis env-set IP_HASH_SALT=$(openssl rand -hex 32)
+   scalingo --app qualis env-set "ADMIN_EMAIL=$QUALIS_ADMIN_EMAIL"
+   scalingo --app qualis env-set "ADMIN_PASSWORD=$QUALIS_ADMIN_PASSWORD"
+   scalingo --app qualis env-set FRONTEND_URL=https://qualis.osc-fr1.scalingo.io
    scalingo --app qualis env-set ALLOWED_ORIGINS=https://qualis.osc-fr1.scalingo.io
+   scalingo --app qualis env-set TRUSTED_PROXIES=\*
    scalingo --app qualis env-set ENVIRONMENT=production
    ```
+
+   The PostgreSQL addon already creates `DATABASE_URL` as an alias of
+   `SCALINGO_POSTGRESQL_URL`; do not copy the connection string into another
+   variable. Keeping the alias lets Scalingo rotate the database URL safely.
 
 4. **Deploy**
 
@@ -78,6 +93,10 @@ The Python buildpack picks up `pyproject.toml` and `package.json` automatically.
 - `alembic upgrade head` — applies pending migrations.
 - An admin bootstrap step that creates the initial admin account (using `ADMIN_EMAIL` / `ADMIN_PASSWORD`) if the database is empty.
 
+The bootstrap fails closed on an empty production database when either admin
+variable is missing or uses a documented demo value. Existing databases, where
+an account already exists, are unaffected.
+
 Watch the logs:
 
 ```bash
@@ -88,9 +107,81 @@ scalingo --app qualis logs -n 100
 
 ## Docker
 
-A `docker-compose.yml` is provided at the repository root. For evaluation or local exploration, use the repository defaults through `make demo-up`; they start PostgreSQL, the backend, and the frontend at `http://localhost:3000` with the demo admin account documented in the README.
+The root `docker-compose.yml` is deliberately a **local demo**: it contains
+public credentials and development secrets. Use it only through `make demo-up`.
+Do not expose that stack to a network or adapt it for production.
 
-For production-like Docker deployment, override the development defaults before launch. At minimum, set strong `SECRET_KEY` and `IP_HASH_SALT` values, set `ENVIRONMENT=production`, configure `ALLOWED_ORIGINS`, and point `DATABASE_URL` at the intended PostgreSQL database. See the [Configuration reference](../reference/configuration.md#environment--app-settings).
+For a self-hosted production deployment, use the separate, fail-closed Compose
+file. It binds Qualis to the host loopback interface so that a TLS reverse proxy
+can be the only public entry point.
+
+### Prerequisites
+
+- A Linux server with Git, Docker, and the `docker compose` plugin.
+- A public domain pointing to the server.
+- A TLS reverse proxy such as Caddy, Traefik, or nginx.
+
+### Steps
+
+1. **Create the private environment file**
+
+   ```bash
+   cp .env.production.example .env.production
+   openssl rand -hex 32 # QUALIS_DB_PASSWORD
+   openssl rand -hex 32 # SECRET_KEY
+   openssl rand -hex 32 # IP_HASH_SALT
+   openssl rand -base64 24 # ADMIN_PASSWORD
+   ```
+
+   Edit `.env.production`: paste each generated value, choose `ADMIN_EMAIL`,
+   and replace `qualis.example.org` in `FRONTEND_URL`, `ALLOWED_ORIGINS`, and
+   `QUALIS_ALLOWED_HOST_PATTERN`. Use `[.]` for literal dots in the host regex.
+   The generated hexadecimal database password is URL-safe.
+
+2. **Validate before starting anything**
+
+   ```bash
+   docker compose --env-file .env.production \
+     -f docker-compose.production.yml config --quiet
+   ```
+
+   This fails when a required value is empty. It must finish without output.
+
+3. **Build and start the stack**
+
+   ```bash
+   docker compose --env-file .env.production \
+     -f docker-compose.production.yml up --build -d
+   docker compose --env-file .env.production \
+     -f docker-compose.production.yml ps
+   ```
+
+   Configure the reverse proxy to forward the public HTTPS domain to
+   `http://127.0.0.1:3000` (or the `QUALIS_HTTP_PORT` you chose). For example,
+   a minimal Caddyfile is:
+
+   ```caddyfile
+   qualis.example.org {
+       reverse_proxy 127.0.0.1:3000
+   }
+   ```
+
+   Replace the domain and restart Caddy; it obtains the TLS certificate
+   automatically. Then sign in with `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+
+4. **Stop without deleting data**
+
+   ```bash
+   docker compose --env-file .env.production \
+     -f docker-compose.production.yml down
+   ```
+
+   Do not add `--volumes`: the `qualis-pgdata` volume contains the database.
+   Back up that volume or PostgreSQL on a schedule before collecting real data.
+
+This baseline does not enable audio uploads, SMTP, or Redis. Add their variables
+from the [Configuration reference](../reference/configuration.md#environment--app-settings)
+when needed; audio also requires S3-compatible object storage.
 
 ---
 
@@ -105,6 +196,10 @@ The minimum set for any production deployment:
 | `IP_HASH_SALT` | yes | Salt for participant IP hashing. Generate the same way. |
 | `ALLOWED_ORIGINS` | yes | Comma-separated origin allow-list for CORS. No wildcards. |
 | `ENVIRONMENT` | yes | Set to `production`; the test routes (`/api/test/*`) are wired only for `development` / `test`. |
+| `FRONTEND_URL` | yes | Public HTTPS origin, used in account and invitation links. |
+| `ADMIN_EMAIL` | first deploy | Email of the initial owner created when the database is empty. |
+| `ADMIN_PASSWORD` | first deploy | Unique initial password. Demo/template values are rejected in production. |
+| `TRUSTED_PROXIES` | behind a proxy | Set to `*` on Scalingo; use explicit proxy IPs on infrastructure you control. |
 
 For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
 

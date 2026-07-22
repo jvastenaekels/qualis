@@ -111,8 +111,16 @@ export function AdminDashboard() {
         );
     }
 
-    // Show onboarding only until a study is created
-    if (!hasStudies) {
+    const hasConcourseItems = (concourse?.item_count ?? 0) > 0;
+    const onboardingStudy = draftStudies[0];
+    // Keep the first-project checklist visible while the first study is still
+    // a draft. Once any study has been activated, the normal dashboard takes
+    // over; historical projects with only closed/paused studies are not reset
+    // to "first steps".
+    const shouldShowOnboarding =
+        !hasStudies || (activeStudies.length === 0 && draftStudies.length > 0);
+
+    if (shouldShowOnboarding) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
                 <div>
@@ -147,7 +155,7 @@ export function AdminDashboard() {
                             />
                             <OnboardingStep
                                 step={2}
-                                done={false}
+                                done={hasConcourseItems}
                                 title={t(
                                     'admin.dashboard.step_concourse',
                                     'Collect statements in the concourse'
@@ -161,29 +169,42 @@ export function AdminDashboard() {
                             />
                             <OnboardingStep
                                 step={3}
-                                done={false}
-                                title={t('admin.dashboard.step_qset', 'Select the Q-set')}
-                                description={t(
-                                    'admin.dashboard.step_qset_desc',
-                                    'Review and accept the items that will form your Q-set.'
-                                )}
-                                action={() => navigate(`/app/${projectSlug}/concourses`)}
-                                actionLabel={t('admin.dashboard.go_to_qset', 'Open Q-set')}
-                            />
-                            <OnboardingStep
-                                step={4}
-                                done={false}
+                                done={hasStudies}
                                 title={t('admin.dashboard.step_study', 'Create a study')}
                                 description={t(
                                     'admin.dashboard.step_study_desc',
                                     'Define the sorting grid for your Q-sort.'
                                 )}
                                 action={
-                                    canCreateStudy ? () => setShowCreateDialog(true) : undefined
+                                    !hasStudies && canCreateStudy
+                                        ? () => setShowCreateDialog(true)
+                                        : undefined
                                 }
                                 actionLabel={
-                                    canCreateStudy
+                                    !hasStudies && canCreateStudy
                                         ? t('admin.dashboard.create_study', 'Create study')
+                                        : undefined
+                                }
+                            />
+                            <OnboardingStep
+                                step={4}
+                                done={false}
+                                title={t('admin.dashboard.step_launch', 'Launch recruitment')}
+                                description={t(
+                                    'admin.dashboard.step_launch_desc',
+                                    'Test and activate the study, then generate participation links.'
+                                )}
+                                action={
+                                    onboardingStudy
+                                        ? () =>
+                                              navigate(
+                                                  `/app/${projectSlug}/studies/${onboardingStudy.slug}/design`
+                                              )
+                                        : undefined
+                                }
+                                actionLabel={
+                                    onboardingStudy
+                                        ? t('admin.dashboard.open_study', 'Open study')
                                         : undefined
                                 }
                             />

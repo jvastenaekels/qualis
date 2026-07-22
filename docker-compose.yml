@@ -92,6 +92,8 @@ services:
 
   frontend:
     build: ./frontend
+    environment:
+      QUALIS_ALLOWED_HOST_PATTERN: "^(qualis[.]example[.]org|localhost|127[.]0[.]0[.]1)$"
     ports:
       - "3000:80"
     depends_on:

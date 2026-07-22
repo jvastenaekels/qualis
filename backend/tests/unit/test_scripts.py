@@ -77,6 +77,66 @@ print('Arg received correctly')
 class TestInitDb:
     """Tests for init_db.py reset functionality."""
 
+    def test_development_bootstrap_keeps_demo_credentials(self, monkeypatch):
+        """The documented local demo remains zero-configuration."""
+        from init_db import resolve_admin_credentials
+
+        monkeypatch.setenv("ENVIRONMENT", "development")
+        monkeypatch.delenv("ADMIN_EMAIL", raising=False)
+        monkeypatch.delenv("ADMIN_PASSWORD", raising=False)
+
+        assert resolve_admin_credentials() == ("admin@example.com", "admin123")
+
+    @pytest.mark.parametrize("missing_name", ["ADMIN_EMAIL", "ADMIN_PASSWORD"])
+    def test_production_bootstrap_requires_explicit_credentials(
+        self, monkeypatch, missing_name
+    ):
+        """A fresh production database must never inherit public demo credentials."""
+        from init_db import resolve_admin_credentials
+
+        monkeypatch.setenv("ENVIRONMENT", "production")
+        monkeypatch.setenv("ADMIN_EMAIL", "owner@example.org")
+        monkeypatch.setenv("ADMIN_PASSWORD", "unique-production-password")
+        monkeypatch.delenv(missing_name)
+
+        with pytest.raises(RuntimeError, match=missing_name):
+            resolve_admin_credentials()
+
+    @pytest.mark.parametrize(
+        "password",
+        [
+            "admin123",
+            "change-me-on-first-login",
+            "CHANGEME-insecure-dev-only",
+            "CHANGEME_USE_A_PASSWORD_MANAGER",
+        ],
+    )
+    def test_production_bootstrap_rejects_documented_passwords(
+        self, monkeypatch, password
+    ):
+        """Even explicitly supplied demo/template passwords are unsafe in production."""
+        from init_db import resolve_admin_credentials
+
+        monkeypatch.setenv("ENVIRONMENT", "production")
+        monkeypatch.setenv("ADMIN_EMAIL", "owner@example.org")
+        monkeypatch.setenv("ADMIN_PASSWORD", password)
+
+        with pytest.raises(RuntimeError, match="documented demo value"):
+            resolve_admin_credentials()
+
+    def test_production_bootstrap_accepts_unique_credentials(self, monkeypatch):
+        """Explicit non-demo credentials allow the first production bootstrap."""
+        from init_db import resolve_admin_credentials
+
+        monkeypatch.setenv("ENVIRONMENT", "production")
+        monkeypatch.setenv("ADMIN_EMAIL", "owner@example.org")
+        monkeypatch.setenv("ADMIN_PASSWORD", "unique-production-password")
+
+        assert resolve_admin_credentials() == (
+            "owner@example.org",
+            "unique-production-password",
+        )
+
     @pytest.mark.asyncio
     async def test_init_db_postgresql_reset(self):
         """Test init_db reset uses separate DROP/CREATE for PostgreSQL."""

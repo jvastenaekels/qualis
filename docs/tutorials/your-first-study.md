@@ -17,7 +17,7 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **Time required:** ~30 minutes
 
-**Prerequisites:** A Qualis account with Owner or Member access to a project (the roles that can create studies). If you are running Qualis locally, see the [Development Workflow guide](../contributing/development.md) first.
+**Prerequisites:** A running Qualis instance and an account with Owner or Member access to a project (the roles that can create studies). For the quickest local start, use the [Docker quick start](../../README.md#quick-start-docker). For a development environment with hot reload, use the [Development Workflow guide](../contributing/development.md).
 
 ---
 
@@ -25,12 +25,12 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 Projects in Qualis organize your studies and team members. Think of a project as a research lab or project group.
 
-1. Log in to Qualis. You will land on the admin dashboard.
-2. In the left sidebar, look for the **Project Switcher** at the top. Click on it and select **Create Project**.
+1. Log in to Qualis. You will land on your last project dashboard, or on the Researcher Hub if you do not have a project yet.
+2. From the Hub, click **New project**. From a project dashboard, open the **Project Switcher** at the top of the left sidebar and select **New project**.
 3. Fill in the form:
-   - **Name:** `Remote Work Research Lab`
-   - **URL slug:** `remote-work-lab` (this auto-generates from the name; you can customize it)
-4. Click **Create Project**.
+   - **Project name:** `Remote Work Research Lab`
+   - **Project URL:** `remote-work-lab` (this auto-generates from the name; you can customize it)
+4. Click **Create project**. Qualis opens **Project settings**; select **Dashboard** in the sidebar to continue.
 
 You are now inside your new project. The sidebar shows project-level navigation.
 
@@ -38,12 +38,12 @@ You are now inside your new project. The sidebar shows project-level navigation.
 
 ## Step 2: Create a New Study
 
-1. From your project dashboard, click the **New Study** button (or use the Study Switcher in the sidebar).
+1. From your project dashboard, click **Create study** (or use the Study Switcher in the sidebar).
 2. In the "Create Study" dialog, fill in:
    - **Title:** `Attitudes Toward Remote Work`
    - **Slug:** `remote-work-attitudes` (auto-generated; must be lowercase letters, numbers, and hyphens only)
    - **Languages:** Check **English**. You can add French or Finnish later if you want a multilingual study.
-3. Click **Create**.
+3. Click **Create study**.
 
 Qualis creates the study in **Draft** state and takes you to the **Study Designer** page. The designer has seven tabs:
 
@@ -196,10 +196,10 @@ Click **Save**.
 1. Click the **Post-sort** tab.
 2. Click **Add defaults** to seed feedback prompts for the most extreme columns — Qualis uses the grid's lowest and highest scores, which here are -3 and +3. Extreme-column feedback is off until you add columns. Participants will then be asked to explain their choices for statements placed at -3 and +3.
 3. Optionally, add a custom question:
-   - **Key:** `overall_thoughts`
    - **Type:** Textarea
    - **Label:** `Do you have any additional thoughts about remote work that were not captured in the statements?`
    - **Required:** No
+   - Qualis assigns the exported field key automatically.
 4. Click **Save**.
 
 ---
@@ -226,9 +226,9 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 
 ---
 
-## Step 10: Preview Your Study
+## Step 10: Test Your Study
 
-1. In the designer toolbar, click the **Preview** button. This opens the study in a new tab in pilot mode.
+1. In the designer toolbar, click **Test run**. This opens the study in a new tab in pilot mode.
 2. Walk through the participant flow: **Welcome, Consent, Pre-sort, Fine Sort, Post-Sort.** (If you re-enabled rough-sort, an extra triage step appears between Pre-sort and Fine Sort.)
 3. At the end you get a local `PILOT-XXXXX` confirmation code. Nothing is persisted to the database — you can preview as many times as you like without polluting the eventual dataset.
 
@@ -236,7 +236,7 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 
 ## Step 11: Open a methodology memo
 
-Click the **Memos** button in the toolbar. A drawer opens. Add a methodology memo and write a short note — even one paragraph — recording the design decisions you just made: why this CoI, why forced distribution, why no rough-sort, why 12 statements.
+Click the notebook icon labelled **Methodology memo** in the designer toolbar. A drawer opens. Add a methodology memo and write a short note — even one paragraph — recording the design decisions you just made: why this CoI, why forced distribution, why no rough-sort, why 12 statements.
 
 Five minutes now, hours saved later when a co-author asks why forced over free, or when you write the methods section. Memos travel with the Research Package export, so the audit trail stays attached to the data.
 
@@ -247,7 +247,7 @@ Five minutes now, hours saved later when a co-author asks why forced over free, 
 ## Step 12: Activate Your Study
 
 1. Return to the Study Designer.
-2. Click the **Activate Study** button.
+2. Use **Next Step** until you reach the final **Interface** tab, then scroll to the bottom and click **Activate Study**.
 3. Qualis runs server-side validation. If there are issues, a dialog will list them.
 4. Once validated, the study state changes from **Draft** to **Active**.
 

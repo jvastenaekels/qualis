@@ -8,7 +8,8 @@ For the architectural overview, see [`../explanation/architecture.md`](../explan
 
 ## Prerequisites
 
-- Git, Python 3.13+, Node.js 24+, PostgreSQL 15+, and a Unix-like environment (Linux, macOS, or WSL).
+- Git, GNU Make, Python 3.13+, [uv](https://docs.astral.sh/uv/), Node.js 24+,
+  PostgreSQL 15+, and a Unix-like environment (Linux, macOS, or WSL).
 
 If PostgreSQL is not yet installed:
 
@@ -50,11 +51,14 @@ This runs `cd backend && uv sync` (Python deps into `backend/.venv/`) and `cd fr
 ```bash
 psql -U postgres
 # In the psql shell:
-CREATE DATABASE qualis_dev;
 CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
-GRANT ALL PRIVILEGES ON DATABASE qualis_dev TO qualis_user;
+CREATE DATABASE qualis_dev OWNER qualis_user;
 \q
 ```
+
+The application role must own the database. On PostgreSQL 15+, granting
+database privileges alone does not grant permission to create tables in the
+`public` schema, so `make migrate` would otherwise fail.
 
 ### Configure environment variables
 
@@ -62,15 +66,25 @@ GRANT ALL PRIVILEGES ON DATABASE qualis_dev TO qualis_user;
 cp .env.example .env
 ```
 
-Minimum local-dev variables:
+Generate two secrets and copy both outputs:
 
 ```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Then edit `.env`. Replace every `PASTE_…` value; `.env` does not execute shell
+expressions such as `$(python3 ...)`.
+
+```dotenv
 DATABASE_URL=postgresql+asyncpg://qualis_user:qualis_pass@localhost:5432/qualis_dev
-SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
-IP_HASH_SALT=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+SECRET_KEY=PASTE_FIRST_GENERATED_VALUE_HERE
+IP_HASH_SALT=PASTE_SECOND_GENERATED_VALUE_HERE
 ENVIRONMENT=development
 ACCESS_TOKEN_EXPIRE_MINUTES=480
 FRONTEND_URL=http://localhost:5173
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=CHOOSE_A_LOCAL_PASSWORD
 ```
 
 For the full set of variables and what they do, see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
@@ -91,14 +105,6 @@ Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`, then:
 cd backend && uv run python init_db.py && cd ..
 ```
 
-### (Optional) Seed an example study
-
-```bash
-cd backend && uv run python seed.py data/example-study.json && cd ..
-```
-
-After seeding, you can walk the participant flow at <http://localhost:5173/study/bioeconomy-futures>. To seed the full demo (study design, a curated concourse, and 18 synthetic pre-/post-sort Q-sorts) run `uv run python seed_demo.py` from `backend/` instead, with the backend running.
-
 ### Run the dev servers
 
 Two terminals:
@@ -109,6 +115,19 @@ make run-frontend    # Vite on :5173, HMR
 ```
 
 Verify: <http://localhost:8000/docs> (Swagger) and <http://localhost:5173>. Log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+
+### (Optional) Seed an example study
+
+Keep the backend running, then use a third terminal:
+
+```bash
+cd backend && uv run python seed.py data/example-study.json && cd ..
+```
+
+After seeding, walk the participant flow at
+<http://localhost:5173/study/bioeconomy-futures>. To load the full demo (study
+design, curated concourse, and 18 synthetic Q-sorts), run `uv run python
+seed_demo.py` from `backend/` instead.
 
 ### Verify the dev loop
 

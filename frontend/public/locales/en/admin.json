@@ -975,7 +975,7 @@
             "step_configure": "Configure the participant flow",
             "step_configure_desc": "Set up instructions, presort, and postsort questions.",
             "step_launch": "Launch recruitment",
-            "step_launch_desc": "Generate participation links and share them.",
+            "step_launch_desc": "Test and activate the study, then generate participation links.",
             "go_to_concourse": "Open concourse",
             "go_to_qset": "Open Q-set",
             "concourse": "Concourse",

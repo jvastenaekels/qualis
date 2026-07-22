@@ -112,6 +112,16 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Test Project')).toBeInTheDocument();
     });
 
+    it('keeps onboarding visible while the first study is still a draft', () => {
+        setupDefaultHooks({ studies: [makeStudy({ state: 'draft' })] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        expect(screen.getByText('First steps')).toBeInTheDocument();
+        expect(screen.getByText('Launch recruitment')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Open study' })).toBeInTheDocument();
+    });
+
     it('shows SingleStudyCard layout when exactly 1 study exists', () => {
         const study = makeStudy({
             state: 'active',
