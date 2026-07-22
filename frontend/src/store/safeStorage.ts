@@ -47,6 +47,9 @@ function createSafeStorage(getStorage: () => Storage): Storage {
     };
 }
 
-export const safeLocalStorage = createJSONStorage(() => createSafeStorage(() => localStorage));
+export const safeBrowserLocalStorage = createSafeStorage(() => localStorage);
+export const safeBrowserSessionStorage = createSafeStorage(() => sessionStorage);
 
-export const safeSessionStorage = createJSONStorage(() => createSafeStorage(() => sessionStorage));
+export const safeLocalStorage = createJSONStorage(() => safeBrowserLocalStorage);
+
+export const safeSessionStorage = createJSONStorage(() => safeBrowserSessionStorage);

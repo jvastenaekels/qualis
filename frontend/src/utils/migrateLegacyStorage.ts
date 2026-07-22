@@ -23,7 +23,9 @@
  * from the new namespace, so the first read on each existing key sees the
  * preserved value.
  */
-export function migrateLegacyStorage(): void {
+const LEGACY_PREFIX = 'libre-q-';
+
+function getAvailableStorages(): Storage[] {
     const storages: Storage[] = [];
     try {
         storages.push(localStorage);
@@ -36,23 +38,57 @@ export function migrateLegacyStorage(): void {
         // Same as above for sessionStorage.
     }
 
-    const PREFIX = 'libre-q-';
-    for (const storage of storages) {
-        const legacyKeys: string[] = [];
+    return storages;
+}
+
+function collectLegacyKeys(storage: Storage): string[] {
+    const legacyKeys: string[] = [];
+    try {
         for (let i = 0; i < storage.length; i++) {
             const key = storage.key(i);
-            if (key?.startsWith(PREFIX)) legacyKeys.push(key);
+            if (key?.startsWith(LEGACY_PREFIX)) legacyKeys.push(key);
         }
-        for (const oldKey of legacyKeys) {
-            const newKey = `qualis-${oldKey.slice(PREFIX.length)}`;
-            const value = storage.getItem(oldKey);
-            // Don't clobber: if the user has already produced a qualis-namespaced
-            // value (e.g. by visiting a tab that ran post-migration code first),
-            // keep the new one.
-            if (value !== null && storage.getItem(newKey) === null) {
+    } catch {
+        return [];
+    }
+
+    return legacyKeys;
+}
+
+function migrateLegacyKey(storage: Storage, oldKey: string): void {
+    const newKey = `qualis-${oldKey.slice(LEGACY_PREFIX.length)}`;
+    let value: string | null;
+
+    try {
+        value = storage.getItem(oldKey);
+    } catch {
+        return;
+    }
+
+    if (value !== null) {
+        try {
+            // Don't clobber: if post-migration code has already written the
+            // qualis key in another tab, keep that newer value.
+            if (storage.getItem(newKey) === null) {
                 storage.setItem(newKey, value);
             }
-            storage.removeItem(oldKey);
+        } catch {
+            return;
+        }
+    }
+
+    try {
+        storage.removeItem(oldKey);
+    } catch {
+        // Best-effort cleanup only.
+    }
+}
+
+export function migrateLegacyStorage(): void {
+    const storages = getAvailableStorages();
+    for (const storage of storages) {
+        for (const oldKey of collectLegacyKeys(storage)) {
+            migrateLegacyKey(storage, oldKey);
         }
     }
 }

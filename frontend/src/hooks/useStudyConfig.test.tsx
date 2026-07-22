@@ -7,6 +7,14 @@ import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { useStudyConfig } from './useStudyConfig';
 
+const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+function restoreLocalStorage(): void {
+    if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', originalLocalStorage);
+    }
+}
+
 // Mock the query hook
 vi.mock('./useGetStudyConfig', () => ({
     useGetStudyConfig: vi.fn(),
@@ -152,6 +160,49 @@ describe('useStudyConfig', () => {
             expect(refetchMock).toHaveBeenCalled();
             expect(useConfigStore.getState().config?.title).toBe('Server Fallback Title');
         });
+    });
+
+    it('Pilot Mode: Falls back to server when localStorage is unavailable', async () => {
+        vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) => {
+            if (key === 'mode') return 'test';
+            return null;
+        });
+        Object.defineProperty(globalThis, 'localStorage', {
+            configurable: true,
+            get() {
+                throw new Error('storage unavailable');
+            },
+        });
+
+        const mockServerData = {
+            slug: 'test-study',
+            title: 'Server Fallback Without Storage',
+            language: 'en',
+            presort_config: {},
+            statements: [],
+        };
+        const refetchMock = vi.fn().mockResolvedValue({ data: mockServerData });
+
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: null,
+            refetch: refetchMock,
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        } as any);
+
+        try {
+            renderHook(() => useStudyConfig());
+
+            await waitFor(() => {
+                expect(refetchMock).toHaveBeenCalled();
+                expect(useConfigStore.getState().config?.title).toBe(
+                    'Server Fallback Without Storage'
+                );
+            });
+        } finally {
+            restoreLocalStorage();
+        }
     });
 
     // ── Defensive guard against the OOM loop fixed in 0a31428 ────────────────

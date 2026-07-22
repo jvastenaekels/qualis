@@ -50,6 +50,7 @@ import { customInstance } from '@/api/mutator';
 import { areStudiesEqual, projectStudyToUpdate, useStudyDesigner } from '@/store/useStudyDesigner';
 import { DEFAULT_STUDY_CONTENT } from '@/constants/studyDefaults';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
+import { safeBrowserLocalStorage } from '@/store/safeStorage';
 import { useRoughSortLock } from './useRoughSortLock';
 
 // ────────────────────────────────────────────────────────────────
@@ -551,12 +552,15 @@ export function useStudyDesignPage(): StudyDesignPageApi {
             }),
         };
 
-        localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
-        localStorage.setItem(
+        safeBrowserLocalStorage.setItem(
+            `qualis-test-draft-${effectiveSlug}`,
+            JSON.stringify(draft)
+        );
+        safeBrowserLocalStorage.setItem(
             `qualis-test-config-${effectiveSlug}`,
             JSON.stringify(syntheticConfig)
         );
-        localStorage.setItem(`qualis-pilot-reset-${effectiveSlug}`, 'true');
+        safeBrowserLocalStorage.setItem(`qualis-pilot-reset-${effectiveSlug}`, 'true');
 
         const testUrl = `/study/${effectiveSlug}?mode=test`;
         window.open(testUrl, '_blank');

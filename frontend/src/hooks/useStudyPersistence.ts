@@ -7,6 +7,7 @@ import type { StudyUpdate, StudyRead } from '@/api/model';
 import { useBlocker, useParams } from 'react-router-dom';
 import type { ApiError } from '@/api/client';
 import { toast } from 'sonner';
+import { safeBrowserLocalStorage } from '@/store/safeStorage';
 
 /**
  * Custom hook that monitors the study designer draft and provides
@@ -85,12 +86,15 @@ export function useStudyPersistence() {
                     _study_id: original?.id,
                     _backup_at: new Date().toISOString(),
                 };
-                localStorage.setItem(
+                safeBrowserLocalStorage.setItem(
                     `qualis-draft-backup-${effectiveSlug}`,
                     JSON.stringify(backupData)
                 );
                 // Also update the test-draft key so open test tabs react via 'storage' event.
-                localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
+                safeBrowserLocalStorage.setItem(
+                    `qualis-test-draft-${effectiveSlug}`,
+                    JSON.stringify(draft)
+                );
             }
         }, 1000);
 
@@ -183,7 +187,10 @@ export function useStudyPersistence() {
             setSyncStatus('synced');
             setLastSavedAt(new Date());
             setStudy(result);
-            localStorage.setItem(`qualis-test-draft-${effectiveSlug}`, JSON.stringify(draft));
+            safeBrowserLocalStorage.setItem(
+                `qualis-test-draft-${effectiveSlug}`,
+                JSON.stringify(draft)
+            );
             toast.success(t('admin.study.save.success'));
         } catch (error) {
             handleSaveError(error);

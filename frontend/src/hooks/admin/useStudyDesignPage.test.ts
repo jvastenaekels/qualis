@@ -20,6 +20,14 @@ import { applyTranslationDefaults, DESIGN_STEPS, useStudyDesignPage } from './us
 import type { StudyRead } from '@/api/model';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
+const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+function restoreLocalStorage(): void {
+    if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', originalLocalStorage);
+    }
+}
+
 // ── Mocks ──────────────────────────────────────────────────────────
 
 vi.mock('sonner', () => ({
@@ -327,6 +335,34 @@ describe('useStudyDesignPage', () => {
         });
 
         expect(result.current.activeLanguageCodes).toEqual(['en']);
+    });
+
+    it('opens test run even when localStorage is unavailable', () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+        Object.defineProperty(globalThis, 'localStorage', {
+            configurable: true,
+            get() {
+                throw new Error('storage unavailable');
+            },
+        });
+
+        try {
+            const { result } = renderHook(() => useStudyDesignPage(), {
+                wrapper: AllTheProviders,
+            });
+
+            act(() => {
+                result.current.handleTestRun();
+            });
+
+            expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test', '_blank');
+        } finally {
+            restoreLocalStorage();
+            openSpy.mockRestore();
+        }
     });
 
     it('DESIGN_STEPS has the canonical 7 steps in expected order', () => {

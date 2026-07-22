@@ -4,6 +4,7 @@ import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
 import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
+import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/safeStorage';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { resetAllStores } from '../utils/sessionReset';
@@ -159,7 +160,7 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (slug && isTestMode && !isPilotMode) {
             // Set flag for storage isolation in this tab
-            sessionStorage.setItem('qualis-pilot-mode', 'true');
+            safeBrowserSessionStorage.setItem('qualis-pilot-mode', 'true');
             setPilotMode(true);
         }
     }, [isTestMode, slug, isPilotMode, setPilotMode]);
@@ -265,13 +266,13 @@ export const useStudyConfig = () => {
 
             // Honour the StudyDesignPage reset signal before reading drafts.
             const resetKey = `qualis-pilot-reset-${slug}`;
-            if (localStorage.getItem(resetKey)) {
+            if (safeBrowserLocalStorage.getItem(resetKey)) {
                 resetAllStores({ skipConfig: true });
-                localStorage.removeItem(resetKey);
+                safeBrowserLocalStorage.removeItem(resetKey);
             }
 
-            const draftJson = localStorage.getItem(`qualis-test-draft-${slug}`);
-            const legacyJson = localStorage.getItem(`qualis-test-config-${slug}`);
+            const draftJson = safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
+            const legacyJson = safeBrowserLocalStorage.getItem(`qualis-test-config-${slug}`);
 
             if (draftJson || legacyJson) {
                 await loadFromLocalDraft(draftJson, legacyJson);

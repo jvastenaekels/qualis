@@ -4,6 +4,14 @@ import { useStudyPersistence } from './useStudyPersistence';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 
+const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+function restoreLocalStorage(): void {
+    if (originalLocalStorage) {
+        Object.defineProperty(globalThis, 'localStorage', originalLocalStorage);
+    }
+}
+
 // Mock dependencies
 vi.mock('@/store/useStudyDesigner');
 vi.mock('@/api/generated');
@@ -117,6 +125,32 @@ describe('useStudyPersistence', () => {
         });
         expect(mockSetSyncStatus).toHaveBeenCalledWith('saving');
         expect(mockSetSyncStatus).toHaveBeenCalledWith('synced');
+    });
+
+    it('should keep a successful save synced when localStorage backup is unavailable', async () => {
+        const draft = { slug: 'test-study', statements: [] };
+        mockStoreState({ draft, syncStatus: 'modified' });
+        mockMutateAsync.mockResolvedValue({ slug: 'test-study' });
+
+        Object.defineProperty(globalThis, 'localStorage', {
+            configurable: true,
+            get() {
+                throw new Error('storage unavailable');
+            },
+        });
+
+        try {
+            const { result } = renderHook(() => useStudyPersistence());
+
+            await act(async () => {
+                await result.current.save();
+            });
+
+            expect(mockSetSyncStatus).toHaveBeenCalledWith('synced');
+            expect(mockSetSyncStatus).not.toHaveBeenCalledWith('error');
+        } finally {
+            restoreLocalStorage();
+        }
     });
 
     it('should backup draft to localStorage immediately', async () => {
