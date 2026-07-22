@@ -41,6 +41,12 @@ async def submit_sorts() -> None:
         study = await api.get_study(SLUG)
         if study is None:
             raise RuntimeError(f"Study '{SLUG}' not found after sync")
+        if study.get("participant_count", 0) > 0:
+            print(
+                f"Study '{SLUG}' already has {study['participant_count']} participant(s) — "
+                "skipping Q-sort submission."
+            )
+            return
         code_to_id = {s["code"]: s["id"] for s in study["statements"]}
 
         for sort_id, placements in sorts.items():

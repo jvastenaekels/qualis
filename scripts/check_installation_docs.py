@@ -56,6 +56,47 @@ def check_readme_demo_path() -> list[str]:
     ]
 
 
+def check_readme_demo_guidance() -> list[str]:
+    readme = _read("README.md")
+    errors: list[str] = []
+    start_link = readme.find("[Start Qualis locally with Docker](#quick-start-docker)")
+    statement_of_need = readme.find("## Statement of need")
+
+    if start_link == -1 or statement_of_need == -1 or start_link > statement_of_need:
+        errors.append("README.md does not expose the Docker quick start before the long overview")
+
+    for token in (
+        "**Expected result:**",
+        "Cannot connect to the Docker daemon",
+        "port is already allocated",
+        "initial source build can take several minutes",
+    ):
+        if token not in readme:
+            errors.append(f"README.md quick-start guidance is missing {token!r}")
+    return errors
+
+
+def check_demo_make_targets() -> list[str]:
+    makefile = _read("Makefile")
+    errors: list[str] = []
+
+    for script in ("seed_demo.py", "seed_lipset.py"):
+        expected = f"docker compose exec backend .venv/bin/python {script}"
+        if expected not in makefile:
+            errors.append(f"Makefile must run {script} with the baked virtualenv")
+        if f"uv run python {script}" in makefile:
+            errors.append(f"Makefile lets uv re-sync development dependencies for {script}")
+
+    for message in (
+        "Qualis services are running.",
+        "Demo data is ready.",
+        "Qualis demo is ready:",
+    ):
+        if message not in makefile:
+            errors.append(f"Makefile demo path is missing success feedback {message!r}")
+    return errors
+
+
 def check_local_seed_order() -> list[str]:
     readme = _read("README.md")
     backend_index = readme.find("make run-backend")
@@ -174,6 +215,8 @@ def main() -> int:
     errors = [
         *check_frontend_lock_version(),
         *check_readme_demo_path(),
+        *check_readme_demo_guidance(),
+        *check_demo_make_targets(),
         *check_local_seed_order(),
         *check_local_database_setup(),
         *check_production_bootstrap_docs(),

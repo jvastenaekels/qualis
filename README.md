@@ -12,6 +12,9 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19985835.svg)](https://doi.org/10.5281/zenodo.19985835)
 
+> **First time here?** [Start Qualis locally with Docker](#quick-start-docker).
+> The guided demo takes three commands and opens at `http://localhost:3000`.
+
 ---
 
 ## Statement of need
@@ -149,11 +152,37 @@ Prerequisites:
 ```bash
 git clone https://github.com/jvastenaekels/qualis.git
 cd qualis
+```
 
+Start the application:
+
+```bash
 make demo-up
+```
+
+**Expected result:** after the images are built and the services become healthy,
+the command ends with `Qualis services are running` and tells you what to run
+next. The first build can take several minutes; later starts reuse the images.
+
+Load the guided example:
+
+```bash
 make demo-seed
+```
+
+**Expected result:** the final lines say that the Bioeconomy Futures demo data
+is ready and point you to the smoke test. This step reuses the Python environment
+already built into the backend image and does not install development tools.
+
+Verify the complete path:
+
+```bash
 make demo-smoke
 ```
+
+**Expected result:** `Qualis demo is ready`, followed by the login URL and demo
+credentials. If any check fails, `curl` prints an error and Make stops without
+printing the success message.
 
 Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
@@ -174,6 +203,14 @@ For a useful first tour after login:
    activate a small study of your own.
 
 The Docker stack includes a MinIO object store for the audio comments (console at [http://localhost:9001](http://localhost:9001), login `qualis` / `qualis-demo-secret`).
+
+#### Quick-start troubleshooting
+
+| What you see | What to do |
+| ------------ | ---------- |
+| `Cannot connect to the Docker daemon` or `docker: command not found` | Start Docker Desktop or the Docker service, then confirm `docker compose version` works before retrying. |
+| `port is already allocated` for `3000`, `9000`, or `9001` | Stop the program or container using that port. `docker compose ps` shows Qualis containers; `lsof -i :3000` (replace the port as needed) shows other local processes on Linux/macOS. Then run `make demo-up` again. |
+| The first build appears stuck while downloading or compiling | Leave it running: the initial source build can take several minutes on a slow connection. If it was interrupted, rerun `make demo-up`; Docker reuses completed layers. |
 
 Stop the stack with:
 

@@ -18,20 +18,23 @@ seed:
 
 demo-up:
 	docker compose up --build -d
+	@printf '\nQualis services are running.\nNext: make demo-seed\n\n'
 
 demo-seed:
-	docker compose exec backend uv run python seed_demo.py
+	docker compose exec backend .venv/bin/python seed_demo.py
+	@printf '\nDemo data is ready.\nNext: make demo-smoke\n\n'
 
 demo-lipset:
-	docker compose exec backend uv run python seed_lipset.py
+	docker compose exec backend .venv/bin/python seed_lipset.py
 
 validate-lipset:
 	python3 validation/lipset/compare.py
 
 demo-smoke:
-	curl -fsS http://localhost:3000/ >/dev/null
-	curl -fsS http://localhost:3000/health >/dev/null
-	curl -fsS http://localhost:3000/api/study/bioeconomy-futures >/dev/null
+	@curl -fsS http://localhost:3000/ >/dev/null
+	@curl -fsS http://localhost:3000/health >/dev/null
+	@curl -fsS http://localhost:3000/api/study/bioeconomy-futures >/dev/null
+	@printf '\nQualis demo is ready: http://localhost:3000/login\nLogin: admin@example.com / admin123\n\n'
 
 demo-down:
 	docker compose down

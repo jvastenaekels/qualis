@@ -4,9 +4,10 @@
     "en": {
       "title": "Lipset: Value Patterns of Democracy",
       "description": "Real published Q dataset (Lipset 1963, 'The Value Patterns of Democracy'), distributed with the qmethod R package (Zabala 2014, GPL-2-or-later). 33 statements, 9 Q-sorts, forced distribution -4..+4. Used in Qualis as an analytical validation example: Qualis should reproduce the qmethod factor solution.",
-      "instruction": "Sort each statement by how strongly it reflects the value pattern, from least to most characteristic.",
-      "consent_text": "This study reuses the openly published Lipset (1963) Q dataset distributed with the qmethod R package (GPL-2-or-later). No new participant data is collected.",
-      "thank_you_text": "This is a published-data validation example; no new data is collected."
+      "instructions": "This validation study replays a published dataset; no new participant data is collected.",
+      "condition_of_instruction": "Sort each statement by how strongly it reflects the value pattern, from least to most characteristic.",
+      "consent_title": "Published-data validation",
+      "consent_description": "This study reuses the openly published Lipset (1963) Q dataset distributed with the qmethod R package (GPL-2-or-later). No new participant data is collected."
     }
   },
   "default_language_code": "en",

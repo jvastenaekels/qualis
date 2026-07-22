@@ -1,7 +1,8 @@
-"""Regression tests for the documented demo fixtures.
+"""Regression tests for the documented demo and validation fixtures.
 
 Covers the three files that back ``seed_demo.py`` / ``make demo-seed``:
 the study design, the curated concourse, and the synthetic filled Q-sorts.
+It also guards the study design used by ``make demo-lipset``.
 """
 
 import json
@@ -21,6 +22,7 @@ from app.utils.script_utils import APIClient
 
 DATA = Path(__file__).resolve().parents[2] / "data"
 EXAMPLE_STUDY = DATA / "example-study.json"
+LIPSET_STUDY = DATA / "lipset-democracy.json"
 EXAMPLE_CONCOURSE = DATA / "example-study.concourse.json"
 EXAMPLE_SORTS = DATA / "example-study.sorts.json"
 AUDIO_DIR = DATA / "audio"
@@ -104,6 +106,27 @@ def test_example_study_uses_current_translation_fields() -> None:
         assert translation["condition_of_instruction"]
         assert translation["consent_title"]
         assert translation["consent_description"]
+
+
+def test_lipset_study_uses_current_translation_fields() -> None:
+    study = _load(LIPSET_STUDY)
+    translations = study["translations"]
+    assert isinstance(translations, dict)
+
+    legacy_keys = {"instruction", "consent_text", "thank_you_text"}
+    for translation in translations.values():
+        assert isinstance(translation, dict)
+        assert legacy_keys.isdisjoint(translation)
+        assert translation["instructions"]
+        assert translation["condition_of_instruction"]
+        assert translation["consent_title"]
+        assert translation["consent_description"]
+
+
+def test_lipset_study_validates_against_create_schema_after_seed_transform() -> None:
+    study = _load(LIPSET_STUDY)
+    transformed = APIClient.transform_study_data(deepcopy(study))
+    StudyCreate.model_validate(transformed)
 
 
 def test_example_study_has_bilingual_presort_questionnaire() -> None:
