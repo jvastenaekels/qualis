@@ -123,16 +123,37 @@ export function AdminDashboard() {
     if (shouldShowOnboarding) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
-                <div>
-                    <div className="flex items-center gap-2.5">
-                        <Briefcase className="h-6 w-6 text-indigo-500" />
-                        <h1 className="text-2xl font-black tracking-tight text-slate-900">
-                            {currentProject?.title}
-                        </h1>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <div className="flex items-center gap-2.5">
+                            <Briefcase className="h-6 w-6 text-indigo-500" />
+                            <h1 className="text-2xl font-black tracking-tight text-slate-900">
+                                {currentProject?.title}
+                            </h1>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            {t(
+                                'admin.dashboard.get_started',
+                                'Get started with your research project'
+                            )}
+                        </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        {t('admin.dashboard.get_started', 'Get started with your research project')}
-                    </p>
+                    {canCreateStudy && (
+                        <div className="flex items-center gap-2 shrink-0">
+                            <Button onClick={() => setShowCreateDialog(true)} size="sm">
+                                <Plus className="mr-2 h-3.5 w-3.5" />
+                                {t('admin.dashboard.create_study', 'Create study')}
+                            </Button>
+                            <Button
+                                onClick={() => setShowImportDialog(true)}
+                                variant="ghost"
+                                size="sm"
+                            >
+                                <Upload className="mr-2 h-3.5 w-3.5" />
+                                {t('admin.dashboard.import_study', 'Import')}
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <Card className="border-dashed">
@@ -213,11 +234,18 @@ export function AdminDashboard() {
                 </Card>
 
                 {canCreateStudy && (
-                    <CreateStudyDialog
-                        open={showCreateDialog}
-                        onOpenChange={setShowCreateDialog}
-                        projectSlug={projectSlug}
-                    />
+                    <>
+                        <CreateStudyDialog
+                            open={showCreateDialog}
+                            onOpenChange={setShowCreateDialog}
+                            projectSlug={projectSlug}
+                        />
+                        <ImportStudyDialog
+                            open={showImportDialog}
+                            onOpenChange={setShowImportDialog}
+                            projectSlug={projectSlug}
+                        />
+                    </>
                 )}
             </div>
         );

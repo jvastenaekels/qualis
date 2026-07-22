@@ -120,6 +120,8 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('First steps')).toBeInTheDocument();
         expect(screen.getByText('Launch recruitment')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Open study' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Create study' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Import study' })).toBeInTheDocument();
     });
 
     it('shows SingleStudyCard layout when exactly 1 study exists', () => {
