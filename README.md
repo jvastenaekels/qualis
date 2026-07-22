@@ -146,7 +146,8 @@ This is the recommended path for evaluation and first-time use. It starts Postgr
 Prerequisites:
 
 - Git
-- Docker with the `docker compose` plugin
+- Docker with a current `docker compose` plugin (`docker compose up --help`
+  should list `--wait`)
 - GNU Make and `curl` (included by default on most Linux/macOS systems; use WSL on Windows)
 
 ```bash
@@ -209,6 +210,7 @@ The Docker stack includes a MinIO object store for the audio comments (console a
 | What you see | What to do |
 | ------------ | ---------- |
 | `Cannot connect to the Docker daemon` or `docker: command not found` | Start Docker Desktop or the Docker service, then confirm `docker compose version` works before retrying. |
+| `unknown flag: --wait` | Update Docker Desktop or the Docker Compose plugin, then confirm `docker compose up --help` lists `--wait`. |
 | `port is already allocated` for `3000`, `9000`, or `9001` | Stop the program or container using that port. `docker compose ps` shows Qualis containers; `lsof -i :3000` (replace the port as needed) shows other local processes on Linux/macOS. Then run `make demo-up` again. |
 | The first build appears stuck while downloading or compiling | Leave it running: the initial source build can take several minutes on a slow connection. If it was interrupted, rerun `make demo-up`; Docker reuses completed layers. |
 

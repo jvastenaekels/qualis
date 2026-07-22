@@ -47,7 +47,7 @@ def check_readme_demo_path() -> list[str]:
         "bioeconomy-futures",
         "admin@example.com",
         "admin123",
-        "Docker with the `docker compose` plugin",
+        "`docker compose` plugin",
         "GNU Make",
         "Your First Study",
     ]
@@ -63,11 +63,14 @@ def check_readme_demo_guidance() -> list[str]:
     statement_of_need = readme.find("## Statement of need")
 
     if start_link == -1 or statement_of_need == -1 or start_link > statement_of_need:
-        errors.append("README.md does not expose the Docker quick start before the long overview")
+        errors.append(
+            "README.md does not expose the Docker quick start before the long overview"
+        )
 
     for token in (
         "**Expected result:**",
         "Cannot connect to the Docker daemon",
+        "unknown flag: --wait",
         "port is already allocated",
         "initial source build can take several minutes",
     ):
@@ -78,14 +81,37 @@ def check_readme_demo_guidance() -> list[str]:
 
 def check_demo_make_targets() -> list[str]:
     makefile = _read("Makefile")
+    compose = _read("docker-compose.yml")
+    backend_dockerfile = _read("backend/Dockerfile")
     errors: list[str] = []
+
+    if "docker compose up --build -d --wait --wait-timeout" not in makefile:
+        errors.append("Makefile demo-up does not wait for service health")
+
+    frontend_marker = "\n  frontend:\n"
+    if frontend_marker not in compose:
+        errors.append("docker-compose.yml does not define the demo frontend")
+    else:
+        frontend_block = compose.split(frontend_marker, 1)[1].split("\nvolumes:\n", 1)[
+            0
+        ]
+        for token in ("healthcheck:", "http://127.0.0.1/health"):
+            if token not in frontend_block:
+                errors.append(f"Docker frontend readiness check is missing {token!r}")
+
+    if "DEBIAN_FRONTEND=noninteractive" not in backend_dockerfile:
+        errors.append(
+            "backend/Dockerfile lets debconf emit interactive frontend warnings"
+        )
 
     for script in ("seed_demo.py", "seed_lipset.py"):
         expected = f"docker compose exec backend .venv/bin/python {script}"
         if expected not in makefile:
             errors.append(f"Makefile must run {script} with the baked virtualenv")
         if f"uv run python {script}" in makefile:
-            errors.append(f"Makefile lets uv re-sync development dependencies for {script}")
+            errors.append(
+                f"Makefile lets uv re-sync development dependencies for {script}"
+            )
 
     for message in (
         "Qualis services are running.",

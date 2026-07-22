@@ -303,12 +303,13 @@ async def submit_sorts(api: APIClient) -> None:
 
 async def main() -> None:
     """Seed study design, concourse, and filled Q-sorts in one pass."""
-    print(f"Syncing + activating study from {STUDY_JSON}...")
-    await sync_study_from_file(os.path.join(current_dir, STUDY_JSON), activate=True)
-
     api = APIClient()
     try:
         await api.login()
+        print(f"Syncing + activating study from {STUDY_JSON}...")
+        await sync_study_from_file(
+            os.path.join(current_dir, STUDY_JSON), activate=True, api=api
+        )
         print("\nSeeding concourse...")
         await seed_concourse(api)
         print("\nSubmitting synthetic Q-sorts...")

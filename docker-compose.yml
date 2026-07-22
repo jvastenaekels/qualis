@@ -99,6 +99,14 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    healthcheck:
+      # Compose only reports `make demo-up` as ready once both nginx and the
+      # proxied backend health endpoint answer through the public port.
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
 
 volumes:
   pgdata:

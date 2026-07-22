@@ -44,11 +44,9 @@ class APIClient:
         email = email or os.getenv("ADMIN_EMAIL", "admin@example.com")
         password = password or os.getenv("ADMIN_PASSWORD", "admin123")
 
-        print(f"DEBUG: Attempting login for {email}...")
         response = await self.client.post(
             "/api/token", data={"username": email, "password": password}
         )
-        print(f"DEBUG: Login response status: {response.status_code}")
 
         if response.status_code != 200:
             raise Exception(f"Login failed: {response.text}")
@@ -59,7 +57,6 @@ class APIClient:
         print(f"Logged in as {email}")
 
         # Fetch projects to set X-Project-ID header automatically
-        print("DEBUG: Fetching projects for context...")
         ws_response = await self.client.get("/api/admin/projects")
         if ws_response.status_code == 200:
             payload = ws_response.json()
@@ -74,11 +71,10 @@ class APIClient:
                 # Use the first project as default
                 first_proj_id = projects[0]["id"]
                 self.client.headers.update({"X-Project-ID": str(first_proj_id)})
-                print(f"DEBUG: Set X-Project-ID to {first_proj_id}")
             else:
-                print("DEBUG: No projects found for this user.")
+                print("No projects found for this user.")
         else:
-            print(f"DEBUG: Failed to fetch projects: {ws_response.text}")
+            print(f"Could not load project context: {ws_response.text}")
 
     async def close(self) -> None:
         """Close the underlying HTTPX client."""
@@ -139,7 +135,9 @@ class APIClient:
         return data
 
 
-async def sync_study_from_file(json_path: str, activate: bool = False) -> None:
+async def sync_study_from_file(
+    json_path: str, activate: bool = False, *, api: APIClient | None = None
+) -> None:
     """Idempotent sync of study data from JSON file.
 
     Handles creation if missing, or update if existing.
@@ -150,6 +148,10 @@ async def sync_study_from_file(json_path: str, activate: bool = False) -> None:
     demo seed so ``make demo-seed`` yields a study a reviewer can replay
     end to end. The generic seeder default (``activate=False``) is
     unchanged.
+
+    An already authenticated ``api`` may be borrowed by a multi-step seed.
+    Borrowed clients are neither logged in nor closed here, allowing the
+    caller to reuse one session without consuming the login rate limit.
     """
     if not os.path.exists(json_path):
         print(f"Error: File {json_path} not found.")
@@ -158,11 +160,11 @@ async def sync_study_from_file(json_path: str, activate: bool = False) -> None:
     with open(json_path, encoding="utf-8") as f:
         raw_data = json.load(f)
 
-    api = APIClient()
+    owns_api = api is None
+    api = api or APIClient()
     try:
-        print("DEBUG: Calling api.login()...")
-        await api.login()
-        print("DEBUG: api.login() successful")
+        if owns_api:
+            await api.login()
 
         # 1. Transform data
         data = api.transform_study_data(raw_data)
@@ -216,4 +218,5 @@ async def sync_study_from_file(json_path: str, activate: bool = False) -> None:
                 print(f"Study '{slug}' already active.")
 
     finally:
-        await api.close()
+        if owns_api:
+            await api.close()

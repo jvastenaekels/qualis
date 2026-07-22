@@ -17,7 +17,7 @@ seed:
 	cd backend && uv run python seed.py data/example-study.json
 
 demo-up:
-	docker compose up --build -d
+	docker compose up --build -d --wait --wait-timeout 240
 	@printf '\nQualis services are running.\nNext: make demo-seed\n\n'
 
 demo-seed:
