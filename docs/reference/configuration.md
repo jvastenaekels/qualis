@@ -162,6 +162,7 @@ All settings are read from the `Settings` Pydantic class in `backend/app/core/co
 | `ALGORITHM` | string | `HS256` | JWT signing algorithm. |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | int | `480` | Access token lifetime (minutes). |
 | `IP_HASH_SALT` | string | dev-only | Salt for SHA-256 hashing of participant IPs. **Required in production.** |
+| `ALLOW_PUBLIC_REGISTRATION` | bool | `True` | When `True`, `POST /api/register` accepts token-less sign-ups. Set `False` for an invitation-only instance (token-less registration returns 403; invitations and the `ADMIN_*` bootstrap are unaffected). |
 
 ### Database
 

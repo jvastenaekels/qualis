@@ -123,7 +123,7 @@ A reusable pool of candidate statements that lives at the project level, not the
 - **IP address hashing.** Participant IPs are SHA-256 hashed with a configurable salt before storage. Plaintext IPs are never persisted.
 - **Consent audit trail.** Each participant's consent is recorded with a hash of the consent version they agreed to.
 - **Security headers** (HSTS, CSP, X-Frame-Options) and bcrypt password hashing.
-- **Two-factor authentication** — TOTP (authenticator app) or email-OTP as a fallback channel; self-serve recovery flow to disable 2FA when the authenticator is lost.
+- **Two-factor authentication** — TOTP (authenticator app), with a self-serve recovery flow to disable 2FA when the authenticator is lost.
 - **Email-driven account flows** — sign-up email verification and password reset via time-limited tokens; graceful degradation when SMTP is not configured (dev-friendly).
 - **Role-based access control.** Project-level roles (Owner, Member, Viewer) control who can edit, export, or manage team members.
 
@@ -196,8 +196,10 @@ Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
 For a useful first tour after login:
 
-1. Open **Bioeconomy Futures**, then **Analysis**, to inspect results that are
-   already populated.
+1. Open **Bioeconomy Futures**, then **Analysis**. The 18 seeded Q-sorts are
+   ready to analyse: click **Commit and interpret** to extract a three-factor
+   solution, then explore the loadings, factor arrays, and distinguishing
+   statements.
 2. Open the participant link above in a private window to experience the study
    from the respondent side.
 3. Follow [Your First Study](docs/tutorials/your-first-study.md) to build and

@@ -32,9 +32,9 @@ Projects in Qualis organize your studies and team members. Think of a project as
 3. Fill in the form:
    - **Project name:** `Remote Work Research Lab`
    - **Project URL:** `remote-work-lab` (this auto-generates from the name; you can customize it)
-4. Click **Create project**. Qualis opens **Project settings**; select **Dashboard** in the sidebar to continue.
+4. Click **Create project**. Qualis opens the project **Dashboard**, where a **First steps** checklist guides you through the next actions.
 
-**Expected result:** you are now inside **Remote Work Research Lab**, and the sidebar shows project-level navigation.
+**Expected result:** you are now inside **Remote Work Research Lab**, the sidebar shows project-level navigation, and the dashboard shows the onboarding checklist.
 
 ---
 

@@ -1646,7 +1646,7 @@
                 },
                 "logo": {
                     "title": "Logótipo do estudo",
-                    "desc": "Carregue um logótipo personalizado para substituir a marca Open-Q predefinida.",
+                    "desc": "Carregue um logótipo personalizado para substituir a marca Qualis predefinida.",
                     "label": "URL do logótipo",
                     "hint": "Tamanho recomendado: 200x50px. Suporta PNG, SVG, JPG.",
                     "preview": "Pré-visualização do logótipo",

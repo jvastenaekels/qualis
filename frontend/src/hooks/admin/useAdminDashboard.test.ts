@@ -62,6 +62,8 @@ beforeEach(() => {
     navigate.mockReset();
     setActiveStudy.mockReset();
     mockStudiesHook.mockReset();
+    mockConcoursesHook.mockReset();
+    mockConcoursesHook.mockReturnValue({ data: { items: [] }, isLoading: false });
 });
 
 describe('useAdminDashboard', () => {
@@ -202,5 +204,34 @@ describe('useAdminDashboard', () => {
         mockStudiesHook.mockReturnValue({ data: { items: [] }, isLoading: false });
         const { result } = renderHook(() => useAdminDashboard(), { wrapper: AllTheProviders });
         expect(result.current.hasStudies).toBe(false);
+    });
+
+    it('scopes the concourse to the current project', () => {
+        mockStudiesHook.mockReturnValue({ data: { items: [] }, isLoading: false });
+        mockConcoursesHook.mockReturnValue({
+            data: {
+                items: [
+                    { id: 11, project_id: 999, item_count: 5 },
+                    { id: 22, project_id: 7, item_count: 3 },
+                ],
+            },
+            isLoading: false,
+            // biome-ignore lint/suspicious/noExplicitAny: minimal stub
+        } as any);
+        const { result } = renderHook(() => useAdminDashboard(), { wrapper: AllTheProviders });
+        expect(result.current.concourse?.id).toBe(22);
+    });
+
+    it('returns no concourse when the cached list belongs to another project', () => {
+        // Guards the onboarding checklist: a stale cross-project cache must not
+        // tick the "Collect statements" step for a brand-new project.
+        mockStudiesHook.mockReturnValue({ data: { items: [] }, isLoading: false });
+        mockConcoursesHook.mockReturnValue({
+            data: { items: [{ id: 11, project_id: 999, item_count: 5 }] },
+            isLoading: false,
+            // biome-ignore lint/suspicious/noExplicitAny: minimal stub
+        } as any);
+        const { result } = renderHook(() => useAdminDashboard(), { wrapper: AllTheProviders });
+        expect(result.current.concourse).toBeUndefined();
     });
 });

@@ -113,7 +113,7 @@
         }
     },
     "layout": {
-        "title": "Open-Q",
+        "title": "Qualis",
         "preparing": "Valmistellaan tutkimusistuntoa...",
         "pilot_mode": "Pilottitila: Muutokset ovat väliaikaisia eikä tietoja tallenneta",
         "default_study_title": "Q-metodologinen tutkimus",

@@ -205,6 +205,24 @@ For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/co
 
 ---
 
+## Account onboarding & public registration
+
+Three ways an account comes into being:
+
+1. **First owner** — created from `ADMIN_EMAIL` / `ADMIN_PASSWORD` when the database is empty (see [Post-deploy automation](#post-deploy-automation)).
+2. **Invitation** — an Owner or Member invites a colleague from **Team members**; the invitee follows a tokened `/register` link that pre-fills their email and grants project access. This is the intended discoverable onboarding path.
+3. **Public self-registration** — `POST /api/register` **without** an invitation token.
+
+Public self-registration is controlled by `ALLOW_PUBLIC_REGISTRATION` (default `true`, so token-less sign-ups are accepted). For an invitation-only instance — the common posture for institutional research deployments — set:
+
+```bash
+ALLOW_PUBLIC_REGISTRATION=false
+```
+
+Token-less registration then returns `403`; invitations and the `ADMIN_*` bootstrap are unaffected. The setting does not change the shipped UI (which is invitation-driven either way).
+
+---
+
 ## Manual database operations
 
 Use `--` to separate Scalingo CLI flags from the command arguments.
@@ -295,7 +313,7 @@ When `SMTP_HOST` is unset, invitation emails are logged to stdout instead of bei
 
 ## Email transport (auth flows)
 
-Email-driven auth flows (sign-up verification, password reset, 2FA email-OTP, 2FA self-serve disable) degrade gracefully when SMTP is not configured — sign-ups create immediately-active accounts and none of the email-gate checks block login. Configure the following variables when enabling email auth in production:
+Email-driven auth flows (sign-up verification, password reset, 2FA self-serve disable) degrade gracefully when SMTP is not configured — sign-ups create immediately-active accounts and none of the email-gate checks block login. Configure the following variables when enabling email auth in production:
 
 | Variable | Default | Notes |
 | -------- | ------- | ----- |
@@ -309,8 +327,6 @@ Email-driven auth flows (sign-up verification, password reset, 2FA email-OTP, 2F
 | `EMAIL_VERIFY_TOKEN_EXPIRE_HOURS` | `24` | Validity window for the sign-up verification link. |
 | `PASSWORD_RESET_TOKEN_EXPIRE_HOURS` | `1` | Validity window for the password-reset link. |
 | `TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES` | `15` | Validity window for the 2FA self-serve disable link. |
-| `TWOFA_EMAIL_OTP_EXPIRE_MINUTES` | `5` | Validity window for each 2FA email-OTP code. |
-| `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS` | `30` | Minimum interval between OTP resend requests per user. |
 
 **Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.
 

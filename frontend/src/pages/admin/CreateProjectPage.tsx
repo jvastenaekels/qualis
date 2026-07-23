@@ -87,7 +87,10 @@ export default function CreateProjectPage() {
             });
 
             toast.success(t('admin.project.create.success'));
-            navigate(`/app/${newProject.slug}/settings`);
+            // Land on the dashboard, where the "First steps" onboarding
+            // checklist lives — not on Settings, which stranded the new
+            // researcher away from the next actions.
+            navigate(`/app/${newProject.slug}/dashboard`);
         } catch (error: unknown) {
             const { key, fallback } = resolveApiErrorKey(
                 error as { code?: string; message?: string }

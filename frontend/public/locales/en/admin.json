@@ -1648,7 +1648,7 @@
                 },
                 "logo": {
                     "title": "Study logo",
-                    "desc": "Upload a custom logo to replace the default Open-Q branding.",
+                    "desc": "Upload a custom logo to replace the default Qualis branding.",
                     "label": "Logo URL",
                     "hint": "Recommended size: 200x50px. Supports PNG, SVG, JPG.",
                     "preview": "Logo preview",

@@ -1595,7 +1595,7 @@
                 },
                 "logo": {
                     "title": "Logo de l'étude",
-                    "desc": "Téléchargez un logo personnalisé pour remplacer la marque Open-Q par défaut.",
+                    "desc": "Téléchargez un logo personnalisé pour remplacer la marque Qualis par défaut.",
                     "label": "URL du logo",
                     "hint": "Taille recommandée : 200x50px. Supporte PNG, SVG, JPG.",
                     "preview": "Aperçu du logo",

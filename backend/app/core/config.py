@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "CHANGEME-insecure-dev-only"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
+
+    # Public sign-up. When True (default) POST /api/register accepts
+    # token-less registrations (open onboarding). Set False for an
+    # invitation-only instance: token-less registration returns 403 while
+    # invitation-token sign-ups and the ADMIN_* bootstrap are unaffected.
+    ALLOW_PUBLIC_REGISTRATION: bool = True
     IP_HASH_SALT: str = "CHANGEME-insecure-dev-only"
     # Clock-skew tolerance for JWT validation (F-03-012). Applied to all
     # `jwt.decode` paths (access JWT, email-link JWTs, invitation JWT). 30s

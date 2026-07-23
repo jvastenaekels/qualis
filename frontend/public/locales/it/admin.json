@@ -1646,7 +1646,7 @@
                 },
                 "logo": {
                     "title": "Logo dello studio",
-                    "desc": "Carichi un logo personalizzato per sostituire il brand predefinito Open-Q.",
+                    "desc": "Carichi un logo personalizzato per sostituire il brand predefinito Qualis.",
                     "label": "URL logo",
                     "hint": "Dimensione consigliata: 200x50px. Supporta PNG, SVG, JPG.",
                     "preview": "Anteprima logo",

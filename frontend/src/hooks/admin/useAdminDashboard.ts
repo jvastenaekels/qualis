@@ -82,7 +82,16 @@ export function useAdminDashboard(): AdminDashboardApi {
         useListConcoursesApiAdminConcoursesGet(undefined, {
             query: { enabled: !!currentProject?.id },
         });
-    const concourse = concoursesData?.items?.[0];
+    // Scope to the active project. The concourses query key is project-agnostic,
+    // so on a project switch react-query can briefly serve the previous
+    // project's cached list (the X-Project-ID header only updates once
+    // ProjectLayout's effect runs). Filtering by project_id — as the studies
+    // list already does — prevents another project's concourse from showing,
+    // which would wrongly tick the "Collect statements" onboarding step.
+    const concourse = useMemo(
+        () => concoursesData?.items?.find((c) => c.project_id === currentProject?.id),
+        [concoursesData, currentProject?.id]
+    );
 
     const studies = useMemo(
         () => allStudiesData?.items?.filter((s) => s.project_id === currentProject?.id),

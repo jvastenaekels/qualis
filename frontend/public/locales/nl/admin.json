@@ -1646,7 +1646,7 @@
                 },
                 "logo": {
                     "title": "Onderzoekslogo",
-                    "desc": "Upload een aangepast logo ter vervanging van de standaard Open-Q-huisstijl.",
+                    "desc": "Upload een aangepast logo ter vervanging van de standaard Qualis-huisstijl.",
                     "label": "Logo-URL",
                     "hint": "Aanbevolen formaat: 200x50px. Ondersteunt PNG, SVG, JPG.",
                     "preview": "Logovoorbeeld",

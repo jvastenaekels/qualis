@@ -28,14 +28,18 @@ import os
 import sys
 import uuid
 from collections.abc import Awaitable, Callable
+from datetime import timedelta
 from typing import Any
 
 import httpx
+from sqlalchemy import select
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
+from app.database import SessionLocal  # noqa: E402
+from app.models import Participant, Study  # noqa: E402
 from app.utils.script_utils import APIClient, sync_study_from_file  # noqa: E402
 
 STUDY_JSON = "data/example-study.json"
@@ -301,6 +305,46 @@ async def submit_sorts(api: APIClient) -> None:
             print("No audio comments uploaded (clips missing).")
 
 
+async def backdate_durations() -> None:
+    """Give the synthetic Q-sorts a realistic elapsed time.
+
+    Participant duration in the data view is ``submitted_at - consented_at``
+    (see ``study_data_service``). The seed consents and submits back to back,
+    so every demo participant would otherwise read ``0m`` and be flagged
+    "Suspect" (< 120 s). We rewrite ``consented_at`` to a deterministic,
+    plausible offset before ``submitted_at`` (~6–15 min). The target is
+    absolute, so the pass is idempotent across re-runs.
+    """
+    async with SessionLocal() as session:
+        study = (
+            await session.execute(select(Study).where(Study.slug == SLUG))
+        ).scalar_one_or_none()
+        if study is None:
+            return
+        participants = (
+            (
+                await session.execute(
+                    select(Participant)
+                    .where(Participant.study_id == study.id)
+                    .order_by(Participant.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        updated = 0
+        for i, p in enumerate(participants):
+            if p.submitted_at is None:
+                continue
+            # Deterministic spread, all above the 120 s "suspect" threshold.
+            duration_seconds = 360 + (i * 47) % 540  # ~6 min … ~15 min
+            p.consented_at = p.submitted_at - timedelta(seconds=duration_seconds)
+            updated += 1
+        await session.commit()
+    if updated:
+        print(f"Set a realistic elapsed time on {updated} demo participant(s).")
+
+
 async def main() -> None:
     """Seed study design, concourse, and filled Q-sorts in one pass."""
     api = APIClient()
@@ -316,6 +360,8 @@ async def main() -> None:
         await submit_sorts(api)
     finally:
         await api.close()
+
+    await backdate_durations()
 
     print(
         "\nBioeconomy Futures demo seeded. Open the study, browse the concourse "

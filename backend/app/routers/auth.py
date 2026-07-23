@@ -248,6 +248,20 @@ async def register_user(
       a "you already have an account" email is dispatched to the address,
       and the response mirrors the fresh-email shape.
     """
+    # Operator switch: when public (token-less) registration is disabled,
+    # only invitation-token sign-ups are accepted. The check depends solely
+    # on the presence of a token, never on the submitted email, so it adds
+    # no enumeration signal (F-06-007) — every token-less attempt gets the
+    # same 403 whether or not the email is already registered.
+    if not settings.ALLOW_PUBLIC_REGISTRATION and not user_in.invitation_token:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Public registration is disabled on this instance. "
+                "An invitation is required to create an account."
+            ),
+        )
+
     # The verification gate depends ONLY on whether verification is active
     # (operator opted in via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured
     # to actually deliver the link). When SMTP is unconfigured we degrade to

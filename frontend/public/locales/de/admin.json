@@ -1646,7 +1646,7 @@
                 },
                 "logo": {
                     "title": "Studienlogo",
-                    "desc": "Laden Sie ein benutzerdefiniertes Logo hoch, um das Standard-Open-Q-Branding zu ersetzen.",
+                    "desc": "Laden Sie ein benutzerdefiniertes Logo hoch, um das Standard-Qualis-Branding zu ersetzen.",
                     "label": "Logo-URL",
                     "hint": "Empfohlene Größe: 200x50px. Unterstützt PNG, SVG, JPG.",
                     "preview": "Logovorschau",

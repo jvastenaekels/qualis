@@ -1646,7 +1646,7 @@
                 },
                 "logo": {
                     "title": "Logotipo del estudio",
-                    "desc": "Suba un logotipo personalizado para reemplazar la marca predeterminada de Open-Q.",
+                    "desc": "Suba un logotipo personalizado para reemplazar la marca predeterminada de Qualis.",
                     "label": "URL del logotipo",
                     "hint": "Tamaño recomendado: 200x50px. Admite PNG, SVG, JPG.",
                     "preview": "Vista previa del logotipo",

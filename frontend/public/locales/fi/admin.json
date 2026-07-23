@@ -1557,7 +1557,7 @@
                 },
                 "logo": {
                     "title": "Tutkimuksen logo",
-                    "desc": "Lataa oma logo korvataksesi oletusarvoisen Open-Q-brändäyksen.",
+                    "desc": "Lataa oma logo korvataksesi oletusarvoisen Qualis-brändäyksen.",
                     "label": "Logon URL",
                     "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG.",
                     "preview": "Logon esikatselu",

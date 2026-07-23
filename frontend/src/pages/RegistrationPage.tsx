@@ -193,7 +193,7 @@ const RegistrationPage = () => {
                         <ShieldCheck className="h-3 w-3" /> {t('auth.register.secure_invitation')}
                     </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 italic">
-                        Open<span className="text-primary">-Q</span>
+                        Qual<span className="text-primary">is</span>
                     </h1>
                     <p className="text-slate-500 font-medium">{t('auth.register.subtitle')}</p>
                 </div>

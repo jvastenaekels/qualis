@@ -140,7 +140,6 @@ either derived (e.g. `random_seed`) or non-identifying analytical metadata.
 | TOTP secret (when enabled) | `users.totp_secret` | Contract | Until 2FA disabled |
 | `pending_email` (during email-change flow) | `users.pending_email` | Contract (F-03-011) | Cleared on confirm/cancel |
 | `password_changed_at` | `users.password_changed_at` | Compliance (Art. 32 access-token revocation, F-03-010) | Lifetime of account |
-| 2FA email OTP code-hash | `twofa_email_otp_codes.code_hash` (bcrypt) | Contract | 5-minute TTL; row-attempts cap 5; per-account 24h wrong-attempt cap 30 (F-03-004) |
 | Consumed email-link JTIs (denylist) | `consumed_email_tokens` | Compliance (F-03-001) | 7 days; cleanup script `backend/scripts/cleanup_consumed_email_tokens.py` (F-03-003 — operator schedules) |
 
 ### 3.3 Logs (separate retention regime)
@@ -420,7 +419,7 @@ practices".
 | **Access control** | Art. 32(4) | Role-based access (`ProjectMember.role`); owner-immutable on PATCH (F-04-001 §B_VALID_HEADER); DB-level partial-unique index `project_members_one_owner_per_project`. | Set `MAX_MEMBERS_PER_PROJECT` if your deployment requires; review role assignments quarterly. |
 
 **14 control areas** map to specific Qualis features citing **20 finding IDs**
-(F-02-006, F-02-007, F-03-004, F-03-010, F-03-011, F-03-013, F-04-001,
+(F-02-006, F-02-007, F-03-010, F-03-011, F-03-013, F-04-001,
 F-05-002, F-05-004, F-05-008, F-05-010, F-06-001, F-06-006, F-06-007 plus
 the cross-cutting Wave 6 deliverables).
 
@@ -529,19 +528,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
 - **Residual risk.** Low — refresh-token rotation deferred to Wave 2b
   reduces residual to the 8h window between leak and rotation.
 
-### 9.3 Risk: OTP brute-force defeating email-channel 2FA
-
-- **Description.** Attacker who already has the password brute-forces
-  email-OTP.
-- **Likelihood.** Medium (credential-stuffing corpora abound).
-- **Impact.** High (full account control bypassing 2FA).
-- **Qualis mitigation.** F-03-004 — per-account 24h cap of 30 wrong
-  attempts; per-row `attempts ≥ 5` lockout; 30s resend cooldown.
-- **Operator obligation.** Encourage TOTP over email-channel 2FA where
-  possible.
-- **Residual risk.** Low (~0.003 %/day across 24h cap).
-
-### 9.4 Risk: email-change account takeover
+### 9.3 Risk: email-change account takeover
 
 - **Description.** Transient session compromise → silent permanent
   control transfer.
@@ -552,7 +539,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
 - **Operator obligation.** None (backend-only fix).
 - **Residual risk.** Very low.
 
-### 9.5 Risk: email enumeration → targeted phishing campaign
+### 9.4 Risk: email enumeration → targeted phishing campaign
 
 - **Description.** Probing `/api/token`, `/email/verify/resend`,
   `/2fa/disable/request`, `/register` to confirm whether an email
@@ -566,7 +553,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
 - **Residual risk.** Low (residual ~130 ms minimum-floor on
   password-reset, F-03-009; below remediation threshold).
 
-### 9.6 Risk: audio S3 bucket-list re-identification
+### 9.5 Risk: audio S3 bucket-list re-identification
 
 - **Description.** Operator-side IAM misconfiguration leaks bucket
   listing; attacker reconstructs (study, participant) pairs from keys.
@@ -580,7 +567,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
 - **Residual risk.** Low — pre-existing rows retain legacy keys until
   anonymised; operator orphan-sweep covers stragglers.
 
-### 9.7 Risk: consent-text drift on pre-submission abandonment
+### 9.6 Risk: consent-text drift on pre-submission abandonment
 
 - **Description.** Most participants close the browser without explicit
   withdrawal; their `draft_responses` (free-text) persist indefinitely.
@@ -593,7 +580,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
   participants periodically.
 - **Residual risk.** Medium-low until Wave 4b lands.
 
-### 9.8 Risk: member-quota TOCTOU race
+### 9.7 Risk: member-quota TOCTOU race
 
 - **Description.** Concurrent member invites bypass `MAX_MEMBERS_PER_PROJECT`.
 - **Likelihood.** Very low (default = 0 = unlimited in OSS).
@@ -605,7 +592,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
   monitor; the over-fill is recoverable post-hoc.
 - **Residual risk.** Low.
 
-### 9.9 Risk: supply-chain transitive dep regression
+### 9.8 Risk: supply-chain transitive dep regression
 
 - **Description.** A transitive dep introduces a CVE between Qualis releases.
 - **Likelihood.** Medium (transitive churn in lockfile).
@@ -617,7 +604,7 @@ impact are at the *post-mitigation* level shipped at commit `fe4efd2b`.
   Dependabot PRs.
 - **Residual risk.** Medium — depends on operator update cadence.
 
-### 9.10 Risk: operator misconfiguration leaks
+### 9.9 Risk: operator misconfiguration leaks
 
 - **Description.** Raw IP in `uvicorn.access`; missing S3 lifecycle;
   missing scheduler for cleanup_consumed_email_tokens.

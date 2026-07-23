@@ -1646,7 +1646,7 @@
         },
         "logo": {
           "title": "Logo badania",
-          "desc": "Prześlij niestandardowe logo zastępujące domyślną markę Open-Q.",
+          "desc": "Prześlij niestandardowe logo zastępujące domyślną markę Qualis.",
           "label": "URL logo",
           "hint": "Zalecany rozmiar: 200×50 px. Obsługiwane formaty: PNG, SVG, JPG.",
           "preview": "Podgląd logo",

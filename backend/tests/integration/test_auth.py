@@ -85,6 +85,63 @@ class TestRegistration:
         assert data["user"]["email"] == test_user.email
         assert "requires_email_verification" in data
 
+    async def test_register_public_disabled_rejects_tokenless(
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
+    ):
+        """With public registration off, a token-less sign-up is refused (403)
+        and no account is created."""
+        from app.core.config import settings
+
+        monkeypatch.setattr(settings, "ALLOW_PUBLIC_REGISTRATION", False)
+
+        response = await client.post(
+            "/api/register",
+            json={"email": "walkin@example.com", "password": "securepass123"},
+        )
+        assert response.status_code == 403
+
+        result = await db.execute(
+            select(User).where(User.email == "walkin@example.com")
+        )
+        assert result.scalar_one_or_none() is None
+
+    async def test_register_public_disabled_still_allows_invitation(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        user_factory,
+        project_factory,
+        monkeypatch,
+    ):
+        """An invitation token must still create the account and membership
+        even when public registration is disabled."""
+        from app.core.config import settings
+
+        monkeypatch.setattr(settings, "ALLOW_PUBLIC_REGISTRATION", False)
+
+        owner = await user_factory()
+        project = await project_factory(owner=owner)
+        token = create_invitation_token(
+            email="invited@example.com",
+            project_id=project.id,
+            role="member",
+        )
+
+        response = await client.post(
+            "/api/register",
+            json={
+                "email": "invited@example.com",
+                "password": "securepass123",
+                "invitation_token": token,
+            },
+        )
+        assert response.status_code == 201
+
+        result = await db.execute(
+            select(ProjectMember).where(ProjectMember.project_id == project.id)
+        )
+        assert len(result.scalars().all()) == 2  # owner + invited
+
     async def test_register_with_valid_invitation(
         self,
         client: AsyncClient,

@@ -59,11 +59,13 @@ async def test_bioeconomy_seed_uses_one_authenticated_client(monkeypatch) -> Non
     sync = AsyncMock()
     seed_concourse = AsyncMock()
     submit_sorts = AsyncMock()
+    backdate = AsyncMock()
 
     monkeypatch.setattr(seed_demo, "APIClient", MagicMock(return_value=api))
     monkeypatch.setattr(seed_demo, "sync_study_from_file", sync)
     monkeypatch.setattr(seed_demo, "seed_concourse", seed_concourse)
     monkeypatch.setattr(seed_demo, "submit_sorts", submit_sorts)
+    monkeypatch.setattr(seed_demo, "backdate_durations", backdate)
 
     await seed_demo.main()
 
@@ -72,6 +74,8 @@ async def test_bioeconomy_seed_uses_one_authenticated_client(monkeypatch) -> Non
     assert sync.await_args.kwargs["api"] is api
     seed_concourse.assert_awaited_once_with(api)
     submit_sorts.assert_awaited_once_with(api)
+    # Durations are rewritten after the API client is closed (DB-only pass).
+    backdate.assert_awaited_once_with()
 
 
 @pytest.mark.asyncio

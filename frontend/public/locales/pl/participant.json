@@ -113,7 +113,7 @@
         }
     },
     "layout": {
-        "title": "Open-Q",
+        "title": "Qualis",
         "preparing": "Przygotowywanie sesji badania...",
         "pilot_mode": "Tryb pilotażowy: zmiany są tymczasowe i dane nie zostaną zapisane",
         "default_study_title": "Badanie metodologią Q",

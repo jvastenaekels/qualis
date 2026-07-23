@@ -48,10 +48,23 @@ i18n
         },
 
         detection: {
-            order: ['querystring', 'navigator', 'htmlTag', 'path', 'subdomain'],
+            // `localStorage` must be read (not just written) so an explicit
+            // admin language choice survives a reload; without it the detector
+            // fell back to `navigator` every boot and the picker looked broken.
+            order: ['querystring', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
             lookupQuerystring: 'lang',
             caches: ['localStorage'],
         },
     });
+
+// Keep <html lang> in step with the active language for accessibility and
+// correct hyphenation; the detector only reads the tag, it never updates it.
+const syncHtmlLang = (lng: string): void => {
+    if (typeof document !== 'undefined') {
+        document.documentElement.lang = lng;
+    }
+};
+syncHtmlLang(i18n.language);
+i18n.on('languageChanged', syncHtmlLang);
 
 export default i18n;

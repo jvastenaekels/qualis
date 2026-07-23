@@ -113,7 +113,7 @@
         }
     },
     "layout": {
-        "title": "Open-Q",
+        "title": "Qualis",
         "preparing": "Preparando su sesión de estudio...",
         "pilot_mode": "Modo piloto: los cambios son temporales y los datos no se guardarán",
         "default_study_title": "Estudio de metodología Q",

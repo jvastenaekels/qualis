@@ -17,7 +17,7 @@ Researchers are strongly encouraged to enable Two-Factor Authentication (TOTP).
 
 Once enabled, login takes the password first, then the TOTP code. To disable, you must re-enter the current password.
 
-**2FA login channels.** After entering the password, the user can choose to receive the 2FA code via their authenticator app (TOTP) or by email (a 6-digit one-time code valid for 5 minutes (default `TWOFA_EMAIL_OTP_EXPIRE_MINUTES`), subject to a 30-second resend cooldown). The email channel requires SMTP to be configured; see [`deployment.md`](deployment.md#email-transport-auth-flows).
+**2FA login channel.** After entering the password, the user is prompted for the 6-digit code from their authenticator app (TOTP).
 
 **Lost authenticator (self-serve recovery).** If a user loses access to their authenticator app, they can initiate a 2FA disable flow from the login screen. A time-limited link (15 minutes by default) is sent to their registered email address. Opening the link disables 2FA on the account without admin involvement. A platform superuser can also manually clear a user's TOTP from the admin Users page (`POST /api/admin/users/{id}/reset-totp`), removing their second factor; this does not bump `password_changed_at` or revoke existing sessions. Email *verification*, by contrast, remains email-only — admins cannot mark an email verified through the admin UI.
 
