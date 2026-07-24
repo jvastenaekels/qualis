@@ -77,7 +77,7 @@ email-validator==2.3.0
     #   pydantic
 execnet==2.1.2
     # via pytest-xdist
-fastapi==0.136.3
+fastapi==0.139.2
     # via
     #   qualis-backend
     #   sentry-sdk
@@ -194,14 +194,14 @@ pluggy==1.6.0
 pre-commit==4.6.1
 py-serializable==2.1.0
     # via cyclonedx-python-lib
-pydantic==2.13.3
+pydantic==2.13.4
     # via
     #   fastapi
     #   fastapi-cloud-cli
     #   pydantic-extra-types
     #   pydantic-settings
     #   qualis-backend
-pydantic-core==2.46.3
+pydantic-core==2.46.4
     # via pydantic
 pydantic-extra-types==2.11.1
     # via fastapi
