@@ -94,9 +94,18 @@ jobs:
         # workflow uses the simpler --audit-level=high gate per the
         # plan spec — any finding above the allowlist is reflected
         # there too.
+        #
+        # GHSA-qwww-vcr4-c8h2 (react-router, high) is accepted: the CSRF
+        # bypass it describes is reachable only in React Server Components
+        # mode. Qualis is a client-side SPA — App.tsx mounts
+        # createBrowserRouter with RouterProvider and there is no server
+        # rendering, so the vulnerable path does not exist in this build.
+        # The fix ships in react-router 8.0, a major upgrade of the routing
+        # layer; revisit when that migration is scheduled. Keep this list in
+        # sync with the identical one in ci.yml.
         run: |
           set -e
-          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9'
+          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2'
           audit_json=$(npm audit --json) || true
           unknown=$(echo "$audit_json" | jq -r --arg a "$accepted" '
             [.vulnerabilities | to_entries[].value
