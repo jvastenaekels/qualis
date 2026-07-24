@@ -69,6 +69,14 @@ updates:
       # the runtime does not have. Lift when the project moves to Node 26.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # @babel/core 8 is a coordinated migration, not a drop-in bump. The
+      # toolchain still holds @babel/plugin-transform-runtime@7, whose
+      # `peer @babel/core@^7.0.0-0` conflicts with core 8, so npm ci fails
+      # ERESOLVE (PR #269). babel is only pulled in by @rolldown/plugin-babel;
+      # move the whole babel set together, or after Rolldown drops the babel
+      # bridge, then lift this.
+      - dependency-name: "@babel/core"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
