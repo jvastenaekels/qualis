@@ -69,6 +69,7 @@ function getStateIcon(state: string | undefined) {
     }
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell — complexity is structural (permission-gated CTAs, empty/loading/populated render branches, per-study status cards) not algorithmic; data derivation lives in useAdminDashboard, status/icon helpers are extracted above. Surfaced by biome 2.5.5's recalibrated scorer on unchanged code.
 export function AdminDashboard() {
     const { currentProject } = useAuthStore();
     const navigate = useNavigate();

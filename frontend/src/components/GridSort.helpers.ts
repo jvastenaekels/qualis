@@ -31,7 +31,7 @@ export function resolveNextSlot(
     isForcedDistribution: boolean
 ): { col: number; row: number } | null {
     const match = slotId.match(SLOT_ID_RE);
-    if (!match || !match[1] || !match[2]) return null;
+    if (!match?.[1] || !match[2]) return null;
 
     const col = parseInt(match[1], 10);
     const row = parseInt(match[2], 10);

@@ -193,60 +193,60 @@ describe('FineSortPage resilience — stale rough slice across modes', () => {
         vi.clearAllMocks();
     });
 
-    test.each([
-        true,
-        false,
-    ] as const)('reconciles when draft has a stale rough slice and rough_sort_enabled=%s', async (roughEnabled) => {
-        // Common config with 5 statements
-        configFixture = {
-            rough_sort_enabled: roughEnabled,
-            statements: [
-                { id: 1, text: 'Card 1' },
-                { id: 2, text: 'Card 2' },
-                { id: 3, text: 'Card 3' },
-                { id: 4, text: 'Card 4' },
-                { id: 5, text: 'Card 5' },
-            ],
-            grid_config: [{ score: 0, capacity: 5 }],
-        };
-        // Stale rough slice with 5 cards distributed across piles.
-        responseFixture = {
-            rough: {
-                agree: [1, 2],
-                disagree: [3],
-                neutral: [4, 5],
-                history: [1, 2, 3, 4, 5],
-            },
-            deck: [],
-            qsort: [],
-        };
+    test.each([true, false] as const)(
+        'reconciles when draft has a stale rough slice and rough_sort_enabled=%s',
+        async (roughEnabled) => {
+            // Common config with 5 statements
+            configFixture = {
+                rough_sort_enabled: roughEnabled,
+                statements: [
+                    { id: 1, text: 'Card 1' },
+                    { id: 2, text: 'Card 2' },
+                    { id: 3, text: 'Card 3' },
+                    { id: 4, text: 'Card 4' },
+                    { id: 5, text: 'Card 5' },
+                ],
+                grid_config: [{ score: 0, capacity: 5 }],
+            };
+            // Stale rough slice with 5 cards distributed across piles.
+            responseFixture = {
+                rough: {
+                    agree: [1, 2],
+                    disagree: [3],
+                    neutral: [4, 5],
+                    history: [1, 2, 3, 4, 5],
+                },
+                deck: [],
+                qsort: [],
+            };
 
-        render(<FineSortPage />);
+            render(<FineSortPage />);
 
-        if (roughEnabled) {
-            // Rough mode: every id is already in some rough pile, so
-            // the reconciler must not call categorizeCard or addToDeck.
-            await waitFor(() => {
-                // wait one tick to let the reconciliation effect run
-                expect(mockAddToDeck).not.toHaveBeenCalled();
-            });
-            expect(mockCategorizeCard).not.toHaveBeenCalled();
-        } else {
-            // Deck mode: the stale rough slice must be ignored. The
-            // defensive reset clears `rough` (via setState in the
-            // hook — we cannot observe that on a mocked store) and
-            // every config statement gets reconciled into the deck.
-            await waitFor(() => {
-                expect(mockAddToDeck).toHaveBeenCalledWith(1);
-            });
-            expect(mockAddToDeck).toHaveBeenCalledWith(2);
-            expect(mockAddToDeck).toHaveBeenCalledWith(3);
-            expect(mockAddToDeck).toHaveBeenCalledWith(4);
-            expect(mockAddToDeck).toHaveBeenCalledWith(5);
-            // No rough-mode fallback was used.
-            expect(mockCategorizeCard).not.toHaveBeenCalled();
+            if (roughEnabled) {
+                // Rough mode: every id is already in some rough pile, so
+                // the reconciler must not call categorizeCard or addToDeck.
+                await waitFor(() => {
+                    // wait one tick to let the reconciliation effect run
+                    expect(mockAddToDeck).not.toHaveBeenCalled();
+                });
+                expect(mockCategorizeCard).not.toHaveBeenCalled();
+            } else {
+                // Deck mode: the stale rough slice must be ignored. The
+                // defensive reset clears `rough` (via setState in the
+                // hook — we cannot observe that on a mocked store) and
+                // every config statement gets reconciled into the deck.
+                await waitFor(() => {
+                    expect(mockAddToDeck).toHaveBeenCalledWith(1);
+                });
+                expect(mockAddToDeck).toHaveBeenCalledWith(2);
+                expect(mockAddToDeck).toHaveBeenCalledWith(3);
+                expect(mockAddToDeck).toHaveBeenCalledWith(4);
+                expect(mockAddToDeck).toHaveBeenCalledWith(5);
+                // No rough-mode fallback was used.
+                expect(mockCategorizeCard).not.toHaveBeenCalled();
+            }
         }
-    });
+    );
 });
 
 describe('FineSortPage resilience — resume after browser tab close (rough mode)', () => {

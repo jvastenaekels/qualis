@@ -600,7 +600,7 @@ const StudyLayoutContent: React.FC = () => {
                                                status === 'upcoming' && !isReachable
                                                    ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
                                                    : 'cursor-pointer shadow-sm'
-                                           }
+}
                                        `}
                                         title={stepLabel}
                                     >

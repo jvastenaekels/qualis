@@ -224,37 +224,52 @@ export const useSubmitStudy = () => {
         ]
     );
 
-    const submit = useCallback(
-        async (status: SubmitStatus = 'completed', options?: { silent?: boolean }) => {
-            // Guard against concurrent completed submissions
-            if (isSubmittingRef.current && status === 'completed') return;
-            if (status === 'completed') {
-                isSubmittingRef.current = true;
-                setSubmitting(true);
-            }
-            if (!options?.silent) setIsLoading(true);
-            setError(null);
+    // Acquire / release the concurrency guard. Only a `completed` submission
+    // takes it: a concurrent non-completed autosave finishing mid-completion
+    // must NOT reset the guard while the final submission is still in flight —
+    // that would re-enable draft-autosave / allow a second completion.
+    const acquireCompletionGuard = useCallback(() => {
+        isSubmittingRef.current = true;
+        setSubmitting(true);
+    }, [setSubmitting]);
 
+    const releaseCompletionGuard = useCallback(() => {
+        isSubmittingRef.current = false;
+        setSubmitting(false);
+    }, [setSubmitting]);
+
+    // Runs the request and settles all side effects. Split out of `submit` so
+    // each stays under the cognitive-complexity budget: `submit` owns the entry
+    // guards, this owns the try/catch/finally. `silent` and `isCompletion` are
+    // passed in so the completion-only guard release stays in one place.
+    const runSubmission = useCallback(
+        async (status: SubmitStatus, isCompletion: boolean, silent: boolean) => {
             try {
                 const code = await performSubmission(status);
-                if (status === 'completed' && code) finalizeCompletion(code);
+                if (isCompletion && code) finalizeCompletion(code);
             } catch (err: unknown) {
                 console.error(err);
                 setError(extractErrorMessage(err));
             } finally {
-                // Only release the concurrency guard for the status that
-                // acquired it (completed). A concurrent non-completed autosave
-                // finishing mid-completion must NOT reset the guard while the
-                // final submission is still in flight — that would re-enable
-                // draft-autosave / allow a second completion.
-                if (status === 'completed') {
-                    isSubmittingRef.current = false;
-                    setSubmitting(false);
-                }
-                if (!options?.silent) setIsLoading(false);
+                if (isCompletion) releaseCompletionGuard();
+                if (!silent) setIsLoading(false);
             }
         },
-        [performSubmission, setSubmitting, finalizeCompletion]
+        [performSubmission, finalizeCompletion, releaseCompletionGuard]
+    );
+
+    const submit = useCallback(
+        async (status: SubmitStatus = 'completed', options?: { silent?: boolean }) => {
+            const isCompletion = status === 'completed';
+            // Guard against concurrent completed submissions
+            if (isSubmittingRef.current && isCompletion) return;
+            if (isCompletion) acquireCompletionGuard();
+            if (!options?.silent) setIsLoading(true);
+            setError(null);
+
+            await runSubmission(status, isCompletion, options?.silent ?? false);
+        },
+        [acquireCompletionGuard, runSubmission]
     );
 
     return { submit, isLoading, isSuccess, error, confirmationCode };
