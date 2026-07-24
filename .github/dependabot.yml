@@ -83,6 +83,17 @@ updates:
       # other way (PR #288). Lift together with @babel/core, never alone.
       - dependency-name: "@babel/plugin-transform-runtime"
         update-types: ["version-update:semver-major"]
+      # typescript 7 (the native compiler) is the biggest build win here
+      # (tsc -b 12.6s → 2.3s) but is not adoptable yet: it drops the JS API
+      # (ts.createProgram / ts.resolveModuleName undefined), which two CI
+      # gates depend on. dependency-cruiser 17.4.3 silently cruises 0 modules
+      # under TS 7 (contract passes while checking nothing); 18.1.0 declines
+      # TS ≥ 7 outright. knip 5.88 crashes. The full analysis lives in
+      # frontend/tsconfig.app.json and commit 5f967361 (PR #297 hit exactly
+      # this). Lift when dependency-cruiser ships TS 7 support and knip 6
+      # (oxc-based) lands.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
