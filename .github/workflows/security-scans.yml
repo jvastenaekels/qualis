@@ -141,7 +141,27 @@ jobs:
         # 1.95 imports pkg_resources at startup; Python 3.12+ slim envs
         # don't ship setuptools by default. Pin a recent version that
         # uses importlib.metadata instead.
-        run: pip install semgrep==1.150.0
+        #
+        # Retried at the shell level, not with pip's own --retries: that
+        # option already defaults to 5 and covers only *establishing* a
+        # connection. The 2026-07-24 failure on main was a stream that died
+        # mid-transfer (ProtocolError: IncompleteRead, 11 MB of 50 MB read),
+        # which pip surfaces instead of retrying. semgrep is a ~50 MB wheel,
+        # so a truncated download is the failure mode to expect. --timeout 60
+        # (default 15s) also gives a stalled socket room to recover.
+        run: |
+          set -e
+          for attempt in 1 2 3; do
+            if pip install --timeout 60 semgrep==1.150.0; then
+              exit 0
+            fi
+            if [ "$attempt" = "3" ]; then
+              echo "pip install semgrep failed after 3 attempts"
+              exit 1
+            fi
+            echo "attempt $attempt failed — retrying in $((attempt * 10))s"
+            sleep $((attempt * 10))
+          done
       - name: Run semgrep (OWASP Top Ten)
         # --error: exit non-zero on any finding (semgrep's own "error"
         # severity is high+). The OWASP Top Ten ruleset is the spec
