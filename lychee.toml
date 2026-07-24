@@ -18,6 +18,16 @@ exclude = [
     # Commercial Q-software vendor site cited in the README comparison table;
     # resolves in browsers/curl but bot-protection can block automated checkers.
     "qmethodsoftware\\.com",
+    # Taylor & Francis Q-methodology citations in q-methodology.md. Both DOIs
+    # resolve through doi.org to tandfonline.com, which returns 403 to automated
+    # checkers while resolving fine in browsers — same bot-protection case as
+    # qmethodsoftware above. Excluded by their doi.org source URL, not the
+    # tandfonline redirect target: lychee matches `exclude` against the link as
+    # written before following redirects (the 10.4135 SAGE DOI above is excluded
+    # the same way). Surfaced when lychee-action moved to v2.9, whose checker the
+    # publisher blocks; v1.9 stopped at the doi.org 302 without hitting 403.
+    "doi\\.org/10\\.1080/00330124\\.2019\\.1598271",
+    "doi\\.org/10\\.1111/0033-0124\\.00252",
 ]
 
 # Skip localhost URLs in tutorial code blocks
