@@ -6,7 +6,7 @@ Open-source platform for conducting Q-methodology research. Monorepo with a Fast
 
 - **Backend:** Python 3.14, FastAPI, SQLAlchemy (async), PostgreSQL 18, Alembic, Pydantic
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, Radix UI, dnd-kit, react-hook-form, Zustand, react-i18next
-- **Tooling:** uv (Python), npm (Node 24), Biome (lint/format), Ruff (Python lint/format), Vitest, Playwright
+- **Tooling:** uv (Python), npm (Node 26), Biome (lint/format), Ruff (Python lint/format), Vitest, Playwright
 
 ## Project Structure
 

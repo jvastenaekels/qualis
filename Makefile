@@ -6,7 +6,7 @@ export
 # Toolchain versions CI exercises. Keep in sync with .python-version, .nvmrc,
 # backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
 PYTHON_VERSION := 3.14
-NODE_MAJOR := 24
+NODE_MAJOR := 26
 POSTGRES_MAJOR := 18
 
 # Fail early, and say why. Without this the toolchain mismatch only surfaces
