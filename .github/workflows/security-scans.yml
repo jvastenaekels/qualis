@@ -108,11 +108,24 @@ jobs:
         # createBrowserRouter with RouterProvider and there is no server
         # rendering, so the vulnerable path does not exist in this build.
         # The fix ships in react-router 8.0, a major upgrade of the routing
-        # layer; revisit when that migration is scheduled. Keep this list in
-        # sync with the identical one in ci.yml.
+        # layer; revisit when that migration is scheduled.
+        #
+        # GHSA-mh99-v99m-4gvg (brace-expansion, high) is accepted: an
+        # unbounded-expansion DoS triggered by a maliciously crafted brace
+        # pattern. Every instance in the tree is dev/build tooling (orval
+        # codegen, spectral OpenAPI linting, glob/minimatch) or exceljs's
+        # archiver on the XLSX *write* path — none expands an untrusted,
+        # attacker-supplied pattern, so the trigger does not exist here (same
+        # write-only/trusted-input basis as the xlsx acceptance above). The
+        # fix is brace-expansion 5.0.8, but the tree holds three majors
+        # (1.1.16 / 2.1.2 / 5.0.7) and a global override collides with the
+        # existing minimatch@3.1.5 → 1.1.16 pin, risking a broken dev
+        # toolchain for an untriggerable DoS. Revisit if a shipped/runtime
+        # path ever expands untrusted braces. Keep this list in sync with the
+        # identical one in ci.yml.
         run: |
           set -e
-          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2'
+          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2|GHSA-mh99-v99m-4gvg'
           audit_json=$(npm audit --json) || true
           unknown=$(echo "$audit_json" | jq -r --arg a "$accepted" '
             [.vulnerabilities | to_entries[].value

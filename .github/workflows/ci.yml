@@ -228,10 +228,21 @@ jobs:
         # a major upgrade of the routing layer; revisit this entry when that
         # migration is scheduled, and drop it as soon as we are on 8.x.
         #
+        # GHSA-mh99-v99m-4gvg (brace-expansion, high) is accepted: an
+        # unbounded-expansion DoS from a maliciously crafted brace pattern.
+        # Every instance is dev/build tooling (orval, spectral, glob/minimatch)
+        # or exceljs's archiver on the XLSX write path — none expands an
+        # untrusted pattern, so the trigger does not exist here (same
+        # write-only/trusted-input basis as xlsx). Fix is brace-expansion
+        # 5.0.8, but three majors are in the tree (1.1.16 / 2.1.2 / 5.0.7) and
+        # a global override collides with the minimatch@3.1.5 → 1.1.16 pin,
+        # risking a broken toolchain for an untriggerable DoS. Keep in sync
+        # with security-scans.yml.
+        #
         # Fail only on high+ advisories outside the allowlist.
         run: |
           set -e
-          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2'
+          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2|GHSA-mh99-v99m-4gvg'
           audit_json=$(npm audit --json) || true
           unknown=$(echo "$audit_json" | jq -r --arg a "$accepted" '
             [.vulnerabilities | to_entries[].value
