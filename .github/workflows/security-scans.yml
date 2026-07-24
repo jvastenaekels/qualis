@@ -56,7 +56,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           enable-cache: true
       - name: Install dependencies
         run: cd backend && uv sync
@@ -120,7 +120,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Install semgrep
         # 1.95 imports pkg_resources at startup; Python 3.12+ slim envs
         # don't ship setuptools by default. Pin a recent version that
@@ -140,7 +140,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Run lint script
         # Pure stdlib AST walk; no install needed beyond Python.
         run: python backend/scripts/lint_logger_urls.py
