@@ -53,6 +53,22 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-zoom-pan-pinch"
         update-types: ["version-update:semver-major"]
+      # tailwind-merge v3 supports Tailwind CSS v4 only — its published
+      # README says "if you use Tailwind v3, use tailwind-merge v2.6.0".
+      # Nothing enforces this: there is no peerDependency on tailwindcss
+      # and no type error, so CI goes green while class merging silently
+      # mis-handles the utilities renamed between v3 and v4 (shadow-sm →
+      # shadow-xs, outline-none → outline-hidden, …). PR #190 was blocked
+      # for exactly this. Paired with the tailwindcss entry above: lift
+      # both together during the Tailwind v4 migration, never separately.
+      - dependency-name: "tailwind-merge"
+        update-types: ["version-update:semver-major"]
+      # @types/node must track the Node line the project actually runs
+      # (24 LTS — see .nvmrc, engines, backend/Dockerfile, ci.yml). #257
+      # moved the types to 26, which stops TypeScript from flagging APIs
+      # the runtime does not have. Lift when the project moves to Node 26.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
