@@ -2,13 +2,21 @@ name: qualis-production
 
 services:
   db:
-    image: postgres:16-alpine
+    # UPGRADING FROM 16: PostgreSQL major versions cannot read each other's data
+    # directory, and postgres:18 also relocated PGDATA. An existing deployment
+    # must dump on 16 and restore on 18 — see the "Upgrading PostgreSQL" section
+    # of docs/guides/deployment.md. Starting an 18 image against a 16 volume
+    # fails to boot; it does not corrupt anything, but it will not start either.
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: qualis
       POSTGRES_USER: qualis
       POSTGRES_PASSWORD: ${QUALIS_DB_PASSWORD:?Set QUALIS_DB_PASSWORD in .env.production}
     volumes:
-      - qualis-pgdata:/var/lib/postgresql/data
+      # Mount point follows postgres:18's relocated VOLUME (see the dev compose
+      # file for the full rationale). A 16-era volume holds its cluster at
+      # /var/lib/postgresql/data and is NOT readable through this mount.
+      - qualis-pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U qualis -d qualis"]
       interval: 5s

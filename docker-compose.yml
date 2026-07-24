@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     # DEVELOPMENT ONLY — durability traded for speed. The 33 Alembic migrations
     # and the demo seed are dominated by fsync latency; this data is disposable
     # (`make demo-down` throws it away), so a crash losing it costs nothing.
@@ -15,7 +15,11 @@ services:
       POSTGRES_USER: qualis
       POSTGRES_PASSWORD: qualis
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # postgres:18 moved PGDATA to /var/lib/postgresql/18/docker and the image
+      # VOLUME to /var/lib/postgresql. Mounting the old .../data path against an
+      # 18 image would leave the real data directory outside the volume, so it
+      # would vanish on `docker compose down` — silently, with no error.
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U qualis"]
       interval: 5s

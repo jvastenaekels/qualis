@@ -301,6 +301,46 @@ Pool sizes are tuned per environment:
 
 The production sizing (3 + 2 = 5 connections) is designed to fit Scalingo's starter PostgreSQL plans (5–10 slots).
 
+### Upgrading PostgreSQL
+
+`docker-compose.production.yml` moved from `postgres:16-alpine` to
+`postgres:18-alpine`. **This is not a drop-in swap for an existing deployment.**
+Two things change at once:
+
+* PostgreSQL major versions cannot read each other's data directory. An 18
+  server refuses to start against a 16 cluster — it fails loudly with
+  `database files are incompatible with server`, so nothing is corrupted, but
+  the service stays down until the data is migrated.
+* The official image relocated `PGDATA` from `/var/lib/postgresql/data` to
+  `/var/lib/postgresql/18/docker`, and its `VOLUME` from the former to
+  `/var/lib/postgresql`. The compose file's mount point moved to match.
+
+To migrate, dump on 16 and restore on 18. **Take the dump before pulling the new
+compose file**, while the 16 image is still what's running:
+
+```bash
+# 1. With the OLD (16) compose file still checked out, dump the database
+docker compose --env-file .env.production -f docker-compose.production.yml \
+  exec -T db pg_dumpall -U qualis > qualis-backup-$(date +%F).sql
+
+# 2. Stop, and remove the old volume once the dump is verified non-empty
+docker compose --env-file .env.production -f docker-compose.production.yml down
+docker volume rm qualis-production_qualis-pgdata
+
+# 3. Pull the new compose file, start only the database, and restore
+docker compose --env-file .env.production -f docker-compose.production.yml up -d db
+docker compose --env-file .env.production -f docker-compose.production.yml \
+  exec -T db psql -U qualis -d postgres < qualis-backup-$(date +%F).sql
+
+# 4. Bring the rest up; migrations run as usual
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
+```
+
+Check the dump file is non-empty and ends with a complete statement before
+deleting anything. If you would rather not migrate right now, pinning
+`image: postgres:16-alpine` and restoring the `/var/lib/postgresql/data` mount
+point keeps the previous behaviour — the application code supports both.
+
 ### Startup validation
 
 On startup the backend checks for required tables (`projects`, `users`, `studies`, `participants`, …) and critical columns. If something is missing, it logs a warning with the remediation step (typically `alembic upgrade head`) and continues — it does not fail closed.
