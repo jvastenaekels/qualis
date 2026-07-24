@@ -91,7 +91,7 @@
     "devDependencies": {
         "@axe-core/playwright": "^4.12.1",
         "@babel/core": "^7.29.0",
-        "@babel/plugin-transform-runtime": "^7.29.0",
+        "@babel/plugin-transform-runtime": "^8.0.1",
         "@biomejs/biome": "2.3.10",
         "@faker-js/faker": "^10.2.0",
         "@playwright/test": "^1.61.1",
