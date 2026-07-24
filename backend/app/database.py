@@ -33,14 +33,25 @@ if "sslmode=" in SQLALCHEMY_DATABASE_URL:
     q.pop("sslmode", None)
     SQLALCHEMY_DATABASE_URL = urlunparse(u._replace(query=urlencode(q, doseq=True)))
 
-# Pool sizing: production gets a larger pool; dev/test stays minimal
-# to fit within sandbox DB plans (~5-10 connection slots).
+# Pool sizing. Production stays conservative to fit sandbox DB plans (~5-10
+# connection slots); local/Docker runs target a self-hosted Postgres (100 slots
+# by default), where a 1+1 pool made every concurrent request queue behind two
+# connections. Both ends are overridable via DB_POOL_SIZE / DB_MAX_OVERFLOW so a
+# constrained deployment can dial them back down without a code change.
 _is_production = settings.ENVIRONMENT == "production"
+_default_pool_size = 3 if _is_production else 5
+_default_max_overflow = 2 if _is_production else 5
 
 engine_kwargs: dict[str, Any] = {
     "echo": False,
-    "pool_size": 3 if _is_production else 1,
-    "max_overflow": 2 if _is_production else 1,
+    "pool_size": (
+        _default_pool_size if settings.DB_POOL_SIZE is None else settings.DB_POOL_SIZE
+    ),
+    "max_overflow": (
+        _default_max_overflow
+        if settings.DB_MAX_OVERFLOW is None
+        else settings.DB_MAX_OVERFLOW
+    ),
     "pool_timeout": 30,
     "pool_recycle": 1800,
     "pool_pre_ping": True,  # Detect disconnected connections

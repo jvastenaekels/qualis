@@ -14,6 +14,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+      # Probe every second while starting so a restart is noticed promptly
+      # (Docker Engine 25+; older daemons ignore the key). Durability settings
+      # stay at the Postgres defaults here — unlike the dev Compose file.
+      start_interval: 1s
+      start_period: 30s
     restart: unless-stopped
 
   backend:
@@ -42,6 +47,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 12
+      start_interval: 1s
       start_period: 60s
     restart: unless-stopped
 
