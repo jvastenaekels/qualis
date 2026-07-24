@@ -1,5 +1,48 @@
 # Changelog
 
+## [0.7.4](https://github.com/jvastenaekels/qualis/compare/v0.7.3...v0.7.4) (2026-07-24)
+
+
+### Bug fixes
+
+* audit Wave E — lifecycle & cross-entity integrity (5 findings) ([#247](https://github.com/jvastenaekels/qualis/issues/247)) ([c2d7f1c](https://github.com/jvastenaekels/qualis/commit/c2d7f1cafdb6cbea7ddc207f27436d157dc7bd34))
+* audit Wave F — export hardening (3 findings) ([#249](https://github.com/jvastenaekels/qualis/issues/249)) ([7a93c76](https://github.com/jvastenaekels/qualis/commit/7a93c764faf57d71ba37fc9a1551e83c7e4c3b40))
+* audit Wave G — analysis audit-trail & degeneracy warnings (G3, G4) ([#250](https://github.com/jvastenaekels/qualis/issues/250)) ([b53a1c7](https://github.com/jvastenaekels/qualis/commit/b53a1c7f130ad3ea7d4990eb4ad5cf00e1fefc8e))
+* audit Wave H — list_studies eager-load + export perf (H1, H3, H4a) ([#258](https://github.com/jvastenaekels/qualis/issues/258)) ([add9d44](https://github.com/jvastenaekels/qualis/commit/add9d442d9f7b81741f68e4ae11a57f2457a8f3a))
+* **ci:** whitelist the Starlette Response overrides for vulture ([e9c178a](https://github.com/jvastenaekels/qualis/commit/e9c178a5f0a0df8f6c51182e62034933d5ad938c))
+* **deps:** resolve frontend security advisories ([e7674d3](https://github.com/jvastenaekels/qualis/commit/e7674d36f6194bc00e2801d918d0d85d5e1fb774))
+* **deps:** resync requirements.txt with uv.lock (unbreak Scalingo build) ([336e66d](https://github.com/jvastenaekels/qualis/commit/336e66d67b04157b0220f30d9838d733faf40c3a))
+* **install:** align documented prerequisites with what CI exercises ([#265](https://github.com/jvastenaekels/qualis/issues/265)) ([7d2712d](https://github.com/jvastenaekels/qualis/commit/7d2712ded3890941be399ac7624aa91a3364cb38))
+* **onboarding:** clarify demo setup and recovery ([08ad194](https://github.com/jvastenaekels/qualis/commit/08ad194bf598c971da2255c691aa8852e20536d7))
+* **onboarding:** clarify first-run, persist admin language, tidy docs ([3edce26](https://github.com/jvastenaekels/qualis/commit/3edce264248660c810e20e100afc99ae46345316))
+* **onboarding:** harden setup and first-run guidance ([53016fa](https://github.com/jvastenaekels/qualis/commit/53016faa9c9cac1e4d78315dcec105b310ccf72a))
+* **onboarding:** keep study import accessible ([32d668f](https://github.com/jvastenaekels/qualis/commit/32d668f58c0bd83510f8d5e7f5788a6f827a0401))
+* **onboarding:** make demo startup deterministic ([d6bf9af](https://github.com/jvastenaekels/qualis/commit/d6bf9afc1ba6e616a323417d27e636cbc9dbc84e))
+* **onboarding:** unblock participant clicks and refresh tutorial ([21afb35](https://github.com/jvastenaekels/qualis/commit/21afb354ca52b192a12d211a2c78eeca5502fc84))
+* **security:** patch the postcss advisory, accept the react-router one ([#280](https://github.com/jvastenaekels/qualis/issues/280)) ([9e97b16](https://github.com/jvastenaekels/qualis/commit/9e97b16b4f9da71ce3f44146a9c179f793800176))
+* **storage:** tolerate unavailable browser storage ([dd0763d](https://github.com/jvastenaekels/qualis/commit/dd0763d746b710e685e75faa08e64b6402e78068))
+* **study:** drop Qualis footer on the consent page ([d092a16](https://github.com/jvastenaekels/qualis/commit/d092a16a4af7beaf484ae1f3dae784e760c3aa10))
+
+
+### Performance
+
+* **backend:** move to Python 3.14 and refresh locked dependencies ([c9b5629](https://github.com/jvastenaekels/qualis/commit/c9b562969e42201708d14f929a3a04a444961e20))
+* **backend:** serialise JSON responses with orjson ([0e87286](https://github.com/jvastenaekels/qualis/commit/0e87286933aa539ea4ce6e83127a3ed085ec994e))
+* **db:** move PostgreSQL from 16 to 18 ([8eb360b](https://github.com/jvastenaekels/qualis/commit/8eb360b5982ff35c474696de73c1cf9037745027))
+* **docker:** speed up builds, startup and asset serving ([3d44f87](https://github.com/jvastenaekels/qualis/commit/3d44f87222481c287b0c56567976fbb90463ab96))
+* **frontend:** let Rolldown split chunks instead of grouping by package ([8f7faf6](https://github.com/jvastenaekels/qualis/commit/8f7faf63e7ca97fa03dd89faa9b40ba741e6442e))
+
+
+### Refactor
+
+* audit Wave J — maintainability dedup (J1–J4) ([#260](https://github.com/jvastenaekels/qualis/issues/260)) ([8a7f4c2](https://github.com/jvastenaekels/qualis/commit/8a7f4c2b6376b9159935c4ecc9b132edc4b17056))
+
+
+### Documentation
+
+* index the three operator pages missing from the table of contents ([#266](https://github.com/jvastenaekels/qualis/issues/266)) ([cf6ea4e](https://github.com/jvastenaekels/qualis/commit/cf6ea4efbdf6215b5eda73891b055d55656170d1))
+* refine contributor acknowledgments wording ([c6f0069](https://github.com/jvastenaekels/qualis/commit/c6f0069980cf48c10a854fcb67dc70931c45a561))
+
 ## [0.7.3](https://github.com/jvastenaekels/qualis/compare/v0.7.2...v0.7.3) (2026-06-20)
 
 
