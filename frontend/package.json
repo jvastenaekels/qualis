@@ -94,7 +94,7 @@
         "@babel/plugin-transform-runtime": "^7.29.0",
         "@biomejs/biome": "2.3.10",
         "@faker-js/faker": "^10.2.0",
-        "@playwright/test": "^1.57.0",
+        "@playwright/test": "^1.61.1",
         "@rolldown/plugin-babel": "^0.2.3",
         "@tailwindcss/container-queries": "^0.1.1",
         "@tailwindcss/typography": "^0.5.19",
