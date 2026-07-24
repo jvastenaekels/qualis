@@ -113,6 +113,82 @@ jobs:
         # is not worth the wall-clock saving.
         run: cd backend && uv run pytest tests
 
+  docker-stack:
+    name: Docker Images & Compose Stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Nothing else in CI builds an image or starts Compose: the other jobs run
+    # the code straight on the runner, against a `services:` PostgreSQL. That
+    # left the Dockerfiles, the compose files and the nginx config completely
+    # unexercised — a broken base image, a bad healthcheck or a mount pointing
+    # at the wrong path would ship green. This job runs the same three targets
+    # a contributor runs locally, so the demo path is covered by the same
+    # commands the docs tell people to type.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker environment
+        # start_interval in the healthchecks needs Engine 25+; older daemons
+        # ignore the key silently, so record what we actually got.
+        run: |
+          docker version --format 'Engine: {{.Server.Version}}'
+          docker compose version
+          docker buildx version
+
+      - name: Build and start the stack
+        run: make demo-up
+
+      - name: Assert the images carry the expected runtimes
+        # These are the two version bumps most likely to be reverted by an
+        # unrelated edit to a base image tag, and both are invisible to every
+        # other job.
+        run: |
+          set -e
+          python_version=$(docker compose exec -T backend .venv/bin/python -c \
+            'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+          echo "backend Python: $python_version"
+          [ "$python_version" = "3.14" ] || { echo "expected Python 3.14"; exit 1; }
+
+          pg_major=$(docker compose exec -T db postgres --version | grep -oE '[0-9]+' | head -1)
+          echo "db PostgreSQL: $pg_major"
+          [ "$pg_major" = "18" ] || { echo "expected PostgreSQL 18"; exit 1; }
+
+      - name: Seed the demo dataset
+        run: make demo-seed
+
+      - name: Smoke-test through the public port
+        # Goes through nginx, so it also covers the SPA fallback, the /health
+        # proxy and the /api proxy — none of which the E2E suite touches, since
+        # Playwright points at the Vite dev server.
+        run: make demo-smoke
+
+      - name: Assert nginx compresses and caches assets
+        # Regression guard for frontend/nginx.conf: the upstream image ships
+        # gzip off, and a hashed asset served without a long max-age costs a
+        # revalidation round-trip on every page load.
+        run: |
+          set -e
+          asset=$(curl -fsS http://localhost:3000/ \
+            | grep -oE '/assets/[^"]+\.js' | head -1)
+          echo "probing $asset"
+          # GET, not HEAD: nginx has no body to compress on a HEAD, so it
+          # would answer without Content-Encoding and fail this check falsely.
+          headers=$(curl -fsS -o /dev/null -D - \
+            -H 'Accept-Encoding: gzip' "http://localhost:3000$asset")
+          echo "$headers"
+          echo "$headers" | grep -qi '^content-encoding: gzip' \
+            || { echo "asset not gzipped"; exit 1; }
+          echo "$headers" | grep -qi 'cache-control:.*immutable' \
+            || { echo "hashed asset not immutably cached"; exit 1; }
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --tail 200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes
+
   frontend-lint:
     name: Frontend Lint & Quality
     runs-on: ubuntu-latest
