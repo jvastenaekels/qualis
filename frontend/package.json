@@ -92,7 +92,7 @@
         "@axe-core/playwright": "^4.11.0",
         "@babel/core": "^7.29.0",
         "@babel/plugin-transform-runtime": "^7.29.0",
-        "@biomejs/biome": "2.3.10",
+        "@biomejs/biome": "2.5.5",
         "@faker-js/faker": "^10.2.0",
         "@playwright/test": "^1.57.0",
         "@rolldown/plugin-babel": "^0.2.3",
