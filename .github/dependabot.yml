@@ -28,8 +28,14 @@ updates:
     # bump to mando>=0.8 produces an unsolvable pip resolution and breaks
     # the Scalingo deploy (PR #132 did exactly this). Its version is
     # dictated by radon — never bump it independently.
+    #
+    # `pydantic-core` is pinned exactly by pydantic (2.13.4 requires
+    # `pydantic-core==2.46.4`). A standalone bump to 2.47.0 is unsatisfiable
+    # and fails the Dependency Sync gate (PR #287). Its version is dictated
+    # by pydantic — it moves when pydantic moves, never on its own.
     ignore:
       - dependency-name: "mando"
+      - dependency-name: "pydantic-core"
 
   - package-ecosystem: "npm"
     directory: "/frontend"
@@ -76,6 +82,12 @@ updates:
       # move the whole babel set together, or after Rolldown drops the babel
       # bridge, then lift this.
       - dependency-name: "@babel/core"
+        update-types: ["version-update:semver-major"]
+      # @babel/plugin-transform-runtime is the other half of that same set.
+      # Its 8.0 `peer @babel/core@^8.0.0` is the mirror conflict: with core
+      # pinned at 7 (above), transform-runtime 8 fails npm ci ERESOLVE the
+      # other way (PR #288). Lift together with @babel/core, never alone.
+      - dependency-name: "@babel/plugin-transform-runtime"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
