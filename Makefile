@@ -16,8 +16,12 @@ run-frontend:
 seed:
 	cd backend && uv run python seed.py data/example-study.json
 
+# COMPOSE_BAKE delegates the build to buildx bake, which builds the backend and
+# frontend images in parallel instead of one after the other (ignored by Compose
+# older than 2.33). DOCKER_BUILDKIT=1 guarantees the cache mounts in both
+# Dockerfiles are honoured even if the daemon default was overridden.
 demo-up:
-	docker compose up --build -d --wait --wait-timeout 240
+	DOCKER_BUILDKIT=1 COMPOSE_BAKE=true docker compose up --build -d --wait --wait-timeout 240
 	@printf '\nQualis services are running.\nNext: make demo-seed\n\n'
 
 demo-seed:

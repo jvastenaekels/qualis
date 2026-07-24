@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str | None = None
 
+    # Connection-pool sizing. Leave unset to use the per-environment defaults
+    # in app.database (production stays conservative because managed Postgres
+    # plans cap concurrent connections around 5-10). Set explicitly when the
+    # database has headroom — a self-hosted or Docker Postgres allows 100, and
+    # an undersized pool serialises every concurrent request behind it.
+    DB_POOL_SIZE: int | None = None
+    DB_MAX_OVERFLOW: int | None = None
+
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
