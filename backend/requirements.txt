@@ -26,7 +26,7 @@ boolean-py==5.0
     # via license-expression
 boto3==1.43.55
     # via qualis-backend
-botocore==1.43.55
+botocore==1.43.56
     # via
     #   boto3
     #   s3transfer
