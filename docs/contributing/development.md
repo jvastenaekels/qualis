@@ -8,8 +8,10 @@ For the architectural overview, see [`../explanation/architecture.md`](../explan
 
 ## Prerequisites
 
-- Git, GNU Make, Python 3.13+, [uv](https://docs.astral.sh/uv/), Node.js 24+,
-  PostgreSQL 15+, and a Unix-like environment (Linux, macOS, or WSL).
+- Git, GNU Make, Python 3.14, [uv](https://docs.astral.sh/uv/), Node.js 24,
+  PostgreSQL 18, and a Unix-like environment (Linux, macOS, or WSL).
+  These are the versions CI exercises; `make install` checks them and stops
+  with a clear message if the toolchain does not match.
 
 If PostgreSQL is not yet installed:
 

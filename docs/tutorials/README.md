@@ -20,7 +20,7 @@ Developer setup has moved out of the tutorials section into the contributing gui
 ## Prerequisites
 
 - **Researchers:** A modern web browser (Chrome, Firefox, Safari, or Edge). No software installation required if using a hosted instance.
-- **Developers:** Git, Python 3.13+, Node.js 24+, and PostgreSQL 15+. See the [Development Workflow guide](../contributing/development.md) for full setup instructions.
+- **Developers:** Git, Python 3.14, Node.js 24, and PostgreSQL 18 — the versions CI exercises. See the [Development Workflow guide](../contributing/development.md) for full setup instructions.
 
 ## How to Use These Tutorials
 
