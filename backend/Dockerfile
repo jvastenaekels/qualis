@@ -1,5 +1,11 @@
 # syntax=docker/dockerfile:1.7
-FROM python:3.13-slim
+# 3.14 ships the tail-call interpreter, worth a few percent of CPU across the
+# board for free. Every native dependency (asyncpg, pydantic-core, numpy,
+# bcrypt, greenlet, uvloop) publishes cp314 manylinux wheels, so the image
+# builds without a compiler. Keep this in step with .python-version and the
+# `python-version` inputs in .github/workflows — testing on a different
+# interpreter than we deploy defeats the point.
+FROM python:3.14-slim
 
 WORKDIR /app
 

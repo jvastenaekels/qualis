@@ -70,6 +70,14 @@ python_files = "test_*.py"
 [tool.ruff]
 target-version = "py313"
 
+[tool.ruff.lint]
+# Pinned explicitly rather than inherited. Ruff 0.16 widened its default rule
+# set (B, I, UP, TRY, SIM, RUF…), which surfaced 489 findings on an unchanged
+# codebase — 286 of them B008 false positives on FastAPI's `Depends()` idiom.
+# Naming the set here means a ruff bump can no longer redefine what CI enforces;
+# adopting the wider set is a deliberate change, not a side effect.
+select = ["E4", "E7", "E9", "F"]
+
 [tool.deptry]
 known_first_party = ["app"]
 
