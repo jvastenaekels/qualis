@@ -5,7 +5,7 @@ description = "Backend for Qualis"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]>=0.136.0,<0.137.0",
+    "fastapi[standard]>=0.136.0,<0.140.0",
     "asyncpg==0.31.0",
     "pydantic==2.13.3",
     "sqlalchemy[asyncio]==2.0.45",
