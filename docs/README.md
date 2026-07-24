@@ -36,6 +36,8 @@ Practical guides for accomplishing specific goals.
 |-------|-------------|
 | [Deployment](guides/deployment.md) | Deploy to Scalingo, Render, or Docker |
 | [S3 Setup](guides/s3-setup.md) | Configure S3-compatible storage for audio recordings |
+| [Running without S3](guides/running-without-s3.md) | What still works with no object storage, and what degrades |
+| [Running without SMTP](guides/running-without-smtp.md) | What still works with no mail server, and what degrades |
 
 ### For Contributors
 
@@ -58,6 +60,7 @@ Dry, accurate technical descriptions of the system.
 | [Admin Dashboard](reference/admin-dashboard.md) | Page-by-page catalog of the admin UI |
 | [Frontend Components](reference/components.md) | Sorting primitives + component index |
 | [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export format specification |
+| [GDPR Memo for Self-Hosters](reference/gdpr-self-hosters.md) | Controls the software provides, for the operator's own DPIA and DPA |
 
 ---
 
