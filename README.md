@@ -229,10 +229,12 @@ Use this path when you want hot reload, local tests, or direct backend/frontend 
 #### Prerequisites
 
 - Git and GNU Make
-- Python 3.13+
+- Python 3.14 — the version CI and the backend image use. `pyproject.toml`
+  declares 3.13 as the floor, but only 3.14 is exercised.
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
-- [Node.js](https://nodejs.org/) v24+
-- PostgreSQL 15+ (running locally or reachable by URL)
+- [Node.js](https://nodejs.org/) v24 (the active LTS line, pinned in `.nvmrc`)
+- PostgreSQL 18 — the version CI and `docker-compose.yml` use. Earlier majors
+  are untested.
 
 #### From zero
 
@@ -246,6 +248,8 @@ psql -U postgres
 # In psql:
 CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
 CREATE DATABASE qualis_dev OWNER qualis_user;
+-- The test suite needs its own database; `make test` resets it between runs.
+CREATE DATABASE qualis_test OWNER qualis_user;
 \q
 
 # 3. Configure environment
@@ -332,8 +336,8 @@ Organized using the [Diataxis framework](https://diataxis.fr/). See the [full in
 | Layer | Technologies |
 | :---- | :----------- |
 | **Frontend** | React 19, TypeScript, Vite, Tailwind CSS, dnd-kit, Zustand, TanStack Query, react-i18next |
-| **Backend** | Python 3.13, FastAPI, SQLAlchemy (async), Pydantic, Alembic |
-| **Database** | PostgreSQL 15+ |
+| **Backend** | Python 3.14, FastAPI, SQLAlchemy (async), Pydantic, Alembic |
+| **Database** | PostgreSQL 18 |
 | **Storage** | S3-compatible (AWS, MinIO, Cloudflare R2) for audio recordings |
 | **Tooling** | uv, npm, Biome, Ruff, Vitest, Playwright |
 

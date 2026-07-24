@@ -1,9 +1,37 @@
 -include .env
 export
 
-.PHONY: install run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
+.PHONY: install preflight run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
 
-install:
+# Toolchain versions CI exercises. Keep in sync with .python-version, .nvmrc,
+# backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
+PYTHON_VERSION := 3.14
+NODE_MAJOR := 24
+POSTGRES_MAJOR := 18
+
+# Fail early, and say why. Without this the toolchain mismatch only surfaces
+# deep inside `uv sync` or at the first migration, where the error names a
+# dependency rather than the actual cause.
+preflight:
+	@fail=0; \
+	command -v uv >/dev/null 2>&1 || { echo "MISSING  uv — install: https://docs.astral.sh/uv/"; fail=1; }; \
+	command -v node >/dev/null 2>&1 || { echo "MISSING  node — expected v$(NODE_MAJOR).x"; fail=1; }; \
+	if command -v node >/dev/null 2>&1; then \
+		major=$$(node --version | sed 's/^v\([0-9]*\).*/\1/'); \
+		[ "$$major" = "$(NODE_MAJOR)" ] || echo "WARN     node v$$major, expected v$(NODE_MAJOR) (see .nvmrc)"; \
+	fi; \
+	if command -v python3 >/dev/null 2>&1; then \
+		pv=$$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])'); \
+		[ "$$pv" = "$(PYTHON_VERSION)" ] || echo "WARN     python $$pv, expected $(PYTHON_VERSION) (uv installs it if absent)"; \
+	fi; \
+	if command -v psql >/dev/null 2>&1; then \
+		pg=$$(psql --version | sed 's/[^0-9]*\([0-9]*\).*/\1/'); \
+		[ "$$pg" = "$(POSTGRES_MAJOR)" ] || echo "WARN     psql client $$pg, expected $(POSTGRES_MAJOR) — the server major is what matters"; \
+	fi; \
+	[ -f .env ] || echo "WARN     no .env — copy .env.example and fill SECRET_KEY, IP_HASH_SALT, DATABASE_URL"; \
+	[ "$$fail" = "0" ] || { echo; echo "Prerequisites missing. See README.md > Local development setup."; exit 1; }
+
+install: preflight
 	cd backend && uv sync
 	cd frontend && npm ci
 
