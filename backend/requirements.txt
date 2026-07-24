@@ -160,6 +160,8 @@ nodeenv==1.10.0
     # via pre-commit
 numpy==2.5.1
     # via qualis-backend
+orjson==3.11.9
+    # via qualis-backend
 packageurl-python==0.17.6
     # via cyclonedx-python-lib
 packaging==26.2

@@ -35,6 +35,7 @@ dependencies = [
     "requests>=2.33.0",       # CVE-2026-25645 floor (Wave 1 F-02-003)
     "mako>=1.3.12",           # CVE-2026-44307 floor
     "urllib3>=2.7.0",         # CVE-2026-44431 / CVE-2026-44432 floor
+    "orjson>=3.11.9",
 ]
 
 [dependency-groups]
@@ -111,6 +112,8 @@ module = [
     # SMTP-optional mode — pure startup banner helper
     "app.utils.smtp_mode",
     "app.utils.storage_mode",
+    # orjson-backed default response class
+    "app.utils.json_response",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true

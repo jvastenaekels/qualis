@@ -24,6 +24,7 @@ from app.middleware.errors import (
 )
 from app.middleware.log_scrub import install_access_log_scrub
 from app.middleware.security import SecurityHeadersMiddleware
+from app.utils.json_response import ORJSONResponse
 from app.routers import audio, auth, logs, participants, submissions
 from app.routers import config as config_router
 from app.routers.admin import concourses as admin_concourses
@@ -123,7 +124,14 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Qualis API", lifespan=lifespan)
+# default_response_class applies to every route that does not name its own
+# Response type, so the large dump/export/analysis payloads serialise through
+# orjson instead of the stdlib. Routes returning StreamingResponse or an
+# explicit JSONResponse are unaffected. See app.utils.json_response for why the
+# orjson options are not the library defaults.
+app = FastAPI(
+    title="Qualis API", lifespan=lifespan, default_response_class=ORJSONResponse
+)
 
 # Rate Limiter
 app.state.limiter = limiter
