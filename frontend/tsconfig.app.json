@@ -25,7 +25,23 @@
         "noUncheckedSideEffectImports": true,
         "noImplicitOverride": true,
         "noUncheckedIndexedAccess": true,
-        "baseUrl": ".",
+        /* No baseUrl: it is removed in TypeScript 7, and the mapping below is
+           already tsconfig-relative — which is all baseUrl "." did here. Kept
+           out so the config is ready when we can actually move.
+
+           TypeScript 7 (the native compiler) is NOT adoptable yet, despite
+           being 5.4x faster on this codebase — measured 12.6s -> 2.3s for
+           `tsc -b --force`, with zero type errors. It drops the JS compiler
+           API (ts.createProgram / ts.resolveModuleName are undefined), which
+           two CI gates depend on:
+             - dependency-cruiser 18.1.0 refuses it outright ("support for
+               typescript@>=7 will follow when its API is published and
+               stable"). On 17.4.3 it is worse than a refusal: the cruise
+               silently reports "0 modules" and exits 0, so the architecture
+               contract would pass without checking anything.
+             - knip 5.88 crashes on it. knip 6 fixes this by dropping
+               TypeScript for oxc, so that side is already solved upstream.
+           Re-test when dependency-cruiser ships TS 7 support. */
         "paths": {
             "@/*": ["./src/*"]
         }
