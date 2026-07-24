@@ -69,12 +69,6 @@ updates:
       # both together during the Tailwind v4 migration, never separately.
       - dependency-name: "tailwind-merge"
         update-types: ["version-update:semver-major"]
-      # @types/node must track the Node line the project actually runs
-      # (24 LTS — see .nvmrc, engines, backend/Dockerfile, ci.yml). #257
-      # moved the types to 26, which stops TypeScript from flagging APIs
-      # the runtime does not have. Lift when the project moves to Node 26.
-      - dependency-name: "@types/node"
-        update-types: ["version-update:semver-major"]
       # @babel/core 8 is a coordinated migration, not a drop-in bump. The
       # toolchain still holds @babel/plugin-transform-runtime@7, whose
       # `peer @babel/core@^7.0.0-0` conflicts with core 8, so npm ci fails
