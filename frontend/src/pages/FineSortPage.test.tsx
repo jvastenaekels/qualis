@@ -730,473 +730,473 @@ describe.each([true, false] as const)('FineSortPage Q-set sizes (rough=%s)', (ro
     });
 });
 
-describe.each([
-    true,
-    false,
-] as const)('FineSortPage statement-text edge cases (rough=%s)', (roughEnabled) => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        setViewport('desktop');
-        // Reset XSS sentinel between tests
-        (window as unknown as { __pwned?: boolean }).__pwned = undefined;
-    });
-
-    it('renders RTL text without crashing', () => {
-        const arabic = 'هذا بيان';
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: arabic },
-            { id: 2, code: '2', text: 'Plain' },
-            { id: 3, code: '3', text: 'Plain' },
-        ]);
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+describe.each([true, false] as const)(
+    'FineSortPage statement-text edge cases (rough=%s)',
+    (roughEnabled) => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+            setViewport('desktop');
+            // Reset XSS sentinel between tests
+            (window as unknown as { __pwned?: boolean }).__pwned = undefined;
         });
 
-        const { container } = renderWithProviders(<FineSortPage />);
+        it('renders RTL text without crashing', () => {
+            const arabic = 'هذا بيان';
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
+                { id: 1, code: '1', text: arabic },
+                { id: 2, code: '2', text: 'Plain' },
+                { id: 3, code: '3', text: 'Plain' },
+            ]);
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-        const card1 = container.querySelector('[data-card-id="1"]');
-        expect(card1).not.toBeNull();
-        expect(card1?.textContent).toBe(arabic);
-    });
+            const { container } = renderWithProviders(<FineSortPage />);
 
-    it('renders a 300-char statement without unbounded layout expansion', () => {
-        const longText = 'x'.repeat(300);
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: longText },
-            { id: 2, code: '2', text: 'Short' },
-            { id: 3, code: '3', text: 'Short' },
-        ]);
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+            const card1 = container.querySelector('[data-card-id="1"]');
+            expect(card1).not.toBeNull();
+            expect(card1?.textContent).toBe(arabic);
         });
 
-        const { container } = renderWithProviders(<FineSortPage />);
+        it('renders a 300-char statement without unbounded layout expansion', () => {
+            const longText = 'x'.repeat(300);
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
+                { id: 1, code: '1', text: longText },
+                { id: 2, code: '2', text: 'Short' },
+                { id: 3, code: '3', text: 'Short' },
+            ]);
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-        const deckContainer = container.querySelector('[data-testid="deck-cards-container"]');
-        expect(deckContainer).not.toBeNull();
-        // JSDOM does not lay out, so scrollHeight is 0 — assert it stays
-        // a finite, non-negative number (no infinite layout loop).
-        const sh = (deckContainer as HTMLElement).scrollHeight;
-        expect(Number.isFinite(sh)).toBe(true);
-        expect(sh).toBeGreaterThanOrEqual(0);
-        // The full string should be rendered as text content.
-        expect(container.querySelector('[data-card-id="1"]')?.textContent).toBe(longText);
-    });
+            const { container } = renderWithProviders(<FineSortPage />);
 
-    it('escapes HTML in statement text (no XSS)', () => {
-        const malicious = '<script>window.__pwned=true</script>';
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: malicious },
-            { id: 2, code: '2', text: 'Safe' },
-            { id: 3, code: '3', text: 'Safe' },
-        ]);
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+            const deckContainer = container.querySelector('[data-testid="deck-cards-container"]');
+            expect(deckContainer).not.toBeNull();
+            // JSDOM does not lay out, so scrollHeight is 0 — assert it stays
+            // a finite, non-negative number (no infinite layout loop).
+            const sh = (deckContainer as HTMLElement).scrollHeight;
+            expect(Number.isFinite(sh)).toBe(true);
+            expect(sh).toBeGreaterThanOrEqual(0);
+            // The full string should be rendered as text content.
+            expect(container.querySelector('[data-card-id="1"]')?.textContent).toBe(longText);
         });
 
-        const { container } = renderWithProviders(<FineSortPage />);
+        it('escapes HTML in statement text (no XSS)', () => {
+            const malicious = '<script>window.__pwned=true</script>';
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
+                { id: 1, code: '1', text: malicious },
+                { id: 2, code: '2', text: 'Safe' },
+                { id: 3, code: '3', text: 'Safe' },
+            ]);
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-        // The malicious script must NOT have executed during render.
-        expect((window as unknown as { __pwned?: boolean }).__pwned).toBeUndefined();
-        // The raw text must be visible as text — React escapes it.
-        const card = container.querySelector('[data-card-id="1"]');
-        expect(card?.textContent).toBe(malicious);
-        // And there must be no <script> tag injected from statement text.
-        const injected = Array.from(container.querySelectorAll('script')).filter((s) =>
-            s.textContent?.includes('window.__pwned')
-        );
-        expect(injected).toHaveLength(0);
-    });
-});
+            const { container } = renderWithProviders(<FineSortPage />);
 
-describe.each([
-    true,
-    false,
-] as const)('FineSortPage interaction edge cases (rough=%s)', (roughEnabled) => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        setViewport('desktop');
-    });
+            // The malicious script must NOT have executed during render.
+            expect((window as unknown as { __pwned?: boolean }).__pwned).toBeUndefined();
+            // The raw text must be visible as text — React escapes it.
+            const card = container.querySelector('[data-card-id="1"]');
+            expect(card?.textContent).toBe(malicious);
+            // And there must be no <script> tag injected from statement text.
+            const injected = Array.from(container.querySelectorAll('script')).filter((s) =>
+                s.textContent?.includes('window.__pwned')
+            );
+            expect(injected).toHaveLength(0);
+        });
+    }
+);
 
-    it('keeps validate disabled after rapid double-click before placement completes', () => {
-        // The page delegates click handling to useFineSortDrag → handleCardClick,
-        // which the response store ultimately translates into placeCardInGrid.
-        // The store dedupes by filtering out the existing entry, so two rapid
-        // calls with the same id collapse to a single qsort entry.
-        const placeMock = vi.fn();
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: 'A' },
-            { id: 2, code: '2', text: 'B' },
-            { id: 3, code: '3', text: 'C' },
-        ]);
-        fx.responseStore.placeCardInGrid = placeMock;
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+describe.each([true, false] as const)(
+    'FineSortPage interaction edge cases (rough=%s)',
+    (roughEnabled) => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+            setViewport('desktop');
         });
 
-        renderWithProviders(<FineSortPage />);
-        // Simulate two rapid synchronous calls; the action passed to the
-        // store should still produce a single placed card (idempotent).
-        placeMock(1, 0, 0);
-        placeMock(1, 0, 0);
-        // The action itself is called twice (it is a fan-out point), but
-        // the store-level invariant is that the qsort is deduped — verified
-        // separately in useResponseStore.test. Here we assert that the
-        // page does not crash and the validate button stays in the
-        // expected disabled state (cards still unplaced in the mock).
-        expect(screen.getByTestId('validate-btn')).toBeDisabled();
-    });
-
-    it('Escape during an active selection clears selectedCardId', () => {
-        // useFineSort listens for window keydown and resets selectedCardId
-        // to null when Escape fires. This covers the "Escape during drag"
-        // contract at the hook level; full DnD cancellation is covered
-        // indirectly via useFineSortDrag tests.
-        const setSelectedCardMock = vi.fn();
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: 'A' },
-            { id: 2, code: '2', text: 'B' },
-            { id: 3, code: '3', text: 'C' },
-        ]);
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: setSelectedCardMock,
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
-        });
-
-        renderWithProviders(<FineSortPage />);
-        fireEvent.keyDown(window, { key: 'Escape' });
-        expect(setSelectedCardMock).toHaveBeenCalledWith(null);
-    });
-
-    it('rejects placement into a full column in forced mode', () => {
-        // Forced grid with capacity 1: placing a card succeeds, then a
-        // second placement into the same column is rejected by the store
-        // (warnOnFull=true). We mount the page to confirm that the
-        // distribution_mode='forced' branch wires through cleanly.
-        const fx = buildEdgeCaseFixtures(
-            roughEnabled,
-            [
-                { id: 1, code: '1', text: 'A' },
-                { id: 2, code: '2', text: 'B' },
-            ],
-            [
-                { score: -1, capacity: 1 },
-                { score: 1, capacity: 1 },
-            ]
-        );
-        const cfg: StudyConfig = { ...fx.config, distribution_mode: 'forced' };
-        // Pre-place card 1 in column 0.
-        fx.responseStore.qsort = [{ statementId: 1, col: 0, row: 0 }];
-        setupStoreMocks({
-            useConfigStore: { config: cfg },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
-        });
-
-        renderWithProviders(<FineSortPage />);
-        // The page mounts cleanly with the forced full column;
-        // capacity-1 column is rendered (grid-slots sums all capacities).
-        expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
-        expect(screen.getByTestId('grid-slots')).toHaveTextContent('2');
-        // Card 1 is placed; the unplaced count reflects only card 2.
-        expect(screen.getAllByTestId(/^deck-(agree|disagree|neutral|flat)$/)).toBeTruthy();
-    });
-
-    it('over-fills allowed in flexible mode (page renders without rejection)', () => {
-        // Flexible mode renders the same grid surface but the participant
-        // is allowed to overflow column capacity at the UI layer. The
-        // page itself must not crash when distribution_mode='flexible'
-        // and qsort already exceeds a column capacity.
-        const fx = buildEdgeCaseFixtures(
-            roughEnabled,
-            [
+        it('keeps validate disabled after rapid double-click before placement completes', () => {
+            // The page delegates click handling to useFineSortDrag → handleCardClick,
+            // which the response store ultimately translates into placeCardInGrid.
+            // The store dedupes by filtering out the existing entry, so two rapid
+            // calls with the same id collapse to a single qsort entry.
+            const placeMock = vi.fn();
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
                 { id: 1, code: '1', text: 'A' },
                 { id: 2, code: '2', text: 'B' },
                 { id: 3, code: '3', text: 'C' },
-            ],
-            [
-                { score: -1, capacity: 1 },
-                { score: 1, capacity: 1 },
-            ]
-        );
-        const cfg: StudyConfig = { ...fx.config, distribution_mode: 'flexible' };
-        fx.responseStore.qsort = [
-            { statementId: 1, col: 0, row: 0 },
-            { statementId: 2, col: 0, row: 1 },
-        ];
-        setupStoreMocks({
-            useConfigStore: { config: cfg },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+            ]);
+            fx.responseStore.placeCardInGrid = placeMock;
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
+
+            renderWithProviders(<FineSortPage />);
+            // Simulate two rapid synchronous calls; the action passed to the
+            // store should still produce a single placed card (idempotent).
+            placeMock(1, 0, 0);
+            placeMock(1, 0, 0);
+            // The action itself is called twice (it is a fan-out point), but
+            // the store-level invariant is that the qsort is deduped — verified
+            // separately in useResponseStore.test. Here we assert that the
+            // page does not crash and the validate button stays in the
+            // expected disabled state (cards still unplaced in the mock).
+            expect(screen.getByTestId('validate-btn')).toBeDisabled();
         });
 
-        renderWithProviders(<FineSortPage />);
-        expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
-    });
-});
-
-describe.each([
-    true,
-    false,
-] as const)('FineSortPage viewport rotation (rough=%s)', (roughEnabled) => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it('rotation portrait → landscape preserves placedIds and selection', () => {
-        setViewport('mobile_portrait');
-
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: 'A' },
-            { id: 2, code: '2', text: 'B' },
-            { id: 3, code: '3', text: 'C' },
-        ]);
-        // Card 1 placed; card 2 will be the "selected" one.
-        fx.responseStore.qsort = [{ statementId: 1, col: 1, row: 0 }];
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
-        });
-
-        const { container } = renderWithProviders(<FineSortPage />);
-        // Sanity: 2 cards unplaced (2, 3); 1 placed.
-        expect(container.querySelectorAll('[data-card-id]').length).toBe(2);
-
-        setViewport('mobile_landscape');
-
-        // After rotation the page is still mounted; placedIds preserved.
-        expect(container.querySelectorAll('[data-card-id]').length).toBe(2);
-        expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
-    });
-
-    it('rotation landscape → portrait does not unplace cards', () => {
-        setViewport('tablet_landscape');
-
-        const fx = buildEdgeCaseFixtures(
-            roughEnabled,
-            [
+        it('Escape during an active selection clears selectedCardId', () => {
+            // useFineSort listens for window keydown and resets selectedCardId
+            // to null when Escape fires. This covers the "Escape during drag"
+            // contract at the hook level; full DnD cancellation is covered
+            // indirectly via useFineSortDrag tests.
+            const setSelectedCardMock = vi.fn();
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
                 { id: 1, code: '1', text: 'A' },
                 { id: 2, code: '2', text: 'B' },
                 { id: 3, code: '3', text: 'C' },
-                { id: 4, code: '4', text: 'D' },
-            ],
-            [
-                { score: -1, capacity: 2 },
-                { score: 0, capacity: 2 },
-                { score: 1, capacity: 2 },
-            ]
-        );
-        fx.responseStore.qsort = [
-            { statementId: 1, col: 0, row: 0 },
-            { statementId: 2, col: 1, row: 0 },
-            { statementId: 3, col: 2, row: 0 },
-        ];
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+            ]);
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: setSelectedCardMock,
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
+
+            renderWithProviders(<FineSortPage />);
+            fireEvent.keyDown(window, { key: 'Escape' });
+            expect(setSelectedCardMock).toHaveBeenCalledWith(null);
         });
 
-        const { container } = renderWithProviders(<FineSortPage />);
-        // Only card 4 is unplaced before rotation.
-        expect(container.querySelectorAll('[data-card-id]').length).toBe(1);
+        it('rejects placement into a full column in forced mode', () => {
+            // Forced grid with capacity 1: placing a card succeeds, then a
+            // second placement into the same column is rejected by the store
+            // (warnOnFull=true). We mount the page to confirm that the
+            // distribution_mode='forced' branch wires through cleanly.
+            const fx = buildEdgeCaseFixtures(
+                roughEnabled,
+                [
+                    { id: 1, code: '1', text: 'A' },
+                    { id: 2, code: '2', text: 'B' },
+                ],
+                [
+                    { score: -1, capacity: 1 },
+                    { score: 1, capacity: 1 },
+                ]
+            );
+            const cfg: StudyConfig = { ...fx.config, distribution_mode: 'forced' };
+            // Pre-place card 1 in column 0.
+            fx.responseStore.qsort = [{ statementId: 1, col: 0, row: 0 }];
+            setupStoreMocks({
+                useConfigStore: { config: cfg },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-        setViewport('tablet_portrait');
-
-        // After rotation, still only card 4 is unplaced — qsort intact.
-        expect(container.querySelectorAll('[data-card-id]').length).toBe(1);
-    });
-
-    it('zoom 50% → 200% does not break drag handles (data attributes intact)', () => {
-        setViewport('desktop');
-
-        const fx = buildEdgeCaseFixtures(roughEnabled, [
-            { id: 1, code: '1', text: 'A' },
-            { id: 2, code: '2', text: 'B' },
-            { id: 3, code: '3', text: 'C' },
-        ]);
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+            renderWithProviders(<FineSortPage />);
+            // The page mounts cleanly with the forced full column;
+            // capacity-1 column is rendered (grid-slots sums all capacities).
+            expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
+            expect(screen.getByTestId('grid-slots')).toHaveTextContent('2');
+            // Card 1 is placed; the unplaced count reflects only card 2.
+            expect(screen.getAllByTestId(/^deck-(agree|disagree|neutral|flat)$/)).toBeTruthy();
         });
 
-        const { container } = renderWithProviders(<FineSortPage />);
+        it('over-fills allowed in flexible mode (page renders without rejection)', () => {
+            // Flexible mode renders the same grid surface but the participant
+            // is allowed to overflow column capacity at the UI layer. The
+            // page itself must not crash when distribution_mode='flexible'
+            // and qsort already exceeds a column capacity.
+            const fx = buildEdgeCaseFixtures(
+                roughEnabled,
+                [
+                    { id: 1, code: '1', text: 'A' },
+                    { id: 2, code: '2', text: 'B' },
+                    { id: 3, code: '3', text: 'C' },
+                ],
+                [
+                    { score: -1, capacity: 1 },
+                    { score: 1, capacity: 1 },
+                ]
+            );
+            const cfg: StudyConfig = { ...fx.config, distribution_mode: 'flexible' };
+            fx.responseStore.qsort = [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 0, row: 1 },
+            ];
+            setupStoreMocks({
+                useConfigStore: { config: cfg },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-        (document.body.style as unknown as { zoom: string }).zoom = '0.5';
-        const cardsAt50 = container.querySelectorAll('[data-dnd-id]');
-        expect(cardsAt50.length).toBe(3);
+            renderWithProviders(<FineSortPage />);
+            expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
+        });
+    }
+);
 
-        (document.body.style as unknown as { zoom: string }).zoom = '2.0';
-        const cardsAt200 = container.querySelectorAll('[data-dnd-id]');
-        expect(cardsAt200.length).toBe(3);
-        // Drag-handle attribute is still present and well-formed.
-        for (const el of cardsAt200) {
-            expect(el.getAttribute('data-dnd-id')).toMatch(/^card-\d+$/);
-        }
+describe.each([true, false] as const)(
+    'FineSortPage viewport rotation (rough=%s)',
+    (roughEnabled) => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+        });
 
-        // Cleanup zoom side-effect for downstream tests
-        (document.body.style as unknown as { zoom: string }).zoom = '';
-    });
-});
+        it('rotation portrait → landscape preserves placedIds and selection', () => {
+            setViewport('mobile_portrait');
 
-describe.each([
-    true,
-    false,
-] as const)('FineSortPage distribution-mode edge cases (rough=%s)', (roughEnabled) => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        setViewport('desktop');
-    });
-
-    it.each([
-        'forced',
-        'flexible',
-    ] as const)('handles a capacity-0 column in %s mode (page renders, capacity sum reflects 0)', (mode) => {
-        const grid = [
-            { score: -1, capacity: 1 },
-            { score: 0, capacity: 0 }, // empty centre column
-            { score: 1, capacity: 1 },
-        ];
-        const fx = buildEdgeCaseFixtures(
-            roughEnabled,
-            [
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
                 { id: 1, code: '1', text: 'A' },
                 { id: 2, code: '2', text: 'B' },
-            ],
-            grid
-        );
-        const cfg: StudyConfig = { ...fx.config, distribution_mode: mode };
-        setupStoreMocks({
-            useConfigStore: { config: cfg },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+                { id: 3, code: '3', text: 'C' },
+            ]);
+            // Card 1 placed; card 2 will be the "selected" one.
+            fx.responseStore.qsort = [{ statementId: 1, col: 1, row: 0 }];
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
+
+            const { container } = renderWithProviders(<FineSortPage />);
+            // Sanity: 2 cards unplaced (2, 3); 1 placed.
+            expect(container.querySelectorAll('[data-card-id]').length).toBe(2);
+
+            setViewport('mobile_landscape');
+
+            // After rotation the page is still mounted; placedIds preserved.
+            expect(container.querySelectorAll('[data-card-id]').length).toBe(2);
+            expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
         });
 
-        renderWithProviders(<FineSortPage />);
+        it('rotation landscape → portrait does not unplace cards', () => {
+            setViewport('tablet_landscape');
 
-        // Grid renders all 3 columns; capacity sum = 1 + 0 + 1 = 2.
-        expect(screen.getByTestId('grid-slots')).toHaveTextContent('2');
-        // No crash, no DOM explosion.
-        expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
-    });
+            const fx = buildEdgeCaseFixtures(
+                roughEnabled,
+                [
+                    { id: 1, code: '1', text: 'A' },
+                    { id: 2, code: '2', text: 'B' },
+                    { id: 3, code: '3', text: 'C' },
+                    { id: 4, code: '4', text: 'D' },
+                ],
+                [
+                    { score: -1, capacity: 2 },
+                    { score: 0, capacity: 2 },
+                    { score: 1, capacity: 2 },
+                ]
+            );
+            fx.responseStore.qsort = [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 1, row: 0 },
+                { statementId: 3, col: 2, row: 0 },
+            ];
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
 
-    it('handles non-symmetric grid (asymmetric distribution, 16 cards total)', () => {
-        const grid = [
-            { score: -3, capacity: 1 },
-            { score: -2, capacity: 2 },
-            { score: -1, capacity: 3 },
-            { score: 0, capacity: 4 },
-            { score: 1, capacity: 3 },
-            { score: 2, capacity: 2 },
-            { score: 3, capacity: 1 },
-        ];
-        const stmts = Array.from({ length: 16 }, (_, i) => ({
-            id: i + 1,
-            code: String(i + 1),
-            text: `S${i + 1}`,
-        }));
-        // Place every card consistent with the grid capacity layout.
-        const qsort: { statementId: number; col: number; row: number }[] = [];
-        let next = 1;
-        grid.forEach((col, colIdx) => {
-            for (let row = 0; row < col.capacity; row++) {
-                qsort.push({ statementId: next, col: colIdx, row });
-                next += 1;
+            const { container } = renderWithProviders(<FineSortPage />);
+            // Only card 4 is unplaced before rotation.
+            expect(container.querySelectorAll('[data-card-id]').length).toBe(1);
+
+            setViewport('tablet_portrait');
+
+            // After rotation, still only card 4 is unplaced — qsort intact.
+            expect(container.querySelectorAll('[data-card-id]').length).toBe(1);
+        });
+
+        it('zoom 50% → 200% does not break drag handles (data attributes intact)', () => {
+            setViewport('desktop');
+
+            const fx = buildEdgeCaseFixtures(roughEnabled, [
+                { id: 1, code: '1', text: 'A' },
+                { id: 2, code: '2', text: 'B' },
+                { id: 3, code: '3', text: 'C' },
+            ]);
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
+
+            const { container } = renderWithProviders(<FineSortPage />);
+
+            (document.body.style as unknown as { zoom: string }).zoom = '0.5';
+            const cardsAt50 = container.querySelectorAll('[data-dnd-id]');
+            expect(cardsAt50.length).toBe(3);
+
+            (document.body.style as unknown as { zoom: string }).zoom = '2.0';
+            const cardsAt200 = container.querySelectorAll('[data-dnd-id]');
+            expect(cardsAt200.length).toBe(3);
+            // Drag-handle attribute is still present and well-formed.
+            for (const el of cardsAt200) {
+                expect(el.getAttribute('data-dnd-id')).toMatch(/^card-\d+$/);
             }
+
+            // Cleanup zoom side-effect for downstream tests
+            (document.body.style as unknown as { zoom: string }).zoom = '';
+        });
+    }
+);
+
+describe.each([true, false] as const)(
+    'FineSortPage distribution-mode edge cases (rough=%s)',
+    (roughEnabled) => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+            setViewport('desktop');
         });
 
-        const fx = buildEdgeCaseFixtures(roughEnabled, stmts, grid);
-        fx.responseStore.qsort = qsort;
-        // Empty rough/deck so everything is "placed".
-        fx.responseStore.rough = {
-            agree: [],
-            disagree: [],
-            neutral: [],
-            history: [],
-        };
-        fx.responseStore.deck = [];
-        setupStoreMocks({
-            useConfigStore: { config: fx.config },
-            useResponseStore: fx.responseStore,
-            useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: {
-                setSelectedCard: vi.fn(),
-                setActiveCard: vi.fn(),
-                setHoveredCard: vi.fn(),
-            },
+        it.each(['forced', 'flexible'] as const)(
+            'handles a capacity-0 column in %s mode (page renders, capacity sum reflects 0)',
+            (mode) => {
+                const grid = [
+                    { score: -1, capacity: 1 },
+                    { score: 0, capacity: 0 }, // empty centre column
+                    { score: 1, capacity: 1 },
+                ];
+                const fx = buildEdgeCaseFixtures(
+                    roughEnabled,
+                    [
+                        { id: 1, code: '1', text: 'A' },
+                        { id: 2, code: '2', text: 'B' },
+                    ],
+                    grid
+                );
+                const cfg: StudyConfig = { ...fx.config, distribution_mode: mode };
+                setupStoreMocks({
+                    useConfigStore: { config: cfg },
+                    useResponseStore: fx.responseStore,
+                    useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                    useUIStore: {
+                        setSelectedCard: vi.fn(),
+                        setActiveCard: vi.fn(),
+                        setHoveredCard: vi.fn(),
+                    },
+                });
+
+                renderWithProviders(<FineSortPage />);
+
+                // Grid renders all 3 columns; capacity sum = 1 + 0 + 1 = 2.
+                expect(screen.getByTestId('grid-slots')).toHaveTextContent('2');
+                // No crash, no DOM explosion.
+                expect(screen.getByTestId('grid-sort')).toBeInTheDocument();
+            }
+        );
+
+        it('handles non-symmetric grid (asymmetric distribution, 16 cards total)', () => {
+            const grid = [
+                { score: -3, capacity: 1 },
+                { score: -2, capacity: 2 },
+                { score: -1, capacity: 3 },
+                { score: 0, capacity: 4 },
+                { score: 1, capacity: 3 },
+                { score: 2, capacity: 2 },
+                { score: 3, capacity: 1 },
+            ];
+            const stmts = Array.from({ length: 16 }, (_, i) => ({
+                id: i + 1,
+                code: String(i + 1),
+                text: `S${i + 1}`,
+            }));
+            // Place every card consistent with the grid capacity layout.
+            const qsort: { statementId: number; col: number; row: number }[] = [];
+            let next = 1;
+            grid.forEach((col, colIdx) => {
+                for (let row = 0; row < col.capacity; row++) {
+                    qsort.push({ statementId: next, col: colIdx, row });
+                    next += 1;
+                }
+            });
+
+            const fx = buildEdgeCaseFixtures(roughEnabled, stmts, grid);
+            fx.responseStore.qsort = qsort;
+            // Empty rough/deck so everything is "placed".
+            fx.responseStore.rough = {
+                agree: [],
+                disagree: [],
+                neutral: [],
+                history: [],
+            };
+            fx.responseStore.deck = [];
+            setupStoreMocks({
+                useConfigStore: { config: fx.config },
+                useResponseStore: fx.responseStore,
+                useSessionStore: { currentStep: 4, setStep: vi.fn() },
+                useUIStore: {
+                    setSelectedCard: vi.fn(),
+                    setActiveCard: vi.fn(),
+                    setHoveredCard: vi.fn(),
+                },
+            });
+
+            renderWithProviders(<FineSortPage />);
+
+            // 16 capacity total → 16 statements placed → isAllPlaced=true →
+            // validate enabled.
+            expect(screen.getByTestId('grid-slots')).toHaveTextContent('16');
+            expect(screen.getByTestId('validate-btn')).not.toBeDisabled();
         });
-
-        renderWithProviders(<FineSortPage />);
-
-        // 16 capacity total → 16 statements placed → isAllPlaced=true →
-        // validate enabled.
-        expect(screen.getByTestId('grid-slots')).toHaveTextContent('16');
-        expect(screen.getByTestId('validate-btn')).not.toBeDisabled();
-    });
-});
+    }
+);

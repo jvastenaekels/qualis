@@ -41,6 +41,45 @@ interface UseGridPlacementProps {
     distributionMode?: DistributionMode;
 }
 
+/**
+ * Applies a resolved placement decision. Extracted from handlePlacement so the
+ * hook body stays under the cognitive-complexity budget: this holds the nested
+ * swap-vs-place / already-placed branching, leaving the caller with the linear
+ * decision logic. `finalRow` equals the original target row whenever
+ * `shouldSwap` is true (finalRow only diverges when an empty row was found, in
+ * which case shouldSwap stays false), so passing it in both branches preserves
+ * the previous behaviour.
+ */
+function applyPlacement(
+    actions: Actions,
+    decision: {
+        cardId: number;
+        col: number;
+        finalRow: number;
+        shouldSwap: boolean;
+        existingCard: DragCard | undefined;
+        activeCardPlaced: boolean;
+    }
+): void {
+    const { cardId, col, finalRow, shouldSwap, existingCard, activeCardPlaced } = decision;
+
+    if (shouldSwap && existingCard) {
+        if (activeCardPlaced) {
+            actions.swapCardsInGrid(cardId, existingCard.statementId);
+        } else {
+            actions.unplaceCard(existingCard.statementId);
+            actions.placeCardInGrid(cardId, col, finalRow);
+        }
+        return;
+    }
+
+    if (activeCardPlaced) {
+        actions.moveCardInGrid(cardId, col, finalRow);
+    } else {
+        actions.placeCardInGrid(cardId, col, finalRow);
+    }
+}
+
 export const useGridPlacement = ({
     responses,
     gridColumns,
@@ -109,20 +148,14 @@ export const useGridPlacement = ({
 
             const activeCardPlaced = responses.qsort.find((c) => c.statementId === cardId);
 
-            if (shouldSwap && existingCard) {
-                if (activeCardPlaced) {
-                    actions.swapCardsInGrid(cardId, existingCard.statementId);
-                } else {
-                    actions.unplaceCard(existingCard.statementId);
-                    actions.placeCardInGrid(cardId, col, targetRow);
-                }
-            } else {
-                if (activeCardPlaced) {
-                    actions.moveCardInGrid(cardId, col, finalRow);
-                } else {
-                    actions.placeCardInGrid(cardId, col, finalRow);
-                }
-            }
+            applyPlacement(actions, {
+                cardId,
+                col,
+                finalRow,
+                shouldSwap,
+                existingCard,
+                activeCardPlaced: Boolean(activeCardPlaced),
+            });
             return true;
         },
         [responses.qsort, findClosestEmptyRow, actions]

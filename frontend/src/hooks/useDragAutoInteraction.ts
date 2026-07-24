@@ -82,7 +82,7 @@ export const useDragAutoInteraction = ({
 
     const updateInteraction = useCallback(
         (x: number, y: number) => {
-            if (!interactionUtils || !interactionUtils.transformRef.current) return;
+            if (!interactionUtils?.transformRef.current) return;
 
             const threshold = 10;
             const dist = Math.sqrt((x - lastPos.current.x) ** 2 + (y - lastPos.current.y) ** 2);
