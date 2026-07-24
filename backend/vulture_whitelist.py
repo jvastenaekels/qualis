@@ -411,3 +411,11 @@ require_audio_storage
 # --- app/schemas/recruitment.py (#24: public-link capacity validator) ---
 # Pydantic @model_validator invoked by the framework, not called directly.
 reject_capacity_on_public
+
+# --- app/utils/json_response.py (orjson default response class) ---
+# Both are Starlette Response overrides invoked by the framework: `render`
+# is called by Response.__init__ to build the body, and `media_type` is read
+# when the Content-Type header is assembled. Neither has a call site in our
+# own code, so vulture cannot see them.
+media_type
+render
