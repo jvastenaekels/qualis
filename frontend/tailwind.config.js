@@ -1,4 +1,18 @@
 /** @type {import('tailwindcss').Config} */
+
+// Deliberately still on Tailwind 3 (the v3-lts line), not 4.
+//
+// The case for v4 is its Oxide engine. Measured here, though, Tailwind is not
+// what makes this build slow: compiling the whole stylesheet takes 1.6s out of
+// a 25.7s `npm run build`, so even a 5x faster engine returns about a second.
+// The build is dominated by tsc (12.6s) and the React Compiler babel pass.
+//
+// Against that: v4 changes rendered output, not just build time — default
+// border colour, ring width, the shadow-sm/shadow-xs rename, oklch palette —
+// across 867 source files. Vitest covers logic, not appearance, and the
+// Playwright suite needs a backend, so a visual regression would ship silently.
+//
+// Revisit if the build profile changes or if v3-lts stops receiving fixes.
 export default {
     darkMode: ['class'],
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
