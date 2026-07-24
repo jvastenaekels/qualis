@@ -194,7 +194,7 @@ pluggy==1.6.0
 pre-commit==4.6.1
 py-serializable==2.1.0
     # via cyclonedx-python-lib
-pydantic==2.13.3
+pydantic==2.13.4
     # via
     #   fastapi
     #   fastapi-cloud-cli
