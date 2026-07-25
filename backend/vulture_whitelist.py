@@ -81,6 +81,7 @@ revoke_recruitment_link
 
 # admin/studies.py
 list_studies
+list_studies_across_projects
 validate_study
 change_study_state
 delete_study
