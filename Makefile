@@ -49,7 +49,23 @@ seed:
 # older than 2.33). DOCKER_BUILDKIT=1 guarantees the cache mounts in both
 # Dockerfiles are honoured even if the daemon default was overridden.
 demo-up:
-	DOCKER_BUILDKIT=1 COMPOSE_BAKE=true docker compose up --build -d --wait --wait-timeout 240
+	@# Registry pulls are the one flaky part in CI: a Docker Hub hiccup
+	@# ("context deadline exceeded") on any base image or the db/minio/mc
+	@# services fails the whole run. Isolate that network step and retry only it
+	@# — BuildKit caches, so a retry after a partial pull is cheap. `build`
+	@# covers the Dockerfile base images; `pull --ignore-buildable` covers the
+	@# image:-only services. The health-wait below then starts from local images
+	@# only, so a genuinely unhealthy service still fails once, not three times.
+	@for i in 1 2 3; do \
+		echo "==> build + pull (attempt $$i/3)"; \
+		if DOCKER_BUILDKIT=1 COMPOSE_BAKE=true docker compose build \
+			&& docker compose pull --ignore-buildable; then \
+			break; \
+		fi; \
+		if [ "$$i" = 3 ]; then echo "build/pull failed after 3 attempts"; exit 1; fi; \
+		echo "   registry hiccup — retrying in $$((i * 5))s"; sleep $$((i * 5)); \
+	done
+	docker compose up -d --wait --wait-timeout 240
 	@printf '\nQualis services are running.\nNext: make demo-seed\n\n'
 
 demo-seed:
