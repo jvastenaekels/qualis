@@ -85,7 +85,10 @@ def check_demo_make_targets() -> list[str]:
     backend_dockerfile = _read("backend/Dockerfile")
     errors: list[str] = []
 
-    if "docker compose up --build -d --wait --wait-timeout" not in makefile:
+    # demo-up builds/pulls (retried) then starts with a health-wait as a
+    # separate step, so --build is no longer on the `up` line. What this guard
+    # exists to protect is the health-wait itself.
+    if "docker compose up -d --wait --wait-timeout" not in makefile:
         errors.append("Makefile demo-up does not wait for service health")
 
     frontend_marker = "\n  frontend:\n"
