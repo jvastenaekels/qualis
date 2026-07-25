@@ -205,6 +205,57 @@ For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/co
 
 ---
 
+## Audio storage (object storage)
+
+Audio is optional. Spoken feedback and `text_audio` questions need
+S3-compatible object storage; everything else — presort, sorting, postsort
+text, exports, analysis — runs without it. When the `S3_*` variables are
+unset, Qualis starts in **storage-optional mode**: audio-enabled studies
+degrade silently to text-only, with no error shown to participants (see
+[`running-without-s3.md`](running-without-s3.md) for the capability matrix).
+
+The production Compose file deliberately does **not** bundle a storage server,
+unlike the dev stack — which ships MinIO purely so `make demo-up` works with
+zero setup. Choose per deployment:
+
+| Situation | Recommendation |
+| --------- | -------------- |
+| **No audio** | Leave the `S3_*` variables unset. Storage-optional mode handles it; nothing to run or back up. |
+| **Audio, least operations** | A **managed** S3-compatible service — Cloudflare R2, Backblaze B2, AWS S3, or the object-storage add-on of your platform (Scalingo, Clever Cloud). Durable and backed up by the provider; R2/B2 have no egress fees. |
+| **Audio + data sovereignty / air-gapped / you already run object storage** | **Self-hosted MinIO**, accepting the operational burden below. |
+
+**Why self-hosted MinIO is not the default.** It is viable, but it is a
+stateful service you take responsibility for:
+
+- Its data needs its own backup schedule, separate from Postgres. A single
+  MinIO node is a single point of failure for every audio recording.
+- MinIO ships breaking changes between releases — the reason the dev images
+  are pinned to a dated tag rather than `:latest`. Each upgrade is a change to
+  review, not a free bump.
+- Playback uses presigned URLs handed to the browser, so the store must be
+  reachable **from the browser**, not just from the backend. That means a
+  public hostname with its own TLS — see `S3_PUBLIC_ENDPOINT_URL` below.
+
+**Configuration.** Whichever backend you pick, set:
+
+```bash
+S3_ENDPOINT_URL=https://<storage-host>          # where the backend uploads
+S3_PUBLIC_ENDPOINT_URL=https://<browser-host>   # where the browser plays back
+                                                # (defaults to S3_ENDPOINT_URL)
+S3_BUCKET_NAME=qualis-audio
+S3_ACCESS_KEY_ID=                               # credential from your provider
+S3_SECRET_ACCESS_KEY=                           # credential from your provider
+S3_REGION=us-east-1                             # or the provider's region
+S3_ADDRESSING_STYLE=auto                        # 'path' for MinIO, 'virtual' for most managed S3
+```
+
+`S3_PUBLIC_ENDPOINT_URL` matters when the store is reached internally at one
+host but served to the browser at another (the dev stack uploads to
+`http://minio:9000` and plays back from `http://localhost:9000`). For a managed
+service the two are usually the same public host, so it can be omitted.
+
+---
+
 ## Account onboarding & public registration
 
 Three ways an account comes into being:
