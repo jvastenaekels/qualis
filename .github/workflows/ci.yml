@@ -232,7 +232,20 @@ jobs:
         run: docker compose config >/dev/null
 
       - name: Build and start the production stack
-        run: docker compose up --build -d --wait --wait-timeout 240
+        # Same shape as demo-up: retry the network-bound build+pull (a Docker
+        # Hub hiccup on postgres:18-alpine or a Dockerfile base image should not
+        # fail the run), then start from local images with a single, un-retried
+        # health-wait so a genuinely unhealthy service fails once.
+        run: |
+          for i in 1 2 3; do
+            echo "==> build + pull (attempt $i/3)"
+            if docker compose build && docker compose pull --ignore-buildable; then
+              break
+            fi
+            if [ "$i" = 3 ]; then echo "build/pull failed after 3 attempts"; exit 1; fi
+            echo "   registry hiccup — retrying in $((i * 5))s"; sleep $((i * 5))
+          done
+          docker compose up -d --wait --wait-timeout 240
 
       - name: Assert the db runs PostgreSQL 18 with the production mount
         run: |
