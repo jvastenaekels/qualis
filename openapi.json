@@ -824,6 +824,37 @@
         }
       }
     },
+    "/api/admin/studies/across-projects": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "List Studies Across Projects",
+        "description": "Every study in the projects the current user belongs to.\n\nThe Researcher Hub lists projects together with their studies before any\nsingle project is selected, so it cannot use the list endpoint above \u2014 that\none is scoped to one project via the X-Project-ID header and 400s without\nit. This returns all studies the user can reach, each carrying project_id so\nthe client can group them by project.\n\nAccess mirrors the projects list: membership-based, not superuser-wide, so a\nsuperuser sees only the projects they actually belong to. Loading options\nmatch the per-project list (participant_count is a column_property computed\nin the query; statements/recruitment_links are never serialised by\nStudyListRead, so they are lazyloaded to keep them off the query).",
+        "operationId": "list_studies_across_projects_api_admin_studies_across_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StudyListRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Studies Across Projects Api Admin Studies Across Projects Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/admin/studies/{slug}": {
       "get": {
         "tags": [

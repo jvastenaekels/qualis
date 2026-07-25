@@ -14,16 +14,30 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+import {
+    useListProjectsApiAdminProjectsGet,
+    useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet,
+} from '@/api/generated';
 
 export default function ResearcherHub() {
-    const { projects, user } = useAuthStore();
+    const { user } = useAuthStore();
     const { setActiveStudy, setActiveProject } = useAdminStore();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
 
-    const { data: allStudiesData } = useListStudiesApiAdminStudiesGet();
-    const allStudies = allStudiesData?.items;
+    // Own the queries rather than reading the store. The store's `projects` is
+    // populated by ProjectSwitcher, which mounts only inside AdminLayout — never
+    // on /hub — so a fresh login here saw an empty store and the "no projects"
+    // empty state despite having projects. And study counts need every project's
+    // studies at once: the per-project list endpoint 400s without an
+    // X-Project-ID header (none is selected on /hub), so it is replaced by the
+    // cross-project endpoint that returns all reachable studies with project_id.
+    // Both queries share React Query's cache with RequireAdmin's own projects
+    // fetch, so landing here adds at most one request.
+    const { data: projectsData } = useListProjectsApiAdminProjectsGet();
+    const projects = projectsData?.items;
+
+    const { data: allStudies } = useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet();
     const hasProjects = !!projects?.length;
 
     const handleProjectClick = (projectSlug: string, projectId: number) => {

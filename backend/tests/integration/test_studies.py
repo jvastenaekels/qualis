@@ -172,6 +172,81 @@ class TestStudyAdmin:
         assert "statements" not in item
         assert "recruitment_links" not in item
 
+    async def test_across_projects_returns_studies_without_project_header(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+    ):
+        """The Researcher Hub case: no X-Project-ID, yet studies come back.
+
+        The per-project list endpoint 400s without the header; this one must
+        not, and every study must carry project_id so the hub can group them.
+        """
+        headers = auth_token_factory(test_user)  # deliberately no X-Project-ID
+        response = await client.get(
+            "/api/admin/studies/across-projects", headers=headers
+        )
+        assert response.status_code == 200
+        studies = response.json()
+        assert isinstance(studies, list)
+        item = next(s for s in studies if s["slug"] == seed_study.slug)
+        assert item["project_id"] == seed_study.project_id
+        # Same lighter shape as the per-project list (audit H1).
+        assert "translations" in item
+        assert "statements" not in item
+
+    async def test_across_projects_is_membership_scoped(
+        self,
+        client: AsyncClient,
+        auth_token_factory,
+        user_factory,
+        project_factory,
+        study_factory,
+    ):
+        """A user sees studies only in projects they belong to.
+
+        Access mirrors the projects list — membership-based, not superuser-wide.
+        An outsider with their own project must not see another user's study.
+        """
+        owner = await user_factory()
+        outsider = await user_factory()
+        owner_project = await project_factory(owner=owner)
+        owner_study = await study_factory(project=owner_project, owner=owner)
+        # The outsider has a project of their own, so an empty result would be
+        # ambiguous; give them one study to prove the endpoint returns theirs
+        # and only theirs.
+        outsider_project = await project_factory(owner=outsider)
+        outsider_study = await study_factory(project=outsider_project, owner=outsider)
+
+        response = await client.get(
+            "/api/admin/studies/across-projects",
+            headers=auth_token_factory(outsider),
+        )
+        assert response.status_code == 200
+        slugs = {s["slug"] for s in response.json()}
+        assert outsider_study.slug in slugs
+        assert owner_study.slug not in slugs
+
+    async def test_across_projects_path_not_shadowed_by_slug(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        auth_token_factory,
+    ):
+        """`/across-projects` must resolve to its own route, not `/{slug}`.
+
+        It is declared before the slug route; a regression that reordered them
+        would turn this into a study lookup for slug "across-projects" (404).
+        """
+        response = await client.get(
+            "/api/admin/studies/across-projects",
+            headers=auth_token_factory(test_user),
+        )
+        assert response.status_code == 200
+        assert isinstance(response.json(), list)
+
     async def test_update_study(
         self,
         client: AsyncClient,
