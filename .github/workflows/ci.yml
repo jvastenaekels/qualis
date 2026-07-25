@@ -189,6 +189,94 @@ jobs:
         if: always()
         run: docker compose down --volumes
 
+  docker-production-stack:
+    name: Production Compose Stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # docker-compose.production.yml is never otherwise exercised: it gates every
+    # value behind `${VAR:?}`, so it cannot be started without a full secret set,
+    # and CI had none. That left its own risks unchecked — the production Postgres
+    # mount (same relocation as dev but a different file), the backend booting in
+    # ENVIRONMENT=production (stricter CORS, no fsync-off tuning), the Host
+    # allowlist that only exists in the production config, and the whole
+    # `${VAR:?}` interpolation itself. This job supplies throwaway secrets and
+    # boots it.
+    env:
+      # Real secrets are generated per-run below; these are the non-secret ones.
+      QUALIS_HTTP_PORT: "3000"
+      FRONTEND_URL: http://localhost:3000
+      ALLOWED_ORIGINS: http://localhost:3000
+      # nginx checks $host (port stripped) against this regex; allow loopback.
+      QUALIS_ALLOWED_HOST_PATTERN: "^(localhost|127[.]0[.]0[.]1)$"
+      ADMIN_EMAIL: admin@ci.example.com
+      COMPOSE_FILE: docker-compose.production.yml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate throwaway secrets
+        # init_db refuses to bootstrap in ENVIRONMENT=production if ADMIN_PASSWORD
+        # is a known demo value, so a random one is required — which also means
+        # this job exercises that production guard for real. openssl rand keeps
+        # the secrets out of the workflow file and out of the logs.
+        run: |
+          {
+            echo "SECRET_KEY=$(openssl rand -hex 32)"
+            echo "IP_HASH_SALT=$(openssl rand -hex 16)"
+            echo "QUALIS_DB_PASSWORD=$(openssl rand -hex 16)"
+            echo "ADMIN_PASSWORD=$(openssl rand -hex 24)"
+          } >> "$GITHUB_ENV"
+
+      - name: Validate the compose file parses and interpolates
+        # `config` fails loudly if any ${VAR:?} is unset or the YAML is malformed,
+        # separating a config error from a boot error in the next step.
+        run: docker compose config >/dev/null
+
+      - name: Build and start the production stack
+        run: docker compose up --build -d --wait --wait-timeout 240
+
+      - name: Assert the db runs PostgreSQL 18 with the production mount
+        run: |
+          set -e
+          pg_major=$(docker compose exec -T db postgres --version | grep -oE '[0-9]+' | head -1)
+          echo "db PostgreSQL: $pg_major"
+          [ "$pg_major" = "18" ] || { echo "expected PostgreSQL 18"; exit 1; }
+          # The production mount is /var/lib/postgresql; the live cluster must sit
+          # under it, at the relocated 18 PGDATA, or a `down` would drop the data.
+          docker compose exec -T db test -d /var/lib/postgresql/18/docker \
+            || { echo "PGDATA not under the mounted volume"; exit 1; }
+
+      - name: Smoke-test through the published port
+        # The frontend has no healthcheck in the production compose, so --wait
+        # only proved it started; this proves nginx actually serves and its
+        # /health proxy reaches the backend.
+        run: |
+          set -e
+          for path in / /health; do
+            code=$(curl -fsS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3000$path")
+            echo "GET $path -> $code"
+            [ "$code" = "200" ] || { echo "expected 200 on $path"; exit 1; }
+          done
+
+      - name: Assert the Host allowlist rejects a foreign Host
+        # F-02-007 lives only in the production nginx config. Until now it was
+        # asserted statically (test_supply_chain_pinning); this is its first
+        # runtime check. A disallowed Host hits `return 444`, which closes the
+        # connection with no response, so curl fails — that failure is the pass.
+        run: |
+          set -e
+          if curl -fsS -o /dev/null -H 'Host: evil.example.com' http://127.0.0.1:3000/; then
+            echo "foreign Host was served — allowlist not enforced"; exit 1
+          fi
+          echo "foreign Host rejected as expected"
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --tail 200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes
+
   frontend-lint:
     name: Frontend Lint & Quality
     runs-on: ubuntu-latest
