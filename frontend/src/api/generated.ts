@@ -158,6 +158,7 @@ import type {
     StorageUsageResponse,
     StudyDumpResponse,
     StudyImportResponse,
+    StudyListRead,
     StudyRead,
     StudyStatsRead,
     SubmissionResultResponse,
@@ -1941,6 +1942,176 @@ export function useListStudiesApiAdminStudiesGet<
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(params, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Every study in the projects the current user belongs to.
+
+The Researcher Hub lists projects together with their studies before any
+single project is selected, so it cannot use the list endpoint above — that
+one is scoped to one project via the X-Project-ID header and 400s without
+it. This returns all studies the user can reach, each carrying project_id so
+the client can group them by project.
+
+Access mirrors the projects list: membership-based, not superuser-wide, so a
+superuser sees only the projects they actually belong to. Loading options
+match the per-project list (participant_count is a column_property computed
+in the query; statements/recruitment_links are never serialised by
+StudyListRead, so they are lazyloaded to keep them off the query).
+ * @summary List Studies Across Projects
+ */
+export const listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet = (signal?: AbortSignal) => {
+    return customInstance<StudyListRead[]>({
+        url: `/api/admin/studies/across-projects`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryKey = () => {
+    return [`/api/admin/studies/across-projects`] as const;
+};
+
+export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+            TError,
+            TData
+        >
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryKey();
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>
+    > = ({ signal }) => listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>
+>;
+export type ListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryError = unknown;
+
+export function useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet<
+    TData = Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet<
+    TData = Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet<
+    TData = Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Studies Across Projects
+ */
+
+export function useListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet<
+    TData = Awaited<ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -15954,6 +16125,230 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
     ...overrideResponse,
 });
 
+export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetResponseMock =
+    (): StudyListRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+            state: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(StudyState)),
+                undefined,
+            ]),
+            grid_config: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                score: faker.number.int({ min: -10, max: 10 }),
+                capacity: faker.number.int({ min: undefined, max: undefined }),
+            })),
+            presort_config: {},
+            postsort_config: {},
+            branding: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    {
+                        logo_url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 500 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        accent_color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 50 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        primary_color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 50 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        partners: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => ({
+                                id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                url: faker.helpers.arrayElement([
+                                    faker.helpers.arrayElement([
+                                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                        null,
+                                    ]),
+                                    undefined,
+                                ]),
+                            })),
+                            undefined,
+                        ]),
+                    },
+                    null,
+                ]),
+                undefined,
+            ]),
+            default_language: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            randomize_statement_order: faker.helpers.arrayElement([
+                faker.datatype.boolean(),
+                undefined,
+            ]),
+            symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            distribution_mode: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(DistributionMode)),
+                undefined,
+            ]),
+            start_date: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            end_date: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            data_retention_months: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            project_id: faker.number.int({ min: undefined, max: undefined }),
+            project: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    {
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    },
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+                        description: faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            undefined,
+                        ]),
+                        instructions: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        subtitle: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 200 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        objective: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        condition_of_instruction: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        pre_instruction: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        consent_title: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 200 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        consent_description: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        ui_labels: faker.helpers.arrayElement([{}, undefined]),
+                        process_steps: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => ({
+                                id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                                icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                color: faker.helpers.arrayElement([
+                                    faker.helpers.arrayElement([
+                                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                        null,
+                                    ]),
+                                    undefined,
+                                ]),
+                            })),
+                            undefined,
+                        ]),
+                        methodology_tips: faker.helpers.arrayElement([
+                            Array.from(
+                                { length: faker.number.int({ min: 1, max: 10 }) },
+                                (_, i) => i + 1
+                            ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+                            undefined,
+                        ]),
+                        step_help: faker.helpers.arrayElement([
+                            {
+                                [faker.string.alphanumeric(5)]: {
+                                    [faker.string.alphanumeric(5)]: faker.string.alpha({
+                                        length: { min: 10, max: 20 },
+                                    }),
+                                },
+                            },
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        study_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            participant_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
+        }));
+
 export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     overrideResponse: Partial<StudyRead> = {}
 ): StudyRead => ({
@@ -20384,6 +20779,32 @@ export const getListStudiesApiAdminStudiesGetMockHandler = (
     );
 };
 
+export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetMockHandler = (
+    overrideResponse?:
+        | StudyListRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StudyListRead[]> | StudyListRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/across-projects',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getGetStudyApiAdminStudiesSlugGetMockHandler = (
     overrideResponse?:
         | StudyRead
@@ -23004,6 +23425,7 @@ export const getQualisAPIMock = () => [
     getTwofaDisableConfirmApi2faDisableConfirmPostMockHandler(),
     getCreateStudyApiAdminStudiesPostMockHandler(),
     getListStudiesApiAdminStudiesGetMockHandler(),
+    getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetMockHandler(),
     getGetStudyApiAdminStudiesSlugGetMockHandler(),
     getUpdateStudyApiAdminStudiesSlugPatchMockHandler(),
     getDeleteStudyApiAdminStudiesSlugDeleteMockHandler(),

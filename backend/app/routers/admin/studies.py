@@ -103,6 +103,45 @@ async def list_studies(
     )
 
 
+# Declared before "/{slug}" so the literal path is not captured as a slug.
+@router.get("/across-projects", response_model=list[StudyListRead])
+async def list_studies_across_projects(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[Study]:
+    """Every study in the projects the current user belongs to.
+
+    The Researcher Hub lists projects together with their studies before any
+    single project is selected, so it cannot use the list endpoint above — that
+    one is scoped to one project via the X-Project-ID header and 400s without
+    it. This returns all studies the user can reach, each carrying project_id so
+    the client can group them by project.
+
+    Access mirrors the projects list: membership-based, not superuser-wide, so a
+    superuser sees only the projects they actually belong to. Loading options
+    match the per-project list (participant_count is a column_property computed
+    in the query; statements/recruitment_links are never serialised by
+    StudyListRead, so they are lazyloaded to keep them off the query).
+    """
+    query = (
+        select(Study)
+        .join(ProjectMember, ProjectMember.project_id == Study.project_id)
+        .where(ProjectMember.user_id == current_user.id)
+        .options(
+            selectinload(Study.project),
+            lazyload(Study.statements),
+            lazyload(Study.recruitment_links),
+        )
+        .order_by(Study.created_at.desc())
+        # A safety cap; a single researcher's study count sits far below this,
+        # and the hub groups whatever it receives. Documented rather than paged
+        # because the hub has no pagination affordance.
+        .limit(500)
+    )
+    result = await db.execute(query)
+    return list(result.scalars().all())
+
+
 @router.get("/{slug}", response_model=StudyRead)
 async def get_study(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
