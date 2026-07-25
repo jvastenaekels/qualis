@@ -27,6 +27,13 @@ jobs:
         with:
           args: --verbose --no-progress --config ./lychee.toml './docs/**/*.md' './README.md'
           fail: true
+      - name: Installation docs coherence
+        # Asserts the README/Makefile/compose demo path stays internally
+        # consistent (target names, the demo-up health-wait, the frontend
+        # healthcheck, …). It is part of `make check` but was not in CI, so the
+        # #311 demo-up refactor silently broke it while every CI job stayed
+        # green. Pure stdlib, reads repo files only — no setup needed.
+        run: python3 scripts/check_installation_docs.py
 
   backend-lint:
     name: Backend Lint & Quality
