@@ -424,6 +424,8 @@ git commit -m "fix(i18n): replace the API-status note on Account settings with u
 
 **The defect:** `FactorVoicesPanel.tsx:104` renders `{rec.question_key}` — a database identifier (`question_q_voice`) — as the label above each audio player, three times per factor.
 
+> **Superseded by the Phase 2 fix wave.** The static key→label table prescribed in Step 3 shipped, then was removed: it had one entry, it existed only because of the demo seeder, and it disagreed with the label the same recording carries on the participant Post-Sort tab. `FactorVoicesPanel` now resolves the researcher's own `postsort_config.questions[<id>].label` through the shared `resolveAudioQuestionLabel` helper. No props signature change was needed — the panel already receives `slug`.
+
 **Files:**
 - Test: `frontend/src/components/admin/analysis/FactorVoicesPanel.test.tsx`
 - Modify: `frontend/src/components/admin/analysis/FactorVoicesPanel.tsx:104`
@@ -1482,8 +1484,6 @@ These came out of the audit but are judgement calls, not defects with an obvious
 4. **The interpretive narrative field** (`F1 narrative`) is an italic grey placeholder with no border. It is the central function of the interpret screen and looks like static text; making it look editable is a small change with a real effect on whether the feature gets used.
 5. **Truncated public URL** on `Overview` (`http://localhost:3000/study/b:`). The field is too narrow to read the link it exists to share.
 6. **The native `<audio>` player** in Factor voices is the only unstyled control in the product, while `components/admin/AudioPlayer.tsx` exists. Adopting it is straightforward; whether the custom player is good enough to carry research audio is your call.
-
-9. **Audio question labels are ambiguous when a study has more than one.** Task 2.2 stopped the raw `question_key` from reaching the screen, but since keys are researcher-generated per study (`q_<Date.now()>`), a static lookup can never be complete: two audio questions both render as "Spoken comment". The durable fix is to thread the researcher's own configured label — `postsort_config.questions[key].label`, already a `MultilangString` — through to `FactorVoicesPanel`. That needs a props signature change, which is why it was not folded into 2.2.
 7. **Sidebar at 768 px** stays expanded at 255 px, taking a third of the viewport. Auto-collapsing below `lg` is the obvious move but changes the tablet experience.
 8. **No read-only mode for an active study's design.** Task 3.2 adds an escape hatch from the lock overlay; a genuine read-only rendering of the design is the larger, better fix.
 
