@@ -177,6 +177,12 @@ export default function AnalysisPage() {
         query: { enabled: !!slug },
     });
     const runs = runsQuery.data ?? [];
+    // Has the runs list resolved at least once (success OR error)? Distinct from
+    // `runs.length > 0` — a study with zero prior runs legitimately has an empty
+    // *loaded* list. InterpretShell needs this to avoid treating "haven't heard
+    // back yet" as "this run has no history", which would silently (and
+    // wrongly) tag any run as current before the list is known.
+    const runsListLoaded = runsQuery.isSuccess || runsQuery.isError;
 
     // ── Empty-state contract: not enough participants for factor analysis ──
     // Wave A — UX progressive-disclosure audit. The configuration card walls
@@ -208,7 +214,8 @@ export default function AnalysisPage() {
                 />
                 <AnalysisHistoryPanel
                     slug={slug}
-                    currentRunId={null}
+                    viewedRunId={null}
+                    latestRunId={null}
                     onLoadRun={(_result, run) => {
                         // The legacy callback signature passes (result, run); we
                         // only need the id to route. The panel may also call this
@@ -232,6 +239,7 @@ export default function AnalysisPage() {
                 onBackToExplore={navigateToExplore}
                 onFocusChange={setFocusFromCanvas}
                 runs={runs}
+                runsListLoaded={runsListLoaded}
                 compareTo={compareTo}
                 onPin={handlePin}
                 onUnpin={handleUnpin}
@@ -775,7 +783,8 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={null}
+                viewedRunId={null}
+                latestRunId={null}
                 onLoadRun={(_result, run) => {
                     if (run) onSelectHistoricalRun(run.id);
                 }}
@@ -797,11 +806,13 @@ interface InterpretShellProps {
     onBackToExplore: () => void;
     onFocusChange: (factor: number) => void;
     runs: AnalysisRunSummary[];
+    runsListLoaded: boolean;
     compareTo: number | null;
     onPin: (runId: number) => void;
     onUnpin: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell with multiple loading/error/success gates (run fetch, runs-list fetch, historical-run banner) plus focus/overview mode toggle, export menu, and compare-pin picker; all logic lives in useInterpretPhase/useExplorePhase
 function InterpretShell({
     slug,
     runId,
@@ -811,6 +822,7 @@ function InterpretShell({
     onBackToExplore,
     onFocusChange,
     runs,
+    runsListLoaded,
     compareTo,
     onPin,
     onUnpin,
@@ -920,13 +932,40 @@ function InterpretShell({
         return summary as AnalysisRunSummary;
     }, [run]);
 
+    // ── latestRun — the study's most-recently-run analysis, derived from
+    //   the same `ran_at`-descending ordering AnalysisHistoryPanel already
+    //   applies to its list and useExplorePhase already relies on
+    //   (`runs[0]`) to find "the fresh run" right after a commit. This is
+    //   the run banner's notion of "current", and it is what the history
+    //   panel's `latestRunId` (CURRENT tag) is fed below. It is deliberately
+    //   NOT this view's `runId` — that is always the selected run by
+    //   construction, so comparing against it could never tell "just
+    //   committed" apart from "loaded an older entry from history". The panel
+    //   still receives `runId` separately, as `viewedRunId`, for its
+    //   post-delete bounce.
+    const latestRun = useMemo<AnalysisRunSummary | null>(() => {
+        return runs.reduce<AnalysisRunSummary | null>((latest, candidate) => {
+            if (!latest) return candidate;
+            return new Date(candidate.ran_at).getTime() > new Date(latest.ran_at).getTime()
+                ? candidate
+                : latest;
+        }, null);
+    }, [runs]);
+
     // ── Per-analyst, per-study UI preference for showing per-factor narratives.
     // Owned by useInterpretPhase so the localStorage contract (default-true,
     // per-slug key, quota/private-mode safe) is covered by hook tests.
     const { showFactorNarratives, setShowFactorNarratives } = interpret;
 
     // ── Loading / error gates ────────────────────────────────────────
-    if (interpret.isLoading) {
+    // Also wait on the runs list (`runsListLoaded`): the historical-run
+    // determination below and the history panel's CURRENT tag both need
+    // `latestRun`, which is only meaningful once the runs list has actually
+    // resolved. Without this, a fresh direct navigation to a historical run
+    // (bookmark, shared link, refresh) can render the success branch with
+    // `runs=[]` before the list arrives, silently — and wrongly — treating
+    // the unresolved case as "current" and hiding a banner that should show.
+    if (interpret.isLoading || !runsListLoaded) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
@@ -987,7 +1026,8 @@ function InterpretShell({
                 </div>
                 <AnalysisHistoryPanel
                     slug={slug}
-                    currentRunId={null}
+                    viewedRunId={null}
+                    latestRunId={null}
                     onLoadRun={(_r, summary) => {
                         if (summary) onSelectHistoricalRun(summary.id);
                     }}
@@ -995,6 +1035,11 @@ function InterpretShell({
             </div>
         );
     }
+
+    // The run banner should only announce a *historical* run — one that
+    // isn't the study's most recent analysis. `run` is narrowed non-null
+    // by the gate above.
+    const isViewingHistoricalRun = latestRun !== null && run.id !== latestRun.id;
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -1052,49 +1097,63 @@ function InterpretShell({
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={runId}
+                // Two distinct signals, deliberately not the same value:
+                // `viewedRunId` is what this view is displaying (drives the
+                // post-delete bounce below), `latestRunId` is the study's most
+                // recent run (drives the panel's CURRENT tag). They diverge
+                // exactly when an older run is being viewed.
+                viewedRunId={runId}
+                latestRunId={latestRun?.id ?? null}
                 onLoadRun={(_result, summary) => {
                     if (summary) {
                         onSelectHistoricalRun(summary.id);
                     } else {
-                        // Panel may pass `(null, null)` after deleting the
-                        // currently-displayed run — bounce back to explore.
+                        // Panel passes `(null, null)` after deleting the run
+                        // this view is displaying — bounce back to explore
+                        // rather than keep rendering a deleted run.
                         onBackToExplore();
                     }
                 }}
             />
 
-            {/* Run banner */}
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                <History className="size-4 flex-shrink-0" aria-hidden="true" />
-                <span className="flex-1">
-                    {t(
-                        'admin.analysis.history.viewing_banner',
-                        'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
-                        {
-                            date: new Date(run.ran_at).toLocaleString(undefined, {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            }),
-                            extraction: run.extraction_method.toUpperCase(),
-                            n: run.n_factors,
-                            rotation: run.rotation_method,
-                        }
-                    )}
-                </span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onBackToExplore}
-                    className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+            {/* Run banner — only for a genuinely historical run; the
+                study's most recent run needs no "back to current" escape
+                hatch, since it already is current (see isViewingHistoricalRun). */}
+            {isViewingHistoricalRun && (
+                <div
+                    className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800"
+                    data-testid="run-banner"
                 >
-                    <X className="size-3.5" aria-hidden="true" />
-                    {t('admin.analysis.history.back_to_current', 'Back to current')}
-                </Button>
-            </div>
+                    <History className="size-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1">
+                        {t(
+                            'admin.analysis.history.viewing_banner',
+                            'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
+                            {
+                                date: new Date(run.ran_at).toLocaleString(undefined, {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                }),
+                                extraction: run.extraction_method.toUpperCase(),
+                                n: run.n_factors,
+                                rotation: run.rotation_method,
+                            }
+                        )}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onBackToExplore}
+                        className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    >
+                        <X className="size-3.5" aria-hidden="true" />
+                        {t('admin.analysis.history.back_to_current', 'Back to current')}
+                    </Button>
+                </div>
+            )}
 
             {/* Mode toggle — Focus (FactorCanvas) by default, Overview restores
                 the legacy four-tab layout. Sits above the results card. */}

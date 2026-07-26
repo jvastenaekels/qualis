@@ -1,4 +1,4 @@
-import { renderWithProviders, screen, waitFor } from '@/test-utils/test-utils';
+import { renderWithProviders, screen, waitFor, within } from '@/test-utils/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import AnalysisPage from './AnalysisPage';
@@ -754,6 +754,132 @@ describe('AnalysisPage', () => {
         expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
     });
 
+    // ── Delete wiring: viewedRunId vs latestRunId (review round 2) ──
+    // InterpretShell feeds AnalysisHistoryPanel two different run ids —
+    // `viewedRunId` (what this view renders, drives the post-delete bounce)
+    // and `latestRunId` (the study's most recent run, drives the CURRENT
+    // tag). They diverge exactly when an older run is being viewed, and the
+    // panel's own suite cannot catch a swap at this call site. Both
+    // directions are pinned here, at the wiring.
+
+    describe('post-delete bounce wiring (two runs, older one viewed)', () => {
+        /** Interpret phase on run 42, with run 99 as the study's latest. */
+        function setupTwoRunsViewingOlder() {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun, // id 42 — older than 99
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // the study's latest run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+            const mockDeleteMutate = vi.fn((_vars: unknown, opts?: { onSuccess?: () => void }) => {
+                opts?.onSuccess?.();
+            });
+            mockDeleteRunMutation.mockReturnValue({
+                mutate: mockDeleteMutate,
+                isPending: false,
+            });
+            return mockDeleteMutate;
+        }
+
+        /**
+         * Deletes the history row at `rowIndex` (the panel sorts ran_at
+         * descending, so 0 = run 99, 1 = run 42) and confirms the dialog.
+         */
+        async function deleteHistoryRow(rowIndex: number) {
+            const deleteButtons = screen.getAllByLabelText(/Delete this analysis run/i);
+            const target = deleteButtons[rowIndex];
+            if (!target) throw new Error(`no delete button at row ${rowIndex}`);
+            await userEvent.click(target);
+            await userEvent.click(await screen.findByRole('button', { name: /^Delete$/ }));
+        }
+
+        it('bounces to Explore when the run being viewed is deleted, even though it is not the latest', async () => {
+            const mockDeleteMutate = setupTwoRunsViewingOlder();
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            });
+
+            // Row 1 is run 42 — the one this view is displaying.
+            await deleteHistoryRow(1);
+            expect(mockDeleteMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 42 },
+                expect.any(Object)
+            );
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
+            });
+            expect(
+                screen.getByRole('button', { name: /commit and interpret/i })
+            ).toBeInTheDocument();
+        });
+
+        it('stays on the run being viewed when a different (latest) run is deleted', async () => {
+            const mockDeleteMutate = setupTwoRunsViewingOlder();
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            });
+
+            // Row 0 is run 99 — the study's latest, but NOT what we're viewing.
+            await deleteHistoryRow(0);
+            expect(mockDeleteMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 99 },
+                expect.any(Object)
+            );
+
+            // Run 42 still exists, so the analyst must still be on it. Assert
+            // a positive marker of the loaded interpret branch (not just the
+            // sr-only phase marker) so this cannot pass on a blank render.
+            expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
+            expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            expect(
+                screen.queryByRole('button', { name: /commit and interpret/i })
+            ).not.toBeInTheDocument();
+        });
+    });
+
     // ── Focus / Overview mode toggle (Task 24) ─────────────────────
 
     it('Interpret phase renders Focus mode by default', async () => {
@@ -990,6 +1116,298 @@ describe('AnalysisPage', () => {
         // the URL has flipped to interpret.
         await waitFor(() => {
             expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+        });
+    });
+
+    // ── Historical-run banner (Task 1.4) ────────────────────────────
+    // The amber "Viewing run from … / Back to current" banner must only
+    // appear when the selected run is NOT the study's most recent one.
+    // "Most recent" is derived from the same runs list + `ran_at`
+    // ordering AnalysisHistoryPanel already uses for its own CURRENT tag
+    // and useExplorePhase already uses to find "the fresh run" right
+    // after a commit — not a per-run `is_current` field (the API exposes
+    // no such thing).
+    describe('historical-run banner (Task 1.4)', () => {
+        it('hides the historical-run banner when the selected run is the current one', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            // Run 42 is the only run on record, so it is trivially also the
+            // most recent one.
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: mockRun.ran_at,
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // Sanity check: we actually reached the loaded (non-error,
+            // non-loading) interpret branch — the only branch that can
+            // render the run banner. Without this, an assertion of absence
+            // could pass vacuously because the page never got there.
+            expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
+
+            expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();
+            expect(screen.queryByText(/viewing run from/i)).not.toBeInTheDocument();
+        });
+
+        it('hides the historical-run banner when the latest of several runs is selected', async () => {
+            // The headline post-commit journey: run 99 was just committed on
+            // top of run 42, and the page lands on 99. The single-run case
+            // above cannot tell "the latest run wins" apart from "any run with
+            // no history wins" — this one can.
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: { ...mockRun, id: 99, ran_at: '2026-04-29T13:00:00Z' },
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // the just-committed run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=99`],
+            });
+
+            // Sanity check: we reached the loaded interpret branch, the only
+            // one that can render the banner — otherwise the absence
+            // assertions below would pass vacuously.
+            expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
+
+            expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();
+            expect(screen.queryByText(/viewing run from/i)).not.toBeInTheDocument();
+        });
+
+        it('shows the historical-run banner when an older run is selected', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun, // id 42, ran_at 2026-04-29T12:00:00Z
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            // Run 99 was created after run 42, so 42 is now historical.
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // Scoped to the banner itself: the page has a second, unrelated
+            // "Back to current" affordance in its error state, which shares
+            // the same accessible name. Asserting inside the banner element
+            // (rather than a bare screen.getByRole) means this test can only
+            // pass by matching the banner, not that other affordance.
+            const banner = await screen.findByTestId('run-banner');
+            expect(within(banner).getByText(/viewing run from/i)).toBeInTheDocument();
+            expect(
+                within(banner).getByRole('button', { name: /back to current/i })
+            ).toBeInTheDocument();
+        });
+
+        // ── Review round 1 fixes ────────────────────────────────────
+        // Two findings from the first review pass on Task 1.4:
+        // (1) AnalysisHistoryPanel's own CURRENT tag was still wired to
+        //     `runId` (whichever run is being viewed), not to the study's
+        //     actual latest run — so browsing to an older run from history
+        //     retagged *that* row CURRENT, reproducing the exact
+        //     contradiction this task exists to remove, just reached via
+        //     the history panel instead of a post-commit banner.
+        // (2) The banner could silently render as "hidden" (i.e. claim the
+        //     viewed run is current) before the runs list had loaded at
+        //     all — a worse failure than the one being fixed, since it
+        //     actively hides a needed warning rather than wrongly showing
+        //     an unneeded one.
+
+        it('tags the study’s actual latest run CURRENT in the history panel, not whichever run is being viewed', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun, // id 42 — the run being viewed, but NOT the latest
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // later — the actual latest run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // AnalysisHistoryPanel sorts its rows by ran_at descending, so the
+            // most recent run (99) renders first, the older one (42) second.
+            // Each row's own clickable area is a <button> whose accessible
+            // name is derived from that row's `ran_at` — using role/order
+            // instead of the formatted date string keeps this test immune
+            // to the test runner's timezone.
+            const rows = await screen.findAllByRole('button', {
+                name: /load analysis run from/i,
+            });
+            expect(rows).toHaveLength(2);
+            const [latestRow, historicalRow] = rows;
+            if (!latestRow || !historicalRow) throw new Error('expected two history rows');
+
+            // The actual latest run (99) is tagged CURRENT...
+            expect(within(latestRow).getByText(/^current$/i)).toBeInTheDocument();
+            // ...and the run being viewed (42, historical) is NOT — even
+            // though it's the one driving the page's `runId`.
+            expect(within(historicalRow).queryByText(/^current$/i)).not.toBeInTheDocument();
+        });
+
+        it('does not render the success view (nor silently hide the banner) while the runs list is still loading', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            // The run-by-id fetch has already resolved...
+            mockGetRunHook.mockReturnValue({
+                data: mockRun,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            // ...but the separate runs-list query (which `latestRun` and the
+            // history panel's CURRENT tag both depend on) has not settled
+            // yet — this is the ordinary shape of a fresh direct navigation
+            // to `?phase=interpret&runId=42` (bookmark, shared link,
+            // refresh), where the two fetches race.
+            mockListRunsHook.mockReturnValue({
+                data: undefined,
+                isLoading: true,
+                isSuccess: false,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // Still shows the run-loading indicator...
+            expect(await screen.findByText(/loading run/i)).toBeInTheDocument();
+            // ...and crucially has NOT fallen through to the success view,
+            // which is the only place that could wrongly render with a
+            // silently-assumed-current (banner absent) state.
+            expect(screen.queryByRole('button', { name: /export/i })).not.toBeInTheDocument();
+            expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();
         });
     });
 });

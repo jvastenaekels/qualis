@@ -426,6 +426,8 @@
             "bulk_status_success": "{{count}} Einträge aktualisiert",
             "bulk_status_error": "Einige Einträge konnten nicht aktualisiert werden",
             "qset_title": "Kuratierung",
+            "qset_reviewed_of": "{{total}} Einträge geprüft",
+            "qset_accepted": "{{count}} akzeptiert",
             "qset_pending": "{{count}} Einträge noch zu prüfen",
             "qset_complete": "Alle Einträge geprüft",
             "show_pending": "Zu prüfen",

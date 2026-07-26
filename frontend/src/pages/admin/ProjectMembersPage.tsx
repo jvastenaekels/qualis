@@ -220,52 +220,68 @@ export default function ProjectMembersPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Select
-                                                    value={member.role}
-                                                    onValueChange={(val) =>
-                                                        handleRoleChange(
-                                                            member.user_id,
-                                                            val as ProjectRole
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        !isOwner ||
-                                                        member.user_id === currentUser?.id
-                                                    }
-                                                >
-                                                    <SelectTrigger
+                                                {member.role === 'owner' ? (
+                                                    // Ownership transfer is not a dropdown
+                                                    // action (a project has exactly one
+                                                    // owner), so the owner's role renders
+                                                    // as a static badge rather than a
+                                                    // permanently-disabled Select — that
+                                                    // also keeps "owner" out of every
+                                                    // row's dropdown listbox.
+                                                    <span
                                                         className={cn(
-                                                            'w-[120px] h-8 rounded-lg text-xs font-bold border-none shadow-none focus:ring-0',
-                                                            member.role === 'owner'
-                                                                ? 'bg-indigo-50 text-indigo-700'
-                                                                : member.role === 'member'
-                                                                  ? 'bg-emerald-50 text-emerald-700'
-                                                                  : 'bg-slate-100 text-slate-600'
+                                                            'inline-flex h-8 w-[120px] items-center justify-center rounded-lg text-xs font-bold',
+                                                            'bg-indigo-50 text-indigo-700'
                                                         )}
                                                     >
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="rounded-xl border-white/20 glass shadow-2xl">
-                                                        <SelectItem
-                                                            value="member"
-                                                            className="text-xs font-bold py-2 rounded-lg m-1"
-                                                        >
-                                                            {t(
-                                                                'admin.project.roles.member',
-                                                                'Member'
+                                                        {t('admin.project.roles.owner', 'Owner')}
+                                                    </span>
+                                                ) : (
+                                                    <Select
+                                                        value={member.role}
+                                                        onValueChange={(val) =>
+                                                            handleRoleChange(
+                                                                member.user_id,
+                                                                val as ProjectRole
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !isOwner ||
+                                                            member.user_id === currentUser?.id
+                                                        }
+                                                    >
+                                                        <SelectTrigger
+                                                            className={cn(
+                                                                'w-[120px] h-8 rounded-lg text-xs font-bold border-none shadow-none focus:ring-0',
+                                                                member.role === 'member'
+                                                                    ? 'bg-emerald-50 text-emerald-700'
+                                                                    : 'bg-slate-100 text-slate-600'
                                                             )}
-                                                        </SelectItem>
-                                                        <SelectItem
-                                                            value="viewer"
-                                                            className="text-xs font-bold py-2 rounded-lg m-1"
                                                         >
-                                                            {t(
-                                                                'admin.project.roles.viewer',
-                                                                'Viewer'
-                                                            )}
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="rounded-xl border-white/20 glass shadow-2xl">
+                                                            <SelectItem
+                                                                value="member"
+                                                                className="text-xs font-bold py-2 rounded-lg m-1"
+                                                            >
+                                                                {t(
+                                                                    'admin.project.roles.member',
+                                                                    'Member'
+                                                                )}
+                                                            </SelectItem>
+                                                            <SelectItem
+                                                                value="viewer"
+                                                                className="text-xs font-bold py-2 rounded-lg m-1"
+                                                            >
+                                                                {t(
+                                                                    'admin.project.roles.viewer',
+                                                                    'Viewer'
+                                                                )}
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-xs font-medium text-slate-400">
                                                 {new Date(member.joined_at).toLocaleDateString()}

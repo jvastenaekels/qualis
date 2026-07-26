@@ -426,6 +426,8 @@
       "bulk_status_success": "Zaktualizowano {{count}} elementów",
       "bulk_status_error": "Nie udało się zaktualizować niektórych elementów",
       "qset_title": "Kuracja",
+      "qset_reviewed_of": "{{total}} elementów przejrzanych",
+      "qset_accepted": "{{count}} zaakceptowanych",
       "qset_pending": "{{count}} elementów do przejrzenia",
       "qset_complete": "Wszystkie elementy przejrzane",
       "show_pending": "Do przejrzenia",

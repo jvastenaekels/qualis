@@ -115,6 +115,50 @@ export default function InteractiveDataView({
     slug,
     participants: initialParticipants,
 }: InteractiveDataViewProps) {
+    /**
+     * Root cause of the responses-table header/body column-count mismatch
+     * (Task 1.1): the React Compiler auto-memoizes JSX expressions by
+     * inferring their reactive dependencies from what identifiers they
+     * read. `table` (from `useReactTable`, below) is a *stable* object for
+     * this component's lifetime — TanStack Table signals updates by
+     * mutating it via `setOptions`, never by returning a new reference —
+     * so an expression like `table.getHeaderGroups().map(...)` appears, to
+     * the compiler, to depend on nothing but that never-changing
+     * reference. The compiler then caches it forever after the first
+     * render that reaches it, even though the *content* of
+     * `getHeaderGroups()` depends on `columns`, which does change (e.g.
+     * when `showLanguageColumn` flips true). The row body happened to keep
+     * working only by accident, because its own JSX also reads
+     * `columns.length` in the empty-state branch, giving the compiler a
+     * real dependency to key on — the header row has no such reference, so
+     * it freezes at whichever column set existed on the first qualifying
+     * render, silently dropping a `<th>` while every `<td>` keeps
+     * rendering.
+     *
+     * `"use no memo"` opts this component out of that auto-memoization so
+     * `table`'s methods are called fresh on every render, matching normal
+     * (uncompiled) React semantics.
+     *
+     * The directive must live here, on the component that *consumes* the
+     * table instance — not on a child it renders. An earlier version of
+     * this fix extracted the table JSX into a child component and put the
+     * directive there; that un-compiled the child correctly, but this
+     * (still-compiled) parent kept memoizing the *element* it passed to
+     * that child, e.g.:
+     *
+     *   t130 = ($[317] !== clearAllFilters || ... || $[324] !== table)
+     *       ? <ResponsesTable table={table} ... />
+     *       : $[325]; // reused element — child never re-renders
+     *
+     * `sorting` and `globalFilter` were in neither the child's props nor
+     * that dependency list, so sorting/searching left the element
+     * reference unchanged, React bailed out of the subtree, and the
+     * child's own `"use no memo"` never got a chance to run — sort and
+     * search stayed frozen even after the header/body fix. Per TanStack
+     * Table's own guidance, the opt-out belongs on the component holding
+     * the table instance.
+     */
+    'use no memo';
     const { t, i18n } = useTranslation();
     const {
         status: { isLoading, error },
@@ -873,7 +917,7 @@ export default function InteractiveDataView({
                             <p className="text-xs text-slate-500 font-medium">
                                 {t(
                                     'admin.data.pagination.showing',
-                                    'Showing {{from}}\u2013{{to}} of {{total}}',
+                                    'Showing {{from}}–{{to}} of {{total}}',
                                     {
                                         from: pagination.pageIndex * pagination.pageSize + 1,
                                         to: Math.min(

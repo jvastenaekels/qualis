@@ -11,7 +11,7 @@
  */
 
 import { lazy } from 'react';
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, type RouteObject, RouterProvider } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -80,7 +80,11 @@ const AdminDashboard = lazy(() =>
 );
 import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 
-const router = createBrowserRouter([
+// Exported so App.routing.test.tsx can build a createMemoryRouter over this
+// exact config — see frontend/src/App.routing.test.tsx for why: testing
+// routing behaviour (which unmatched paths render) requires exercising the
+// real route tree, not a hand-built duplicate that could drift from it.
+export const routes: RouteObject[] = [
     {
         path: '/',
         element: (
@@ -358,7 +362,22 @@ const router = createBrowserRouter([
             },
         ],
     },
-]);
+    // Catch-all: any path that matches nothing above. Must stay last — an
+    // earlier `path: '*'` would shadow every route below it. Without this,
+    // an unmatched path (e.g. a typo'd admin URL) falls through to
+    // react-router's unstyled default error boundary instead of the app's
+    // own styled ErrorPage.
+    {
+        path: '*',
+        element: (
+            <PublicPageLayout>
+                <ErrorPage error={new ApiError(404, 'Page not found')} />
+            </PublicPageLayout>
+        ),
+    },
+];
+
+const router = createBrowserRouter(routes);
 
 import { ViewportProvider } from '@/contexts/ViewportContext';
 import { usePlatformConfigBootstrap } from '@/hooks/usePlatformConfigBootstrap';

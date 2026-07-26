@@ -426,6 +426,8 @@
             "bulk_status_success": "{{count}} itens atualizados",
             "bulk_status_error": "Falha ao atualizar alguns itens",
             "qset_title": "Curadoria",
+            "qset_reviewed_of": "{{total}} itens revistos",
+            "qset_accepted": "{{count}} aceites",
             "qset_pending": "{{count}} itens ainda por rever",
             "qset_complete": "Todos os itens revistos",
             "show_pending": "Por rever",
