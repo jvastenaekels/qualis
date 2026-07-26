@@ -632,10 +632,7 @@
                 "audio_label": "Aufnahme: {{key}} von {{participant}}",
                 "url_unavailable": "Audio-URL nicht verfügbar.",
                 "comments_label": "Kartenkommentare",
-                "question_default": "Gesprochener Kommentar",
-                "question": {
-                    "question_q_voice": "Gesprochener Kommentar zur Q-Sortierung"
-                }
+                "question_default": "Gesprochener Kommentar"
             },
             "factor_note": {
                 "label": "Faktorinterpretation",

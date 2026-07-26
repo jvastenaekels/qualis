@@ -544,10 +544,7 @@
                 "audio_label": "Enregistrement : {{key}} par {{participant}}",
                 "url_unavailable": "URL audio non disponible.",
                 "comments_label": "Commentaires sur les cartes",
-                "question_default": "Commentaire oral",
-                "question": {
-                    "question_q_voice": "Commentaire oral sur le tri Q"
-                }
+                "question_default": "Commentaire oral"
             },
             "factor_note": {
                 "label": "Narration du facteur",

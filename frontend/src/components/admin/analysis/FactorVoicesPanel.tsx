@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Info, Loader2, AlertTriangle, Mic, MessageSquareText } from 'lucide-react';
 import type { ParticipantLoading } from '@/api/model/participantLoading';
 import type { ParticipantCardComment } from '@/api/model/participantCardComment';
 import type { ParticipantAudioRecording } from '@/api/model/participantAudioRecording';
 import {
+    useGetStudyApiAdminStudiesSlugGet,
     useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet,
     useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet,
 } from '@/api/generated';
+import {
+    buildQuestionsMap,
+    resolveAudioQuestionLabel,
+    type QuestionMapEntry,
+} from '@/components/admin/dashboard/SurveyResponseTable.helpers';
 
 /** |Δloading| threshold above which the chip is visually emphasised. Mirrors spec §5.5. */
 const DELTA_LOADING_HIGHLIGHT = 0.2;
@@ -61,6 +67,10 @@ interface ParticipantMaterialCardProps {
     deltaLoading?: number;
     recordings: ParticipantAudioRecording[];
     comments: ParticipantCardComment[];
+    /** Researcher-authored post-sort questions, keyed by their config id. */
+    questionsMap: Record<string, QuestionMapEntry>;
+    /** Active admin language, used to pick a translation of the question label. */
+    language: string;
     onInsertCommentQuote?: (comment: ParticipantCardComment, participantLabel: string) => void;
 }
 
@@ -69,6 +79,8 @@ function ParticipantMaterialCard({
     deltaLoading,
     recordings,
     comments,
+    questionsMap,
+    language,
     onInsertCommentQuote,
 }: ParticipantMaterialCardProps) {
     const { t } = useTranslation();
@@ -100,11 +112,17 @@ function ParticipantMaterialCard({
                 <div className="space-y-2">
                     {recordings.map((rec) => {
                         // rec.question_key is an internal, researcher-configured
-                        // identifier (e.g. "q_1737849283000") — never fit for
-                        // display. Map it to a human label, falling back to a
-                        // generic one rather than ever leaking the raw key.
-                        const questionLabel = t(
-                            `admin.analysis.factor_voices.question.${rec.question_key}`,
+                        // identifier (e.g. "question_q_1737849283000") — never
+                        // fit for display. Resolve the researcher's own label
+                        // from the study's postsort_config, exactly as the
+                        // participant Post-Sort tab does, so one recording is
+                        // named the same way on both screens. The generic
+                        // fallback applies only when the question config is
+                        // genuinely gone.
+                        const questionLabel = resolveAudioQuestionLabel(
+                            questionsMap,
+                            rec.question_key,
+                            language,
                             t('admin.analysis.factor_voices.question_default', 'Spoken comment')
                         );
                         return (
@@ -195,7 +213,7 @@ export function FactorVoicesPanel({
     onInsertCommentQuote,
     deltaByParticipant,
 }: FactorVoicesPanelProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
     const factorNumber = factorIndex + 1;
@@ -216,6 +234,15 @@ export function FactorVoicesPanel({
         slug,
         { participant_ids: participantIds },
         { query: { enabled: queryEnabled } }
+    );
+
+    // The researcher's own post-sort question labels live on the study, so
+    // the analysis screen can name a recording the way its author wrote it
+    // (and the way the participant read it) instead of showing a raw id.
+    const studyQuery = useGetStudyApiAdminStudiesSlugGet(slug);
+    const postsortQuestionsMap = useMemo(
+        () => buildQuestionsMap(studyQuery.data?.postsort_config ?? {}),
+        [studyQuery.data]
     );
 
     const recordingsByParticipant = groupByParticipant(audiosQuery.data);
@@ -307,6 +334,8 @@ export function FactorVoicesPanel({
                             deltaLoading={deltaByParticipant?.get(p.db_id)}
                             recordings={recordingsByParticipant.get(p.db_id) ?? []}
                             comments={commentsByParticipant.get(p.db_id) ?? []}
+                            questionsMap={postsortQuestionsMap}
+                            language={i18n.language}
                             onInsertCommentQuote={onInsertCommentQuote}
                         />
                     ))}

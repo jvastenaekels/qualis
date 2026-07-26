@@ -26,6 +26,14 @@ vi.mock('@/api/generated', () => ({
     useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet: mockCommentsHook,
     useUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch: mockUpdateHook,
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: mockListRunsKey,
+    // FactorVoicesPanel reads the study's postsort_config to label audio
+    // recordings with the researcher's own question wording.
+    useGetStudyApiAdminStudiesSlugGet: () => ({
+        data: undefined,
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
+    }),
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

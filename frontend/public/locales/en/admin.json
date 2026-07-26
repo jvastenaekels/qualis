@@ -634,10 +634,7 @@
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
                 "comments_label": "Card comments",
-                "question_default": "Spoken comment",
-                "question": {
-                    "question_q_voice": "Spoken comment on the Q-sort"
-                }
+                "question_default": "Spoken comment"
             },
             "factor_note": {
                 "label": "Factor narrative",

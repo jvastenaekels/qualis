@@ -632,10 +632,7 @@
                 "audio_label": "Gravação: {{key}} por {{participant}}",
                 "url_unavailable": "URL de áudio não disponível.",
                 "comments_label": "Comentários às afirmações",
-                "question_default": "Comentário oral",
-                "question": {
-                    "question_q_voice": "Comentário oral sobre a classificação Q"
-                }
+                "question_default": "Comentário oral"
             },
             "factor_note": {
                 "label": "Interpretação do fator",

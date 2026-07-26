@@ -27,8 +27,7 @@ import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
 import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
 import type { InteractionUtils } from '@/types/grid';
-import { buildQuestionsMap } from './SurveyResponseTable.helpers';
-import { getLocalizedText } from '@/utils/localization';
+import { buildQuestionsMap, resolveAudioQuestionLabel } from './SurveyResponseTable.helpers';
 
 /** Shape of an audio recording entry in the participant answer blob. */
 type AudioEntry = {
@@ -574,8 +573,12 @@ export function ParticipantDetailContent({
                                                     AudioEntry
                                                 >
                                             ).map(([key, audio]) => {
-                                                // Resolve label from question_key
-                                                let label = key;
+                                                // Resolve label from question_key.
+                                                // Deliberately left uninitialised: the chain
+                                                // below must assign on every branch, and the
+                                                // compiler now says so. Seeding it with `key`
+                                                // is what leaked the raw identifier before.
+                                                let label: string;
                                                 if (key.startsWith('card_')) {
                                                     const sId = Number(key.replace('card_', ''));
                                                     const stmt = statementsMap.get(sId);
@@ -603,25 +606,16 @@ export function ParticipantDetailContent({
                                                 } else {
                                                     // Custom post-sort question (text_audio type),
                                                     // uploaded with a "question_" prefix — see
-                                                    // Step2_Questionnaire.tsx. The participant-
-                                                    // facing label lives in the study's own
-                                                    // postsort_config.questions[key].label (a
-                                                    // MultilangString the researcher wrote in
-                                                    // QuestionBuilder) — resolve it there instead
-                                                    // of ever showing the raw, researcher-generated
-                                                    // id (e.g. "q_1737849283000", see
-                                                    // QuestionBuilder.tsx:964). Falls back to a
-                                                    // generic label only if the question can no
-                                                    // longer be found in the config (e.g. deleted
-                                                    // after the participant answered).
-                                                    const configKey = key.startsWith('question_')
-                                                        ? key.slice('question_'.length)
-                                                        : key;
-                                                    const questionConfig =
-                                                        postsortQuestionsMap[configKey];
-                                                    label = getLocalizedText(
-                                                        questionConfig?.label ||
-                                                            questionConfig?.text,
+                                                    // Step2_Questionnaire.tsx. resolveAudioQuestionLabel
+                                                    // reads the researcher's own wording out of
+                                                    // postsort_config instead of ever showing the raw,
+                                                    // researcher-generated id (e.g. "q_1737849283000",
+                                                    // see QuestionBuilder.tsx:964); the analysis
+                                                    // Voices panel uses the same helper, so one
+                                                    // recording is named the same way on both screens.
+                                                    label = resolveAudioQuestionLabel(
+                                                        postsortQuestionsMap,
+                                                        key,
                                                         language,
                                                         t(
                                                             'admin.participant.survey.question_default',

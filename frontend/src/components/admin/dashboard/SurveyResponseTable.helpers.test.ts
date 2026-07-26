@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
     resolveAnswerLabel,
+    resolveAudioQuestionLabel,
     resolveOptionText,
     buildQuestionsMap,
     classifyAnswerKey,
@@ -64,6 +65,68 @@ describe('resolveAnswerLabel', () => {
         const result = resolveAnswerLabel(map, 'q1', 'en', t);
         expect(result).not.toBe('q1');
         expect(result).toBe('Response');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// resolveAudioQuestionLabel
+// ---------------------------------------------------------------------------
+
+describe('resolveAudioQuestionLabel', () => {
+    const GENERIC = 'Spoken comment';
+
+    it('strips the storage "question_" prefix before looking the id up', () => {
+        // Recordings are stored as "question_<id>" while postsort_config is
+        // keyed by the bare id — the prefix must not defeat the lookup.
+        const map = {
+            q_voice: { id: 'q_voice', label: { en: 'Record a short spoken comment.' } },
+        };
+        expect(resolveAudioQuestionLabel(map, 'question_q_voice', 'en', GENERIC)).toBe(
+            'Record a short spoken comment.'
+        );
+    });
+
+    it('resolves an unprefixed key too', () => {
+        const map = { q_voice: { id: 'q_voice', label: { en: 'Record a short comment.' } } };
+        expect(resolveAudioQuestionLabel(map, 'q_voice', 'en', GENERIC)).toBe(
+            'Record a short comment.'
+        );
+    });
+
+    it('returns the requested language, not just English', () => {
+        const map = {
+            q_voice: {
+                id: 'q_voice',
+                label: { en: 'Record a short comment.', fr: 'Enregistrez un bref commentaire.' },
+            },
+        };
+        expect(resolveAudioQuestionLabel(map, 'question_q_voice', 'fr', GENERIC)).toBe(
+            'Enregistrez un bref commentaire.'
+        );
+    });
+
+    it('falls back to `text` when the entry has no `label`', () => {
+        const map = { q_voice: { id: 'q_voice', text: 'Legacy text field' } };
+        expect(resolveAudioQuestionLabel(map, 'question_q_voice', 'en', GENERIC)).toBe(
+            'Legacy text field'
+        );
+    });
+
+    it('returns the generic fallback — never the key — when the question is gone', () => {
+        // A populated map that simply lacks this id: the question was deleted
+        // after the participant answered.
+        const map = { q_other: { id: 'q_other', label: { en: 'A different question' } } };
+        const result = resolveAudioQuestionLabel(map, 'question_q_1737849283000', 'en', GENERIC);
+        expect(result).not.toBe('question_q_1737849283000');
+        expect(result).not.toBe('q_1737849283000');
+        expect(result).toBe(GENERIC);
+    });
+
+    it('returns the generic fallback when the entry carries neither label nor text', () => {
+        const map = { q_voice: { id: 'q_voice' } };
+        const result = resolveAudioQuestionLabel(map, 'question_q_voice', 'en', GENERIC);
+        expect(result).not.toBe('q_voice');
+        expect(result).toBe(GENERIC);
     });
 });
 

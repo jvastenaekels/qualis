@@ -7,7 +7,10 @@ import type { TFunction } from 'i18next';
 
 /**
  * Returns a human-readable label for a survey answer key.
- * Falls back to the raw key when no match is found.
+ *
+ * Resolution order: the study's own question config, then the small set of
+ * built-in keys, then a generic label. The raw key is never returned — it is
+ * an internal identifier that must not be shown to the researcher.
  */
 export function resolveAnswerLabel(
     questionsMap: Record<string, QuestionMapEntry>,
@@ -37,6 +40,44 @@ export function resolveAnswerLabel(
         return t('post.extreme.missing_statement', 'Missing Statement');
     if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');
     return genericFallback;
+}
+
+// ---------------------------------------------------------------------------
+// Audio-recording label resolver
+// ---------------------------------------------------------------------------
+
+/**
+ * Prefix the upload path adds to a researcher-configured question id when it
+ * stores an audio recording (see Step2_Questionnaire.tsx / seed_demo.py).
+ */
+const AUDIO_QUESTION_KEY_PREFIX = 'question_';
+
+/**
+ * Returns a human-readable label for a post-sort *audio* recording key.
+ *
+ * The participant-facing wording lives in the study's own
+ * `postsort_config.questions[<id>].label` — a MultilangString the researcher
+ * wrote in QuestionBuilder. Recordings are stored under that id prefixed with
+ * `question_`, so strip the prefix before the lookup. `genericFallback` is
+ * used only when the question can no longer be found (e.g. it was deleted
+ * after the participant answered); the raw, internal id is never returned.
+ *
+ * Shared by the participant Post-Sort tab and the analysis Voices panel so
+ * that one recording is named the same way on both screens.
+ */
+export function resolveAudioQuestionLabel(
+    questionsMap: Record<string, QuestionMapEntry>,
+    key: string,
+    language: string,
+    genericFallback: string
+): string {
+    const configKey = key.startsWith(AUDIO_QUESTION_KEY_PREFIX)
+        ? key.slice(AUDIO_QUESTION_KEY_PREFIX.length)
+        : key;
+    const question = questionsMap[configKey];
+    // label/text are typed as string | Record<string,string> | undefined —
+    // both are valid inputs for getLocalizedText.
+    return getLocalizedText(question?.label || question?.text, language, genericFallback);
 }
 
 // ---------------------------------------------------------------------------
@@ -86,7 +127,7 @@ type ConfigWithQuestionsOrFields = {
  * needing `any`; the index signature keeps the type compatible with
  * `Record<string, any>` consumers (e.g. renderValue in SurveyResponseTable).
  */
-type QuestionMapEntry = {
+export type QuestionMapEntry = {
     label?: string | Record<string, string>;
     text?: string | Record<string, string>;
     options?: unknown[];

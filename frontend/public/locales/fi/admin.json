@@ -569,10 +569,7 @@
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
                 "comments_label": "Card comments",
-                "question_default": "Puhuttu kommentti",
-                "question": {
-                    "question_q_voice": "Puhuttu kommentti Q-sortista"
-                }
+                "question_default": "Puhuttu kommentti"
             },
             "factor_note": {
                 "label": "Factor narrative",
