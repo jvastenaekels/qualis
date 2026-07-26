@@ -210,12 +210,15 @@ export default function ProjectMembersPage() {
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-bold text-slate-900">
-                                                            {member.user.full_name || 'No Name'}
+                                                            {member.user.full_name ||
+                                                                member.user.email}
                                                         </span>
-                                                        <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                                                            <Mail className="size-3" />{' '}
-                                                            {member.user.email}
-                                                        </span>
+                                                        {member.user.full_name && (
+                                                            <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                                                <Mail className="size-3" />{' '}
+                                                                {member.user.email}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </TableCell>

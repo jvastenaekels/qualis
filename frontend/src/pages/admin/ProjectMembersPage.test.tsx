@@ -43,6 +43,12 @@ vi.mock('@/api/generated', () => ({
                     joined_at: '2024-01-01T00:00:00Z',
                     user: { full_name: 'Grace Hopper', email: 'grace@x.io' },
                 },
+                {
+                    user_id: 13,
+                    role: 'member',
+                    joined_at: '2024-01-01T00:00:00Z',
+                    user: { full_name: null, email: 'nn@example.com' },
+                },
             ],
         },
         isLoading: false,
@@ -105,5 +111,19 @@ describe('ProjectMembersPage role select', () => {
         expect(await screen.findByRole('option', { name: /^member$/i })).toBeInTheDocument();
         expect(screen.getByRole('option', { name: /^viewer$/i })).toBeInTheDocument();
         expect(screen.queryByRole('option', { name: /^owner$/i })).not.toBeInTheDocument();
+    });
+
+    it('falls back to the email when the member has no full name', async () => {
+        renderWithProviders(<ProjectMembersPage />);
+
+        // Scope to the no-name member's row: an unscoped query would still
+        // pass if some other row happened to render matching text.
+        const row = await screen.findByRole('row', { name: /nn@example\.com/i });
+        expect(within(row).queryByText(/no name/i)).not.toBeInTheDocument();
+        // The email must appear exactly once in the cell — as the display
+        // name. A second, identical "email line" underneath it would be a
+        // redundant duplicate rather than a real fix, so assert the count
+        // instead of just presence.
+        expect(within(row).getAllByText('nn@example.com')).toHaveLength(1);
     });
 });
