@@ -2170,6 +2170,7 @@
                 "presort": "Voorsorteringsvragen",
                 "postsort": "Nasorteringsvragen",
                 "no_answers": "Geen antwoorden geregistreerd voor dit gedeelte.",
+                "question_default": "Gesproken antwoord",
                 "categories": {
                     "identity": "Identiteit & contact",
                     "questions": "Vragenlijstantwoorden",

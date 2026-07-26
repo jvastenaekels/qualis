@@ -2110,6 +2110,7 @@
                 "postsort": "Jälkilajittelu",
                 "presort": "Esilajittelu",
                 "no_answers": "Tähän osioon ei ole kirjattu vastauksia.",
+                "question_default": "Puhuttu vastaus",
                 "categories": {
                     "identity": "Henkilö- ja yhteystiedot",
                     "questions": "Kyselyvastaukset",

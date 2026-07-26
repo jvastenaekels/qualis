@@ -68,7 +68,8 @@ const countSlotsInColumnByScore = (score: number) => {
 const buildStudyData = (
     distributionMode: 'forced' | 'free' | 'flexible' | undefined,
     statementCount: number,
-    capacities: number[]
+    capacities: number[],
+    postsortConfig?: Record<string, unknown>
 ): DumpResponse => {
     const statements = Array.from({ length: statementCount }, (_, i) => ({
         id: i + 1,
@@ -89,6 +90,7 @@ const buildStudyData = (
             state: 'active',
             // distribution_mode is the under-test field — propagated from the page.
             distribution_mode: distributionMode,
+            postsort_config: postsortConfig,
         } as DumpResponse['study'],
         participants: [],
         statement_id_to_index: statements.reduce(
@@ -101,7 +103,10 @@ const buildStudyData = (
     };
 };
 
-const buildParticipant = (placements: Record<string, number>): DumpParticipant => ({
+const buildParticipant = (
+    placements: Record<string, number>,
+    audioRecordings?: Record<string, unknown>
+): DumpParticipant => ({
     id: 'session-1',
     db_id: 1,
     duration_seconds: 600,
@@ -109,7 +114,7 @@ const buildParticipant = (placements: Record<string, number>): DumpParticipant =
     placements,
     presort: {},
     postsort: {},
-    audio_recordings: {},
+    audio_recordings: audioRecordings ?? {},
     language: 'en',
     is_discarded: false,
     discard_reason: null,
@@ -133,6 +138,24 @@ const switchToGridTab = () => {
         fireEvent.mouseDown(gridTab);
         fireEvent.pointerUp(gridTab);
         fireEvent.click(gridTab);
+    });
+};
+
+const switchToPostsortTab = () => {
+    // Same rationale as switchToGridTab: identify by Radix's id suffix and
+    // dispatch the full pointer sequence Radix Tabs requires to switch.
+    const tabs = screen.getAllByRole('tab');
+    const postsortTab = tabs.find((tab) =>
+        (tab.getAttribute('id') || '').endsWith('-trigger-postsort')
+    );
+    if (!postsortTab) {
+        throw new Error('Postsort tab not found');
+    }
+    act(() => {
+        fireEvent.pointerDown(postsortTab, { button: 0 });
+        fireEvent.mouseDown(postsortTab);
+        fireEvent.pointerUp(postsortTab);
+        fireEvent.click(postsortTab);
     });
 };
 
@@ -226,5 +249,99 @@ describe('ParticipantDetailContent — read-only GridSort overflow propagation',
         // the legacy behaviour we want to preserve when distribution_mode
         // is unset.)
         expect(countSlotsInColumnByScore(0)).toBe(2);
+    });
+});
+
+describe('ParticipantDetailContent — post-sort audio question labels', () => {
+    it('resolves a custom post-sort audio question to its researcher-configured label', () => {
+        // The upload path (Step2_Questionnaire.tsx) prefixes the researcher's
+        // own question id with "question_" when saving the recording key.
+        const studyData = buildStudyData(undefined, 1, [1, 1], {
+            questions: {
+                q_1737849283000: {
+                    type: 'text_audio',
+                    label: { en: 'Tell us why you placed the top card here' },
+                    required: false,
+                },
+            },
+        });
+        const participant = buildParticipant(
+            { '1': 0 },
+            {
+                question_q_1737849283000: {
+                    presigned_url: 'https://example.com/audio.webm',
+                    duration_seconds: 12,
+                    file_size_bytes: 2048,
+                },
+            }
+        );
+
+        render(
+            <ParticipantDetailContent
+                participant={participant}
+                studyData={studyData}
+                onToggleDiscard={() => {}}
+            />
+        );
+
+        switchToPostsortTab();
+
+        // Positive: the researcher's own label is shown — proves the real
+        // config was actually consulted, not just that nothing crashed and
+        // the raw-key assertions below passed vacuously.
+        expect(screen.getByText('Tell us why you placed the top card here')).toBeInTheDocument();
+        // Negative: neither the bare config key nor the uploaded (prefixed)
+        // key ever reach the screen.
+        expect(screen.queryByText('q_1737849283000')).not.toBeInTheDocument();
+        expect(screen.queryByText('question_q_1737849283000')).not.toBeInTheDocument();
+    });
+
+    it('falls back to a generic label — never the raw key — for a question no longer in the config', () => {
+        // Simulates a researcher-generated key with no matching lookup entry
+        // (e.g. the question was edited or removed from postsort_config
+        // after the participant answered). This is resolution #3's required
+        // safe-degrade case: an unmapped key must render the generic label,
+        // never the identifier.
+        const studyData = buildStudyData(undefined, 1, [1, 1], {
+            questions: {
+                // A different question exists in the config, but not the one
+                // this participant's recording references — this proves a
+                // real map lookup that missed, not an empty-config
+                // short-circuit that would pass for the wrong reason.
+                q_other: {
+                    type: 'text_audio',
+                    label: { en: 'A different question' },
+                    required: false,
+                },
+            },
+        });
+        const participant = buildParticipant(
+            { '1': 0 },
+            {
+                question_q_9999999999999: {
+                    presigned_url: 'https://example.com/audio.webm',
+                    duration_seconds: 5,
+                    file_size_bytes: 1024,
+                },
+            }
+        );
+
+        render(
+            <ParticipantDetailContent
+                participant={participant}
+                studyData={studyData}
+                onToggleDiscard={() => {}}
+            />
+        );
+
+        switchToPostsortTab();
+
+        // Never the raw identifier, in either form.
+        expect(screen.queryByText('q_9999999999999')).not.toBeInTheDocument();
+        expect(screen.queryByText('question_q_9999999999999')).not.toBeInTheDocument();
+        // The generic, honest fallback label is shown instead — this proves
+        // the row actually rendered (not merely that the raw key is absent
+        // because nothing rendered at all).
+        expect(screen.getByText('Spoken response')).toBeInTheDocument();
     });
 });

@@ -2170,6 +2170,7 @@
         "presort": "Pytania wstępne",
         "postsort": "Pytania końcowe",
         "no_answers": "Brak zapisanych odpowiedzi dla tej sekcji.",
+        "question_default": "Odpowiedź głosowa",
         "categories": {
           "identity": "Tożsamość i kontakt",
           "questions": "Odpowiedzi na pytania",

@@ -27,6 +27,8 @@ import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
 import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
 import type { InteractionUtils } from '@/types/grid';
+import { buildQuestionsMap } from './SurveyResponseTable.helpers';
+import { getLocalizedText } from '@/utils/localization';
 
 /** Shape of an audio recording entry in the participant answer blob. */
 type AudioEntry = {
@@ -206,6 +208,16 @@ export function ParticipantDetailContent({
 
     const language = participant.language || 'en';
     const studyForSurvey = studyData.study as unknown as StudyRead;
+
+    // Researcher-authored labels for custom post-sort questions (text_audio
+    // type included), keyed by the same id the study designer assigns in
+    // QuestionBuilder (e.g. "q_1737849283000"). Used below to resolve a real
+    // label for audio recordings instead of ever showing that raw,
+    // researcher-generated id.
+    const postsortQuestionsMap = useMemo(
+        () => buildQuestionsMap(studyData.study.postsort_config ?? {}),
+        [studyData.study.postsort_config]
+    );
 
     const detailStatement = detailStatementId ? statementsMap.get(detailStatementId) : null;
     const detailComment = detailStatementId
@@ -587,6 +599,34 @@ export function ParticipantDetailContent({
                                                     label = t(
                                                         'post.extreme.general_comment',
                                                         'General Comment'
+                                                    );
+                                                } else {
+                                                    // Custom post-sort question (text_audio type),
+                                                    // uploaded with a "question_" prefix — see
+                                                    // Step2_Questionnaire.tsx. The participant-
+                                                    // facing label lives in the study's own
+                                                    // postsort_config.questions[key].label (a
+                                                    // MultilangString the researcher wrote in
+                                                    // QuestionBuilder) — resolve it there instead
+                                                    // of ever showing the raw, researcher-generated
+                                                    // id (e.g. "q_1737849283000", see
+                                                    // QuestionBuilder.tsx:964). Falls back to a
+                                                    // generic label only if the question can no
+                                                    // longer be found in the config (e.g. deleted
+                                                    // after the participant answered).
+                                                    const configKey = key.startsWith('question_')
+                                                        ? key.slice('question_'.length)
+                                                        : key;
+                                                    const questionConfig =
+                                                        postsortQuestionsMap[configKey];
+                                                    label = getLocalizedText(
+                                                        questionConfig?.label ||
+                                                            questionConfig?.text,
+                                                        language,
+                                                        t(
+                                                            'admin.participant.survey.question_default',
+                                                            'Spoken response'
+                                                        )
                                                     );
                                                 }
 

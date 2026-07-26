@@ -2170,6 +2170,7 @@
                 "presort": "Perguntas de pré-classificação",
                 "postsort": "Perguntas de pós-classificação",
                 "no_answers": "Não foram registadas respostas para esta secção.",
+                "question_default": "Resposta oral",
                 "categories": {
                     "identity": "Identidade e contacto",
                     "questions": "Respostas ao questionário",

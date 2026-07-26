@@ -2170,6 +2170,7 @@
                 "presort": "Preguntas pre-clasificación",
                 "postsort": "Preguntas post-clasificación",
                 "no_answers": "No se registraron respuestas para esta sección.",
+                "question_default": "Respuesta oral",
                 "categories": {
                     "identity": "Identidad y contacto",
                     "questions": "Respuestas del cuestionario",
