@@ -920,6 +920,24 @@ function InterpretShell({
         return summary as AnalysisRunSummary;
     }, [run]);
 
+    // ── latestRun — the study's most-recently-run analysis, derived from
+    //   the same `ran_at`-descending ordering AnalysisHistoryPanel already
+    //   applies to its list and useExplorePhase already relies on
+    //   (`runs[0]`) to find "the fresh run" right after a commit. This is
+    //   the run banner's notion of "current". It is deliberately NOT the
+    //   same thing as AnalysisHistoryPanel's own `currentRunId` prop —
+    //   that prop is just this view's `runId`, i.e. always the selected
+    //   run by construction, so comparing against it could never tell
+    //   "just committed" apart from "loaded an older entry from history".
+    const latestRun = useMemo<AnalysisRunSummary | null>(() => {
+        return runs.reduce<AnalysisRunSummary | null>((latest, candidate) => {
+            if (!latest) return candidate;
+            return new Date(candidate.ran_at).getTime() > new Date(latest.ran_at).getTime()
+                ? candidate
+                : latest;
+        }, null);
+    }, [runs]);
+
     // ── Per-analyst, per-study UI preference for showing per-factor narratives.
     // Owned by useInterpretPhase so the localStorage contract (default-true,
     // per-slug key, quota/private-mode safe) is covered by hook tests.
@@ -996,6 +1014,11 @@ function InterpretShell({
         );
     }
 
+    // The run banner should only announce a *historical* run — one that
+    // isn't the study's most recent analysis. `run` is narrowed non-null
+    // by the gate above.
+    const isViewingHistoricalRun = latestRun !== null && run.id !== latestRun.id;
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
@@ -1064,37 +1087,44 @@ function InterpretShell({
                 }}
             />
 
-            {/* Run banner */}
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                <History className="size-4 flex-shrink-0" aria-hidden="true" />
-                <span className="flex-1">
-                    {t(
-                        'admin.analysis.history.viewing_banner',
-                        'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
-                        {
-                            date: new Date(run.ran_at).toLocaleString(undefined, {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            }),
-                            extraction: run.extraction_method.toUpperCase(),
-                            n: run.n_factors,
-                            rotation: run.rotation_method,
-                        }
-                    )}
-                </span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onBackToExplore}
-                    className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+            {/* Run banner — only for a genuinely historical run; the
+                study's most recent run needs no "back to current" escape
+                hatch, since it already is current (see isViewingHistoricalRun). */}
+            {isViewingHistoricalRun && (
+                <div
+                    className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800"
+                    data-testid="run-banner"
                 >
-                    <X className="size-3.5" aria-hidden="true" />
-                    {t('admin.analysis.history.back_to_current', 'Back to current')}
-                </Button>
-            </div>
+                    <History className="size-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1">
+                        {t(
+                            'admin.analysis.history.viewing_banner',
+                            'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
+                            {
+                                date: new Date(run.ran_at).toLocaleString(undefined, {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                }),
+                                extraction: run.extraction_method.toUpperCase(),
+                                n: run.n_factors,
+                                rotation: run.rotation_method,
+                            }
+                        )}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onBackToExplore}
+                        className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    >
+                        <X className="size-3.5" aria-hidden="true" />
+                        {t('admin.analysis.history.back_to_current', 'Back to current')}
+                    </Button>
+                </div>
+            )}
 
             {/* Mode toggle — Focus (FactorCanvas) by default, Overview restores
                 the legacy four-tab layout. Sits above the results card. */}
