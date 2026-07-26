@@ -1,6 +1,9 @@
 import type { ParticipantRead } from '@/api/model';
+import type { TFunction } from 'i18next';
 import { type ReactNode, useState } from 'react';
-import { flexRender } from '@tanstack/react-table';
+import { flexRender, type Table as ReactTable } from '@tanstack/react-table';
+import type { DumpParticipant } from './types';
+import type { buildColumns } from './InteractiveDataView.columns';
 import {
     Table,
     TableBody,
@@ -107,6 +110,189 @@ function CollapsibleSection({
                 <div className="pt-2 pb-1">{children}</div>
             </Collapsible.Content>
         </Collapsible.Root>
+    );
+}
+
+interface ResponsesTableProps {
+    table: ReactTable<DumpParticipant>;
+    columns: ReturnType<typeof buildColumns>;
+    liveCount: number;
+    hasActiveFilters: boolean;
+    clearAllFilters: () => void;
+    handleViewParticipant: (participant: DumpParticipant) => void;
+    pagination: { pageIndex: number; pageSize: number };
+    t: TFunction;
+}
+
+/**
+ * ResponsesTable — thead/tbody/pagination for the interactive data view.
+ *
+ * Root cause of the header/body column-count mismatch (Task 1.1): the React
+ * Compiler auto-memoizes JSX expressions by inferring their reactive
+ * dependencies from what identifiers they read. `table` (from
+ * `useReactTable`) is a *stable* object for the component's lifetime —
+ * TanStack Table signals updates by mutating it via `setOptions`, never by
+ * returning a new reference — so an expression like
+ * `table.getHeaderGroups().map(...)` appears, to the compiler, to depend
+ * on nothing but that never-changing reference. The compiler then caches
+ * it forever after the first render that reaches it, even though the
+ * *content* of `getHeaderGroups()` depends on `columns`, which does
+ * change (e.g. when `showLanguageColumn` flips true). The row body
+ * happened to keep working only by accident, because its own JSX also
+ * reads `columns.length` in the empty-state branch, giving the compiler a
+ * real dependency to key on — the header row has no such reference, so it
+ * freezes at whichever column set existed on the first qualifying render,
+ * silently dropping a `<th>` while every `<td>` keeps rendering.
+ *
+ * `"use no memo"` opts this component out of that auto-memoization so
+ * `table`'s methods are called fresh on every render, matching normal
+ * (uncompiled) React semantics — the same semantics the test suite already
+ * exercises, since Vitest's config does not run the React Compiler babel
+ * pass.
+ */
+function ResponsesTable({
+    table,
+    columns,
+    liveCount,
+    hasActiveFilters,
+    clearAllFilters,
+    handleViewParticipant,
+    pagination,
+    t,
+}: ResponsesTableProps) {
+    'use no memo';
+    return (
+        <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 rounded-xl sm:rounded-2xl">
+            <Table className="min-w-[800px]">
+                <TableHeader className="bg-slate-50/80">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow
+                            key={headerGroup.id}
+                            className="hover:bg-transparent border-slate-100"
+                        >
+                            {headerGroup.headers.map((header) => (
+                                <TableHead
+                                    key={header.id}
+                                    className="h-14 text-xs font-semibold text-slate-600 px-2 sm:px-6 whitespace-nowrap"
+                                >
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                              header.column.columnDef.header,
+                                              header.getContext()
+                                          )}
+                                </TableHead>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableHeader>
+                <TableBody>
+                    {table.getRowModel().rows.length ? (
+                        table.getRowModel().rows.map((row) => (
+                            <TableRow
+                                key={row.id}
+                                className={cn(
+                                    'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                    !!row.original.is_discarded && 'opacity-60 grayscale-[0.5]'
+                                )}
+                                onClick={() => handleViewParticipant(row.original)}
+                            >
+                                {row.getVisibleCells().map((cell) => (
+                                    <TableCell
+                                        key={cell.id}
+                                        className="px-2 sm:px-6 py-4 sm:py-5 whitespace-nowrap"
+                                    >
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))
+                    ) : (
+                        <TableRow>
+                            <TableCell colSpan={columns.length} className="h-64 text-center">
+                                {liveCount === 0 ? (
+                                    // Wave E (E2): migrated to <EmptyState>.
+                                    <EmptyState
+                                        icon={Inbox}
+                                        title={t(
+                                            'admin.data.empty.no_participants_title',
+                                            'No participants yet'
+                                        )}
+                                        body={t(
+                                            'admin.data.empty.no_participants_desc',
+                                            'Share your study link to start collecting responses.'
+                                        )}
+                                        variant="inline"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                        <div className="p-4 bg-slate-50 rounded-full">
+                                            <Search className="w-8 h-8 opacity-20" />
+                                        </div>
+                                        <p className="font-bold">
+                                            {t('admin.data.search.no_results')}
+                                        </p>
+                                        {hasActiveFilters && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={clearAllFilters}
+                                                className="mt-2"
+                                            >
+                                                {t('admin.data.filters.clear_all', 'Clear filters')}
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+
+            {/* Pagination */}
+            {table.getPageCount() > 1 && (
+                <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+                    <p className="text-xs text-slate-500 font-medium">
+                        {t(
+                            'admin.data.pagination.showing',
+                            'Showing {{from}}–{{to}} of {{total}}',
+                            {
+                                from: pagination.pageIndex * pagination.pageSize + 1,
+                                to: Math.min(
+                                    (pagination.pageIndex + 1) * pagination.pageSize,
+                                    table.getRowCount()
+                                ),
+                                total: table.getRowCount(),
+                            }
+                        )}
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                            className="h-8 w-8 p-0 rounded-lg"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
+                            {pagination.pageIndex + 1} / {table.getPageCount()}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                            className="h-8 w-8 p-0 rounded-lg"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -769,147 +955,16 @@ export default function InteractiveDataView({
                 </AlertDialog>
 
                 {/* Table View */}
-                <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 rounded-xl sm:rounded-2xl">
-                    <Table className="min-w-[800px]">
-                        <TableHeader className="bg-slate-50/80">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow
-                                    key={headerGroup.id}
-                                    className="hover:bg-transparent border-slate-100"
-                                >
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead
-                                            key={header.id}
-                                            className="h-14 text-xs font-semibold text-slate-600 px-2 sm:px-6 whitespace-nowrap"
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext()
-                                                  )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        className={cn(
-                                            'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
-                                            !!row.original.is_discarded &&
-                                                'opacity-60 grayscale-[0.5]'
-                                        )}
-                                        onClick={() => handleViewParticipant(row.original)}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell
-                                                key={cell.id}
-                                                className="px-2 sm:px-6 py-4 sm:py-5 whitespace-nowrap"
-                                            >
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-64 text-center"
-                                    >
-                                        {liveCount === 0 ? (
-                                            // Wave E (E2): migrated to <EmptyState>.
-                                            <EmptyState
-                                                icon={Inbox}
-                                                title={t(
-                                                    'admin.data.empty.no_participants_title',
-                                                    'No participants yet'
-                                                )}
-                                                body={t(
-                                                    'admin.data.empty.no_participants_desc',
-                                                    'Share your study link to start collecting responses.'
-                                                )}
-                                                variant="inline"
-                                            />
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                <div className="p-4 bg-slate-50 rounded-full">
-                                                    <Search className="w-8 h-8 opacity-20" />
-                                                </div>
-                                                <p className="font-bold">
-                                                    {t('admin.data.search.no_results')}
-                                                </p>
-                                                {hasActiveFilters && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={clearAllFilters}
-                                                        className="mt-2"
-                                                    >
-                                                        {t(
-                                                            'admin.data.filters.clear_all',
-                                                            'Clear filters'
-                                                        )}
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-
-                    {/* Pagination */}
-                    {table.getPageCount() > 1 && (
-                        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
-                            <p className="text-xs text-slate-500 font-medium">
-                                {t(
-                                    'admin.data.pagination.showing',
-                                    'Showing {{from}}\u2013{{to}} of {{total}}',
-                                    {
-                                        from: pagination.pageIndex * pagination.pageSize + 1,
-                                        to: Math.min(
-                                            (pagination.pageIndex + 1) * pagination.pageSize,
-                                            table.getRowCount()
-                                        ),
-                                        total: table.getRowCount(),
-                                    }
-                                )}
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.previousPage()}
-                                    disabled={!table.getCanPreviousPage()}
-                                    className="h-8 w-8 p-0 rounded-lg"
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </Button>
-                                <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
-                                    {pagination.pageIndex + 1} / {table.getPageCount()}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.nextPage()}
-                                    disabled={!table.getCanNextPage()}
-                                    className="h-8 w-8 p-0 rounded-lg"
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <ResponsesTable
+                    table={table}
+                    columns={columns}
+                    liveCount={liveCount}
+                    hasActiveFilters={hasActiveFilters}
+                    clearAllFilters={clearAllFilters}
+                    handleViewParticipant={handleViewParticipant}
+                    pagination={pagination}
+                    t={t}
+                />
             </CollapsibleSection>
 
             {/* Section 3: Key statistics */}
