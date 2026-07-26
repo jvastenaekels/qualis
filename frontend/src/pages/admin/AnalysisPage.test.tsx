@@ -1106,5 +1106,125 @@ describe('AnalysisPage', () => {
                 within(banner).getByRole('button', { name: /back to current/i })
             ).toBeInTheDocument();
         });
+
+        // ── Review round 1 fixes ────────────────────────────────────
+        // Two findings from the first review pass on Task 1.4:
+        // (1) AnalysisHistoryPanel's own CURRENT tag was still wired to
+        //     `runId` (whichever run is being viewed), not to the study's
+        //     actual latest run — so browsing to an older run from history
+        //     retagged *that* row CURRENT, reproducing the exact
+        //     contradiction this task exists to remove, just reached via
+        //     the history panel instead of a post-commit banner.
+        // (2) The banner could silently render as "hidden" (i.e. claim the
+        //     viewed run is current) before the runs list had loaded at
+        //     all — a worse failure than the one being fixed, since it
+        //     actively hides a needed warning rather than wrongly showing
+        //     an unneeded one.
+
+        it('tags the study’s actual latest run CURRENT in the history panel, not whichever run is being viewed', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun, // id 42 — the run being viewed, but NOT the latest
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // later — the actual latest run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // AnalysisHistoryPanel sorts its rows by ran_at descending, so the
+            // most recent run (99) renders first, the older one (42) second.
+            // Each row's own clickable area is a <button> whose accessible
+            // name is derived from that row's `ran_at` — using role/order
+            // instead of the formatted date string keeps this test immune
+            // to the test runner's timezone.
+            const rows = await screen.findAllByRole('button', {
+                name: /load analysis run from/i,
+            });
+            expect(rows).toHaveLength(2);
+            const [latestRow, historicalRow] = rows;
+            if (!latestRow || !historicalRow) throw new Error('expected two history rows');
+
+            // The actual latest run (99) is tagged CURRENT...
+            expect(within(latestRow).getByText(/^current$/i)).toBeInTheDocument();
+            // ...and the run being viewed (42, historical) is NOT — even
+            // though it's the one driving the page's `runId`.
+            expect(within(historicalRow).queryByText(/^current$/i)).not.toBeInTheDocument();
+        });
+
+        it('does not render the success view (nor silently hide the banner) while the runs list is still loading', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            // The run-by-id fetch has already resolved...
+            mockGetRunHook.mockReturnValue({
+                data: mockRun,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            // ...but the separate runs-list query (which `latestRun` and the
+            // history panel's CURRENT tag both depend on) has not settled
+            // yet — this is the ordinary shape of a fresh direct navigation
+            // to `?phase=interpret&runId=42` (bookmark, shared link,
+            // refresh), where the two fetches race.
+            mockListRunsHook.mockReturnValue({
+                data: undefined,
+                isLoading: true,
+                isSuccess: false,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            // Still shows the run-loading indicator...
+            expect(await screen.findByText(/loading run/i)).toBeInTheDocument();
+            // ...and crucially has NOT fallen through to the success view,
+            // which is the only place that could wrongly render with a
+            // silently-assumed-current (banner absent) state.
+            expect(screen.queryByRole('button', { name: /export/i })).not.toBeInTheDocument();
+            expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();
+        });
     });
 });

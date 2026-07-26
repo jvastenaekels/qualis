@@ -177,6 +177,12 @@ export default function AnalysisPage() {
         query: { enabled: !!slug },
     });
     const runs = runsQuery.data ?? [];
+    // Has the runs list resolved at least once (success OR error)? Distinct from
+    // `runs.length > 0` — a study with zero prior runs legitimately has an empty
+    // *loaded* list. InterpretShell needs this to avoid treating "haven't heard
+    // back yet" as "this run has no history", which would silently (and
+    // wrongly) tag any run as current before the list is known.
+    const runsListLoaded = runsQuery.isSuccess || runsQuery.isError;
 
     // ── Empty-state contract: not enough participants for factor analysis ──
     // Wave A — UX progressive-disclosure audit. The configuration card walls
@@ -232,6 +238,7 @@ export default function AnalysisPage() {
                 onBackToExplore={navigateToExplore}
                 onFocusChange={setFocusFromCanvas}
                 runs={runs}
+                runsListLoaded={runsListLoaded}
                 compareTo={compareTo}
                 onPin={handlePin}
                 onUnpin={handleUnpin}
@@ -797,11 +804,13 @@ interface InterpretShellProps {
     onBackToExplore: () => void;
     onFocusChange: (factor: number) => void;
     runs: AnalysisRunSummary[];
+    runsListLoaded: boolean;
     compareTo: number | null;
     onPin: (runId: number) => void;
     onUnpin: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell with multiple loading/error/success gates (run fetch, runs-list fetch, historical-run banner) plus focus/overview mode toggle, export menu, and compare-pin picker; all logic lives in useInterpretPhase/useExplorePhase
 function InterpretShell({
     slug,
     runId,
@@ -811,6 +820,7 @@ function InterpretShell({
     onBackToExplore,
     onFocusChange,
     runs,
+    runsListLoaded,
     compareTo,
     onPin,
     onUnpin,
@@ -944,7 +954,14 @@ function InterpretShell({
     const { showFactorNarratives, setShowFactorNarratives } = interpret;
 
     // ── Loading / error gates ────────────────────────────────────────
-    if (interpret.isLoading) {
+    // Also wait on the runs list (`runsListLoaded`): the historical-run
+    // determination below and the history panel's CURRENT tag both need
+    // `latestRun`, which is only meaningful once the runs list has actually
+    // resolved. Without this, a fresh direct navigation to a historical run
+    // (bookmark, shared link, refresh) can render the success branch with
+    // `runs=[]` before the list arrives, silently — and wrongly — treating
+    // the unresolved case as "current" and hiding a banner that should show.
+    if (interpret.isLoading || !runsListLoaded) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
@@ -1075,7 +1092,7 @@ function InterpretShell({
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={runId}
+                currentRunId={latestRun?.id ?? null}
                 onLoadRun={(_result, summary) => {
                     if (summary) {
                         onSelectHistoricalRun(summary.id);

@@ -307,13 +307,23 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
                             n: data.n_factors,
                         })
                     );
-                    // Invalidate the runs list so the history panel refreshes when the
-                    // analyst returns. Then fetch the fresh runId so the caller can route.
+                    // Fetch the fresh runs list, then seed the query cache with it
+                    // directly (setQueryData) rather than merely invalidating and
+                    // relying on a separate background refetch. AnalysisPage's own
+                    // `runsQuery` reads this exact cache entry to decide which run
+                    // is "current" for the interpret-phase banner and the history
+                    // panel's CURRENT tag; a plain invalidate races an unrelated
+                    // refetch against the navigation below, so InterpretShell could
+                    // render the just-committed run before that refetch lands and
+                    // wrongly flag it as historical — the very contradiction this
+                    // banner exists to avoid. Writing the data we already fetched
+                    // straight into the cache makes it available the instant we
+                    // navigate, with no second round-trip.
                     const runsQueryKey =
                         getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey(slug);
-                    queryClient.invalidateQueries({ queryKey: runsQueryKey });
                     try {
                         const runs = await listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet(slug);
+                        queryClient.setQueryData(runsQueryKey, runs);
                         const fresh = runs.length > 0 ? (runs[0] ?? null) : null;
                         if (fresh) onCommit(fresh.id);
                     } catch {

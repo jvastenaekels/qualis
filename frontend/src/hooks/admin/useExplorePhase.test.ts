@@ -14,6 +14,8 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createElement, type ReactNode } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AllTheProviders } from '@/test-utils/test-utils';
 import type { PreviewRangeRow } from '@/api/model/previewRangeRow';
 import { useExplorePhase } from './useExplorePhase';
@@ -286,6 +288,67 @@ describe('useExplorePhase', () => {
 
         await waitFor(() => expect(mockListAnalysisRuns).toHaveBeenCalled());
         expect(onCommit).not.toHaveBeenCalled();
+    });
+
+    // ── Task 1.4 review round 1 ──────────────────────────────────────
+    // AnalysisPage's own runs-list query (which both the interpret-phase
+    // banner and AnalysisHistoryPanel's CURRENT tag read to determine the
+    // study's actual latest run) shares this exact cache entry. A plain
+    // `invalidateQueries` only marks it stale and kicks off a second,
+    // independent background refetch with no ordering guarantee against
+    // the `onCommit` navigation right below it — so InterpretShell could
+    // render the just-committed run before that refetch lands, reading a
+    // pre-commit list and wrongly treating the new run as historical.
+    it('seeds the runs-list query cache with the fresh list (not just invalidates it) on a successful commit', async () => {
+        const mockMutate = vi.fn(
+            (_vars: unknown, opts?: { onSuccess?: (data: { n_factors: number }) => void }) => {
+                opts?.onSuccess?.({ n_factors: 3 });
+            }
+        );
+        mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+        mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+        const freshRuns = [
+            {
+                id: 99,
+                ran_at: '2026-04-29T10:00:00Z',
+                n_factors: 3,
+                extraction_method: 'pca',
+                rotation_method: 'varimax',
+                flagging_mode: 'auto',
+            },
+            {
+                id: 50,
+                ran_at: '2026-04-28T10:00:00Z',
+                n_factors: 2,
+                extraction_method: 'pca',
+                rotation_method: 'varimax',
+                flagging_mode: 'auto',
+            },
+        ];
+        mockListAnalysisRuns.mockResolvedValue(freshRuns);
+
+        // A dedicated QueryClient, kept in scope so the test can inspect its
+        // cache directly afterwards — `AllTheProviders` creates its own
+        // internal client with no way to reach back into it.
+        const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        const wrapper = ({ children }: { children: ReactNode }) =>
+            createElement(QueryClientProvider, { client: queryClient }, children);
+
+        const onCommit = vi.fn();
+        const { result } = renderHook(() => useExplorePhase('test-study', onCommit), { wrapper });
+
+        await waitFor(() => expect(result.current.hasEigenvalues).toBe(true));
+
+        await act(async () => {
+            result.current.handleRunAnalysis();
+        });
+
+        await waitFor(() => expect(onCommit).toHaveBeenCalledWith(99));
+
+        // The cache already holds the fresh list by the time onCommit fires
+        // — not merely marked stale for some later, unordered refetch to
+        // fill in.
+        expect(queryClient.getQueryData(mockGetListAnalysisRunsQueryKey())).toEqual(freshRuns);
     });
 
     describe('judgmental rotation', () => {
