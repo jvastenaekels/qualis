@@ -2171,6 +2171,7 @@
                 "postsort": "Domande post-classificazione",
                 "no_answers": "Nessuna risposta registrata per questa sezione.",
                 "question_default": "Risposta parlata",
+                "answer_default": "Risposta",
                 "categories": {
                     "identity": "Identità e contatto",
                     "questions": "Risposte al questionario",

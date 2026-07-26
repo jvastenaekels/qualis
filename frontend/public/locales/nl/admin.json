@@ -2171,6 +2171,7 @@
                 "postsort": "Nasorteringsvragen",
                 "no_answers": "Geen antwoorden geregistreerd voor dit gedeelte.",
                 "question_default": "Gesproken antwoord",
+                "answer_default": "Antwoord",
                 "categories": {
                     "identity": "Identiteit & contact",
                     "questions": "Vragenlijstantwoorden",

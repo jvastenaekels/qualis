@@ -2171,6 +2171,7 @@
                 "postsort": "Questions Post-Sort",
                 "no_answers": "Aucune réponse enregistrée pour cette section.",
                 "question_default": "Réponse orale",
+                "answer_default": "Réponse",
                 "categories": {
                     "identity": "Identité & Contact",
                     "questions": "Réponses au questionnaire",

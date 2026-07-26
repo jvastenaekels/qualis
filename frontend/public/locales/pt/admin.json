@@ -2171,6 +2171,7 @@
                 "postsort": "Perguntas de pós-classificação",
                 "no_answers": "Não foram registadas respostas para esta secção.",
                 "question_default": "Resposta oral",
+                "answer_default": "Resposta",
                 "categories": {
                     "identity": "Identidade e contacto",
                     "questions": "Respostas ao questionário",

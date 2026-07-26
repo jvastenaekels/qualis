@@ -2173,6 +2173,7 @@
                 "postsort": "Post-Sort Questions",
                 "no_answers": "No answers recorded for this section.",
                 "question_default": "Spoken response",
+                "answer_default": "Response",
                 "categories": {
                     "identity": "Identity & Contact",
                     "questions": "Questionnaire Responses",

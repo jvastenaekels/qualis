@@ -49,8 +49,21 @@ describe('resolveAnswerLabel', () => {
         expect(resolveAnswerLabel({}, 'general_comment', 'en', t)).toBe('General Comment');
     });
 
-    it('returns raw key when no match found', () => {
-        expect(resolveAnswerLabel({}, 'unknown_key', 'en', t)).toBe('unknown_key');
+    it('returns a generic fallback — never the raw key — when no match found', () => {
+        const result = resolveAnswerLabel({}, 'unknown_key', 'en', t);
+        expect(result).not.toBe('unknown_key');
+        expect(result).toBe('Response');
+    });
+
+    it('returns a generic fallback — never the raw key — when the matched entry has no label or text', () => {
+        // A config entry exists for this key (e.g. a legacy/malformed
+        // question config), but it carries neither a label nor a text
+        // field. This must degrade the same way as a missing entry, not
+        // leak the key via getLocalizedText's own fallback parameter.
+        const map = { q1: { id: 'q1' } };
+        const result = resolveAnswerLabel(map, 'q1', 'en', t);
+        expect(result).not.toBe('q1');
+        expect(result).toBe('Response');
     });
 });
 

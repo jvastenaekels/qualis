@@ -15,11 +15,18 @@ export function resolveAnswerLabel(
     language: string,
     t: TFunction
 ): string {
+    // Generic, honest fallback for a key that cannot be resolved to a real
+    // question label — e.g. a researcher-generated key (see
+    // QuestionBuilder.tsx) whose config entry no longer exists (the question
+    // was edited or removed after the participant answered). Never fall back
+    // to the raw key itself: that leaks an internal identifier to the
+    // researcher (same defect class as the audio-recording labels above).
+    const genericFallback = t('admin.participant.survey.answer_default', 'Response');
     const q = questionsMap[key];
     if (q) {
         // label/text are typed as string | Record<string,string> | undefined —
         // both are valid inputs for getLocalizedText.
-        return getLocalizedText(q.label || q.text, language, key);
+        return getLocalizedText(q.label || q.text, language, genericFallback);
     }
     if (key === 'email') return t('post.contact.email_label', 'Email Address');
     if (key === 'interview_consent') return t('post.contact.interview_consent', 'Follow-up');
@@ -29,7 +36,7 @@ export function resolveAnswerLabel(
     if (key === 'missing_statement')
         return t('post.extreme.missing_statement', 'Missing Statement');
     if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');
-    return key;
+    return genericFallback;
 }
 
 // ---------------------------------------------------------------------------

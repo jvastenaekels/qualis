@@ -2111,6 +2111,7 @@
                 "presort": "Esilajittelu",
                 "no_answers": "Tähän osioon ei ole kirjattu vastauksia.",
                 "question_default": "Puhuttu vastaus",
+                "answer_default": "Vastaus",
                 "categories": {
                     "identity": "Henkilö- ja yhteystiedot",
                     "questions": "Kyselyvastaukset",

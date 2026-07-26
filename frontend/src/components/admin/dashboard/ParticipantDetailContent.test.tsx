@@ -344,4 +344,50 @@ describe('ParticipantDetailContent — post-sort audio question labels', () => {
         // because nothing rendered at all).
         expect(screen.getByText('Spoken response')).toBeInTheDocument();
     });
+
+    it('falls back to a generic label — never the raw key — for a text-type post-sort question no longer in the config', () => {
+        // Same defect class, reached via a different render path: the
+        // presort/postsort question table (SurveyResponseTable), rendered
+        // two lines above the audio-recordings block on this exact tab, has
+        // the identical "config entry is gone" failure mode for non-audio
+        // answers (SurveyResponseTable.helpers.ts's resolveAnswerLabel).
+        const studyData = buildStudyData(undefined, 1, [1, 1], {
+            questions: {
+                // A different question exists in the config, but not the
+                // one this participant answered — proves a real map lookup
+                // that missed, not an empty-config short-circuit.
+                q_other: {
+                    type: 'text',
+                    label: { en: 'A different question' },
+                    required: false,
+                },
+            },
+        });
+        const participant: DumpParticipant = {
+            ...buildParticipant({ '1': 0 }),
+            postsort: {
+                questions_answers: {
+                    q_9999999999999: 'A genuine free-text answer',
+                },
+            },
+        };
+
+        render(
+            <ParticipantDetailContent
+                participant={participant}
+                studyData={studyData}
+                onToggleDiscard={() => {}}
+            />
+        );
+
+        switchToPostsortTab();
+
+        // Never the raw identifier.
+        expect(screen.queryByText('q_9999999999999')).not.toBeInTheDocument();
+        // The answer value itself renders — proves the row actually
+        // mounted, not that the whole section silently failed to render.
+        expect(screen.getByText('A genuine free-text answer')).toBeInTheDocument();
+        // ...labelled with the generic fallback, not the identifier.
+        expect(screen.getByText('Response')).toBeInTheDocument();
+    });
 });

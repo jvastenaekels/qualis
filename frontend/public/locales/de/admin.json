@@ -2171,6 +2171,7 @@
                 "postsort": "Nachsortierungsfragen",
                 "no_answers": "Keine Antworten für diesen Abschnitt aufgezeichnet.",
                 "question_default": "Gesprochene Antwort",
+                "answer_default": "Antwort",
                 "categories": {
                     "identity": "Identität & Kontakt",
                     "questions": "Fragebogenantworten",
