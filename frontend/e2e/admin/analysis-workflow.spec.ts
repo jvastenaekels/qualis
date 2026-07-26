@@ -10,8 +10,10 @@
 import { test, expect } from '../fixtures/db-setup';
 import { testDataBuilders, gridConfig23 } from '../fixtures/test-data';
 
-// Analysis can be CPU-bound on a fresh DB — give it room
-test.setTimeout(120_000);
+// Analysis can be CPU-bound on a fresh DB — give it room. Test 1 commits
+// two runs (the historical-run banner needs a study with a history), so it
+// pays that cost twice.
+test.setTimeout(180_000);
 
 // -------------------------------------------------------------------------
 // Test 1 — Full happy-path: seed study + 8 participants, run analysis,
@@ -198,31 +200,63 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     const historyHeader = page.getByRole('button', { name: /analysis history/i });
     await expect(historyHeader).toBeVisible({ timeout: 10_000 });
 
-    // Wait for at least one dated run entry in the panel body
-    const runEntry = page
-        .getByRole('button', {
-            name: /load analysis run from/i,
-        })
-        .first();
-    await expect(runEntry).toBeVisible({ timeout: 15_000 });
+    // Wait for the dated run entry in the panel body — exactly one so far.
+    const runEntries = page.getByRole('button', { name: /load analysis run from/i });
+    await expect(runEntries.first()).toBeVisible({ timeout: 15_000 });
+    await expect(runEntries).toHaveCount(1);
 
     // -----------------------------------------------------------------------
-    // 10. Verify history persistence: click the run, see historical banner,
-    //     then click "Back to current"
+    // 10. Historical-run banner + "Back to current".
+    //
+    //     The amber banner announces a run that is NOT the study's most
+    //     recent one (Task 1.4) — a study with a single run can never show
+    //     it, and must not: the sole run *is* current, and the history panel
+    //     tags it CURRENT 40px above. So commit a second run first, then
+    //     exercise both directions of the real journey:
+    //       latest run selected  → no banner
+    //       older run selected   → banner + working escape hatch
     // -----------------------------------------------------------------------
-    await runEntry.click();
+    // Second commit. We're back on the Explore phase (the URL carries no
+    // ?phase), where the CTA sits outside the Advanced accordion. Pin
+    // n_factors to 2 again so both runs have the same shape.
+    const advancedTrigger2 = page.getByRole('button', { name: /advanced configuration/i });
+    await expect(advancedTrigger2).toBeVisible({ timeout: 10_000 });
+    await advancedTrigger2.click();
+    const factorsSelect2 = page.getByRole('combobox', { name: /factors/i });
+    await expect(factorsSelect2).toBeEnabled({ timeout: 10_000 });
+    await factorsSelect2.click();
+    const secondOption2 = page.getByRole('option', { name: '2' });
+    if (await secondOption2.isVisible({ timeout: 3_000 }).catch(() => false)) {
+        await secondOption2.click();
+    }
 
-    // The historical-run amber banner should appear
-    const historyBanner = page.getByText(/viewing run from/i).first();
+    const secondRunButton = page.getByRole('button', { name: /commit and interpret/i });
+    await expect(secondRunButton).toBeEnabled({ timeout: 10_000 });
+    await secondRunButton.click();
+
+    // Once the commit lands, the history panel lists both runs, newest first.
+    await expect(runEntries).toHaveCount(2, { timeout: 60_000 });
+
+    // The page now shows the just-committed run, which IS the latest — the
+    // banner must stay away. Assert a positive marker of the loaded interpret
+    // phase first, so the absence assertion can't pass on a blank page.
+    // (`getByTestId` targets the banner's data-testid; the error state carries
+    // a second "Back to current" button with the same accessible name, so
+    // every banner assertion below is scoped to this element.)
+    const historyBanner = page.getByTestId('run-banner');
+    await expect(page.getByRole('button', { name: /^export$/i })).toBeVisible({
+        timeout: 30_000,
+    });
+    await expect(historyBanner).toBeHidden();
+
+    // Now load the older run from history — that one IS historical.
+    await runEntries.nth(1).click();
     await expect(historyBanner).toBeVisible({ timeout: 15_000 });
+    await expect(historyBanner).toContainText(/viewing run from/i);
 
-    // Click "Back to current" to dismiss the banner
-    const backButton = page.getByRole('button', { name: /back to current/i });
-    await expect(backButton).toBeVisible();
-    await backButton.click();
-
-    // Banner must disappear after dismissal
-    await expect(historyBanner).not.toBeVisible({ timeout: 10_000 });
+    // "Back to current" (the banner's own, not the error state's) dismisses it.
+    await historyBanner.getByRole('button', { name: /back to current/i }).click();
+    await expect(historyBanner).toBeHidden({ timeout: 10_000 });
 });
 
 // -------------------------------------------------------------------------
