@@ -382,12 +382,20 @@ describe('ParticipantDetailContent — post-sort audio question labels', () => {
 
         switchToPostsortTab();
 
-        // Never the raw identifier.
-        expect(screen.queryByText('q_9999999999999')).not.toBeInTheDocument();
         // The answer value itself renders — proves the row actually
         // mounted, not that the whole section silently failed to render.
         expect(screen.getByText('A genuine free-text answer')).toBeInTheDocument();
         // ...labelled with the generic fallback, not the identifier.
         expect(screen.getByText('Response')).toBeInTheDocument();
+        // The raw key does reach this screen, but only in the row's explicit
+        // "Internal ID" line — a deliberate, labelled disclosure. It must
+        // appear exactly there and nowhere else; in particular it must not be
+        // the question's label. (A bare queryByText('q_9999999999999') would
+        // pass whatever happened, because testing-library's default matcher
+        // compares an element's whole text and the ID line reads
+        // "Internal ID: q_9999999999999".)
+        const rawKeyNodes = screen.getAllByText(/q_9999999999999/);
+        expect(rawKeyNodes).toHaveLength(1);
+        expect(rawKeyNodes[0]).toHaveTextContent('Internal ID: q_9999999999999');
     });
 });
