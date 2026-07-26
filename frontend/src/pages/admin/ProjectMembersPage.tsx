@@ -247,6 +247,16 @@ export default function ProjectMembersPage() {
                                                     </SelectTrigger>
                                                     <SelectContent className="rounded-xl border-white/20 glass shadow-2xl">
                                                         <SelectItem
+                                                            value="owner"
+                                                            disabled
+                                                            className="text-xs font-bold py-2 rounded-lg m-1"
+                                                        >
+                                                            {t(
+                                                                'admin.project.roles.owner',
+                                                                'Owner'
+                                                            )}
+                                                        </SelectItem>
+                                                        <SelectItem
                                                             value="member"
                                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                                         >

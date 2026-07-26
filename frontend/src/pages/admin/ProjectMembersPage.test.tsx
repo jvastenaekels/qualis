@@ -1,0 +1,85 @@
+import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import ProjectMembersPage from './ProjectMembersPage';
+import { useAuthStore } from '@/store/useAuthStore';
+
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+
+// Deliberately NOT mocking '@/components/ui/select' here (unlike the
+// remove-member-dialog test file): the real Radix Select's value-rendering
+// path (SelectValue resolving against SelectContent's items) is exactly what
+// this test needs to exercise. It has been verified stable in this
+// React 19 + happy-dom environment for this page.
+
+const { removeMember, refetchMembers } = vi.hoisted(() => ({
+    removeMember: vi.fn().mockResolvedValue({}),
+    refetchMembers: vi.fn(),
+}));
+
+vi.mock('@/api/generated', () => ({
+    useGetProjectApiAdminProjectsSlugGet: () => ({
+        data: { id: 1, slug: 'demo', title: 'Demo Project' },
+        isLoading: false,
+    }),
+    useListProjectMembersApiAdminProjectsSlugMembersGet: () => ({
+        data: {
+            items: [
+                {
+                    user_id: 11,
+                    role: 'member',
+                    joined_at: '2024-01-01T00:00:00Z',
+                    user: { full_name: 'Ada Lovelace', email: 'ada@x.io' },
+                },
+                {
+                    user_id: 12,
+                    role: 'owner',
+                    joined_at: '2024-01-01T00:00:00Z',
+                    user: { full_name: 'Grace Hopper', email: 'grace@x.io' },
+                },
+            ],
+        },
+        isLoading: false,
+        refetch: refetchMembers,
+    }),
+    useRemoveProjectMemberApiAdminProjectsSlugMembersUserIdDelete: () => ({
+        mutateAsync: removeMember,
+        isPending: false,
+    }),
+    useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch: () => ({
+        mutateAsync: vi.fn(),
+        isPending: false,
+    }),
+    useCreateInvitationApiAdminProjectsSlugInvitationsPost: () => ({
+        mutateAsync: vi.fn(),
+        isPending: false,
+    }),
+}));
+
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+    return {
+        ...actual,
+        useLoaderData: () => ({ slug: 'demo' }),
+        useNavigate: () => vi.fn(),
+    };
+});
+
+describe('ProjectMembersPage role select', () => {
+    beforeEach(() => {
+        removeMember.mockReset().mockResolvedValue({});
+        useAuthStore.setState({
+            user: { id: 12, email: 'grace@x.io', is_superuser: false },
+            isAuthenticated: true,
+        });
+    });
+
+    it('shows the Owner role label for the project owner', async () => {
+        renderWithProviders(<ProjectMembersPage />);
+
+        // Scope to the owner's own row: the page also renders an unrelated
+        // "Owner" legend in the permissions-matrix card, so an unscoped
+        // screen.findByText('Owner') would pass even without the fix.
+        const ownerRow = await screen.findByRole('row', { name: /grace hopper/i });
+        expect(within(ownerRow).getByText('Owner')).toBeInTheDocument();
+    });
+});
