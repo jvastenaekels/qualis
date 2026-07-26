@@ -481,26 +481,32 @@ export default function ConcourseDetailPage() {
                                     <CheckSquare className="size-4 text-emerald-600 shrink-0" />
                                     <div>
                                         <p className="text-sm font-bold text-emerald-900">
-                                            {t('admin.concourse.qset_title', 'Q-set')}
+                                            {t('admin.concourse.qset_title', 'Curation')}
                                             <span className="ml-2 text-lg font-black">
-                                                {acceptedCt}
+                                                {acceptedCt + rejectedCt}
                                             </span>
                                             <span className="text-emerald-600 font-normal text-xs ml-1">
                                                 / {totalCount}{' '}
-                                                {t('admin.concourse.items_label', 'items')}
+                                                {t('admin.concourse.items_label', 'items')}{' '}
+                                                {t('admin.concourse.qset_reviewed', 'reviewed')}
                                             </span>
                                         </p>
                                         <p className="text-xs text-emerald-700 mt-0.5">
-                                            {proposedCt > 0
-                                                ? t(
-                                                      'admin.concourse.qset_pending',
-                                                      '{{count}} items still to review',
-                                                      { count: proposedCt }
-                                                  )
-                                                : t(
-                                                      'admin.concourse.qset_complete',
-                                                      'All items reviewed'
-                                                  )}
+                                            {t(
+                                                'admin.concourse.qset_accepted',
+                                                '{{count}} accepted',
+                                                { count: acceptedCt }
+                                            )}
+                                            {proposedCt > 0 && (
+                                                <>
+                                                    {' · '}
+                                                    {t(
+                                                        'admin.concourse.qset_pending',
+                                                        '{{count}} items still to review',
+                                                        { count: proposedCt }
+                                                    )}
+                                                </>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -534,6 +540,7 @@ export default function ConcourseDetailPage() {
                             {/* Progress bar */}
                             <div className="mt-2.5 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
                                 <div
+                                    data-testid="curation-progress"
                                     className="h-full rounded-full bg-emerald-500 transition-all duration-500"
                                     style={{ width: `${progress}%` }}
                                 />
