@@ -327,7 +327,16 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
                         const fresh = runs.length > 0 ? (runs[0] ?? null) : null;
                         if (fresh) onCommit(fresh.id);
                     } catch {
-                        // Non-fatal: the analyst can navigate via history.
+                        // The seeding fetch failed (it is a raw call, with none
+                        // of the query client's retry budget). Nothing has
+                        // written the new run into the cache, so fall back to
+                        // invalidating: without it the list stays "fresh" for
+                        // staleTime (5 min, no refetch-on-focus) and the
+                        // history panel below the success toast keeps showing
+                        // the pre-commit list — reading, to the analyst, as
+                        // "it did not save", with a duplicate run as the
+                        // natural next move.
+                        queryClient.invalidateQueries({ queryKey: runsQueryKey });
                     }
                 },
                 onError: (error) => {

@@ -351,6 +351,48 @@ describe('useExplorePhase', () => {
         expect(queryClient.getQueryData(mockGetListAnalysisRunsQueryKey())).toEqual(freshRuns);
     });
 
+    // ── Task 1.4 review round 2 ──────────────────────────────────────
+    // Seeding the cache (above) covers the happy path, but it is the only
+    // thing that marks the runs list as needing a refresh. If the raw
+    // follow-up fetch throws — no retry budget, unlike the query client's
+    // own — nothing marks it stale, and with staleTime 5 min +
+    // refetchOnWindowFocus:false the history panel keeps rendering the
+    // pre-commit list under a "Analysis complete" toast. Invalidating in
+    // the catch restores the recovery path without regressing the seeding.
+    it('invalidates the runs-list query when the follow-up fetch fails', async () => {
+        const mockMutate = vi.fn(
+            (_vars: unknown, opts?: { onSuccess?: (data: { n_factors: number }) => void }) => {
+                opts?.onSuccess?.({ n_factors: 3 });
+            }
+        );
+        mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+        mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+        mockListAnalysisRuns.mockRejectedValue(new Error('Network'));
+
+        const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+        const wrapper = ({ children }: { children: ReactNode }) =>
+            createElement(QueryClientProvider, { client: queryClient }, children);
+
+        const onCommit = vi.fn();
+        const { result } = renderHook(() => useExplorePhase('test-study', onCommit), { wrapper });
+
+        await waitFor(() => expect(result.current.hasEigenvalues).toBe(true));
+
+        await act(async () => {
+            result.current.handleRunAnalysis();
+        });
+
+        await waitFor(() => {
+            expect(invalidateSpy).toHaveBeenCalledWith({
+                queryKey: mockGetListAnalysisRunsQueryKey(),
+            });
+        });
+        // The failure is still non-fatal for routing: no run id was learned,
+        // so the analyst stays on Explore rather than being sent nowhere.
+        expect(onCommit).not.toHaveBeenCalled();
+    });
+
     describe('judgmental rotation', () => {
         it('manualRotations is empty by default', () => {
             const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
