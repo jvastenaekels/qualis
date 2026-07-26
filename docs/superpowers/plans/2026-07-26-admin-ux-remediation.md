@@ -152,25 +152,19 @@ it('shows the Owner role label for the project owner', async () => {
 Run: `cd frontend && npx vitest run src/pages/admin/ProjectMembersPage.test.tsx -t 'Owner role label'`
 Expected: FAIL — "Unable to find an element with the text: Owner".
 
-- [ ] **Step 3: Add the owner item, disabled**
+- [ ] **Step 3: Render the owner's role as a static badge**
 
-Ownership transfer is not a dropdown action, so the item exists to *display* the value, not to offer it. Insert as the first child of `<SelectContent>` at `ProjectMembersPage.tsx:248`:
+> **Corrected after CI.** This step originally prescribed adding a `<SelectItem value="owner" disabled>` so `<SelectValue />` would have something to render. That is wrong: `SelectContent` is one shared JSX block instantiated per row, so the item appears in **every** row's dropdown — and the repo encodes the opposite as a deliberate invariant in two E2E tests (`e2e/admin/roles.spec.ts:405` and `:419`, "owner role is never offered in dropdowns"). CI caught it. The task's own review had flagged the phantom item and proposed the badge; it was deferred as visual noise. It was not.
 
-```tsx
-<SelectItem
-    value="owner"
-    disabled
-    className="text-xs font-bold py-2 rounded-lg m-1"
->
-    {t('admin.project.roles.owner', 'Owner')}
-</SelectItem>
-```
+Ownership transfer is not a dropdown action — a project has exactly one owner, and the owner row's `<Select>` is already unconditionally disabled (`ProjectMembersPage.tsx:231-235`). So render the value, don't offer it:
 
-Add the matching key to `frontend/public/locales/en/admin.json` under `admin.project.roles`:
+- When `member.role === 'owner'`, render a static badge carrying `t('admin.project.roles.owner', 'Owner')` instead of the `<Select>`, styled to match the existing owner pill (`bg-indigo-50 text-indigo-700`).
+- Leave `<SelectContent>` offering only `member` and `viewer`.
+- Leave the member/viewer rows untouched.
 
-```json
-"owner": "Owner"
-```
+This fixes the empty label, keeps `owner` out of every listbox, and removes a permanently-disabled combobox from the tab order.
+
+The key `admin.project.roles.owner` already exists in all nine locales — do not re-add it.
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
