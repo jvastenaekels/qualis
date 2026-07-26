@@ -1105,6 +1105,15 @@ cd frontend/src && grep -rnoE "t\('admin\.[a-z_.]*'\)" --include=*.tsx . | head 
 
 Add the canonical English label as the fallback for each.
 
+**Most important: resolve every `t()` key against the locale JSON.** Phase 2's whole-branch review found **twelve `t()` calls whose keys exist in neither `en/admin.json` nor `en/participant.json`** — i18next then renders the raw dotted key path as UI text, which is the purest instance of the defect class Phase 2 set out to remove. Confirmed sites include:
+
+- `components/auth/RequireAdmin.tsx:53-54` — the full-screen access-denied gate renders `common.errors.access_denied.title` and `…message`
+- `components/admin/dashboard/InteractiveDataView.tsx:809` — the destructive confirm button of "clear all participants" reads `common.confirm_delete`
+- `pages/admin/ProjectMembersPage.tsx:87,96` — changing a member's role toasts `admin.projects.settings.team.role_update_success` / `…role_update_error`
+- `hooks/admin/useStudyDesignPage.ts:484`, `pages/ErrorPage.helpers.ts:43,44,87,88`, `pages/RegistrationPage.tsx:151`, `hooks/participant/useFineSort.ts:464` (a participant-facing `window.confirm`)
+
+Note the `t('key') || 'Fallback'` guard used at ~17 sites (e.g. `PostSortConfigEditor.tsx:504-604`) is **inert**: `t()` returns the key itself on a miss, which is truthy, so `||` never fires. Write the check as a script that loads the locale JSON and asserts every key referenced in source resolves — then wire it into `npm run i18n-check` so this cannot regress.
+
 *(The `ConcourseDetailPage.tsx:484` `'Q-set'` / `'Curation'` divergence originally listed here was already retired by Phase 1 Task 1.3.)*
 
 - [ ] **Step 5: Run the tests to verify they pass**
