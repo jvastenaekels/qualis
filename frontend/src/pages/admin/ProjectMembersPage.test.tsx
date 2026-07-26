@@ -5,6 +5,7 @@
  */
 
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ProjectMembersPage from './ProjectMembersPage';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -87,5 +88,22 @@ describe('ProjectMembersPage role select', () => {
         // screen.findByText('Owner') would pass even without the fix.
         const ownerRow = await screen.findByRole('row', { name: /grace hopper/i });
         expect(within(ownerRow).getByText('Owner')).toBeInTheDocument();
+    });
+
+    it('never offers the owner role as an option in a member/viewer row dropdown', async () => {
+        const user = userEvent.setup();
+        renderWithProviders(<ProjectMembersPage />);
+
+        // Ada Lovelace is a plain member, so her row's role Select is
+        // interactive for the (owner) current user. Ownership transfer is
+        // not a dropdown action: the listbox must offer member/viewer only.
+        const memberRow = await screen.findByRole('row', { name: /ada lovelace/i });
+        await user.click(within(memberRow).getByRole('combobox'));
+
+        // The listbox is portalled, so options are asserted globally rather
+        // than scoped to the row.
+        expect(await screen.findByRole('option', { name: /^member$/i })).toBeInTheDocument();
+        expect(screen.getByRole('option', { name: /^viewer$/i })).toBeInTheDocument();
+        expect(screen.queryByRole('option', { name: /^owner$/i })).not.toBeInTheDocument();
     });
 });
