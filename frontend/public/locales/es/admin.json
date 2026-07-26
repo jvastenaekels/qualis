@@ -426,6 +426,8 @@
             "bulk_status_success": "{{count}} elementos actualizados",
             "bulk_status_error": "Error al actualizar algunos elementos",
             "qset_title": "Curación",
+            "qset_reviewed_of": "{{total}} elementos revisados",
+            "qset_accepted": "{{count}} aceptados",
             "qset_pending": "{{count}} elementos por revisar",
             "qset_complete": "Todos los elementos revisados",
             "show_pending": "Por revisar",

@@ -485,10 +485,19 @@ export default function ConcourseDetailPage() {
                                             <span className="ml-2 text-lg font-black">
                                                 {acceptedCt + rejectedCt}
                                             </span>
+                                            {/* One key for the whole fragment, rather than
+                                                a noun key and a participle key concatenated:
+                                                a translator must be able to reorder them,
+                                                and in several locales has to. The count
+                                                above stays a typographic figure — it is what
+                                                the progress bar measures. */}
                                             <span className="text-emerald-600 font-normal text-xs ml-1">
-                                                / {totalCount}{' '}
-                                                {t('admin.concourse.items_label', 'items')}{' '}
-                                                {t('admin.concourse.qset_reviewed', 'reviewed')}
+                                                /{' '}
+                                                {t(
+                                                    'admin.concourse.qset_reviewed_of',
+                                                    '{{total}} items reviewed',
+                                                    { total: totalCount }
+                                                )}
                                             </span>
                                         </p>
                                         <p className="text-xs text-emerald-700 mt-0.5">

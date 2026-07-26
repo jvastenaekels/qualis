@@ -426,6 +426,8 @@
             "bulk_status_success": "{{count}} items bijgewerkt",
             "bulk_status_error": "Sommige items bijwerken mislukt",
             "qset_title": "Curatie",
+            "qset_reviewed_of": "{{total}} items beoordeeld",
+            "qset_accepted": "{{count}} geaccepteerd",
             "qset_pending": "{{count}} items nog te beoordelen",
             "qset_complete": "Alle items beoordeeld",
             "show_pending": "Te beoordelen",
