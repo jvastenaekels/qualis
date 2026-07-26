@@ -754,6 +754,132 @@ describe('AnalysisPage', () => {
         expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
     });
 
+    // ── Delete wiring: viewedRunId vs latestRunId (review round 2) ──
+    // InterpretShell feeds AnalysisHistoryPanel two different run ids —
+    // `viewedRunId` (what this view renders, drives the post-delete bounce)
+    // and `latestRunId` (the study's most recent run, drives the CURRENT
+    // tag). They diverge exactly when an older run is being viewed, and the
+    // panel's own suite cannot catch a swap at this call site. Both
+    // directions are pinned here, at the wiring.
+
+    describe('post-delete bounce wiring (two runs, older one viewed)', () => {
+        /** Interpret phase on run 42, with run 99 as the study's latest. */
+        function setupTwoRunsViewingOlder() {
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: mockRun, // id 42 — older than 99
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // the study's latest run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+            const mockDeleteMutate = vi.fn((_vars: unknown, opts?: { onSuccess?: () => void }) => {
+                opts?.onSuccess?.();
+            });
+            mockDeleteRunMutation.mockReturnValue({
+                mutate: mockDeleteMutate,
+                isPending: false,
+            });
+            return mockDeleteMutate;
+        }
+
+        /**
+         * Deletes the history row at `rowIndex` (the panel sorts ran_at
+         * descending, so 0 = run 99, 1 = run 42) and confirms the dialog.
+         */
+        async function deleteHistoryRow(rowIndex: number) {
+            const deleteButtons = screen.getAllByLabelText(/Delete this analysis run/i);
+            const target = deleteButtons[rowIndex];
+            if (!target) throw new Error(`no delete button at row ${rowIndex}`);
+            await userEvent.click(target);
+            await userEvent.click(await screen.findByRole('button', { name: /^Delete$/ }));
+        }
+
+        it('bounces to Explore when the run being viewed is deleted, even though it is not the latest', async () => {
+            const mockDeleteMutate = setupTwoRunsViewingOlder();
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            });
+
+            // Row 1 is run 42 — the one this view is displaying.
+            await deleteHistoryRow(1);
+            expect(mockDeleteMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 42 },
+                expect.any(Object)
+            );
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
+            });
+            expect(
+                screen.getByRole('button', { name: /commit and interpret/i })
+            ).toBeInTheDocument();
+        });
+
+        it('stays on the run being viewed when a different (latest) run is deleted', async () => {
+            const mockDeleteMutate = setupTwoRunsViewingOlder();
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+            });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            });
+
+            // Row 0 is run 99 — the study's latest, but NOT what we're viewing.
+            await deleteHistoryRow(0);
+            expect(mockDeleteMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 99 },
+                expect.any(Object)
+            );
+
+            // Run 42 still exists, so the analyst must still be on it. Assert
+            // a positive marker of the loaded interpret branch (not just the
+            // sr-only phase marker) so this cannot pass on a blank render.
+            expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
+            expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
+            expect(
+                screen.queryByRole('button', { name: /commit and interpret/i })
+            ).not.toBeInTheDocument();
+        });
+    });
+
     // ── Focus / Overview mode toggle (Task 24) ─────────────────────
 
     it('Interpret phase renders Focus mode by default', async () => {
@@ -1044,6 +1170,63 @@ describe('AnalysisPage', () => {
             // non-loading) interpret branch — the only branch that can
             // render the run banner. Without this, an assertion of absence
             // could pass vacuously because the page never got there.
+            expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
+
+            expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();
+            expect(screen.queryByText(/viewing run from/i)).not.toBeInTheDocument();
+        });
+
+        it('hides the historical-run banner when the latest of several runs is selected', async () => {
+            // The headline post-commit journey: run 99 was just committed on
+            // top of run 42, and the page lands on 99. The single-run case
+            // above cannot tell "the latest run wins" apart from "any run with
+            // no history wins" — this one can.
+            mockEigenvaluesHook.mockReturnValue({
+                data: mockEigenvalues,
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+                refetch: vi.fn(),
+            });
+            mockGetRunHook.mockReturnValue({
+                data: { ...mockRun, id: 99, ran_at: '2026-04-29T13:00:00Z' },
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+                error: null,
+            });
+            mockListRunsHook.mockReturnValue({
+                data: [
+                    {
+                        id: 42,
+                        ran_at: '2026-04-29T12:00:00Z',
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                    {
+                        id: 99,
+                        ran_at: '2026-04-29T13:00:00Z', // the just-committed run
+                        extraction_method: 'pca',
+                        n_factors: 2,
+                        rotation_method: 'varimax',
+                        flagging_mode: 'auto',
+                    },
+                ],
+                isLoading: false,
+                isSuccess: true,
+                isError: false,
+            });
+
+            renderWithProviders(<AnalysisPage />, {
+                initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=99`],
+            });
+
+            // Sanity check: we reached the loaded interpret branch, the only
+            // one that can render the banner — otherwise the absence
+            // assertions below would pass vacuously.
             expect(await screen.findByRole('button', { name: /export/i })).toBeInTheDocument();
 
             expect(screen.queryByTestId('run-banner')).not.toBeInTheDocument();

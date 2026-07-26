@@ -124,7 +124,12 @@ describe('AnalysisHistoryPanel', () => {
         });
 
         renderWithProviders(
-            <AnalysisHistoryPanel slug="test-study" currentRunId={null} onLoadRun={vi.fn()} />
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={null}
+                onLoadRun={vi.fn()}
+            />
         );
 
         expect(screen.getByText(/No previous analyses for this study yet/i)).toBeInTheDocument();
@@ -151,7 +156,12 @@ describe('AnalysisHistoryPanel', () => {
         const onLoadRun = vi.fn();
 
         renderWithProviders(
-            <AnalysisHistoryPanel slug="test-study" currentRunId={null} onLoadRun={onLoadRun} />
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={null}
+                onLoadRun={onLoadRun}
+            />
         );
 
         // The row button loads the run (identified by its aria-label or text)
@@ -185,7 +195,12 @@ describe('AnalysisHistoryPanel', () => {
         const onLoadRun = vi.fn();
 
         renderWithProviders(
-            <AnalysisHistoryPanel slug="test-study" currentRunId={null} onLoadRun={onLoadRun} />
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={null}
+                onLoadRun={onLoadRun}
+            />
         );
 
         // Click the trash icon
@@ -226,7 +241,12 @@ describe('AnalysisHistoryPanel', () => {
         });
 
         renderWithProviders(
-            <AnalysisHistoryPanel slug="test-study" currentRunId={null} onLoadRun={vi.fn()} />
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={null}
+                onLoadRun={vi.fn()}
+            />
         );
 
         expect(screen.getByText('CENTROID')).toBeInTheDocument();
@@ -235,8 +255,8 @@ describe('AnalysisHistoryPanel', () => {
         expect(screen.getByText('manual')).toBeInTheDocument();
     });
 
-    // ── Test 5: Current tag shown when currentRunId matches a run ──────────
-    it('shows "current" tag on the run matching currentRunId', () => {
+    // ── Test 5: Current tag shown when latestRunId matches a run ──────────
+    it('shows "current" tag on the run matching latestRunId', () => {
         const run = makeRun({ id: 99 });
         mockListRunsHook.mockReturnValue({
             data: [run],
@@ -246,9 +266,112 @@ describe('AnalysisHistoryPanel', () => {
         });
 
         renderWithProviders(
-            <AnalysisHistoryPanel slug="test-study" currentRunId={99} onLoadRun={vi.fn()} />
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={99}
+                onLoadRun={vi.fn()}
+            />
         );
 
         expect(screen.getByText('current')).toBeInTheDocument();
+    });
+
+    // ── Tests 6-7: the post-delete bounce keys off `viewedRunId` ───────────
+    // `viewedRunId` (what the parent is displaying) and `latestRunId` (the
+    // study's most recent run) diverge whenever an older run is being viewed.
+    // Guarding the bounce on the wrong one breaks in both directions: it
+    // leaves the parent rendering a deleted run, and it ejects the analyst
+    // from a run that still exists. Both directions are pinned here.
+
+    /** Deletes the row for `runId`, confirming the AlertDialog. */
+    async function deleteRun(runId: number, runs: AnalysisRunSummary[]) {
+        const index = runs.findIndex((r) => r.id === runId);
+        if (index === -1) throw new Error(`run ${runId} not in the rendered list`);
+        const deleteButtons = screen.getAllByRole('button', {
+            name: /Delete this analysis run/i,
+        });
+        const target = deleteButtons[index];
+        if (!target) throw new Error(`no delete button at index ${index}`);
+        await userEvent.click(target);
+        await userEvent.click(screen.getByRole('button', { name: /^Delete$/ }));
+    }
+
+    it('signals the parent with (null, null) when the deleted run is the one being viewed', async () => {
+        // Newest first — the panel sorts ran_at descending, so this is also
+        // the rendered order.
+        const runs = [
+            makeRun({ id: 99, ran_at: '2025-03-02T10:00:00Z' }),
+            makeRun({ id: 42, ran_at: '2025-03-01T10:00:00Z' }),
+        ];
+        mockListRunsHook.mockReturnValue({
+            data: runs,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+        });
+        const mockMutate = vi.fn((_args, callbacks) => {
+            callbacks.onSuccess();
+        });
+        mockDeleteRunMutation.mockReturnValue({ mutate: mockMutate, isPending: false });
+
+        const onLoadRun = vi.fn();
+        renderWithProviders(
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={42}
+                latestRunId={99}
+                onLoadRun={onLoadRun}
+            />
+        );
+
+        await deleteRun(42, runs);
+
+        await waitFor(() => {
+            expect(mockMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 42 },
+                expect.any(Object)
+            );
+        });
+        expect(onLoadRun).toHaveBeenCalledWith(null, null);
+    });
+
+    it('leaves the parent alone when the deleted run is not the one being viewed', async () => {
+        const runs = [
+            makeRun({ id: 99, ran_at: '2025-03-02T10:00:00Z' }),
+            makeRun({ id: 42, ran_at: '2025-03-01T10:00:00Z' }),
+        ];
+        mockListRunsHook.mockReturnValue({
+            data: runs,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+        });
+        const mockMutate = vi.fn((_args, callbacks) => {
+            callbacks.onSuccess();
+        });
+        mockDeleteRunMutation.mockReturnValue({ mutate: mockMutate, isPending: false });
+
+        const onLoadRun = vi.fn();
+        renderWithProviders(
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={42}
+                latestRunId={99}
+                onLoadRun={onLoadRun}
+            />
+        );
+
+        // Delete the study's latest run (99) while viewing the older one (42).
+        await deleteRun(99, runs);
+
+        await waitFor(() => {
+            expect(mockMutate).toHaveBeenCalledWith(
+                { slug: 'test-study', runId: 99 },
+                expect.any(Object)
+            );
+        });
+        // Run 42 is still there — the parent must not be bounced off it.
+        expect(onLoadRun).not.toHaveBeenCalled();
     });
 });

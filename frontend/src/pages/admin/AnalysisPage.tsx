@@ -214,7 +214,8 @@ export default function AnalysisPage() {
                 />
                 <AnalysisHistoryPanel
                     slug={slug}
-                    currentRunId={null}
+                    viewedRunId={null}
+                    latestRunId={null}
                     onLoadRun={(_result, run) => {
                         // The legacy callback signature passes (result, run); we
                         // only need the id to route. The panel may also call this
@@ -782,7 +783,8 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={null}
+                viewedRunId={null}
+                latestRunId={null}
                 onLoadRun={(_result, run) => {
                     if (run) onSelectHistoricalRun(run.id);
                 }}
@@ -934,11 +936,13 @@ function InterpretShell({
     //   the same `ran_at`-descending ordering AnalysisHistoryPanel already
     //   applies to its list and useExplorePhase already relies on
     //   (`runs[0]`) to find "the fresh run" right after a commit. This is
-    //   the run banner's notion of "current". It is deliberately NOT the
-    //   same thing as AnalysisHistoryPanel's own `currentRunId` prop —
-    //   that prop is just this view's `runId`, i.e. always the selected
-    //   run by construction, so comparing against it could never tell
-    //   "just committed" apart from "loaded an older entry from history".
+    //   the run banner's notion of "current", and it is what the history
+    //   panel's `latestRunId` (CURRENT tag) is fed below. It is deliberately
+    //   NOT this view's `runId` — that is always the selected run by
+    //   construction, so comparing against it could never tell "just
+    //   committed" apart from "loaded an older entry from history". The panel
+    //   still receives `runId` separately, as `viewedRunId`, for its
+    //   post-delete bounce.
     const latestRun = useMemo<AnalysisRunSummary | null>(() => {
         return runs.reduce<AnalysisRunSummary | null>((latest, candidate) => {
             if (!latest) return candidate;
@@ -1022,7 +1026,8 @@ function InterpretShell({
                 </div>
                 <AnalysisHistoryPanel
                     slug={slug}
-                    currentRunId={null}
+                    viewedRunId={null}
+                    latestRunId={null}
                     onLoadRun={(_r, summary) => {
                         if (summary) onSelectHistoricalRun(summary.id);
                     }}
@@ -1092,13 +1097,20 @@ function InterpretShell({
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={latestRun?.id ?? null}
+                // Two distinct signals, deliberately not the same value:
+                // `viewedRunId` is what this view is displaying (drives the
+                // post-delete bounce below), `latestRunId` is the study's most
+                // recent run (drives the panel's CURRENT tag). They diverge
+                // exactly when an older run is being viewed.
+                viewedRunId={runId}
+                latestRunId={latestRun?.id ?? null}
                 onLoadRun={(_result, summary) => {
                     if (summary) {
                         onSelectHistoricalRun(summary.id);
                     } else {
-                        // Panel may pass `(null, null)` after deleting the
-                        // currently-displayed run — bounce back to explore.
+                        // Panel passes `(null, null)` after deleting the run
+                        // this view is displaying — bounce back to explore
+                        // rather than keep rendering a deleted run.
                         onBackToExplore();
                     }
                 }}

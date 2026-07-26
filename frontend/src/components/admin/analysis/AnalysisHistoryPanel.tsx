@@ -25,7 +25,23 @@ import { EmptyState } from '@/components/ui/empty-state';
 
 interface AnalysisHistoryPanelProps {
     slug: string;
-    currentRunId: number | null;
+    /**
+     * The run the parent is currently displaying, or `null` when it isn't
+     * displaying one (explore phase, empty state, error state).
+     *
+     * Drives the post-delete bounce only: deleting *this* run would leave the
+     * parent rendering a run that no longer exists, so the panel signals it
+     * via `onLoadRun(null, null)`.
+     */
+    viewedRunId: number | null;
+    /**
+     * The study's most recent run, or `null` when unknown / not applicable.
+     *
+     * Drives the CURRENT tag only. Deliberately NOT `viewedRunId`: loading an
+     * older entry from history must not retag that row as "current", which is
+     * the contradiction Task 1.4 exists to remove.
+     */
+    latestRunId: number | null;
     onLoadRun: (result: AnalysisResult, run: AnalysisRunSummary) => void;
 }
 
@@ -48,7 +64,12 @@ function truncate(str: string, maxLen: number): string {
     return `${str.slice(0, maxLen)}…`;
 }
 
-export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: AnalysisHistoryPanelProps) {
+export function AnalysisHistoryPanel({
+    slug,
+    viewedRunId,
+    latestRunId,
+    onLoadRun,
+}: AnalysisHistoryPanelProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -131,10 +152,15 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
                     toast.success(t('admin.analysis.history.deleted', 'Analysis run deleted.'));
                     setDeleteTargetId(null);
                     queryClient.invalidateQueries({ queryKey: listQueryKey });
-                    // If the deleted run is the one currently displayed,
-                    // the parent is notified via currentRunId becoming stale —
-                    // the caller clears the banner when currentRunId no longer exists.
-                    if (currentRunId === targetId) {
+                    // Deleting the run the parent is *displaying* would leave it
+                    // rendering a run that no longer exists (stale factor arrays,
+                    // a narrative editor and an Export menu that 404s). Signal it
+                    // with `(null, null)` so it can bounce back to explore.
+                    // Guarded on `viewedRunId`, never on `latestRunId`: those two
+                    // differ whenever an older run is being viewed, and using the
+                    // latter both misses this case and ejects the analyst from a
+                    // run that is still there.
+                    if (viewedRunId === targetId) {
                         onLoadRun(
                             null as unknown as AnalysisResult,
                             null as unknown as AnalysisRunSummary
@@ -235,7 +261,7 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
                                             <span className="text-xs font-semibold text-slate-700">
                                                 {formatDateTime(run.ran_at)}
                                             </span>
-                                            {currentRunId === run.id && (
+                                            {latestRunId === run.id && (
                                                 <span className="text-2xs bg-indigo-100 text-indigo-700 font-black rounded-full px-1.5 py-0.5 uppercase tracking-wide">
                                                     {t(
                                                         'admin.analysis.history.current_tag',
