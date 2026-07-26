@@ -633,7 +633,11 @@
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
-                "comments_label": "Card comments"
+                "comments_label": "Card comments",
+                "question_default": "Spoken comment",
+                "question": {
+                    "question_q_voice": "Spoken comment on the Q-sort"
+                }
             },
             "factor_note": {
                 "label": "Factor narrative",

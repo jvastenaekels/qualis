@@ -631,7 +631,11 @@
                 "context_aria": "Acerca de este panel",
                 "audio_label": "Grabación: {{key}} por {{participant}}",
                 "url_unavailable": "URL de audio no disponible.",
-                "comments_label": "Comentarios de tarjetas"
+                "comments_label": "Comentarios de tarjetas",
+                "question_default": "Comentario oral",
+                "question": {
+                    "question_q_voice": "Comentario oral sobre la clasificación Q"
+                }
             },
             "factor_note": {
                 "label": "Narrativa del factor",

@@ -98,33 +98,43 @@ function ParticipantMaterialCard({
 
             {recordings.length > 0 && (
                 <div className="space-y-2">
-                    {recordings.map((rec) => (
-                        <div key={rec.id} className="space-y-1">
-                            <p className="text-2xs text-slate-500 font-medium">
-                                {rec.question_key}
-                            </p>
-                            {rec.presigned_url ? (
-                                // biome-ignore lint/a11y/useMediaCaption: research tool — transcripts are not available server-side
-                                <audio
-                                    controls
-                                    src={rec.presigned_url}
-                                    className="w-full h-8"
-                                    aria-label={t(
-                                        'admin.analysis.factor_voices.audio_label',
-                                        'Recording: {{key}} by {{participant}}',
-                                        { key: rec.question_key, participant: label }
-                                    )}
-                                />
-                            ) : (
-                                <p className="text-2xs text-slate-400 italic">
-                                    {t(
-                                        'admin.analysis.factor_voices.url_unavailable',
-                                        'Audio URL not available.'
-                                    )}
+                    {recordings.map((rec) => {
+                        // rec.question_key is an internal, researcher-configured
+                        // identifier (e.g. "q_1737849283000") — never fit for
+                        // display. Map it to a human label, falling back to a
+                        // generic one rather than ever leaking the raw key.
+                        const questionLabel = t(
+                            `admin.analysis.factor_voices.question.${rec.question_key}`,
+                            t('admin.analysis.factor_voices.question_default', 'Spoken comment')
+                        );
+                        return (
+                            <div key={rec.id} className="space-y-1">
+                                <p className="text-2xs text-slate-500 font-medium">
+                                    {questionLabel}
                                 </p>
-                            )}
-                        </div>
-                    ))}
+                                {rec.presigned_url ? (
+                                    // biome-ignore lint/a11y/useMediaCaption: research tool — transcripts are not available server-side
+                                    <audio
+                                        controls
+                                        src={rec.presigned_url}
+                                        className="w-full h-8"
+                                        aria-label={t(
+                                            'admin.analysis.factor_voices.audio_label',
+                                            'Recording: {{key}} by {{participant}}',
+                                            { key: questionLabel, participant: label }
+                                        )}
+                                    />
+                                ) : (
+                                    <p className="text-2xs text-slate-400 italic">
+                                        {t(
+                                            'admin.analysis.factor_voices.url_unavailable',
+                                            'Audio URL not available.'
+                                        )}
+                                    </p>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 

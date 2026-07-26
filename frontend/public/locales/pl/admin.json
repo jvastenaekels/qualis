@@ -631,7 +631,11 @@
         "context_aria": "O tym panelu",
         "audio_label": "Nagranie: {{key}} — {{participant}}",
         "url_unavailable": "URL audio niedostępny.",
-        "comments_label": "Komentarze do kart"
+        "comments_label": "Komentarze do kart",
+        "question_default": "Komentarz głosowy",
+        "question": {
+          "question_q_voice": "Komentarz głosowy do sortowania Q"
+        }
       },
       "factor_note": {
         "label": "Interpretacja czynnika",

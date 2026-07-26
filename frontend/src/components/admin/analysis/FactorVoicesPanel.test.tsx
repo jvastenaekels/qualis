@@ -141,8 +141,12 @@ describe('FactorVoicesPanel', () => {
         expect(screen.getByText('Carol')).toBeInTheDocument();
         expect(screen.getByText('Dave')).toBeInTheDocument();
 
-        expect(screen.getAllByText('post_sort_q1')).toHaveLength(2);
-        expect(screen.getByText('post_sort_q2')).toBeInTheDocument();
+        // 'post_sort_q1'/'post_sort_q2' are unmapped researcher-configured
+        // keys (Task 2.2): every recording shows the generic fallback label,
+        // never the raw key.
+        expect(screen.queryByText('post_sort_q1')).not.toBeInTheDocument();
+        expect(screen.queryByText('post_sort_q2')).not.toBeInTheDocument();
+        expect(screen.getAllByText('Spoken comment')).toHaveLength(3);
     });
 
     // ── Test 3: factor filtering — factor-1 participant NOT in factor-2 panel ─
@@ -374,6 +378,77 @@ describe('FactorVoicesPanel', () => {
             });
 
             expect(screen.queryByLabelText(/Δloading/i)).toBeNull();
+        });
+    });
+
+    // ── Question key → human label (Task 2.2) ──────────────────────────────
+    describe('question label lookup (Task 2.2)', () => {
+        it('never renders the raw question key', async () => {
+            const participants = [makeParticipant(90, 'Omar', [1])];
+            const recordings = [
+                makeRecording(900, 90, 'question_q_voice', 'https://cdn.example.com/rec900.webm'),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Omar')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByText('question_q_voice')).not.toBeInTheDocument();
+        });
+
+        it('labels the recording with its human question label', async () => {
+            const participants = [makeParticipant(91, 'Priya', [1])];
+            const recordings = [
+                makeRecording(901, 91, 'question_q_voice', 'https://cdn.example.com/rec901.webm'),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Priya')).toBeInTheDocument();
+            });
+
+            expect(screen.getByText('Spoken comment on the Q-sort')).toBeInTheDocument();
+
+            // The audio element's accessible name is built from the same
+            // resolved label, so a screen-reader user never hears the raw
+            // key either.
+            const audioEl = screen.getByLabelText(/Spoken comment on the Q-sort by Priya/);
+            expect(audioEl.tagName.toLowerCase()).toBe('audio');
+        });
+
+        it('falls back to the generic label for an unmapped question key, never the raw key', async () => {
+            const participants = [makeParticipant(92, 'Quinn', [1])];
+            const unmappedKey = 'q_1737849283000'; // a researcher-configured key with no lookup entry
+            const recordings = [
+                makeRecording(902, 92, unmappedKey, 'https://cdn.example.com/rec902.webm'),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Quinn')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByText(unmappedKey)).not.toBeInTheDocument();
+            expect(screen.getByText('Spoken comment')).toBeInTheDocument();
         });
     });
 

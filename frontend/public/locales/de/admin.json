@@ -631,7 +631,11 @@
                 "context_aria": "Über dieses Panel",
                 "audio_label": "Aufnahme: {{key}} von {{participant}}",
                 "url_unavailable": "Audio-URL nicht verfügbar.",
-                "comments_label": "Kartenkommentare"
+                "comments_label": "Kartenkommentare",
+                "question_default": "Gesprochener Kommentar",
+                "question": {
+                    "question_q_voice": "Gesprochener Kommentar zur Q-Sortierung"
+                }
             },
             "factor_note": {
                 "label": "Faktorinterpretation",

@@ -631,7 +631,11 @@
                 "context_aria": "Informazioni su questo pannello",
                 "audio_label": "Registrazione: {{key}} di {{participant}}",
                 "url_unavailable": "URL audio non disponibile.",
-                "comments_label": "Commenti alle affermazioni"
+                "comments_label": "Commenti alle affermazioni",
+                "question_default": "Commento parlato",
+                "question": {
+                    "question_q_voice": "Commento parlato sulla classificazione Q"
+                }
             },
             "factor_note": {
                 "label": "Narrativa del fattore",

@@ -631,7 +631,11 @@
                 "context_aria": "Over dit paneel",
                 "audio_label": "Opname: {{key}} door {{participant}}",
                 "url_unavailable": "Audio-URL niet beschikbaar.",
-                "comments_label": "Kaartcommentaren"
+                "comments_label": "Kaartcommentaren",
+                "question_default": "Gesproken commentaar",
+                "question": {
+                    "question_q_voice": "Gesproken commentaar over de Q-sortering"
+                }
             },
             "factor_note": {
                 "label": "Factornarratief",
