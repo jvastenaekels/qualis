@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Personal information",
                 "email": "Email address",
-                "email_locked": "Email changes via the API are coming soon to this page; backend support is live.",
+                "email_locked": "Your email address can't be changed here yet. Contact your administrator to update it.",
                 "name": "Full name",
                 "save": "Save",
                 "saving": "Saving...",

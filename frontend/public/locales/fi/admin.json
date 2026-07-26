@@ -173,7 +173,7 @@
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
                 "email": "Sähköpostiosoite",
-                "email_locked": "Sähköpostin vaihto API:n kautta on tulossa pian tälle sivulle; taustatuki on jo käytössä.",
+                "email_locked": "Sähköpostiosoitettasi ei voi vielä muuttaa täällä. Ota yhteyttä järjestelmänvalvojaan sen päivittämiseksi.",
                 "name": "Koko nimi",
                 "save": "Tallenna",
                 "saving": "Tallennetaan...",

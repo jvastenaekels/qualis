@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Informazioni personali",
                 "email": "Indirizzo e-mail",
-                "email_locked": "La modifica dell'e-mail tramite API sarà presto disponibile su questa pagina; il supporto backend è attivo.",
+                "email_locked": "Il tuo indirizzo email non può ancora essere modificato qui. Contatta il tuo amministratore per aggiornarlo.",
                 "name": "Nome completo",
                 "save": "Salva",
                 "saving": "Salvataggio in corso...",

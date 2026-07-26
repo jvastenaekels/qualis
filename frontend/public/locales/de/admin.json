@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Persönliche Informationen",
                 "email": "E-Mail-Adresse",
-                "email_locked": "E-Mail-Änderungen über diese Seite sind in Kürze verfügbar; die Backend-Unterstützung ist bereits aktiv.",
+                "email_locked": "Ihre E-Mail-Adresse kann hier noch nicht geändert werden. Wenden Sie sich an Ihren Administrator, um sie zu aktualisieren.",
                 "name": "Vollständiger Name",
                 "save": "Speichern",
                 "saving": "Wird gespeichert...",

@@ -261,7 +261,7 @@
       "personal": {
         "title": "Dane osobowe",
         "email": "Adres e-mail",
-        "email_locked": "Zmiana adresu e-mail przez API będzie wkrótce dostępna na tej stronie; obsługa serwerowa jest już aktywna.",
+        "email_locked": "Twój adres e-mail nie może być jeszcze zmieniony tutaj. Skontaktuj się z administratorem, aby go zaktualizować.",
         "name": "Imię i nazwisko",
         "save": "Zapisz",
         "saving": "Zapisywanie...",

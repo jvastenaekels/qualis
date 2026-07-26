@@ -173,7 +173,7 @@
             "personal": {
                 "title": "Informations personnelles",
                 "email": "Adresse e-mail",
-                "email_locked": "La modification de l'e-mail via l'API arrivera bientôt sur cette page ; le support back-end est déjà en place.",
+                "email_locked": "Votre adresse e-mail ne peut pas encore être modifiée ici. Contactez votre administrateur pour la mettre à jour.",
                 "name": "Nom complet",
                 "save": "Enregistrer",
                 "saving": "Enregistrement...",
