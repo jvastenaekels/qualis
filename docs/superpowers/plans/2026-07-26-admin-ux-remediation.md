@@ -528,6 +528,41 @@ git commit -m "fix(members): show the email instead of a 'No Name' placeholder"
 
 ---
 
+### Task 2.4: The same raw-key leak on the participant detail page
+
+**The defect:** found by Task 2.2's review. `ParticipantDetailContent.tsx:565-591` renders `question_key` directly for any key that is not one of `card_N`, `missing_statement`, or `general_comment` — the identical defect Task 2.2 fixed in `FactorVoicesPanel`. Since `question_key` is researcher-generated (`q_<Date.now()>`, `QuestionBuilder.tsx:964`), every custom post-sort question on this screen prints its raw identifier.
+
+**Files:**
+- Modify: `frontend/src/components/admin/dashboard/ParticipantDetailContent.tsx:565-591`
+- Test: `frontend/src/components/admin/dashboard/ParticipantDetailContent.test.tsx`
+
+- [ ] **Step 1: Write the failing test**
+
+```tsx
+it('never renders a raw question key', () => {
+    renderWithProviders(<ParticipantDetailContent {...propsWithAnswer('q_1737849283000')} />);
+    expect(screen.queryByText('q_1737849283000')).not.toBeInTheDocument();
+});
+```
+
+- [ ] **Step 2: Run it, confirm it fails with the raw key present**
+
+- [ ] **Step 3: Apply the same safe-default lookup Task 2.2 established**
+
+Reuse `admin.analysis.factor_voices.question_default` if the label fits, or add a sibling default in this screen's own namespace. The rule is the one from Task 2.2: an unmapped key falls back to a generic human label, never to the identifier.
+
+- [ ] **Step 4: Run the test, confirm it passes**
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add frontend/src/components/admin/dashboard/ParticipantDetailContent.tsx \
+        frontend/src/components/admin/dashboard/ParticipantDetailContent.test.tsx
+git commit -m "fix(participants): stop rendering raw question keys on the detail page"
+```
+
+---
+
 # PHASE 3 — Accessibility and interaction
 
 ### Task 3.1: Row actions are invisible but tabbable
@@ -1447,6 +1482,8 @@ These came out of the audit but are judgement calls, not defects with an obvious
 4. **The interpretive narrative field** (`F1 narrative`) is an italic grey placeholder with no border. It is the central function of the interpret screen and looks like static text; making it look editable is a small change with a real effect on whether the feature gets used.
 5. **Truncated public URL** on `Overview` (`http://localhost:3000/study/b:`). The field is too narrow to read the link it exists to share.
 6. **The native `<audio>` player** in Factor voices is the only unstyled control in the product, while `components/admin/AudioPlayer.tsx` exists. Adopting it is straightforward; whether the custom player is good enough to carry research audio is your call.
+
+9. **Audio question labels are ambiguous when a study has more than one.** Task 2.2 stopped the raw `question_key` from reaching the screen, but since keys are researcher-generated per study (`q_<Date.now()>`), a static lookup can never be complete: two audio questions both render as "Spoken comment". The durable fix is to thread the researcher's own configured label — `postsort_config.questions[key].label`, already a `MultilangString` — through to `FactorVoicesPanel`. That needs a props signature change, which is why it was not folded into 2.2.
 7. **Sidebar at 768 px** stays expanded at 255 px, taking a third of the viewport. Auto-collapsing below `lg` is the obvious move but changes the tablet experience.
 8. **No read-only mode for an active study's design.** Task 3.2 adds an escape hatch from the lock overlay; a genuine read-only rendering of the design is the larger, better fix.
 
