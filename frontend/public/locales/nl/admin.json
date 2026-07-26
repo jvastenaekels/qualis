@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Persoonlijke informatie",
                 "email": "E-mailadres",
-                "email_locked": "Je e-mailadres kan hier nog niet worden gewijzigd. Neem contact op met je beheerder om deze bij te werken.",
+                "email_locked": "Uw e-mailadres kan hier nog niet worden gewijzigd. Neem contact op met uw beheerder om deze bij te werken.",
                 "name": "Volledige naam",
                 "save": "Opslaan",
                 "saving": "Opslaan...",

@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Informazioni personali",
                 "email": "Indirizzo e-mail",
-                "email_locked": "Il tuo indirizzo email non può ancora essere modificato qui. Contatta il tuo amministratore per aggiornarlo.",
+                "email_locked": "Il suo indirizzo email non può ancora essere modificato qui. Contatti il suo amministratore per aggiornarlo.",
                 "name": "Nome completo",
                 "save": "Salva",
                 "saving": "Salvataggio in corso...",
