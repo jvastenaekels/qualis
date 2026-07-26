@@ -13,12 +13,15 @@
  * leaving every column from "Status" onward reading under the wrong
  * label. Root cause was a React Compiler auto-memoization bug in the
  * thead render (InteractiveDataView.tsx), not the column definitions in
- * InteractiveDataView.columns.tsx — see the fix's doc comment on
- * ResponsesTable for the full mechanism. These tests can't reproduce the
- * compiler-specific defect directly (Vitest doesn't run the React
- * Compiler babel pass — see vitest.config.ts vs vite.config.ts), but they
- * pin the structural contract the bug violated: header count must match
- * body cell count, and the language column must have a visible header.
+ * InteractiveDataView.columns.tsx — see the `'use no memo'` doc comment at
+ * the top of InteractiveDataView for the full mechanism. These tests can't
+ * reproduce the compiler-specific defect directly (Vitest doesn't run the
+ * React Compiler babel pass — see vitest.config.ts vs vite.config.ts), but
+ * they pin the structural contract the bug violated: header count must
+ * match body cell count, and the language column must have a visible
+ * header. The compiler-specific RED/GREEN guard lives in
+ * frontend/e2e/admin/data-table-columns.spec.ts, which runs against the
+ * real `npm run dev` pipeline (React Compiler included).
  */
 
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
