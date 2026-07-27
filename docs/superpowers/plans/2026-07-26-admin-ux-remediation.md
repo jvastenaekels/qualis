@@ -569,7 +569,9 @@ git commit -m "fix(participants): stop rendering raw question keys on the detail
 
 ### Task 3.1: Row actions are invisible but tabbable
 
-**The defect:** each concourse row carries four 32×32 buttons (History, Comments, Edit, Delete). Three sit at `opacity: 0`, revealed by `group-hover` only — no `group-focus-within`. Across 36 statements that is ~108 tab stops on invisible targets, and the actions are undiscoverable on touch. "Edit" is permanently at `opacity-50` on `text-slate-400`, roughly 1.4:1 against white.
+**The defect:** each concourse row carries four 32×32 buttons (History, Comments, Edit, Delete). Three sit at `opacity: 0`, revealed by `group-hover` only, and are undiscoverable on touch, where there is no hover at all. "Edit" is permanently visible but at `text-slate-300` — **1.49:1** against white, against a 4.5:1 AA threshold; the mobile variant of the same control is 2.56:1.
+
+> **Audit correction.** The original finding claimed ~108 invisible tab stops and "no visible focus anywhere". That was wrong: the pre-fix source already carried `focus-visible:opacity-100` on all three hover-only buttons, so keyboard focus did reveal the focused button. The measurement behind the claim read resting opacity and never exercised focus. What this task adds is that the whole cluster reveals together on focus, matching hover — an improvement, not a rescue. The contrast defect is the real accessibility failure here, and it was worse than first described.
 
 **Files:**
 - Test: `frontend/src/pages/admin/ConcourseDetailPage.test.tsx`
@@ -720,7 +722,12 @@ git commit -m "fix(a11y): make dashboard study cards keyboard-operable"
 
 ### Task 3.4: Unlabelled switches
 
-**The defect:** both switches in `Access → Access rules` return an empty accessible name. A screen reader announces "switch" with no indication of what it toggles.
+**The defect — retracted.** The original finding claimed both switches in `Access → Access rules` returned an empty accessible name. That was wrong, on two counts:
+
+- `<button>` is a **labelable element** (WHATWG HTML §4.10.2, which lists it first), so the existing `<Label htmlFor="password-toggle">` / `<Switch id="password-toggle">` pairing names them legitimately. The claim in this task's original text that "`htmlFor`/`<label>` association does not apply to buttons" is simply false.
+- The measurement behind it read the absent `aria-label` **attribute** and mistook it for the computed accessible **name**. Verified two ways: live Chromium, and the project's own happy-dom test environment (which implements `HTMLButtonElement.labels`), both resolve the names pre-fix.
+
+What shipped is therefore **hardening, not a bug fix**: an explicit `aria-labelledby` so the name no longer depends on a single `id`/`htmlFor` pairing that a future edit could silently break. Keep it, but do not cite this task as having fixed a silent control.
 
 **Files:**
 - Modify: `frontend/src/pages/admin/RecruitmentPage.tsx:376-390`, `:465-…`
@@ -808,6 +815,49 @@ Expected: PASS.
 git add frontend/src/pages/LoginPage.tsx frontend/src/pages/LoginPage.test.tsx \
         frontend/src/components/admin/AdminDashboard.tsx frontend/public/locales/en/admin.json
 git commit -m "fix(a11y): repair heading hierarchy and login form affordances"
+```
+
+---
+
+### Task 3.6: Controls that genuinely have no accessible name
+
+**The defect:** found while retracting Task 3.4. Six controls have **no `id`, no `htmlFor`, and no `aria-label`** anywhere near them — unlike the Access switches, these are real, unambiguous accessible-name gaps, confirmed by reading each one:
+
+- `frontend/src/components/admin/designer/PostSortConfigEditor.tsx:386`, `:446`, `:512`
+- `frontend/src/components/admin/designer/QuestionBuilder.tsx:380`
+- `frontend/src/pages/admin/ConcourseDetailPage.tsx:655`, `:696`
+
+A screen-reader user hears "switch" or "checkbox" with nothing to identify it.
+
+**Do not blanket-fix every switch in the codebase.** Task 3.4's retraction exists precisely because a control that looks unlabelled in source may be correctly labelled through `<label for>`. `QuestionBuilder.tsx:346` (`req-${id}`) is one such false positive — it has a matching pair. Verify each candidate's computed accessible name before changing it.
+
+**Files:**
+- Modify: the six sites above
+- Test: the corresponding test files
+
+- [ ] **Step 1: Confirm each one is genuinely unnamed**
+
+```tsx
+it('names every settings toggle', () => {
+    renderWithProviders(<PostSortConfigEditor {...props} />);
+    // getByRole computes the real accessible name — an unnamed control will not match.
+    expect(screen.getByRole('switch', { name: /allow audio/i })).toBeInTheDocument();
+});
+```
+
+Run it first: it must fail because the name does not resolve, not because the element is absent.
+
+- [ ] **Step 2: Add the label association**
+
+Prefer a visible `<Label htmlFor>` pointing at an `id` on the control — that names it *and* gives a click target. Use `aria-label` only where no visible text exists to point at.
+
+- [ ] **Step 3: Confirm the tests pass, and that no control gained a name that differs from its visible text**
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/src/components/admin/designer frontend/src/pages/admin/ConcourseDetailPage.tsx
+git commit -m "fix(a11y): name the designer and concourse controls that had none"
 ```
 
 ---
