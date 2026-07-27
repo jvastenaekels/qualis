@@ -358,6 +358,7 @@ const RecruitmentPage = () => {
                             <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                 <div className="space-y-0.5">
                                     <Label
+                                        id="password-toggle-label"
                                         htmlFor="password-toggle"
                                         className="text-sm font-bold text-slate-700"
                                     >
@@ -375,6 +376,7 @@ const RecruitmentPage = () => {
                                 </div>
                                 <Switch
                                     id="password-toggle"
+                                    aria-labelledby="password-toggle-label"
                                     checked={passwordEnabled}
                                     onCheckedChange={(checked) => {
                                         accessForm.setValue('passwordEnabled', checked, {
@@ -447,6 +449,7 @@ const RecruitmentPage = () => {
                             <div className="flex items-start justify-between gap-4">
                                 <div className="space-y-0.5">
                                     <Label
+                                        id="window-toggle-label"
                                         htmlFor="window-toggle"
                                         className="text-sm font-black text-slate-700"
                                     >
@@ -464,6 +467,7 @@ const RecruitmentPage = () => {
                                 </div>
                                 <Switch
                                     id="window-toggle"
+                                    aria-labelledby="window-toggle-label"
                                     checked={showWindowPickers}
                                     onCheckedChange={(checked) => {
                                         setShowWindowPickers(checked);
