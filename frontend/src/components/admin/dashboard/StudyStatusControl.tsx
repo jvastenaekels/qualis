@@ -112,9 +112,12 @@ function StatusStepButton({ step, currentState, renderActionDialog }: StatusStep
                 {renderActionDialog(
                     // biome-ignore lint/suspicious/noExplicitAny: generic ID
                     step.id as any,
-                    <div role="button" tabIndex={0} className="outline-none">
+                    <button
+                        type="button"
+                        className="block w-full text-left outline-none bg-transparent"
+                    >
                         {content}
-                    </div>
+                    </button>
                 )}
             </React.Fragment>
         );
