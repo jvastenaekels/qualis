@@ -204,31 +204,22 @@ function SortableStatementItem({
                 </>
             ) : (
                 <>
-                    <div
-                        role="button"
-                        tabIndex={0}
+                    <button
+                        type="button"
+                        disabled={readOnly}
                         className={cn(
-                            'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
+                            'flex-1 block w-full text-left px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
                             !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
                         )}
                         onClick={() => {
-                            if (readOnly) return;
                             setEditingId(item.code);
                             setEditingText(item.text);
                             setEditingCode(item.code);
                         }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                setEditingId(item.code);
-                                setEditingText(item.text);
-                                setEditingCode(item.code);
-                                e.preventDefault();
-                            }
-                        }}
                         title={t('admin.components.click_to_edit')}
                     >
                         {item.text}
-                    </div>
+                    </button>
                     {staleInfo && !readOnly && !structureLocked && (
                         <TooltipProvider>
                             <Tooltip>
@@ -295,7 +286,7 @@ function SortableStatementItem({
                                 });
                             }}
                             aria-label={t('common.delete', 'Delete')}
-                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all"
+                            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>

@@ -1,9 +1,6 @@
 {
     "unnamedControls": {},
     "lowContrastControls": {
-        "src/components/admin/designer/QSortEditor.tsx": {
-            "Button#cfd0f92c60": 1
-        },
         "src/layouts/StudyLayout.tsx": {
             "button#543c37a641": 1
         }

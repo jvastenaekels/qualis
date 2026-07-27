@@ -178,6 +178,17 @@ describe('QSortEditor', () => {
             expect(screen.queryByText('Existing Statement')).not.toBeInTheDocument();
         });
 
+        it('renders the delete-statement icon at a legible contrast (Task 6.7d)', () => {
+            renderEditor();
+
+            const statementItem = screen.getByText('Existing Statement').closest('.group');
+            expect(statementItem).toBeInTheDocument();
+            // biome-ignore lint/style/noNonNullAssertion: test setup
+            const deleteButton = within(statementItem!).getByRole('button', { name: 'Delete' });
+            expect(deleteButton).toHaveClass('text-slate-500');
+            expect(deleteButton).not.toHaveClass('text-slate-300');
+        });
+
         it('names the save/cancel controls by the statement code being edited (Task 6.7c)', async () => {
             const user = userEvent.setup();
             renderEditor();
@@ -186,6 +197,35 @@ describe('QSortEditor', () => {
 
             expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Cancel editing s1' })).toBeInTheDocument();
+        });
+
+        describe('click-to-edit control is a real, keyboard-operable button (Task 6.7d)', () => {
+            it('is a native <button> with no hand-rolled role/tabIndex, and enters edit mode on Enter', async () => {
+                const user = userEvent.setup();
+                renderEditor();
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl.tagName).toBe('BUTTON');
+                expect(editControl).not.toHaveAttribute('role');
+                expect(editControl).not.toHaveAttribute('tabindex');
+
+                editControl.focus();
+                await user.keyboard('{Enter}');
+
+                expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
+            });
+
+            it('is disabled (not just visually muted) when the editor is read-only', () => {
+                renderWithStore(
+                    <TooltipProvider>
+                        <QSortEditor readOnly />
+                    </TooltipProvider>,
+                    { initialState: { draft: mockDraft, activeLocale: 'en' } }
+                );
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl).toBeDisabled();
+            });
         });
 
         it('clears all statements with confirmation', async () => {
