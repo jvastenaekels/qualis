@@ -91,11 +91,6 @@
         }
     },
     "suppressedLabelErrors": {
-        "src/components/admin/designer/InterfaceEditor.tsx": {
-            "Label#82b1d76fc7": 1,
-            "Label#941606f737": 1,
-            "Label#fe9364a7a7": 1
-        },
         "src/components/admin/designer/IntroductionEditor.tsx": {
             "Label#02e66bf1f6": 1,
             "Label#2081ca5d80": 1,
