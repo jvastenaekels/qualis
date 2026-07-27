@@ -1484,7 +1484,9 @@
                     "imported": "{{count}} énoncés importés avec succès",
                     "reset_codes": "Réinitialiser les codes",
                     "confirm_reset_codes": "Êtes-vous sûr de vouloir re-sequencer tous les codes d'énoncés (S1, S2, S3...) ?",
-                    "codes_reset": "Codes des énoncés réinitialisés"
+                    "codes_reset": "Codes des énoncés réinitialisés",
+                    "save_item": "Enregistrer {{code}}",
+                    "cancel_edit": "Annuler la modification de {{code}}"
                 },
                 "settings": {
                     "title": "Paramètres de recherche",

@@ -1535,7 +1535,9 @@
                     "imported": "{{count}} affermazioni importate con successo",
                     "reset_codes": "Reimposta codici",
                     "confirm_reset_codes": "È sicuro di voler risequenziare tutti i codici delle affermazioni (s1, s2, s3...)?",
-                    "codes_reset": "Codici delle affermazioni risequenziati"
+                    "codes_reset": "Codici delle affermazioni risequenziati",
+                    "save_item": "Salva {{code}}",
+                    "cancel_edit": "Annulla la modifica di {{code}}"
                 },
                 "settings": {
                     "title": "Impostazioni di ricerca",

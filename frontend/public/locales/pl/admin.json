@@ -1535,7 +1535,9 @@
           "imported": "Pomyślnie zaimportowano {{count}} stwierdzeń",
           "reset_codes": "Resetuj kody",
           "confirm_reset_codes": "Czy na pewno chcesz ponownie nadać numery wszystkim kodom stwierdzeń (s1, s2, s3...)?",
-          "codes_reset": "Kody stwierdzeń ponownie ponumerowane"
+          "codes_reset": "Kody stwierdzeń ponownie ponumerowane",
+          "save_item": "Zapisz {{code}}",
+          "cancel_edit": "Anuluj edycję {{code}}"
         },
         "settings": {
           "title": "Ustawienia badawcze",

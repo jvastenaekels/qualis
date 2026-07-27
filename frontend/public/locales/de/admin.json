@@ -1535,7 +1535,9 @@
                     "imported": "{{count}} Aussagen erfolgreich importiert",
                     "reset_codes": "Codes zurücksetzen",
                     "confirm_reset_codes": "Sind Sie sicher, dass Sie alle Aussagecodes neu sequenzieren möchten (s1, s2, s3...)?",
-                    "codes_reset": "Aussagecodes neu sequenziert"
+                    "codes_reset": "Aussagecodes neu sequenziert",
+                    "save_item": "{{code}} speichern",
+                    "cancel_edit": "Bearbeitung von {{code}} abbrechen"
                 },
                 "settings": {
                     "title": "Forschungseinstellungen",

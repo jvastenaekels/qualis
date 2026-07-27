@@ -1535,7 +1535,9 @@
                     "imported": "{{count}} enunciados importados correctamente",
                     "reset_codes": "Restablecer códigos",
                     "confirm_reset_codes": "¿Está seguro de que desea renumerar todos los códigos de enunciados (s1, s2, s3...)?",
-                    "codes_reset": "Códigos de enunciados renumerados"
+                    "codes_reset": "Códigos de enunciados renumerados",
+                    "save_item": "Guardar {{code}}",
+                    "cancel_edit": "Cancelar edición de {{code}}"
                 },
                 "settings": {
                     "title": "Configuración de investigación",

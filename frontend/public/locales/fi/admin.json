@@ -1446,7 +1446,9 @@
                     "imported": "{{count}} väittämää tuotu onnistuneesti",
                     "reset_codes": "Reset Codes",
                     "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väitekoodit (s1, s2, s3…)?",
-                    "codes_reset": "Väitekoodit uudelleennumeroitu"
+                    "codes_reset": "Väitekoodit uudelleennumeroitu",
+                    "save_item": "Tallenna {{code}}",
+                    "cancel_edit": "Peruuta kohteen {{code}} muokkaus"
                 },
                 "settings": {
                     "title": "Tutkimusasetukset",

@@ -181,6 +181,9 @@ function SortableStatementItem({
                             size="icon"
                             onClick={handleSaveStatement}
                             className="h-9 w-9 text-green-600 hover:bg-green-50 rounded-xl"
+                            aria-label={t('admin.design.qsort.set.save_item', 'Save {{code}}', {
+                                code: item.code,
+                            })}
                         >
                             <CheckCircle2 className="h-4 w-4" />
                         </Button>
@@ -189,6 +192,11 @@ function SortableStatementItem({
                             size="icon"
                             onClick={() => setEditingId(null)}
                             className="h-9 w-9 text-slate-400 hover:bg-slate-50 rounded-xl"
+                            aria-label={t(
+                                'admin.design.qsort.set.cancel_edit',
+                                'Cancel editing {{code}}',
+                                { code: item.code }
+                            )}
                         >
                             <AlertCircle className="h-4 w-4" />
                         </Button>
@@ -1124,6 +1132,9 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-10 w-10 text-slate-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all"
+                                                    aria-label={t(
+                                                        'admin.design.qsort.grid.tooltip_title'
+                                                    )}
                                                 >
                                                     <HelpCircle className="h-5 w-5" />
                                                 </Button>

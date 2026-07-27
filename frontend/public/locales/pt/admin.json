@@ -1535,7 +1535,9 @@
                     "imported": "{{count}} afirmações importadas com sucesso",
                     "reset_codes": "Repor códigos",
                     "confirm_reset_codes": "Tem a certeza de que pretende resequenciar todos os códigos de afirmações (s1, s2, s3...)?",
-                    "codes_reset": "Códigos das afirmações resequenciados"
+                    "codes_reset": "Códigos das afirmações resequenciados",
+                    "save_item": "Guardar {{code}}",
+                    "cancel_edit": "Cancelar edição de {{code}}"
                 },
                 "settings": {
                     "title": "Definições de investigação",

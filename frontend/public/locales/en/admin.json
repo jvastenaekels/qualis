@@ -1537,7 +1537,9 @@
                     "imported": "Successfully imported {{count}} statements",
                     "reset_codes": "Reset codes",
                     "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
-                    "codes_reset": "Statement codes re-sequenced"
+                    "codes_reset": "Statement codes re-sequenced",
+                    "save_item": "Save {{code}}",
+                    "cancel_edit": "Cancel editing {{code}}"
                 },
                 "settings": {
                     "title": "Research settings",

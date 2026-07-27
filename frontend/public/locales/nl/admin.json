@@ -1535,7 +1535,9 @@
                     "imported": "{{count}} stellingen succesvol geïmporteerd",
                     "reset_codes": "Codes herstellen",
                     "confirm_reset_codes": "Weet u zeker dat u alle stellingcodes opnieuw wilt nummeren (s1, s2, s3...)?",
-                    "codes_reset": "Stellingcodes opnieuw genummerd"
+                    "codes_reset": "Stellingcodes opnieuw genummerd",
+                    "save_item": "{{code}} opslaan",
+                    "cancel_edit": "Bewerken van {{code}} annuleren"
                 },
                 "settings": {
                     "title": "Onderzoeksinstellingen",
