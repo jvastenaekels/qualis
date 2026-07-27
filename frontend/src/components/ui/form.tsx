@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: FormLabel forwards children via props spread; the htmlFor is set from useFormField.
 import * as React from 'react';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
@@ -87,6 +86,7 @@ const FormLabel = React.forwardRef<
     const { error, formItemId } = useFormField();
 
     return (
+        // biome-ignore lint/a11y/noLabelWithoutControl: FormLabel sets htmlFor from useFormField; its children arrive through {...props}, which the rule cannot see.
         <Label
             ref={ref}
             className={cn(error && 'text-destructive', className)}
