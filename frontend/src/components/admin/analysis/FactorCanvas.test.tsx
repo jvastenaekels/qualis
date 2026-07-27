@@ -217,6 +217,27 @@ describe('FactorCanvas', () => {
         expect(screen.getByLabelText(/distinguishing statement/i)).toBeInTheDocument();
     });
 
+    // The badge's aria-label used to be the hardcoded literal
+    // "distinguishing statement" (lowercase). It now reuses the
+    // already-registered, already-nine-locale admin.analysis.distinguishing_legend
+    // key ("Distinguishing statement", capital D) so a screen reader on a
+    // translated interface hears the researcher's own language instead of
+    // English. Asserted via getByRole with the exact computed accessible
+    // name, not a case-insensitive substring match, so a regression back to
+    // the hardcoded literal (which would still satisfy the looser test
+    // above) fails this one.
+    it('names the D badge with the registered distinguishing_legend translation', () => {
+        renderWithProviders(
+            <FactorCanvas
+                slug="s"
+                interpret={buildInterpret()}
+                onFocusChange={vi.fn()}
+                {...compareDefaults()}
+            />
+        );
+        expect(screen.getByRole('img', { name: 'Distinguishing statement' })).toBeInTheDocument();
+    });
+
     it('shows defining-sorts count from interpret.flaggedParticipants.length', () => {
         renderWithProviders(
             <FactorCanvas
