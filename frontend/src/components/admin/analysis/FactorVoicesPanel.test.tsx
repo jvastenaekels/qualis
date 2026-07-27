@@ -563,6 +563,10 @@ describe('FactorVoicesPanel', () => {
             );
 
             const participants = [makeParticipant(92, 'Quinn', [1])];
+            // gitleaks:allow — a question key minted by QuestionBuilder as
+            // `q_${Date.now()}`, not a credential. Kept realistic on purpose: the
+            // whole point of this case is a key shaped like the ones real studies
+            // produce.
             const unmappedKey = 'question_q_1737849283000';
             const recordings = [
                 makeRecording(902, 92, unmappedKey, 'https://cdn.example.com/rec902.webm'),
