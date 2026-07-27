@@ -112,6 +112,17 @@ describe('StudyDesignPage Feature Tests', () => {
         expect(screen.getByText(/Grid balanced/i)).toBeInTheDocument();
     });
 
+    it('names the language switcher by its purpose, not just its visible value', async () => {
+        // Regression guard for task 6.7e: the trigger's only visible text sat in a
+        // `hidden sm:inline` span, so below the `sm` breakpoint it had no accessible
+        // name at all — invisible to a static checker (the child is a dynamic
+        // expression) and only caught by axe run at a small viewport. An explicit
+        // aria-label survives at every width and, per accname precedence, wins over
+        // the visible "EN" text either way.
+        renderPage();
+        expect(await screen.findByRole('button', { name: 'Select language' })).toBeInTheDocument();
+    });
+
     it('signals ready status in checklist when all required fields are valid', async () => {
         renderPage();
 

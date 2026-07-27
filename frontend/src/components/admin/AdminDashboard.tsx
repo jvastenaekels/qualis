@@ -55,20 +55,29 @@ const CARD_SHELL =
 const CARD_TITLE_BUTTON =
     'block max-w-full truncate text-left cursor-pointer outline-none transition-colors group-hover:text-indigo-600 after:absolute after:inset-0 after:rounded-xl';
 
+// text-*-800 (text-*-700 for slate, which already clears the threshold with
+// margin to spare), not the original -700/-500 tier: axe (task 6.7e) measured
+// the rendered "Active" badge (bg-emerald-100/text-emerald-700) at 3.92:1 on
+// its own pastel background — below WCAG AA's 4.5:1 despite the nominal
+// Tailwind palette values computing closer to 4.8:1, so a thin margin here
+// reliably fails once rendered. Only 'active' was directly observed failing,
+// but all five branches share the same pastel-bg/700-text shape, so all five
+// get the same one-step-darker treatment rather than leaving four unverified
+// siblings on a shade already shown to be too light.
 function getStateColor(state: string | undefined): string {
     switch (state) {
         case 'active':
-            return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+            return 'bg-emerald-100 text-emerald-800 border-emerald-200';
         case 'draft':
-            return 'bg-slate-100 text-slate-600 border-slate-200';
+            return 'bg-slate-100 text-slate-700 border-slate-200';
         case 'paused':
-            return 'bg-amber-100 text-amber-700 border-amber-200';
+            return 'bg-amber-100 text-amber-800 border-amber-200';
         case 'closed':
-            return 'bg-blue-100 text-blue-700 border-blue-200';
+            return 'bg-blue-100 text-blue-800 border-blue-200';
         case 'archived':
-            return 'bg-gray-100 text-gray-500 border-gray-200';
+            return 'bg-gray-100 text-gray-700 border-gray-200';
         default:
-            return 'bg-slate-100 text-slate-600 border-slate-200';
+            return 'bg-slate-100 text-slate-700 border-slate-200';
     }
 }
 
@@ -410,7 +419,17 @@ function ConcourseCard({
                                 {t('admin.concourse.title', 'Concourse')}
                             </button>
                         </h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        {/*
+                         * text-slate-600, not text-muted-foreground: axe (task 6.7e) measured the
+                         * theme's --muted-foreground token at 3.79-3.91:1 on white at this text-xs
+                         * size — below WCAG AA's 4.5:1 for normal text. The token itself is used
+                         * too widely across the admin (dozens of files) to retune here without a
+                         * dedicated visual-QA pass, so this fix is scoped to the instances of it
+                         * axe actually flagged on this page; see task 6.7e's report for the rest
+                         * of that finding. Same swap below, on the "Add study" button and the
+                         * study card's metadata row.
+                         */}
+                        <p className="text-xs text-slate-600 mt-0.5">
                             {concourse
                                 ? t('admin.dashboard.concourse_n_items', {
                                       count: itemCount,
@@ -511,10 +530,11 @@ function SingleStudyCard({
                     </h2>
                 </div>
                 {onCreateStudy && (
+                    // text-slate-600, not text-muted-foreground — see ConcourseCard above.
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-xs text-muted-foreground"
+                        className="text-xs text-slate-600"
                         onClick={onCreateStudy}
                     >
                         <Plus className="h-3 w-3 mr-1" />
@@ -551,7 +571,8 @@ function SingleStudyCard({
                                     )}
                                 </Badge>
                             </div>
-                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                            {/* text-slate-600, not text-muted-foreground — see ConcourseCard above. */}
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-600">
                                 {languageCodes && <span>{languageCodes}</span>}
                                 <span className="inline-flex items-center gap-1">
                                     <Users className="h-3 w-3" />
