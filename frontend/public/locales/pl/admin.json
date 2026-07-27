@@ -1484,7 +1484,10 @@
         "actions": {
           "add_option": "Dodaj opcję",
           "copy_from": "Importuj z języka",
-          "copy_success": "Zaimportowano"
+          "copy_success": "Zaimportowano",
+          "copy_from_aria": "Importuj {{label}} z innego języka",
+          "delete": "Usuń {{label}}",
+          "remove_option": "Usuń {{option}}"
         },
         "logic": {
           "title": "Logika widoczności",

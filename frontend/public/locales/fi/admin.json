@@ -1395,7 +1395,10 @@
                 "actions": {
                     "add_option": "Lisää vaihtoehto",
                     "copy_from": "Kopioi kielestä",
-                    "copy_success": "Kopioitu"
+                    "copy_success": "Kopioitu",
+                    "copy_from_aria": "Tuo {{label}} toisesta kielestä",
+                    "delete": "Poista {{label}}",
+                    "remove_option": "Poista {{option}}"
                 },
                 "logic": {
                     "title": "Näkyvyyslogiikka",

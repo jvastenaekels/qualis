@@ -1486,7 +1486,10 @@
                 "actions": {
                     "add_option": "Add option",
                     "copy_from": "Import from language",
-                    "copy_success": "Imported"
+                    "copy_success": "Imported",
+                    "copy_from_aria": "Import {{label}} from another language",
+                    "delete": "Delete {{label}}",
+                    "remove_option": "Remove {{option}}"
                 },
                 "logic": {
                     "title": "Visibility logic",

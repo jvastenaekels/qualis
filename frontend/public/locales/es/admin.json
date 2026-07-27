@@ -1484,7 +1484,10 @@
                 "actions": {
                     "add_option": "Añadir opción",
                     "copy_from": "Importar desde idioma",
-                    "copy_success": "Importado"
+                    "copy_success": "Importado",
+                    "copy_from_aria": "Importar {{label}} desde otro idioma",
+                    "delete": "Eliminar {{label}}",
+                    "remove_option": "Quitar {{option}}"
                 },
                 "logic": {
                     "title": "Lógica de visibilidad",

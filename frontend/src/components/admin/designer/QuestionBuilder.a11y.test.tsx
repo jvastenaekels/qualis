@@ -266,3 +266,94 @@ describe('QuestionBuilder — question field accessible names (Task 6.7b)', () =
         expect(screen.getByRole('textbox', { name: 'Option 2' })).toHaveValue('Beta');
     });
 });
+
+describe('QuestionBuilder — action-button accessible names (Task 6.7c)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility
+    const renderBuilder = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            postsort_config: { questions: {} },
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<QuestionBuilder type="post" />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    it('discriminates the delete button by the question label', () => {
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: 'First question', required: false },
+                    },
+                },
+            },
+        });
+
+        expect(screen.getByRole('button', { name: 'Delete First question' })).toBeInTheDocument();
+    });
+
+    it('discriminates the "import from another language" trigger by the question label', () => {
+        renderBuilder({
+            draft: {
+                translations: [{ language_code: 'en' }, { language_code: 'fr' }],
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: 'First question', required: false },
+                    },
+                },
+            },
+        });
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Import First question from another language',
+            })
+        ).toBeInTheDocument();
+    });
+
+    it('falls back to the item id when the question has no label yet', () => {
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: '', required: false },
+                    },
+                },
+            },
+        });
+
+        expect(screen.getByRole('button', { name: 'Delete q1' })).toBeInTheDocument();
+    });
+
+    it('discriminates the remove-option button by the option’s own ordinal', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: {
+                            type: 'select',
+                            label: 'Pick one',
+                            required: false,
+                            options: ['Alpha', 'Beta'],
+                        },
+                    },
+                },
+            },
+        });
+
+        const trigger = await screen.findByTestId('question-accordion-trigger');
+        await user.click(trigger);
+
+        expect(screen.getByRole('button', { name: 'Remove Option 1' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Remove Option 2' })).toBeInTheDocument();
+    });
+});

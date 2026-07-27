@@ -1433,7 +1433,10 @@
                 "actions": {
                     "add_option": "Ajouter une option",
                     "copy_from": "Importer d'une langue",
-                    "copy_success": "Importé"
+                    "copy_success": "Importé",
+                    "copy_from_aria": "Importer {{label}} depuis une autre langue",
+                    "delete": "Supprimer {{label}}",
+                    "remove_option": "Retirer {{option}}"
                 },
                 "logic": {
                     "title": "Logique d'affichage",

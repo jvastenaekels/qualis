@@ -1484,7 +1484,10 @@
                 "actions": {
                     "add_option": "Optie toevoegen",
                     "copy_from": "Importeren vanuit taal",
-                    "copy_success": "Geïmporteerd"
+                    "copy_success": "Geïmporteerd",
+                    "copy_from_aria": "{{label}} uit een andere taal importeren",
+                    "delete": "{{label}} verwijderen",
+                    "remove_option": "{{option}} verwijderen"
                 },
                 "logic": {
                     "title": "Zichtbaarheidslogica",

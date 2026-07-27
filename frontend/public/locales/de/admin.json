@@ -1484,7 +1484,10 @@
                 "actions": {
                     "add_option": "Option hinzufügen",
                     "copy_from": "Aus Sprache importieren",
-                    "copy_success": "Importiert"
+                    "copy_success": "Importiert",
+                    "copy_from_aria": "{{label}} aus einer anderen Sprache importieren",
+                    "delete": "{{label}} löschen",
+                    "remove_option": "{{option}} entfernen"
                 },
                 "logic": {
                     "title": "Sichtbarkeitslogik",
