@@ -189,6 +189,58 @@ describe('AdminDashboard', () => {
         ).not.toBeInTheDocument();
     });
 
+    // ── Headings must survive the accessibility tree (review finding 2) ──
+    // WAI-ARIA §5.2.7 gives `button` presentational children: Chrome and
+    // Firefox prune heading descendants of a button from the accessibility
+    // tree. `dom-testing-library`'s role engine does not implement that rule,
+    // so `getByRole('heading', …)` alone cannot tell a real heading from one
+    // a screen reader will never hear. These tests assert the structure the
+    // rule turns on — the heading must not sit inside the card button — and
+    // pair it with the card staying operable.
+    it('keeps the card headings outside the card button, so AT can hear them', () => {
+        setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        const concourseHeading = screen.getByRole('heading', { level: 2, name: 'Concourse' });
+        const studyHeading = screen.getByRole('heading', { level: 3, name: 'My Study' });
+
+        // Negative: neither heading is pruned by an ancestor button role.
+        expect(concourseHeading.closest('button')).toBeNull();
+        expect(studyHeading.closest('button')).toBeNull();
+
+        // Positive: each card is still a real button, and now takes its
+        // accessible name from the heading it labels rather than from the
+        // whole card blurb.
+        expect(screen.getByRole('button', { name: 'Concourse' }).tagName).toBe('BUTTON');
+        expect(screen.getByRole('button', { name: 'My Study' }).tagName).toBe('BUTTON');
+    });
+
+    it('keeps multi-study row headings outside the row button', () => {
+        setupDefaultHooks({
+            studies: [
+                makeStudy({ id: 1, slug: 'study-1', state: 'active' }),
+                makeStudy({
+                    id: 2,
+                    slug: 'study-2',
+                    state: 'draft',
+                    translations: [
+                        { language_code: 'en', title: 'Second Study', pre_instruction: 'Hi' },
+                    ],
+                }),
+            ],
+        });
+
+        renderWithProviders(<AdminDashboard />);
+
+        const rowHeading = screen.getByRole('heading', { level: 3, name: 'Second Study' });
+
+        // Negative: not pruned by an ancestor button role.
+        expect(rowHeading.closest('button')).toBeNull();
+        // Positive: the row is still operable and named by its heading.
+        expect(screen.getByRole('button', { name: 'Second Study' }).tagName).toBe('BUTTON');
+    });
+
     it('shows alert when active study is near deadline', () => {
         const now = new Date();
         const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
