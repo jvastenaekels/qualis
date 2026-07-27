@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -217,14 +216,20 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
 
                             {unselectedScores.length > 0 && !readOnly && !structureLocked && (
                                 <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
-                                    <Label className="text-2xs font-black text-slate-500">
+                                    <Label
+                                        htmlFor="postsort-extreme-score-select"
+                                        className="text-2xs font-black text-slate-500"
+                                    >
                                         {t('admin.design.postsort.extreme.add_label')}
                                     </Label>
                                     <Select
                                         value={selectedScore?.toString() || ''}
                                         onValueChange={(val) => setSelectedScore(Number(val))}
                                     >
-                                        <SelectTrigger className="w-32 h-10 rounded-xl border-slate-200 bg-white font-bold">
+                                        <SelectTrigger
+                                            id="postsort-extreme-score-select"
+                                            className="w-32 h-10 rounded-xl border-slate-200 bg-white font-bold"
+                                        >
                                             <SelectValue
                                                 placeholder={t(
                                                     'admin.design.postsort.extreme.select_placeholder'

@@ -246,6 +246,24 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
         expect(screen.getByText(/Prompt for statements \(\+\)/)).toBeInTheDocument();
         expect(screen.queryByText(/Prompt for statements \(-\)/)).not.toBeInTheDocument();
     });
+
+    it('names the "Add column" select and lets its label open it (Task 6.7b)', async () => {
+        const user = userEvent.setup();
+        renderEditor();
+
+        // The trigger's own content is the placeholder ("Select..."); pairing the
+        // Label overrides that with the field's purpose, per accname's label
+        // priority over content.
+        const trigger = screen.getByRole('combobox', { name: /add column/i });
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+        // Clicking the label dispatches a real click at the paired control — a
+        // Radix Select combobox opens (and moves focus into its listbox) exactly
+        // as it would from a direct click on the trigger, which is only possible
+        // because htmlFor/id actually resolve to this element.
+        await user.click(screen.getByText('Add column:'));
+        expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    });
 });
 
 describe('PostSortConfigEditor - accessible names (Task 3.6)', () => {
