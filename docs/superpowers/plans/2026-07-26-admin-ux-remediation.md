@@ -1633,6 +1633,26 @@ Independent of 6.7c and 6.7d; touches no file they touch, so it can run in paral
 
 ---
 
+### Task 6.7g: The Data table's status chips should not be buttons at all
+
+**The defect, and why no automated check will find it.** Task 6.7c named the seven per-row indicator `TooltipTrigger`s in `InteractiveDataView.columns.tsx` — a strict improvement over seven anonymous tab stops. But naming them was the wrong end state: **they are pure status indicators, and activating them does nothing.** Seven focusable buttons × 25 rows is up to **175 phantom tab stops per page**, each announcing a fact the researcher cannot act on.
+
+Critically, **Task 6.7e will not catch this** — a named button is axe-clean — and the static gate counts them as fixed. This is a defect that only a human reading the tab order will find, which is why it is written down here rather than left to a check.
+
+**Why `asChild` is not the fix** (established in 6.7c, worth not relearning): Radix injects no `tabIndex` under `asChild` — `grep tabIndex node_modules/@radix-ui/react-tooltip/dist/index.mjs` returns nothing. Wrapping a bare `<div>` in `asChild` removes the tab stop *and* the accessible name, and the gate exempts `asChild` unconditionally (`check-a11y-names.mjs:330`), so the counter would read zero while keyboard users lost access entirely.
+
+**The end state:** `<span role="img" aria-label={…}>` inside the `<td>`, with the Radix tooltip dropped or reduced to `title` for mouse users. Zero tab stops; the fact still read during table navigation, under the column header that names it. Do **not** move the text to `aria-describedby` on the `<tr>` — row descriptions are announced inconsistently across screen readers and divorce the fact from the column that gives it meaning.
+
+**Files:** `frontend/src/components/admin/dashboard/InteractiveDataView.columns.tsx` (7 sites), and `ParticipantCell` at `:147`, whose OS/browser-icon tooltip uses `asChild` over a nameless `<div>` and is therefore **unreachable by keyboard at all** today.
+
+- [ ] **Step 1: Confirm the current tab order** — count focusable elements in one participant row before the change
+- [ ] **Step 2: Convert the seven to `role="img"` with their existing names**
+- [ ] **Step 3: Assert the count of focusable controls per row drops to what a user can actually act on**
+- [ ] **Step 4: Handle `ParticipantCell` — it needs the name it never had, whichever shape you choose**
+- [ ] **Step 5: Commit** — `fix(a11y): make the Data table's status chips indicators, not buttons`
+
+---
+
 ### Task 6.7e: Extend the axe spec to the admin
 
 **The work:** Task 6.7a wired `Accessibility Smoke` into CI, but the spec itself covers **two public pages**. The admin — where every defect in this remediation lived — is not covered by it at all.
