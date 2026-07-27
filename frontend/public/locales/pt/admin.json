@@ -244,6 +244,26 @@
                 "preview": "Pré-visualizar",
                 "empty": "Nada para pré-visualizar"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Pessoa",
+                    "Zap": "Raio",
+                    "Scale": "Balança",
+                    "MessageSquareText": "Mensagem",
+                    "ClipboardList": "Prancheta",
+                    "CheckCircle": "Marca de verificação",
+                    "Flag": "Bandeira",
+                    "Info": "Informação",
+                    "HelpCircle": "Ajuda",
+                    "FileText": "Documento",
+                    "LayoutGrid": "Grade",
+                    "Rocket": "Foguete",
+                    "Target": "Alvo",
+                    "Brain": "Cérebro",
+                    "Lightbulb": "Ideia",
+                    "ListChecks": "Lista de verificação"
+                }
+            },
             "click_to_edit": "Clique para editar"
         },
         "layout": {
@@ -1420,6 +1440,7 @@
                     "question": "Etiqueta da pergunta",
                     "required": "Campo obrigatório",
                     "options": "Opções",
+                    "option_ordinal": "Opção {{number}}",
                     "multiple": "(Seleção múltipla permitida)",
                     "single": "(Seleção única)",
                     "placeholder": "Introduza aqui a sua pergunta...",

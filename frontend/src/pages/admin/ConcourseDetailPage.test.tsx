@@ -396,7 +396,7 @@ describe('ConcourseDetailPage — Add Item / Bulk Import label accessible names 
         expect(screen.getByRole('textbox', { name: /^statements$/i })).toBeInTheDocument();
     });
 
-    it('renders the tag-picker group heading as plain text, not a dangling label', () => {
+    it('renders the tag-picker group heading as plain text naming a real group (fix round 1)', () => {
         const concourse = concourseWith(0, 0, 0);
         mockUseConcourseDetailPage.mockReturnValue({
             ...baseApi(concourse),
@@ -414,6 +414,11 @@ describe('ConcourseDetailPage — Add Item / Bulk Import label accessible names 
         const dialog = screen.getByRole('dialog');
         const heading = within(dialog).getByText(/^Tags/);
         expect(heading.tagName).not.toBe('LABEL');
+
+        // The wrapper div now carries role="group" aria-labelledby={heading.id}
+        // — getByRole resolves the group's real accessible name from that
+        // association, not from the heading merely sitting nearby.
+        expect(within(dialog).getByRole('group', { name: /^Tags/ })).toBeInTheDocument();
         expect(within(dialog).getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
     });
 });

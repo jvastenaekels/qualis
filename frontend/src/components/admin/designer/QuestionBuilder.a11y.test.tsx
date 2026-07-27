@@ -221,12 +221,17 @@ describe('QuestionBuilder — question field accessible names (Task 6.7b)', () =
         const heading = screen.getByText('Rating scale', { selector: 'p' });
         expect(heading.tagName).not.toBe('LABEL');
 
+        // The wrapper div now carries role="group" aria-labelledby={heading.id}
+        // — getByRole resolves the group's real accessible name from that
+        // association, not from the heading merely sitting nearby.
+        expect(screen.getByRole('group', { name: 'Rating scale' })).toBeInTheDocument();
+
         expect(screen.getByRole('combobox', { name: /number of points/i })).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: /left endpoint label/i })).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: /right endpoint label/i })).toBeInTheDocument();
     });
 
-    it('renders "Options" as a real heading over the option list, not a dangling label', async () => {
+    it('renders "Options" as a real, named heading over individually-named option fields (fix round 1)', async () => {
         const user = userEvent.setup();
         renderBuilder({
             draft: {
@@ -248,7 +253,16 @@ describe('QuestionBuilder — question field accessible names (Task 6.7b)', () =
 
         const heading = screen.getByText('Options');
         expect(heading.tagName).not.toBe('LABEL');
-        expect(screen.getByDisplayValue('Alpha')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('Beta')).toBeInTheDocument();
+        expect(screen.getByRole('group', { name: 'Options' })).toBeInTheDocument();
+
+        // The group name alone doesn't say WHICH option a given input is — a
+        // screen-reader user editing the second option used to hear only
+        // "edit text, Beta", indistinguishable from any other textbox on the
+        // page. Each Input now carries its own ordinal aria-label, so
+        // getByRole resolves it directly rather than falling back to
+        // getByDisplayValue (which only proves the value rendered, not that
+        // the field announces anything).
+        expect(screen.getByRole('textbox', { name: 'Option 1' })).toHaveValue('Alpha');
+        expect(screen.getByRole('textbox', { name: 'Option 2' })).toHaveValue('Beta');
     });
 });

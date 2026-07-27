@@ -187,15 +187,21 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                     <div className="space-y-6">
                                         <div className="grid gap-2">
                                             {/* Heads a grid of 16 individually-named icon buttons
-                                                (each has its own title), not one control — a real
-                                                heading element, not the form-field <Label>. */}
-                                            <p className="text-2xs font-black text-slate-500">
+                                                via aria-labelledby on IconPicker's own group
+                                                wrapper, not htmlFor — a real heading element
+                                                naming a group, not the form-field <Label>
+                                                pointing at one control. */}
+                                            <p
+                                                id={`step-icon-heading-${id}`}
+                                                className="text-2xs font-black text-slate-500"
+                                            >
                                                 {t('admin.design.intro.process_steps.fields.icon')}
                                             </p>
                                             <IconPicker
                                                 selectedIcon={step.icon}
                                                 onChange={(icon) => onUpdate({ ...step, icon })}
                                                 disabled={readOnly}
+                                                ariaLabelledBy={`step-icon-heading-${id}`}
                                             />
                                         </div>
 

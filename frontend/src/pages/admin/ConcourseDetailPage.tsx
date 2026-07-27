@@ -1774,15 +1774,22 @@ function TagCheckboxGroup({
     return (
         <div className="space-y-1">
             {/* Heads a group of individually-labelled checkboxes (each tag
-                already has its own Label/htmlFor below), not one control —
-                a real heading element, not the form-field <Label>. */}
-            <p className="text-2xs font-black text-slate-500">
+                already has its own Label/htmlFor below) via aria-labelledby
+                on the group wrapper, not htmlFor — a real heading element
+                naming a group, not the form-field <Label> pointing at one
+                control. Static id: TagCheckboxGroup is called from a single
+                site in this file, so only one instance is ever mounted. */}
+            <p id="tag-checkbox-group-heading" className="text-2xs font-black text-slate-500">
                 {label}
                 <span className="text-slate-400 font-normal ml-1">
                     ({selectedIds.length}/{tags.length})
                 </span>
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div
+                role="group"
+                aria-labelledby="tag-checkbox-group-heading"
+                className="flex flex-wrap gap-2"
+            >
                 {tags.map((tag) => (
                     <div key={tag.id} className="flex items-center gap-1.5 cursor-pointer">
                         <Checkbox

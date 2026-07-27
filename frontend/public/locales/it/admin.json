@@ -244,6 +244,26 @@
                 "preview": "Anteprima",
                 "empty": "Nulla da visualizzare in anteprima"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Persona",
+                    "Zap": "Fulmine",
+                    "Scale": "Bilancia",
+                    "MessageSquareText": "Messaggio",
+                    "ClipboardList": "Appunti",
+                    "CheckCircle": "Segno di spunta",
+                    "Flag": "Bandiera",
+                    "Info": "Informazioni",
+                    "HelpCircle": "Aiuto",
+                    "FileText": "Documento",
+                    "LayoutGrid": "Griglia",
+                    "Rocket": "Razzo",
+                    "Target": "Obiettivo",
+                    "Brain": "Cervello",
+                    "Lightbulb": "Idea",
+                    "ListChecks": "Lista di controllo"
+                }
+            },
             "click_to_edit": "Clicchi per modificare"
         },
         "layout": {
@@ -1420,6 +1440,7 @@
                     "question": "Etichetta domanda",
                     "required": "Campo obbligatorio",
                     "options": "Opzioni",
+                    "option_ordinal": "Opzione {{number}}",
                     "multiple": "(Selezione multipla consentita)",
                     "single": "(Selezione singola)",
                     "placeholder": "Inserisca qui la sua domanda...",

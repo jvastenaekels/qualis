@@ -235,14 +235,22 @@ describe('ProcessStepEditor — step field accessible names (Task 6.7b)', () => 
         expect(screen.getByLabelText('Color')).toBeInTheDocument();
     });
 
-    it('renders "Icon" as plain text heading a group of individually-named icon buttons', async () => {
+    it('renders "Icon" as plain text heading a real, named group of icon buttons (Task 6.7b fix round 1)', async () => {
         const user = userEvent.setup();
         await expandTheOneStep(user);
 
         const heading = await screen.findByText('Icon');
         expect(heading.tagName).not.toBe('LABEL');
-        // Each icon button in the picker already carries its own name (title=)
-        // — this fix didn't touch that, only stopped mislabelling the group.
-        expect(screen.getByRole('button', { name: 'User' })).toBeInTheDocument();
+
+        // IconPicker's root carries role="group" aria-labelledby={heading.id} —
+        // getByRole computes the group's real accessible name from that
+        // association, not from the heading merely sitting nearby in the DOM.
+        expect(screen.getByRole('group', { name: 'Icon' })).toBeInTheDocument();
+
+        // Each button is named via a translated word ("Person"), not the raw
+        // lucide identifier ("User") the component key uses internally —
+        // getByRole with the identifier would now fail to resolve.
+        expect(screen.getByRole('button', { name: 'Person' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'User' })).not.toBeInTheDocument();
     });
 });

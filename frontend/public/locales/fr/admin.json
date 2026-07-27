@@ -156,6 +156,26 @@
                 "preview": "Aperçu",
                 "empty": "Rien à prévisualiser"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Personne",
+                    "Zap": "Éclair",
+                    "Scale": "Balance",
+                    "MessageSquareText": "Message",
+                    "ClipboardList": "Presse-papiers",
+                    "CheckCircle": "Coche",
+                    "Flag": "Drapeau",
+                    "Info": "Information",
+                    "HelpCircle": "Aide",
+                    "FileText": "Document",
+                    "LayoutGrid": "Grille",
+                    "Rocket": "Fusée",
+                    "Target": "Cible",
+                    "Brain": "Cerveau",
+                    "Lightbulb": "Idée",
+                    "ListChecks": "Liste de contrôle"
+                }
+            },
             "click_to_edit": "Cliquer pour éditer"
         },
         "layout": {
@@ -1369,6 +1389,7 @@
                     "question": "Libellé de la question",
                     "required": "Champ obligatoire",
                     "options": "Options",
+                    "option_ordinal": "Option {{number}}",
                     "multiple": "(choix multiples autorisés)",
                     "single": "(choix unique)",
                     "placeholder": "Entrez votre question ici...",

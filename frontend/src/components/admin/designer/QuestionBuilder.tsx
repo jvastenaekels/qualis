@@ -569,13 +569,23 @@ const QuestionItem = (props: QuestionItemProps) => {
                                 {question.type === 'rating' && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
                                         {/* Heads the scale-points select and the Left/Right
-                                            fields below (each already correctly labelled),
-                                            not one control — a real heading element, not
-                                            the form-field <Label>. */}
-                                        <p className="text-2xs font-black text-slate-500">
+                                            fields below via aria-labelledby on the group
+                                            wrapper, not htmlFor — each field already has its
+                                            own correct Label/htmlFor, so this only supplies
+                                            the group's name, same pattern as the Options
+                                            group below and QSortEditor's distribution-mode
+                                            radiogroup. */}
+                                        <p
+                                            id={`scale-heading-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.scale')}
                                         </p>
-                                        <div className="grid gap-4">
+                                        <div
+                                            role="group"
+                                            aria-labelledby={`scale-heading-${id}`}
+                                            className="grid gap-4"
+                                        >
                                             <div className="space-y-2">
                                                 <Label
                                                     htmlFor={`scale-points-${id}`}
@@ -770,18 +780,28 @@ const QuestionItem = (props: QuestionItemProps) => {
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        {/* Heads the list of option Inputs below (each item
-                                            in the map is its own field, none individually
-                                            named), not one control — a real heading element,
-                                            not the form-field <Label>. */}
-                                        <p className="text-2xs font-black text-slate-500">
+                                        {/* Heads the list of option Inputs below via
+                                            aria-labelledby on the group wrapper, not htmlFor —
+                                            a real heading element naming a group, not the
+                                            form-field <Label> pointing at one control. The
+                                            group name alone doesn't say WHICH option a given
+                                            input is, so each Input also gets its own ordinal
+                                            aria-label below. */}
+                                        <p
+                                            id={`options-heading-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
                                                 ` (${t('admin.design.questions.labels.multiple')})`}
                                             {question.type === 'radio' &&
                                                 ` (${t('admin.design.questions.labels.single')})`}
                                         </p>
-                                        <div className="space-y-3">
+                                        <div
+                                            role="group"
+                                            aria-labelledby={`options-heading-${id}`}
+                                            className="space-y-3"
+                                        >
                                             {(question.options || []).map((opt, idx) => (
                                                 <div
                                                     key={idx}
@@ -790,6 +810,11 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     <div className="size-1.5 rounded-full bg-slate-300 group-hover/opt:bg-indigo-400 transition-colors" />
                                                     <div className="flex-1 flex items-center gap-2">
                                                         <Input
+                                                            aria-label={t(
+                                                                'admin.design.questions.labels.option_ordinal',
+                                                                'Option {{number}}',
+                                                                { number: idx + 1 }
+                                                            )}
                                                             className={cn(
                                                                 'h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white',
                                                                 readOnly &&

@@ -244,6 +244,26 @@
                 "preview": "Preview",
                 "empty": "Nothing to preview"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Person",
+                    "Zap": "Lightning bolt",
+                    "Scale": "Balance",
+                    "MessageSquareText": "Message",
+                    "ClipboardList": "Clipboard",
+                    "CheckCircle": "Checkmark",
+                    "Flag": "Flag",
+                    "Info": "Information",
+                    "HelpCircle": "Help",
+                    "FileText": "Document",
+                    "LayoutGrid": "Grid",
+                    "Rocket": "Rocket",
+                    "Target": "Target",
+                    "Brain": "Brain",
+                    "Lightbulb": "Idea",
+                    "ListChecks": "Checklist"
+                }
+            },
             "click_to_edit": "Click to edit"
         },
         "layout": {
@@ -1422,6 +1442,7 @@
                     "question": "Question label",
                     "required": "Required field",
                     "options": "Options",
+                    "option_ordinal": "Option {{number}}",
                     "multiple": "(Multiple selection allowed)",
                     "single": "(Single selection)",
                     "placeholder": "Enter your question here...",
