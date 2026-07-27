@@ -94,6 +94,7 @@ const SelectLabel = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Label>,
     React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
 >(({ className, ...props }, ref) => (
+    // biome-ignore lint/a11y/noLabelWithoutControl: SelectPrimitive.Label is a listbox group label, not a form label — the rule matches the trailing .Label member name.
     <SelectPrimitive.Label
         ref={ref}
         className={cn('py-1.5 pl-8 pr-2 text-sm font-semibold', className)}

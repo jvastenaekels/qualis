@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Library, Loader2, Upload } from 'lucide-react';

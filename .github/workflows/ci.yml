@@ -323,6 +323,11 @@ jobs:
         run: npm install -g jscpd && npm run lint:duplication
       - name: Dead Code (Knip)
         run: npm run lint:deadcode
+      - name: Accessible names & contrast (baseline ratchet)
+        # Biome's a11y rules only see intrinsic elements, so `<Button>` and
+        # `<TooltipTrigger>` escape every one of them. This gate holds the
+        # measured backlog (task 6.7a) and fails on any increase.
+        run: npm run lint:a11y
       - name: Security SCA (NPM Audit)
         # xlsx CVEs are accepted: SheetJS Community has no fix and Qualis only
         # WRITES XLSX (analysisXlsxExport.ts), never parses untrusted input.

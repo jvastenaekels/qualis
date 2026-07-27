@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

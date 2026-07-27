@@ -86,6 +86,7 @@ const FormLabel = React.forwardRef<
     const { error, formItemId } = useFormField();
 
     return (
+        // biome-ignore lint/a11y/noLabelWithoutControl: FormLabel sets htmlFor from useFormField; its children arrive through {...props}, which the rule cannot see.
         <Label
             ref={ref}
             className={cn(error && 'text-destructive', className)}

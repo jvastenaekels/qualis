@@ -140,6 +140,7 @@ const DropdownMenuLabel = React.forwardRef<
         inset?: boolean;
     }
 >(({ className, inset, ...props }, ref) => (
+    // biome-ignore lint/a11y/noLabelWithoutControl: DropdownMenuPrimitive.Label is a menu group label, not a form label — the rule matches the trailing .Label member name.
     <DropdownMenuPrimitive.Label
         ref={ref}
         className={cn('px-2 py-1.5 text-sm font-semibold', inset && 'pl-8', className)}
