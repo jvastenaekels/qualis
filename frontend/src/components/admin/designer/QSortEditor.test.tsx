@@ -230,7 +230,17 @@ describe('QSortEditor', () => {
                 expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
             });
 
-            it('is disabled (not just visually muted) when the editor is read-only', () => {
+            // Review fix-round 2: a native `disabled` button blocks the mouse
+            // events a text-selection drag needs, in every browser,
+            // regardless of `user-select` (verified live — see the
+            // select-text entry below and the report). Since a read-only
+            // study is exactly the state where statements get read and
+            // quoted, this control now stays focusable and selectable —
+            // `aria-disabled` communicates non-operability to assistive tech,
+            // and the `onClick` guard (restored — the original <div> already
+            // had it) keeps Enter/Space inert without removing the element
+            // from the tab order or from `window.getSelection()`'s reach.
+            it('is aria-disabled — not natively disabled — when the editor is read-only, so its text stays selectable', () => {
                 renderWithStore(
                     <TooltipProvider>
                         <QSortEditor readOnly />
@@ -239,7 +249,28 @@ describe('QSortEditor', () => {
                 );
 
                 const editControl = screen.getByRole('button', { name: 'Existing Statement' });
-                expect(editControl).toBeDisabled();
+                expect(editControl).toHaveAttribute('aria-disabled', 'true');
+                expect(editControl).not.toBeDisabled();
+            });
+
+            it('no-ops on click and on Enter when read-only — the guard does what `disabled` used to', async () => {
+                const user = userEvent.setup();
+                renderWithStore(
+                    <TooltipProvider>
+                        <QSortEditor readOnly />
+                    </TooltipProvider>,
+                    { initialState: { draft: mockDraft, activeLocale: 'en' } }
+                );
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+
+                await user.click(editControl);
+                expect(screen.queryByRole('button', { name: /^Save /i })).not.toBeInTheDocument();
+
+                editControl.focus();
+                expect(editControl).toHaveFocus();
+                await user.keyboard('{Enter}');
+                expect(screen.queryByRole('button', { name: /^Save /i })).not.toBeInTheDocument();
             });
 
             // Review fix-round: Firefox's UA stylesheet sets `user-select: none`

@@ -206,12 +206,24 @@ function SortableStatementItem({
                 <>
                     <button
                         type="button"
-                        disabled={readOnly}
+                        aria-disabled={readOnly}
                         className={cn(
                             'flex-1 block w-full text-left select-text px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
                             !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
                         )}
                         onClick={() => {
+                            // A native `disabled` button blocks the mouse
+                            // events a text-selection drag needs, in every
+                            // browser, regardless of `user-select` — so
+                            // read-only inertness is enforced here instead
+                            // (the guard the original <div> already had),
+                            // keeping the element focusable and its text
+                            // selectable/copyable while a study is
+                            // collecting. `aria-disabled` communicates the
+                            // non-operability to assistive tech; Enter/Space
+                            // route through this same onClick, so both are
+                            // inert too.
+                            if (readOnly) return;
                             setEditingId(item.code);
                             setEditingText(item.text);
                             setEditingCode(item.code);
