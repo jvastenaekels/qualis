@@ -259,3 +259,45 @@ describe('ConcourseDetailPage row actions', () => {
         expect(edit).not.toHaveClass('text-slate-300');
     });
 });
+
+/**
+ * Accessible-name regression test for the item-selection checkboxes
+ * (Task 3.6). Both the "select all" checkbox and each per-row checkbox had
+ * no `id`/`htmlFor`/`aria-label` anywhere near them.
+ */
+describe('ConcourseDetailPage selection checkboxes (a11y, Task 3.6)', () => {
+    function renderEditableRow(itemCount = 1) {
+        const concourse = concourseWith(itemCount, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+        return concourse;
+    }
+
+    it('names the "select all" checkbox', () => {
+        renderEditableRow();
+
+        // getByRole computes the real accessible name — the visible "Select
+        // all" text sits in a plain <span>, not a <label htmlFor>, so an
+        // unfixed checkbox fails to resolve here even though it's on screen.
+        expect(screen.getByRole('checkbox', { name: /select all/i })).toBeInTheDocument();
+    });
+
+    it('names each row checkbox with the specific item it selects', () => {
+        const concourse = renderEditableRow(2);
+        const codes = (concourse.items ?? []).map((item) => item.code);
+        expect(codes).toHaveLength(2);
+
+        // Each row checkbox has no adjacent visible text at all (the item
+        // code is a separate badge elsewhere in the row) — the name must
+        // come from an aria-label distinct per row, not a single fallback.
+        for (const code of codes) {
+            expect(
+                screen.getByRole('checkbox', { name: new RegExp(code, 'i') })
+            ).toBeInTheDocument();
+        }
+    });
+});

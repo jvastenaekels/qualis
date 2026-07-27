@@ -420,6 +420,7 @@
             "field_language": "Taal",
             "import_language": "Taal",
             "select_all": "Alles selecteren",
+            "select_item": "{{code}} selecteren",
             "bulk_selected": "{{count}} geselecteerd",
             "bulk_set_status": "Status instellen:",
             "bulk_clear": "Wissen",

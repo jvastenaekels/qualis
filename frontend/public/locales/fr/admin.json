@@ -332,6 +332,7 @@
             "field_language": "Langue",
             "import_language": "Langue",
             "select_all": "Tout sélectionner",
+            "select_item": "Sélectionner {{code}}",
             "bulk_selected": "{{count}} sélectionné(s)",
             "bulk_set_status": "Définir le statut :",
             "bulk_clear": "Effacer",

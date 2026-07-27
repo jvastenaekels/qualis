@@ -653,6 +653,7 @@ export default function ConcourseDetailPage() {
                             {canEdit && filteredItems.length > 0 && (
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50/80 border-b border-slate-100">
                                     <Checkbox
+                                        id="concourse-select-all"
                                         checked={
                                             filteredItems.length > 0 &&
                                             filteredItems.every((item) =>
@@ -661,9 +662,12 @@ export default function ConcourseDetailPage() {
                                         }
                                         onCheckedChange={toggleSelectAll}
                                     />
-                                    <span className="text-2xs font-bold text-slate-500">
+                                    <Label
+                                        htmlFor="concourse-select-all"
+                                        className="text-2xs font-bold text-slate-500 cursor-pointer"
+                                    >
                                         {t('admin.concourse.select_all', 'Select all')}
-                                    </span>
+                                    </Label>
                                 </div>
                             )}
                             {/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: row rendering — many cooperating visual states (selection, edit mode, status, missing translation, mobile/desktop layouts, hover-only actions). Same shell-suppression precedent as the page-level biome-ignore on line 78 (CLAUDE.md). */}
@@ -694,6 +698,11 @@ export default function ConcourseDetailPage() {
                                             {canEdit && (
                                                 <div className="flex-shrink-0 sm:pt-0.5">
                                                     <Checkbox
+                                                        aria-label={t(
+                                                            'admin.concourse.select_item',
+                                                            'Select {{code}}',
+                                                            { code: item.code }
+                                                        )}
                                                         checked={selectedItems.has(item.id)}
                                                         onCheckedChange={() =>
                                                             toggleSelectItem(item.id)

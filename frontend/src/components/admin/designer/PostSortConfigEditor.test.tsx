@@ -247,3 +247,47 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
         expect(screen.queryByText(/Prompt for statements \(-\)/)).not.toBeInTheDocument();
     });
 });
+
+describe('PostSortConfigEditor - accessible names (Task 3.6)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing
+    const renderEditor = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            postsort_config: {},
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<PostSortConfigEditor />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    // These three switches sit next to a CardTitle/CardDescription pair with
+    // no `id`/`htmlFor`/`aria-label` anywhere — getByRole computes the real
+    // accessible name, so an unnamed switch fails to resolve even though
+    // three switches exist on the page (this isn't a missing-element check).
+    it('names the "Allow random comments" switch', () => {
+        renderEditor();
+
+        expect(screen.getByRole('switch', { name: /allow random comments/i })).toBeInTheDocument();
+    });
+
+    it('names the "Ask about missing statements" switch', () => {
+        renderEditor();
+
+        expect(
+            screen.getByRole('switch', { name: /ask about missing statements/i })
+        ).toBeInTheDocument();
+    });
+
+    it('names the "Audio Recording" switch', () => {
+        renderEditor();
+
+        expect(screen.getByRole('switch', { name: /audio recording/i })).toBeInTheDocument();
+    });
+});

@@ -376,14 +376,18 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader className={allowRandomComments ? 'pb-4' : ''}>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
+                                    <Label
+                                        htmlFor="random-comments-toggle"
+                                        className="block text-base font-black text-slate-900 tracking-tight"
+                                    >
                                         {t('admin.design.postsort.random_comments.title')}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.random_comments.desc')}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="random-comments-toggle"
                                     data-testid="allow-random-comments-toggle"
                                     checked={allowRandomComments}
                                     onCheckedChange={(checked: boolean) => {
@@ -436,14 +440,18 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
+                                    <Label
+                                        htmlFor="missing-statements-toggle"
+                                        className="block text-base font-black text-slate-900 tracking-tight"
+                                    >
                                         {t('admin.design.postsort.missing.title')}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.missing.desc')}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="missing-statements-toggle"
                                     data-testid="allow-missing-statements-toggle"
                                     checked={allowMissingStatements}
                                     onCheckedChange={(checked: boolean) => {
@@ -499,17 +507,21 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                    <Label
+                                        htmlFor="audio-recording-toggle"
+                                        className="text-lg font-black text-slate-800 flex items-center gap-2"
+                                    >
                                         <Mic className="w-5 h-5 text-indigo-600" />
                                         {t('admin.design.postsort.audio.title') ||
                                             'Audio Recording'}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.audio.desc') ||
                                             'Allow participants to record audio responses instead of text'}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="audio-recording-toggle"
                                     data-testid="audio-recording-toggle"
                                     checked={config?.audio?.enabled || false}
                                     onCheckedChange={(checked: boolean) => {

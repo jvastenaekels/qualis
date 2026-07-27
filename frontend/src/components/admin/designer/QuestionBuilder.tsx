@@ -372,12 +372,16 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
-                                                <Label className="text-2xs font-black text-slate-500">
+                                                <Label
+                                                    htmlFor={`visibility-toggle-${id}`}
+                                                    className="text-2xs font-black text-slate-500"
+                                                >
                                                     {t('admin.design.questions.logic.title')}
                                                 </Label>
                                             </div>
                                             {!readOnly && (
                                                 <Switch
+                                                    id={`visibility-toggle-${id}`}
                                                     checked={!!question.visibility_condition}
                                                     onCheckedChange={(checked) => {
                                                         if (checked) {

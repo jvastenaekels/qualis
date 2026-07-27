@@ -332,6 +332,7 @@
             "field_language": "Kieli",
             "import_language": "Kieli",
             "select_all": "Valitse kaikki",
+            "select_item": "Valitse {{code}}",
             "bulk_selected": "{{count}} valittu",
             "bulk_set_status": "Aseta tila:",
             "bulk_clear": "Tyhjennä",

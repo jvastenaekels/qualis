@@ -420,6 +420,7 @@
       "field_language": "Język",
       "import_language": "Język",
       "select_all": "Zaznacz wszystko",
+      "select_item": "Zaznacz {{code}}",
       "bulk_selected": "Zaznaczono {{count}}",
       "bulk_set_status": "Ustaw status:",
       "bulk_clear": "Wyczyść",
