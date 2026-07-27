@@ -1,4 +1,5 @@
 import { renderWithProviders, screen, waitFor, fireEvent } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test-utils/server';
@@ -169,6 +170,85 @@ describe('StudyDesignPage Feature Tests', () => {
         // Wait for the overlay to render (status badge appears)
         await screen.findByTestId('study-status');
         expect(screen.queryByRole('button', { name: /Draft Mode/i })).not.toBeInTheDocument();
+        // Even without a "Draft Mode" affordance, the paused notice must still
+        // be a real, accessible, dismissible dialog — not a trap.
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toHaveAccessibleName(/paused/i);
+        expect(screen.getByRole('button', { name: /view read-only/i })).toBeInTheDocument();
+    });
+
+    // ── Lock notice is a real dialog, not a trap (Phase 3 task 3.2) ─
+    it('exposes the lock notice as an accessible dialog, not an orphan heading', async () => {
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toHaveAccessibleName(/active/i);
+        // The old implementation rendered the message as an orphan <h3> with
+        // no dialog semantics at all; that heading must be gone now that the
+        // message lives inside a properly labelled dialog.
+        expect(
+            screen.queryByRole('heading', { level: 3, name: /active/i })
+        ).not.toBeInTheDocument();
+    });
+
+    it('dismisses the lock dialog on Escape', async () => {
+        const user = userEvent.setup();
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        await screen.findByRole('dialog');
+        await user.keyboard('{Escape}');
+
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+    });
+
+    it('can be dismissed via "View read-only", leaving the configuration visible but inert', async () => {
+        const user = userEvent.setup();
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        await screen.findByRole('dialog');
+        await user.click(screen.getByRole('button', { name: /view read-only/i }));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+        // The configuration underneath must be legible but not editable: the
+        // field is present (readable) and disabled (not a silently-dropped-edit trap).
+        const titleField = screen.getByLabelText(/study title/i);
+        expect(titleField).toBeInTheDocument();
+        expect(titleField).toBeDisabled();
+    });
+
+    it('uses an amber lock icon on the lock notice instead of the green globe', async () => {
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+        const dialog = await screen.findByRole('dialog');
+
+        expect(dialog.querySelector('svg.lucide-lock.text-amber-600')).toBeInTheDocument();
+        expect(dialog.querySelector('svg.lucide-globe')).not.toBeInTheDocument();
     });
 
     // ── Rough-sort toggle (Phase 3 task 17) ───────────────────────

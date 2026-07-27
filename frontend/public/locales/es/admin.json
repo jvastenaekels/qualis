@@ -1545,6 +1545,7 @@
                     "locked_active": "Este estudio está activo. Cambie al modo borrador para editar.",
                     "locked_paused": "Este estudio está pausado. Cambie al modo borrador para editar.",
                     "locked_closed": "Este estudio está cerrado. El diseño está archivado.",
+                    "view_read_only": "Ver en modo solo lectura",
                     "mismatch_title": "Discrepancia en la capacidad de la cuadrícula",
                     "mismatch_desc": "Tiene {{statements}} enunciados pero la cuadrícula solo tiene posiciones para {{slots}} elementos. Por favor, ajuste las columnas a continuación para que coincidan.",
                     "unlock_hint": "Vaya al explorador de datos para eliminar sesiones y desbloquear la estructura"
