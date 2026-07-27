@@ -210,7 +210,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                     <div
                         {...attributes}
                         {...listeners}
-                        className="mt-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
+                        className="mt-1 cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
                     >
                         <GripVertical className="h-5 w-5" />
                     </div>
