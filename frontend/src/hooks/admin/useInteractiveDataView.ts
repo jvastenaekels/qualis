@@ -368,6 +368,7 @@ export function useInteractiveDataView({
                 setStepFilter,
                 setConsentFilters,
                 setQualityFilter,
+                onViewParticipant: handleViewParticipant,
             }),
         [
             t,
@@ -380,6 +381,7 @@ export function useInteractiveDataView({
             stepFilter,
             toggleConsent,
             stepLabels,
+            handleViewParticipant,
         ]
     );
 

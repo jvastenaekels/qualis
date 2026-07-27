@@ -20,6 +20,7 @@ import {
     ArrowUpDown,
     ArrowUp,
     ArrowDown,
+    ArrowRight,
     Clock,
     Globe,
     AlertTriangle,
@@ -226,6 +227,17 @@ export interface BuildColumnsParams {
     setStepFilter: (f: StepFilter) => void;
     setConsentFilters: (s: Set<ConsentType>) => void;
     setQualityFilter: (f: QualityFilter) => void;
+    /**
+     * The row's one real keyboard-and-mouse action (Task 6.7i). Wired to a
+     * dedicated `<Button>` in the trailing "row_actions" column so a
+     * screen-reader user tabbing through the table lands on a real,
+     * per-row-named control rather than relying on the `<TableRow>`'s
+     * mouse-only `onClick` (InteractiveDataView.tsx), which has no keyboard
+     * path at all. Kept as a real button inside a `<td>`, not a role on the
+     * `<tr>` itself, so the row keeps its native `row` semantics for table
+     * navigation (see the task report for the alternatives considered).
+     */
+    onViewParticipant: (participant: DumpParticipant) => void;
 }
 
 export function buildColumns({
@@ -243,6 +255,7 @@ export function buildColumns({
     setStepFilter,
     setConsentFilters,
     setQualityFilter,
+    onViewParticipant,
 }: BuildColumnsParams) {
     return [
         columnHelper.accessor('id', {
@@ -761,6 +774,41 @@ export function buildColumns({
                     >
                         {shortLabel}
                     </span>
+                );
+            },
+        }),
+        columnHelper.display({
+            id: 'row_actions',
+            header: () => (
+                <span className="sr-only">{t('admin.data.table.actions', 'Details')}</span>
+            ),
+            cell: ({ row }) => {
+                const p = row.original;
+                return (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
+                        aria-label={t(
+                            'admin.data.table.view_participant',
+                            'View participant {{id}}',
+                            {
+                                id: p.id,
+                            }
+                        )}
+                        onClick={(e) => {
+                            // The row itself also navigates on click
+                            // (InteractiveDataView.tsx's `<TableRow
+                            // onClick>`, mouse-only); stop the bubble so a
+                            // click or Enter/Space on this button doesn't
+                            // fire handleViewParticipant twice (double
+                            // navigate()/history push).
+                            e.stopPropagation();
+                            onViewParticipant(p);
+                        }}
+                    >
+                        <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
                 );
             },
         }),

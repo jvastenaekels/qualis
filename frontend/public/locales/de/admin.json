@@ -1842,7 +1842,8 @@
                 "view": "Anzeigen",
                 "actions": "Details",
                 "duplicate_ip": "Doppelte IP",
-                "duplicate_ip_hint": "Teilt IP-Hash mit anderen Teilnehmern"
+                "duplicate_ip_hint": "Teilt IP-Hash mit anderen Teilnehmern",
+                "view_participant": "Teilnehmer {{id}} anzeigen"
             },
             "tooltips": {
                 "suspect": "Möglicherweise auffällig: Sitzungsdauer unter 2 Minuten",

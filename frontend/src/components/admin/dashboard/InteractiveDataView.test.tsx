@@ -28,6 +28,8 @@ import { computeAccessibleName } from 'dom-accessibility-api';
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { Routes, Route } from 'react-router-dom';
+import type { ReactElement } from 'react';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import type { DumpParticipant, DumpResponse } from './types';
@@ -223,8 +225,8 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // Same fixture as above, plus a user_agent so ParticipantCell's
         // OS/browser chip (also in scope for 6.7g) renders too, and a
         // submitted_at timestamp (already present via makeParticipant's
-        // default) whose own TooltipTrigger is explicitly OUT of this
-        // task's scope and must remain a real tab stop.
+        // default), whose own TooltipTrigger was out of 6.7g's scope but is
+        // in 6.7i's (see below).
         const participant = makeParticipant({
             id: 'p1',
             db_id: 1,
@@ -259,13 +261,14 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // the time via a bare `asChild` div, so it didn't add to the count) +
         // the submitted_at tooltip trigger = 8 focusable `button`s in this
         // row. After 6.7g: only the (then out-of-scope) submitted_at trigger
-        // remained. After this task's chip conversion (this row has no
-        // duplicate IP, so that badge never renders here): the submitted_at
-        // trigger is converted too — role="img" like the rest — so the row
-        // has zero focusable buttons. (A follow-up task gives the row its
-        // first real, operable action; see the 6.7i report.)
-        const focusable = within(row).queryAllByRole('button');
-        expect(focusable).toHaveLength(0);
+        // remained. After 6.7i's chip conversion (this row has no duplicate
+        // IP, so that badge never renders here): the submitted_at trigger is
+        // converted too — role="img" like the rest — but the row gained its
+        // own real action (the trailing "row_actions" column), so the count
+        // is still 1, for a different and now-functional reason.
+        const focusable = within(row).getAllByRole('button');
+        expect(focusable).toHaveLength(1);
+        expect(focusable[0]).toHaveAccessibleName('View participant p1');
 
         // The OS/browser fact is still announced, with the name it never had.
         expect(
@@ -281,12 +284,12 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         ).toBeInTheDocument();
     });
 
-    it('drops the duplicate-IP badge as an inert tab stop too: a duplicate-IP row loses both of its remaining phantom buttons (Task 6.7i)', async () => {
-        // The fixture must actually trip the duplicate-IP badge, or this
-        // count would already read "0 focusable buttons" from the
-        // submitted_at conversion alone, proving nothing about whether the
-        // badge itself got fixed. Two participants sharing an IP is what
-        // populates duplicateIpGroups (useInteractiveDataView.ts).
+    it('counts focusable controls in a duplicate-IP row: the badge and the date are no longer tab stops, leaving exactly one real, named action (Task 6.7i)', async () => {
+        // The fixture must actually trip the duplicate-IP badge — a row
+        // without it would already read "1 focusable button" before this
+        // task (the untouched submitted_at trigger), proving nothing about
+        // whether the badge itself got fixed. Two participants sharing an
+        // IP is what populates duplicateIpGroups (useInteractiveDataView.ts).
         const participants = [
             makeParticipant({ id: 'p1', db_id: 1, ip_address: '203.0.113.5' }),
             makeParticipant({ id: 'p2', db_id: 2, ip_address: '203.0.113.5' }),
@@ -319,10 +322,83 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
 
         // Before this task, a duplicate-IP row carried two inert tab stops
         // (this badge's own TooltipTrigger, plus the untouched submitted_at
-        // trigger from 6.7g). After: zero — this row has no real action yet
-        // either (that's the companion 6.7i task), so it is, for now,
-        // entirely unreachable by keyboard. That gap is closed next.
-        expect(within(row).queryAllByRole('button')).toHaveLength(0);
+        // trigger from 6.7g) and zero paths to the row's real action. After:
+        // exactly one focusable button, and it is that real action, not a
+        // leftover inert trigger.
+        const focusable = within(row).getAllByRole('button');
+        expect(focusable).toHaveLength(1);
+        expect(focusable[0]).toHaveAccessibleName('View participant p1');
+    });
+});
+
+describe('InteractiveDataView — row keyboard path (Task 6.7i)', () => {
+    // Real navigation (Routes/Route), not a mocked `useNavigate` — same
+    // pattern as AdminDashboard.test.tsx's keyboard-operable-cards suite.
+    // Proves the whole chain: focusable -> Enter -> onClick ->
+    // handleViewParticipant -> navigate() -> route change, not just that
+    // some callback fired with the right argument.
+    function renderWithRoutes(ui: ReactElement) {
+        return renderWithProviders(
+            <Routes>
+                <Route path="/" element={ui} />
+                <Route
+                    path="/admin/studies/demo/participants/:id"
+                    element={<div data-testid="participant-detail" />}
+                />
+            </Routes>
+        );
+    }
+
+    it("gives the row a keyboard path to its own action: focus the row's View control, press Enter, and the participant opens", async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const viewButton = screen.getByRole('button', { name: 'View participant abcd1234' });
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        viewButton.focus();
+        await user.keyboard('{Enter}');
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
+    });
+
+    it('still lets a mouse user click anywhere in the row, unchanged', async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const row = screen.getByText('abcd1234').closest('tr');
+        if (!row) throw new Error('participant row not found');
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        // Click a cell that is NOT the new View button — the row's own
+        // onClick (InteractiveDataView.tsx, mouse-only, untouched by this
+        // task) must still fire.
+        await user.click(within(row).getByText('abcd1234'));
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
+    });
+
+    it('also lets a mouse user click the View control directly, not only the row at large', async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const viewButton = screen.getByRole('button', { name: 'View participant abcd1234' });
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        // The button sits inside the row, which has its own onClick
+        // (InteractiveDataView.tsx). Clicking the button dispatches one
+        // native click that bubbles to the row; the button's handler calls
+        // stopPropagation so the row's handler doesn't also fire — a real
+        // double-navigate would still land here (same destination), so this
+        // is a smoke check that the button itself is independently
+        // clickable, not a substitute for the stopPropagation reasoning
+        // documented at the call site.
+        await user.click(viewButton);
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
     });
 });
 

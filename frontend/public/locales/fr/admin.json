@@ -1792,7 +1792,8 @@
                 "view": "Voir",
                 "actions": "Détails",
                 "duplicate_ip": "IP dupliquée",
-                "duplicate_ip_hint": "Partage un hash IP avec d'autres participants"
+                "duplicate_ip_hint": "Partage un hash IP avec d'autres participants",
+                "view_participant": "Voir le participant {{id}}"
             },
             "tooltips": {
                 "suspect": "Potentiellement suspect : durée de session < 2 minutes",

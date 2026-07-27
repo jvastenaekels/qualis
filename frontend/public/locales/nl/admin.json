@@ -1842,7 +1842,8 @@
                 "view": "Bekijken",
                 "actions": "Details",
                 "duplicate_ip": "Dubbel IP",
-                "duplicate_ip_hint": "Deelt IP-hash met andere deelnemers"
+                "duplicate_ip_hint": "Deelt IP-hash met andere deelnemers",
+                "view_participant": "Deelnemer {{id}} bekijken"
             },
             "tooltips": {
                 "suspect": "Mogelijk verdacht: sessieduur < 2 minuten",
