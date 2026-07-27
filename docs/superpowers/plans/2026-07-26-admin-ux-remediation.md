@@ -1542,6 +1542,114 @@ git commit -m "fix(a11y): enforce accessible names with a lint gate and clear th
 
 ---
 
+### Task 6.7b: Burn down the label backlog
+
+**The work:** 40 `noLabelWithoutControl` errors held behind 13 dated file-level suppressions that Task 6.7a landed. Each is a `<Label>` with no `htmlFor`, sitting beside a control with no `id` — so the control has no accessible name, and clicking the label does nothing.
+
+Distribution, measured: `QuestionBuilder` 9, `ConcourseDetailPage` 8, `ProcessStepEditor` 4, `IntroductionEditor` 4, `InterfaceEditor` 3, `RecruitmentPage` 2, `ProjectMembersPage` 2, `Step1_Feedback` 2, `ImportStudyDialog` 2, `QSortEditor` 1, `PostSortConfigEditor` 1, `ImportFromConcourseDialog` 1, `BrandingEditor` 1.
+
+> **The standing rule, because the gate cannot tell the difference:** never add a bare `id` without the matching `htmlFor` in the same hunk. Task 6.7a's first gate silenced its checker on any `id`; that hole is closed, but the discipline is what makes the fix real rather than the count going down.
+
+**Expected side effect:** several of the 9 remaining unnamed `<SelectTrigger>` findings resolve for free. Verified in Chromium that `<label for="b1">Role</label><button id="b1" role="combobox">Member</button>` yields the accessible name "Role" — so labelling the field names the trigger.
+
+**Out of scope:** the five `<SelectTrigger>` that already carry `<SelectValue placeholder={t(…)} />` — they have a real translated name and are not in the backlog.
+
+**Files:** the 13 above, plus `frontend/a11y-baseline.json` as counts drop, minus each `biome-ignore-all` line as its file reaches zero.
+
+- [ ] **Step 1: Work file by file, committing per file or per small group**
+
+For each `<Label>` without `htmlFor`: give the control an `id`, point the label at it in the same edit. Prefer the control's existing `name`/field key for the id so it stays stable.
+
+- [ ] **Step 2: Remove that file's suppression as it reaches zero**
+
+The gate re-lints suppressed files, so a stale suppression fails as "baseline still records N". That is the burn-down working — re-run with `--update` and confirm the count dropped by what you fixed, not more.
+
+- [ ] **Step 3: Verify the label actually labels**
+
+```tsx
+it('names the field and lets its label focus it', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<QuestionBuilder {...props} />);
+    const field = screen.getByRole('textbox', { name: /question text/i });
+    await user.click(screen.getByText(/question text/i));
+    expect(field).toHaveFocus();
+});
+```
+
+The focus assertion is what distinguishes a real pairing from an `id` that satisfies a linter.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git commit -m "fix(a11y): pair every label with its control"
+```
+
+---
+
+### Task 6.7c: Name the 37 controls the gate still records
+
+**The work:** the baseline at `frontend/a11y-baseline.json` records **37** controls with no accessible name after Task 6.7b: `<Button>`, `<TooltipTrigger>`, `<SelectTrigger>` and bare `<button>`. Run `cd frontend && node scripts/check-a11y-names.mjs --list` for the live set — do not work from a copied list, it moves.
+
+The largest single cluster is `InteractiveDataView.columns.tsx` — seven `<TooltipTrigger>` without `asChild`, each rendering a focusable Radix `<button>` whose only content is a `<div>` and an icon, with the descriptive text in `TooltipContent` wired as `aria-describedby` only while open. That is up to **seven unnamed tab stops per participant row** on the Data table.
+
+**Prefer `asChild`** where a `TooltipTrigger` wraps a control that can carry the name itself. Otherwise `aria-label`, through `t()`, in all nine admin locales.
+
+**The standing rule still applies:** never add a bare `id` without the matching `htmlFor` in the same hunk.
+
+- [ ] **Step 1: `node scripts/check-a11y-names.mjs --list`, group by mechanism**
+- [ ] **Step 2: Name them, asserting the computed name** — `getByRole(role, { name })`, never an attribute check
+- [ ] **Step 3: Re-baseline; confirm the drop equals what you fixed**
+- [ ] **Step 4: Commit** — `fix(a11y): name the controls the gate records as anonymous`
+
+---
+
+### Task 6.7d: Contrast and role hygiene
+
+**The work, both measured:**
+
+1. **13 interactive controls at 1.45:1** (`text-slate-300` on white, against a 4.5:1 threshold), recorded in the baseline. Task 3.1 fixed one file; these are the rest — `QuestionBuilder.tsx:209, 273, 303, 811`, `ProcessStepEditor.tsx:80, 124`, `InterfaceEditor.tsx:357`, `QSortEditor.tsx:139, 290`, `BrandingEditor.tsx:313` and siblings. Several are delete buttons.
+2. **`role="button"` + `tabIndex={0}` divs** at `ImageUploadInput.tsx:194`, `ImportFromConcourseDialog.tsx:248`, `StudyStatusControl.tsx:115`, `QSortEditor.tsx:200` — the pattern Task 3.3 replaced with native `<button>` on the dashboard.
+
+`text-slate-500` is 4.6:1 and is the token Task 3.1 settled on.
+
+**If you enable `useSemanticElements` to catch the divs, use line-level suppressions for the dnd-kit exceptions, not file-level ones** — Phase 3 learned that file-scoped suppressions blind the largest files, and Biome 2.5.5 has no unused-suppression rule to force their removal.
+
+- [ ] **Step 1: Fix the contrast; confirm the baseline's low-contrast count drops to 0**
+- [ ] **Step 2: Convert the four divs to native `<button>`, preserving layout** (Task 3.3's `AdminDashboard` conversion is the worked example, including the stretched `::after` for whole-area clicking)
+- [ ] **Step 3: Commit** — `fix(a11y): raise interactive contrast and drop the clickable divs`
+
+---
+
+### Task 6.7f: Translate the hardcoded accessible names
+
+**The work:** 9 accessible names are hardcoded English string literals rather than `t()` calls — including `dialog.tsx:47`'s `<span className="sr-only">Close</span>`, which every dialog in the product renders. A French researcher's screen reader announces them in English.
+
+Independent of 6.7c and 6.7d; touches no file they touch, so it can run in parallel.
+
+- [ ] **Step 1: Find them** — `grep -rn 'sr-only\|aria-label="' frontend/src --include=*.tsx | grep -v "t("`
+- [ ] **Step 2: Route each through `t('key', 'Fallback')`**, fallback matching `en/admin.json` character-for-character, keys in all nine admin locales, register per `frontend/scripts/i18n/glossaries/<code>.yaml` (there is no `fr.yaml`)
+- [ ] **Step 3: `npm run i18n-check && npm run check-interpolations`**
+- [ ] **Step 4: Commit** — `fix(i18n): translate the accessible names that were hardcoded`
+
+---
+
+### Task 6.7e: Extend the axe spec to the admin
+
+**The work:** Task 6.7a wired `Accessibility Smoke` into CI, but the spec itself covers **two public pages**. The admin — where every defect in this remediation lived — is not covered by it at all.
+
+Extend it to the admin surfaces: dashboard, concourse, study design, data, analysis, access, settings. It needs an authenticated session; `frontend/e2e/fixtures/db-setup.ts`'s `loginToAdminUI` injects `admin-auth-storage` into `sessionStorage`, which is how the admin specs already do it.
+
+Run at **375px as well as desktop** — Task 6.7a found a language switcher whose only text is in a `hidden sm:inline` span, so it has no accessible name at all below that breakpoint, and a desktop-only run would never see it.
+
+**This is the check that would have caught most of this remediation on its own.** axe computes the rendered accessible name: it sees through `asChild`, resolves `<SelectValue placeholder>`, honours `display:none`, and computes real contrast ratios rather than matching a banned class string.
+
+- [ ] **Step 1: Add admin routes to the spec with an authenticated fixture**
+- [ ] **Step 2: Enable the name rules and `color-contrast`; run at both widths**
+- [ ] **Step 3: Confirm it fails on a deliberately unnamed control, then passes** — a spec that cannot fail is not a check
+- [ ] **Step 4: Commit** — `test(a11y): run axe against the admin at both breakpoints`
+
+---
+
 ### Task 6.8: Charts mounting at zero size
 
 **The defect:** loading the `Data` screen logs the Recharts warning *"The width(-1) and height(-1) of chart should be greater than 0"* five times — charts are mounting inside collapsed containers. Harmless today, but it is console noise that will mask a real warning later.
