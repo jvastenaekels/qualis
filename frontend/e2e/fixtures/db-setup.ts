@@ -275,6 +275,38 @@ export class TestDatabase {
     }
 
     /**
+     * Create a concourse via API. `ConcourseListPage` auto-creates one and
+     * redirects to its detail page on first visit, so tests that want a
+     * deterministic URL (rather than waiting on that client-side redirect)
+     * seed it directly the same way `roles.spec.ts` does.
+     */
+    async createConcourse(token: string, title?: string) {
+        if (!this.workspaceId) {
+            throw new Error('Workspace ID not initialized. Did setup() run?');
+        }
+        const cleanBaseUrl = this.baseUrl.replace(/\/$/, '');
+        const response = await this.fetchWithRetry(`${cleanBaseUrl}/api/admin/concourses`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+                'X-Project-ID': this.workspaceId.toString(),
+            },
+            body: JSON.stringify({
+                title: title || `Test Concourse ${Date.now()}`,
+                description: null,
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Failed to create concourse: ${error}`);
+        }
+
+        return response.json() as Promise<{ id: number; title: string }>;
+    }
+
+    /**
      * Activate a study
      */
     async activateStudy(token: string, slug: string) {

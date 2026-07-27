@@ -183,9 +183,10 @@ export function ParticipantCell({
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
+                            {/* text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1. */}
                             <Badge
                                 variant="outline"
-                                className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
+                                className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
                             >
                                 {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
                                 {duplicateIpGroups.get(p.ip_address)}
@@ -413,11 +414,13 @@ export function buildColumns({
                             variant="outline"
                             className={cn(
                                 'h-5 text-2xs px-2 font-semibold border-none',
+                                // text-*-800, not -600/-500: axe (task 6.7e) measured
+                                // 3.07-3.84:1 on these -50 backgrounds, below 4.5:1.
                                 displayStatus === 'completed'
-                                    ? 'bg-emerald-50 text-emerald-600'
+                                    ? 'bg-emerald-50 text-emerald-800'
                                     : displayStatus === 'abandoned'
-                                      ? 'bg-rose-50 text-rose-500'
-                                      : 'bg-sky-50 text-sky-600'
+                                      ? 'bg-rose-50 text-rose-800'
+                                      : 'bg-sky-50 text-sky-800'
                             )}
                         >
                             {t(`admin.data.status.${displayStatus}`, displayStatus)}

@@ -77,7 +77,15 @@ export function ExplorerPanel({ explore, advancedContent }: Props) {
                 <div className="lg:col-span-2">
                     <Accordion type="single" collapsible>
                         <AccordionItem value="advanced">
-                            <AccordionTrigger>
+                            {/*
+                             * The page's only other heading is StudyPageHeader's <h1> —
+                             * Radix's default <h3> here would skip <h2> entirely (axe:
+                             * heading-order, task 6.7e). This is the Accordion axe actually
+                             * flagged; AnalysisPage.tsx also declares one with the same
+                             * "advanced" value/title that turned out to be dead code — see
+                             * the task 6.7e report.
+                             */}
+                            <AccordionTrigger headingLevel={2}>
                                 {t(
                                     'admin.analysis.explore.advanced_title',
                                     'Advanced configuration'

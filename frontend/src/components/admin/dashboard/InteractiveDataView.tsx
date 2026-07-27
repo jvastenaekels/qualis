@@ -247,6 +247,15 @@ export default function InteractiveDataView({
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/*
+             * Sole page heading (task 6.7e). DataExportsPage renders StudyPageHeader's
+             * <h1> only in its zero-participant branch; once participants exist it
+             * renders this component instead, which had no <h1> of its own — the page
+             * has zero <h1>s once real data arrives (axe: page-has-heading-one). Same
+             * title as the empty-state StudyPageHeader, same sr-only-h1 pattern already
+             * used on StudyDesignPage for the identical reason.
+             */}
+            <h1 className="sr-only">{t('admin.data.title', 'Data')}</h1>
             {/* Section 1: Key indicators */}
             <CollapsibleSection
                 title={t('admin.data.sections.key_indicators', 'Key indicators')}

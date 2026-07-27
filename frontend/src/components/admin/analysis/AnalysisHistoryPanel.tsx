@@ -207,7 +207,11 @@ export function AnalysisHistoryPanel({
             {!collapsed && (
                 <div className="px-5 pb-5">
                     {runsQuery.isLoading && (
-                        <p className="text-xs text-slate-400 py-3">
+                        // text-slate-600, not -400 — axe (task 6.7e) measured text-slate-400
+                        // on white at 2.56:1. Same defect as AnalysisPage's loading states,
+                        // missed there because the check was scoped to the page file rather
+                        // than the whole component tree the analysis route mounts.
+                        <p className="text-xs text-slate-600 py-3">
                             {t('admin.analysis.history.loading', 'Loading history…')}
                         </p>
                     )}

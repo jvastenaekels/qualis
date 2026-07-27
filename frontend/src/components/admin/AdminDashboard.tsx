@@ -55,20 +55,31 @@ const CARD_SHELL =
 const CARD_TITLE_BUTTON =
     'block max-w-full truncate text-left cursor-pointer outline-none transition-colors group-hover:text-indigo-600 after:absolute after:inset-0 after:rounded-xl';
 
+// 'active' is back at emerald-100/text-emerald-700 (reverted — see the revert
+// commit). Task 6.7e originally darkened all five branches to -800 on the
+// strength of axe measuring the "Active" badge at 3.92:1 — below WCAG AA's
+// 4.5:1. A later investigation (task-6.7e-animation-investigation.md) found
+// that reading was an animation-scan artifact: axe ran while the dashboard's
+// entry fade was mid-transition. Settled, emerald-100/700 measures 4.83:1, a
+// clean pass. 'paused' and 'closed' are still one shade darker (-800) from
+// that same now-refuted fix; both would also pass at -700 (amber-100/700 =
+// 4.51, thin but passing; blue-100/700 = 5.49) but were left as-is rather
+// than churned in this pass. The palette is inconsistent across branches,
+// not incorrect — worth reverting for consistency in a follow-up.
 function getStateColor(state: string | undefined): string {
     switch (state) {
         case 'active':
             return 'bg-emerald-100 text-emerald-700 border-emerald-200';
         case 'draft':
-            return 'bg-slate-100 text-slate-600 border-slate-200';
+            return 'bg-slate-100 text-slate-700 border-slate-200';
         case 'paused':
-            return 'bg-amber-100 text-amber-700 border-amber-200';
+            return 'bg-amber-100 text-amber-800 border-amber-200';
         case 'closed':
-            return 'bg-blue-100 text-blue-700 border-blue-200';
+            return 'bg-blue-100 text-blue-800 border-blue-200';
         case 'archived':
-            return 'bg-gray-100 text-gray-500 border-gray-200';
+            return 'bg-gray-100 text-gray-700 border-gray-200';
         default:
-            return 'bg-slate-100 text-slate-600 border-slate-200';
+            return 'bg-slate-100 text-slate-700 border-slate-200';
     }
 }
 
@@ -410,7 +421,20 @@ function ConcourseCard({
                                 {t('admin.concourse.title', 'Concourse')}
                             </button>
                         </h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        {/*
+                         * text-slate-600 here (not text-muted-foreground). Task 6.7e originally
+                         * swapped this because axe measured --muted-foreground at 3.79-3.91:1 on
+                         * white at this text-xs size during that run — below WCAG AA's 4.5:1. A
+                         * later investigation (task-6.7e-animation-investigation.md) found that
+                         * reading was an animation-scan artifact: axe ran while this page's entry
+                         * fade was mid-transition. Settled, text-muted-foreground on white measures
+                         * ~4.75:1 — a pass. The study card's metadata row below was reverted back
+                         * to text-muted-foreground for that reason; this hint text and the "Add
+                         * study" button below were left at text-slate-600 rather than churned back
+                         * — functionally equivalent (settled ~7.6:1), just not worth a second edit
+                         * for a token that already passes either way.
+                         */}
+                        <p className="text-xs text-slate-600 mt-0.5">
                             {concourse
                                 ? t('admin.dashboard.concourse_n_items', {
                                       count: itemCount,
@@ -511,10 +535,11 @@ function SingleStudyCard({
                     </h2>
                 </div>
                 {onCreateStudy && (
+                    // text-slate-600, not text-muted-foreground — see ConcourseCard above.
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-xs text-muted-foreground"
+                        className="text-xs text-slate-600"
                         onClick={onCreateStudy}
                     >
                         <Plus className="h-3 w-3 mr-1" />
@@ -551,6 +576,12 @@ function SingleStudyCard({
                                     )}
                                 </Badge>
                             </div>
+                            {/*
+                             * text-muted-foreground, not text-slate-600 (reverted — see the
+                             * ConcourseCard comment above). Settled measurement: ~4.75:1 on white,
+                             * a pass; the 3.79-3.91:1 that justified darkening this was an
+                             * animation-scan artifact, not a real defect.
+                             */}
                             <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                                 {languageCodes && <span>{languageCodes}</span>}
                                 <span className="inline-flex items-center gap-1">

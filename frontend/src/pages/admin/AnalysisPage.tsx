@@ -321,8 +321,11 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
             )}
 
             {explore.eigenvaluesIsLoading && (
+                // text-slate-600, not -400 — axe (task 6.7e) measured text-slate-400 on
+                // white at 2.56:1, a nominal-token reading (not an animation artifact:
+                // this survives settling). Same defect as ScreePlot/RecruitmentPage/etc.
                 <div
-                    className="flex items-center justify-center py-8 text-slate-400"
+                    className="flex items-center justify-center py-8 text-slate-600"
                     role="status"
                     aria-live="polite"
                 >
@@ -423,6 +426,16 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                 value="advanced"
                                 className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30"
                             >
+                                {/*
+                                 * Deliberately still the default <h3> (task 6.7e): this
+                                 * accordion is nested inside `advancedContent`, itself
+                                 * rendered inside ExplorerPanel's own "Advanced
+                                 * configuration" accordion (fixed to <h2> there) — so <h3>
+                                 * here is one level deeper than its <h2> parent, not a skip.
+                                 * axe never reaches this one anyway while the outer
+                                 * accordion starts collapsed; it's set correctly for when a
+                                 * user opens both.
+                                 */}
                                 <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200">
                                     <div className="flex flex-col items-start text-left">
                                         <span className="text-sm font-bold text-slate-700">
@@ -976,8 +989,10 @@ function InterpretShell({
                     )}
                     icon={ChartColumnStacked}
                 />
+                {/* text-slate-600, not -400 — same real (not animation-artifact) defect
+                    as the eigenvalues loading state above. */}
                 <div
-                    className="flex items-center justify-center py-12 text-slate-400"
+                    className="flex items-center justify-center py-12 text-slate-600"
                     role="status"
                     aria-live="polite"
                     data-testid="interpret-phase"

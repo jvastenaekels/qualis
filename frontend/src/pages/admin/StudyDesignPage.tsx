@@ -151,6 +151,19 @@ const StudyDesignPage = () => {
             className="flex flex-col h-full animate-in fade-in duration-500 overflow-hidden max-w-full"
             style={{ animationFillMode: 'forwards' }}
         >
+            {/*
+             * Sole page heading. The visible toolbar title below is an <h2> showing the
+             * *study's* title — correct for orientation inside the page, but it leaves
+             * the page with zero <h1>s (axe: page-has-heading-one), and every sibling
+             * study-scope page (Access, Data, Analysis, Settings) already has one via
+             * StudyPageHeader, whose h1 is the page's *functional* name rather than the
+             * study title (see CLAUDE.md's admin header policy). This page predates
+             * StudyPageHeader and has too much bespoke toolbar layout to convert here
+             * safely, so it gets the same sr-only h1 LandingPage uses for the same
+             * reason — visible layout unchanged, screen readers get one landmark
+             * heading that names the page instead of none.
+             */}
+            <h1 className="sr-only">{t('admin.sidebar.design', 'Design')}</h1>
             {/* Toolbar */}
             <div className="border-b bg-background px-3 sm:px-6 py-2 sm:py-3 shrink-0">
                 <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 min-w-0">
@@ -199,6 +212,10 @@ const StudyDesignPage = () => {
                                         variant="outline"
                                         size="sm"
                                         data-testid="language-switcher"
+                                        aria-label={t(
+                                            'admin.design.toolbar.select_lang',
+                                            'Select language'
+                                        )}
                                         className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-2 sm:px-3"
                                     >
                                         <Globe className="h-4 w-4 text-indigo-500" />
@@ -967,7 +984,8 @@ const StudyDesignPage = () => {
                             </div>
                         </div>
                         <div className="pt-6 border-t border-slate-100">
-                            <h4 className="text-2xs font-black text-slate-400 mb-3">
+                            {/* text-slate-600, not -400 — axe (task 6.7e) measured 2.56:1. */}
+                            <h4 className="text-2xs font-black text-slate-600 mb-3">
                                 {t('admin.design.checklist.languages', 'Languages')}
                             </h4>
                             <div className="space-y-2">

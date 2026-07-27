@@ -75,8 +75,11 @@ export function EmptyState({
     className,
 }: EmptyStateProps) {
     if (variant === 'compact') {
+        // text-slate-600, not -400: axe (task 6.7e) measured text-slate-400 on white
+        // at 2.56:1 — below WCAG AA's 4.5:1. This is a shared primitive, so the fix
+        // lands once here instead of at every call site.
         return (
-            <p className={cn('text-sm text-slate-400 italic', className)}>
+            <p className={cn('text-sm text-slate-600 italic', className)}>
                 {title}
                 {body && <span className="ml-1">{body}</span>}
             </p>
@@ -107,10 +110,11 @@ export function EmptyState({
             ? 'text-lg font-black text-slate-900 tracking-tight'
             : 'text-base font-bold text-slate-600';
 
+    // text-slate-600, not -400 — see the `compact` branch above for why.
     const bodyClass =
         variant === 'card'
             ? 'text-sm text-slate-600 leading-relaxed'
-            : 'text-sm text-slate-400 max-w-xs';
+            : 'text-sm text-slate-600 max-w-xs';
 
     const wrapperAlign = variant === 'card' ? '' : 'items-center';
 
