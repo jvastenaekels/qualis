@@ -264,7 +264,11 @@
                     "ListChecks": "Checkliste"
                 }
             },
-            "click_to_edit": "Zum Bearbeiten klicken"
+            "click_to_edit": "Zum Bearbeiten klicken",
+            "audio_player": {
+                "play": "Audio abspielen",
+                "pause": "Audio pausieren"
+            }
         },
         "layout": {
             "title": "Admin",

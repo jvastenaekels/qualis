@@ -264,7 +264,11 @@
                     "ListChecks": "Checklist"
                 }
             },
-            "click_to_edit": "Klik om te bewerken"
+            "click_to_edit": "Klik om te bewerken",
+            "audio_player": {
+                "play": "Audio afspelen",
+                "pause": "Audio pauzeren"
+            }
         },
         "layout": {
             "title": "Beheer",

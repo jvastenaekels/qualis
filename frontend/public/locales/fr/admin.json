@@ -176,7 +176,11 @@
                     "ListChecks": "Liste de contrôle"
                 }
             },
-            "click_to_edit": "Cliquer pour éditer"
+            "click_to_edit": "Cliquer pour éditer",
+            "audio_player": {
+                "play": "Lire l'audio",
+                "pause": "Mettre l'audio en pause"
+            }
         },
         "layout": {
             "title": "Admin",

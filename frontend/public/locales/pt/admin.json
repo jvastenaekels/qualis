@@ -264,7 +264,11 @@
                     "ListChecks": "Lista de verificação"
                 }
             },
-            "click_to_edit": "Clique para editar"
+            "click_to_edit": "Clique para editar",
+            "audio_player": {
+                "play": "Reproduzir áudio",
+                "pause": "Pausar áudio"
+            }
         },
         "layout": {
             "title": "Administração",

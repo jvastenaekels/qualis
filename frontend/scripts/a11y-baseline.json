@@ -1,8 +1,5 @@
 {
     "unnamedControls": {
-        "src/components/admin/AudioPlayer.tsx": {
-            "Button#9eaa609dff": 1
-        },
         "src/components/admin/dashboard/InteractiveDataView.columns.tsx": {
             "TooltipTrigger#07b7bb5f30": 1,
             "TooltipTrigger#64528336d1": 1,

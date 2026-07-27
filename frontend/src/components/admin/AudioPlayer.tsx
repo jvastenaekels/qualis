@@ -108,6 +108,11 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
                     size="sm"
                     variant="ghost"
                     className="h-10 w-10 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
+                    aria-label={
+                        isPlaying
+                            ? t('admin.components.audio_player.pause', 'Pause audio')
+                            : t('admin.components.audio_player.play', 'Play audio')
+                    }
                 >
                     {isPlaying ? (
                         <Pause className="w-4 h-4" />

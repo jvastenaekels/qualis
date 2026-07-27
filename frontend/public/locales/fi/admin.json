@@ -176,7 +176,11 @@
                     "ListChecks": "Tarkistuslista"
                 }
             },
-            "click_to_edit": "Napsauta muokataksesi"
+            "click_to_edit": "Napsauta muokataksesi",
+            "audio_player": {
+                "play": "Toista ääni",
+                "pause": "Keskeytä ääni"
+            }
         },
         "layout": {
             "title": "Ylläpito",
