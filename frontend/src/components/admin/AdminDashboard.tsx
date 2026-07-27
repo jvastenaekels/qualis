@@ -67,7 +67,7 @@ const CARD_TITLE_BUTTON =
 function getStateColor(state: string | undefined): string {
     switch (state) {
         case 'active':
-            return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            return 'bg-emerald-100 text-emerald-700 border-emerald-200';
         case 'draft':
             return 'bg-slate-100 text-slate-700 border-slate-200';
         case 'paused':
@@ -572,7 +572,7 @@ function SingleStudyCard({
                                 </Badge>
                             </div>
                             {/* text-slate-600, not text-muted-foreground — see ConcourseCard above. */}
-                            <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-600">
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                                 {languageCodes && <span>{languageCodes}</span>}
                                 <span className="inline-flex items-center gap-1">
                                     <Users className="h-3 w-3" />
