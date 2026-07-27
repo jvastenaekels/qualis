@@ -103,3 +103,152 @@ describe('QuestionBuilder - presort-toggle accessible name (Task 3.6 closing swe
         expect(screen.getAllByRole('switch')).toHaveLength(1);
     });
 });
+
+/**
+ * Task 6.7b: the nine `noLabelWithoutControl` findings measured in this file
+ * by task 6.7a. Seven are real Label/control pairings (each control given a
+ * stable id derived from the question's own `id`); two ("Rating scale" and
+ * "Options") headed a group of several fields rather than one control and
+ * became plain text instead of a fake htmlFor pairing.
+ */
+describe('QuestionBuilder — question field accessible names (Task 6.7b)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility
+    const renderBuilder = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            postsort_config: { questions: {} },
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<QuestionBuilder type="post" />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    const expandSecondQuestion = async (user: ReturnType<typeof userEvent.setup>) => {
+        const secondItemText = await screen.findByText('Second question');
+        const secondItem = secondItemText.closest('[data-testid="question-item"]');
+        if (!secondItem) throw new Error('question item not found');
+        const trigger = within(secondItem as HTMLElement).getByTestId('question-accordion-trigger');
+        await user.click(trigger);
+        return within(secondItem as HTMLElement);
+    };
+
+    it('names the "Question label" field and lets its label focus it', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: 'First question', required: false },
+                    },
+                },
+            },
+        });
+
+        const trigger = await screen.findByTestId('question-accordion-trigger');
+        await user.click(trigger);
+
+        const field = screen.getByRole('textbox', { name: /question label/i });
+        await user.click(screen.getByText('Question label'));
+        expect(field).toHaveFocus();
+    });
+
+    it('names the visibility-condition "depends on"/"operator"/"value" fields', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: 'First question', required: false },
+                        q2: {
+                            type: 'text',
+                            label: 'Second question',
+                            required: false,
+                            visibility_condition: {
+                                depends_on: 'q1',
+                                operator: 'equals',
+                                value: 'x',
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const scope = await expandSecondQuestion(user);
+
+        // getByRole computes the real accessible name — a trigger named only
+        // by its selected value ("First question"/"Equals") would still
+        // satisfy a naive text query, so this is what actually distinguishes
+        // "has a name" from "has the RIGHT name".
+        expect(
+            scope.getByRole('combobox', { name: /show this question only if/i })
+        ).toBeInTheDocument();
+        expect(scope.getByRole('combobox', { name: /^operator$/i })).toBeInTheDocument();
+        expect(scope.getByRole('textbox', { name: /comparison value/i })).toBeInTheDocument();
+    });
+
+    it('names the rating-scale fields and renders "Rating scale" as a real heading', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: {
+                            type: 'rating',
+                            label: 'Satisfaction',
+                            required: false,
+                            scale_points: 5,
+                        },
+                    },
+                },
+            },
+        });
+
+        const trigger = await screen.findByTestId('question-accordion-trigger');
+        await user.click(trigger);
+
+        // "Rating scale" used to be a <Label> with no htmlFor at all, heading
+        // the scale-points select and the Left/Right fields below it. Scoped
+        // to <p>: the "add a rating field" button in the palette above is
+        // also named "Rating scale" and is not part of this fix.
+        const heading = screen.getByText('Rating scale', { selector: 'p' });
+        expect(heading.tagName).not.toBe('LABEL');
+
+        expect(screen.getByRole('combobox', { name: /number of points/i })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /left endpoint label/i })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /right endpoint label/i })).toBeInTheDocument();
+    });
+
+    it('renders "Options" as a real heading over the option list, not a dangling label', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: {
+                            type: 'select',
+                            label: 'Pick one',
+                            required: false,
+                            options: ['Alpha', 'Beta'],
+                        },
+                    },
+                },
+            },
+        });
+
+        const trigger = await screen.findByTestId('question-accordion-trigger');
+        await user.click(trigger);
+
+        const heading = screen.getByText('Options');
+        expect(heading.tagName).not.toBe('LABEL');
+        expect(screen.getByDisplayValue('Alpha')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Beta')).toBeInTheDocument();
+    });
+});

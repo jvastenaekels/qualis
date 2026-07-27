@@ -42,8 +42,7 @@
         },
         "src/components/admin/designer/QuestionBuilder.tsx": {
             "Button#81017c5def": 2,
-            "Button#83b5f464b1": 1,
-            "SelectTrigger#872cdad358": 2
+            "Button#83b5f464b1": 1
         },
         "src/pages/admin/AccountSettingsPage.tsx": {
             "button#3ddd1d5369": 1
@@ -90,17 +89,5 @@
             "button#543c37a641": 1
         }
     },
-    "suppressedLabelErrors": {
-        "src/components/admin/designer/QuestionBuilder.tsx": {
-            "Label#55a33a00e6": 1,
-            "Label#5bbd85ed1f": 1,
-            "Label#929f555fc8": 1,
-            "Label#98da6c948b": 1,
-            "Label#b1230a6e26": 1,
-            "Label#b24dbd75d7": 1,
-            "Label#b70312b797": 1,
-            "Label#eb3e025ad6": 1,
-            "Label#ff10c47a50": 1
-        }
-    }
+    "suppressedLabelErrors": {}
 }

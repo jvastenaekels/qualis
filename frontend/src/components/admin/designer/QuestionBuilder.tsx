@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import {
     DndContext,
     closestCenter,
@@ -316,7 +315,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                             <AccordionContent className="pt-6 pb-2 space-y-6">
                                 <div className="grid gap-2.5">
                                     <div className="flex items-center gap-2">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        <Label
+                                            htmlFor={`question-label-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.question')}
                                         </Label>
                                         <MultiLangFieldIcon
@@ -329,6 +331,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         />
                                     </div>
                                     <Input
+                                        id={`question-label-${id}`}
                                         value={label}
                                         readOnly={readOnly}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -411,7 +414,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         {question.visibility_condition && (
                                             <div className="grid gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                                 <div className="space-y-2">
-                                                    <Label className="text-2xs font-bold text-slate-500">
+                                                    <Label
+                                                        htmlFor={`depends-on-${id}`}
+                                                        className="text-2xs font-bold text-slate-500"
+                                                    >
                                                         {t(
                                                             'admin.design.questions.logic.depends_on'
                                                         )}
@@ -433,7 +439,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                             })
                                                         }
                                                     >
-                                                        <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                        <SelectTrigger
+                                                            id={`depends-on-${id}`}
+                                                            className="bg-white rounded-lg h-9 text-xs"
+                                                        >
                                                             <SelectValue
                                                                 placeholder={t(
                                                                     'admin.design.questions.logic.select_placeholder'
@@ -463,7 +472,10 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`operator-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.logic.operator'
                                                             )}
@@ -493,7 +505,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                                 })
                                                             }
                                                         >
-                                                            <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                            <SelectTrigger
+                                                                id={`operator-${id}`}
+                                                                className="bg-white rounded-lg h-9 text-xs"
+                                                            >
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent>
@@ -515,12 +530,16 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     </div>
 
                                                     <div className="space-y-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`condition-value-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.logic.value'
                                                             )}
                                                         </Label>
                                                         <Input
+                                                            id={`condition-value-${id}`}
                                                             value={
                                                                 (question.visibility_condition
                                                                     .value as string) || ''
@@ -549,12 +568,19 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                 {question.type === 'rating' && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        {/* Heads the scale-points select and the Left/Right
+                                            fields below (each already correctly labelled),
+                                            not one control — a real heading element, not
+                                            the form-field <Label>. */}
+                                        <p className="text-2xs font-black text-slate-500">
                                             {t('admin.design.questions.labels.scale')}
-                                        </Label>
+                                        </p>
                                         <div className="grid gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-2xs font-bold text-slate-500">
+                                                <Label
+                                                    htmlFor={`scale-points-${id}`}
+                                                    className="text-2xs font-bold text-slate-500"
+                                                >
                                                     {t(
                                                         'admin.design.questions.labels.scale_points'
                                                     )}
@@ -569,7 +595,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     }
                                                     disabled={readOnly}
                                                 >
-                                                    <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                    <SelectTrigger
+                                                        id={`scale-points-${id}`}
+                                                        className="bg-white rounded-lg h-9 text-xs"
+                                                    >
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -584,7 +613,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <div className="flex items-center gap-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`scale-left-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.labels.scale_left'
                                                             )}
@@ -607,6 +639,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         />
                                                     </div>
                                                     <Input
+                                                        id={`scale-left-${id}`}
                                                         readOnly={readOnly}
                                                         value={
                                                             (typeof question.scale_labels?.left ===
@@ -655,7 +688,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex items-center gap-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`scale-right-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.labels.scale_right'
                                                             )}
@@ -678,6 +714,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         />
                                                     </div>
                                                     <Input
+                                                        id={`scale-right-${id}`}
                                                         readOnly={readOnly}
                                                         value={
                                                             (typeof question.scale_labels?.right ===
@@ -733,13 +770,17 @@ const QuestionItem = (props: QuestionItemProps) => {
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        {/* Heads the list of option Inputs below (each item
+                                            in the map is its own field, none individually
+                                            named), not one control — a real heading element,
+                                            not the form-field <Label>. */}
+                                        <p className="text-2xs font-black text-slate-500">
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
                                                 ` (${t('admin.design.questions.labels.multiple')})`}
                                             {question.type === 'radio' &&
                                                 ` (${t('admin.design.questions.labels.single')})`}
-                                        </Label>
+                                        </p>
                                         <div className="space-y-3">
                                             {(question.options || []).map((opt, idx) => (
                                                 <div
