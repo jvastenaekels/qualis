@@ -1848,7 +1848,8 @@
                 "has_audio": "Heeft audio-antwoorden",
                 "email_provided": "E-mailadres opgegeven",
                 "newsletter_consent": "Wil resultaten",
-                "interview_consent": "Accepteert vervolg"
+                "interview_consent": "Accepteert vervolg",
+                "recruitment_link": "Wervingslink"
             },
             "toast": {
                 "discarded": "Deelnemer verwijderd",

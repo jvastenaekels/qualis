@@ -1,15 +1,5 @@
 {
-    "unnamedControls": {
-        "src/components/admin/dashboard/InteractiveDataView.columns.tsx": {
-            "TooltipTrigger#07b7bb5f30": 1,
-            "TooltipTrigger#64528336d1": 1,
-            "TooltipTrigger#66bd021c8d": 1,
-            "TooltipTrigger#991c394724": 1,
-            "TooltipTrigger#d1a4ff6af5": 1,
-            "TooltipTrigger#ef4eaf74a9": 1,
-            "TooltipTrigger#f738eb0490": 1
-        }
-    },
+    "unnamedControls": {},
     "lowContrastControls": {
         "src/components/admin/analysis/AnalysisHistoryPanel.tsx": {
             "button#74bf5e335c": 1

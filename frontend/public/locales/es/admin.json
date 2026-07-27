@@ -1848,7 +1848,8 @@
                 "has_audio": "Tiene respuestas de audio",
                 "email_provided": "Correo electrónico proporcionado",
                 "newsletter_consent": "Quiere resultados",
-                "interview_consent": "Acepta seguimiento"
+                "interview_consent": "Acepta seguimiento",
+                "recruitment_link": "Enlace de reclutamiento"
             },
             "toast": {
                 "discarded": "Participante descartado",

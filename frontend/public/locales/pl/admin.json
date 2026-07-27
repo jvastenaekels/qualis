@@ -1848,7 +1848,8 @@
         "has_audio": "Ma odpowiedzi audio",
         "email_provided": "Podano e-mail",
         "newsletter_consent": "Chce wyniki",
-        "interview_consent": "Akceptuje kontakt uzupełniający"
+        "interview_consent": "Akceptuje kontakt uzupełniający",
+        "recruitment_link": "Link rekrutacyjny"
       },
       "toast": {
         "discarded": "Uczestnik odrzucony",

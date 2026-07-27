@@ -1850,7 +1850,8 @@
                 "has_audio": "Has audio responses",
                 "email_provided": "Email provided",
                 "newsletter_consent": "Wants results",
-                "interview_consent": "Accepts follow-up"
+                "interview_consent": "Accepts follow-up",
+                "recruitment_link": "Recruitment link"
             },
             "toast": {
                 "discarded": "Participant discarded",

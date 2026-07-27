@@ -1760,7 +1760,8 @@
                 "has_audio": "Sisältää äänivastauksia",
                 "email_provided": "Sähköposti annettu",
                 "newsletter_consent": "Haluaa tulokset",
-                "interview_consent": "Hyväksyy seurannan"
+                "interview_consent": "Hyväksyy seurannan",
+                "recruitment_link": "Rekrytointilinkki"
             },
             "toast": {
                 "discarded": "Osallistuja hylätty",
