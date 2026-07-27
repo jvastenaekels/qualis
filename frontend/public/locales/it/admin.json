@@ -1545,7 +1545,7 @@
                     "locked_active": "Questo studio è attivo. Passi alla modalità bozza per modificare.",
                     "locked_paused": "Questo studio è in pausa. Passi alla modalità bozza per modificare.",
                     "locked_closed": "Questo studio è chiuso. La progettazione è archiviata.",
-                    "view_read_only": "Visualizzi in sola lettura",
+                    "view_read_only": "Visualizza in sola lettura",
                     "mismatch_title": "Capacità della griglia non corrispondente",
                     "mismatch_desc": "Ha {{statements}} affermazioni ma la griglia ha posizioni solo per {{slots}} voci. Regoli le colonne qui sotto per corrispondere.",
                     "unlock_hint": "Vada all'esploratore dati per eliminare le sessioni e sbloccare la struttura"
