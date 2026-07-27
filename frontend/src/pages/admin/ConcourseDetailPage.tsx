@@ -852,7 +852,7 @@ export default function ConcourseDetailPage() {
                                                                     'common.edit',
                                                                     'Edit'
                                                                 )}
-                                                                className="size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                className="size-8 p-0 text-slate-500 hover:text-slate-700"
                                                                 onClick={() => startEdit(item)}
                                                             >
                                                                 <Pencil className="size-3.5" />
@@ -1070,7 +1070,10 @@ export default function ConcourseDetailPage() {
 
                                         {/* Actions (desktop only — mobile shown in top row) */}
                                         {canEdit && (
-                                            <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
+                                            <div
+                                                className="hidden sm:flex items-center gap-1 flex-shrink-0"
+                                                data-row-actions
+                                            >
                                                 {isEditing ? (
                                                     <>
                                                         <Button
@@ -1109,7 +1112,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.history',
                                                                 'History'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'history')
                                                             }
@@ -1123,7 +1126,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.comments',
                                                                 'Comments'
                                                             )}
-                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'comments')
                                                             }
@@ -1139,7 +1142,7 @@ export default function ConcourseDetailPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             aria-label={t('common.edit', 'Edit')}
-                                                            className="size-8 p-0 text-slate-300 hover:text-slate-700 transition-colors"
+                                                            className="size-8 p-0 text-slate-500 hover:text-slate-700 transition-colors"
                                                             onClick={() => startEdit(item)}
                                                         >
                                                             <Pencil className="size-3.5" />
@@ -1151,7 +1154,7 @@ export default function ConcourseDetailPage() {
                                                                 'common.delete',
                                                                 'Delete'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 setDeleteConfirmId(item.id)
                                                             }

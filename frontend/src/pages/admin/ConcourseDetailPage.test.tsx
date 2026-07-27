@@ -196,3 +196,66 @@ describe('ConcourseDetailPage curation panel', () => {
         expect(panelScope.getByText(/25 accepted/i)).toBeInTheDocument();
     });
 });
+
+/**
+ * jsdom/happy-dom never lays out Tailwind classes, so `:focus-within` and the
+ * cascade order that decides whether `sm:opacity-0` or `focus-visible:opacity-100`
+ * wins in a real browser cannot be observed here (verified separately by tabbing
+ * through the real app — see task-3.1-report.md). What CAN be asserted from the
+ * DOM: the hover-reveal classes are paired with an equivalent focus-within
+ * reveal on the desktop row-action group, the controls stay real, focusable
+ * tab stops (not pulled from the tab order as a shortcut), and the always-on
+ * Edit button no longer ships the near-invisible resting token.
+ */
+describe('ConcourseDetailPage row actions', () => {
+    function renderEditableRow() {
+        const concourse = concourseWith(1, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            // baseApi hardcodes filteredItems to [] (the curation-panel test
+            // above only needs concourse.items) — the row list renders from
+            // filteredItems, so it must be wired up here for any row to exist.
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        // Two copies of each action button exist in the DOM (a `sm:hidden`
+        // mobile row and a `hidden sm:flex` desktop row) sharing the same
+        // aria-labels — data-row-actions scopes queries to the desktop group
+        // that actually carries the hover/focus-reveal classes under test.
+        const group = document.querySelector('[data-row-actions]');
+        if (!group) throw new Error('desktop row actions group not found');
+        return within(group as HTMLElement);
+    }
+
+    it('reveals hover-only row actions on keyboard focus, not only on mouse hover', () => {
+        const actions = renderEditableRow();
+
+        for (const name of ['History', 'Comments', 'Delete']) {
+            const button = actions.getByRole('button', { name });
+            // Positive: the group-hover reveal now has a group-focus-within
+            // counterpart, so a keyboard user focusing anywhere in the row
+            // reveals the same controls a mouse hover would.
+            expect(button).toHaveClass('sm:group-hover:opacity-100');
+            expect(button).toHaveClass('sm:group-focus-within:opacity-100');
+            // Negative: still starts hidden at rest (this isn't a shortcut
+            // that makes every action permanently visible, which would defeat
+            // the decluttered-row design) and still carries a real tab stop
+            // (constraint: never pull it from the tab order to "fix" this).
+            expect(button).toHaveClass('sm:opacity-0');
+            expect(button.tabIndex).not.toBe(-1);
+            expect(button).not.toHaveAttribute('disabled');
+        }
+    });
+
+    it('raises the resting Edit button above the near-invisible token it shipped with', () => {
+        const actions = renderEditableRow();
+        const edit = actions.getByRole('button', { name: 'Edit' });
+
+        // Positive: slate-500 clears 4.5:1 against a white row background.
+        expect(edit).toHaveClass('text-slate-500');
+        // Negative: not the ~1.4:1 token this button used to carry at rest.
+        expect(edit).not.toHaveClass('text-slate-300');
+    });
+});
