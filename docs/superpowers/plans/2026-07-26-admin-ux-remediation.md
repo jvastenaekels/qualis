@@ -1693,6 +1693,28 @@ Run at **375px as well as desktop** — Task 6.7a found a language switcher whos
 
 ---
 
+### Task 6.7i: Finish the Data table's tab order
+
+**Two findings from Task 6.7g's review, one of them the more serious of the pair.**
+
+**1. The row's real action is mouse-only.** `InteractiveDataView.tsx:844-851` renders `<TableRow onClick={() => handleViewParticipant(...)}>` with `cursor-pointer` but **no `tabIndex`, no `onKeyDown`, no `role`**. Opening a participant — the primary action of the Data screen — cannot be done from the keyboard at all.
+
+Task 6.7g made this starker rather than causing it: the row now holds one focusable control that does nothing, and zero focusable paths to what it actually does. No task covered this; it was found by a reviewer reading the tab order.
+
+The dashboard card conversion (Task 3.3) is the worked example, including the stretched `::after` that preserves whole-area clicking. Mind the interaction: a row containing its own controls cannot simply become a `<button>`.
+
+**2. Two more inert tab stops per row.** The duplicate-IP badge (`columns.tsx:185`) and the `submitted_at` date tooltip (`:749`) are the same defect 6.7g fixed seven times over — `TooltipTrigger` rendering a focusable `<button>` that does nothing on activation. 6.7g's "8 → 1" is fixture-specific; a duplicate-IP row still carries two.
+
+Convert them the way 6.7g did — `role="img"` with the existing name, `title` for mouse users — so the per-row count reaches what a researcher can actually act on.
+
+- [ ] **Step 1: Count focusable controls in a duplicate-IP row** — the fixture must trip the badge, or the count will look already-correct
+- [ ] **Step 2: Convert the two chips**
+- [ ] **Step 3: Give the row a keyboard path to `handleViewParticipant`**, and assert focus → Enter → the participant opens
+- [ ] **Step 4: Confirm mouse click-through, sorting, filtering and the `is_discarded` styling still work**
+- [ ] **Step 5: Commit** — `fix(a11y): give the Data table's rows a keyboard path and drop the last inert stops`
+
+---
+
 ### Task 6.8: Charts mounting at zero size
 
 **The defect:** loading the `Data` screen logs the Recharts warning *"The width(-1) and height(-1) of chart should be greater than 0"* five times — charts are mounting inside collapsed containers. Harmless today, but it is console noise that will mask a real warning later.
