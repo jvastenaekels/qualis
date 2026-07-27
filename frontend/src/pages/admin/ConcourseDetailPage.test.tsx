@@ -301,3 +301,54 @@ describe('ConcourseDetailPage selection checkboxes (a11y, Task 3.6)', () => {
         }
     });
 });
+
+/**
+ * Accessible-name regression test for the tag-picker checkboxes (Task 3.6,
+ * coordinator-requested closing sweep). Found by the reviewer, not in the
+ * original brief: two call sites render a Checkbox next to a `<Badge>` with
+ * the tag's name, with no `id`/`htmlFor`/`aria-label` anywhere — the inline
+ * tag list on an item being edited (~line 930), and the shared
+ * `TagCheckboxGroup` used by the "Add Item" dialog (~line 1747).
+ */
+describe('ConcourseDetailPage tag-picker checkboxes (a11y, Task 3.6)', () => {
+    const tags = [
+        { id: 1, name: 'Vision', color: '#6366f1', project_id: 1 },
+        { id: 2, name: 'Risk', color: '#ef4444', project_id: 1 },
+    ];
+
+    it('names each tag checkbox in the "Add Item" dialog tag picker (TagCheckboxGroup)', () => {
+        const concourse = concourseWith(1, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+            tags,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        // getByRole computes the real accessible name — the tag name sits in
+        // a <Badge> (a plain styled <div>) beside the checkbox, not a
+        // <label htmlFor>, so an unfixed checkbox fails to resolve by name
+        // even though the tag name is visible right next to it.
+        expect(screen.getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
+        expect(screen.getByRole('checkbox', { name: /risk/i })).toBeInTheDocument();
+    });
+
+    it('names each tag checkbox in the inline item-edit tag picker', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            filteredItems: concourse.items ?? [],
+            editingItem: item.id,
+            tags,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
+        expect(screen.getByRole('checkbox', { name: /risk/i })).toBeInTheDocument();
+    });
+});

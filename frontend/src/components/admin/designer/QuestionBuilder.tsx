@@ -1049,7 +1049,10 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="p-6 flex items-center justify-between">
                         <div className="space-y-1">
-                            <Label className="text-base font-bold text-slate-900 tracking-tight">
+                            <Label
+                                htmlFor="presort-toggle"
+                                className="cursor-pointer text-base font-bold text-slate-900 tracking-tight"
+                            >
                                 {t('admin.design.questions.enable_presort')}
                             </Label>
                             <p className="text-sm font-medium text-slate-500">
@@ -1057,6 +1060,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                             </p>
                         </div>
                         <Switch
+                            id="presort-toggle"
                             data-testid="presort-toggle"
                             checked={!!isPresortEnabled}
                             onCheckedChange={handlePresortToggle}

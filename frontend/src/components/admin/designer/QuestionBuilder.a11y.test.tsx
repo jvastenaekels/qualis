@@ -61,3 +61,45 @@ describe('QuestionBuilder - conditional logic switch accessible name (Task 3.6)'
         expect(scope.getByRole('switch', { name: /visibility logic/i })).toBeInTheDocument();
     });
 });
+
+/**
+ * Accessible-name regression test for the "Enable pre-sort survey" switch
+ * (coordinator-requested closing sweep). Same defect class as the rest of
+ * Task 3.6, on the `type === 'pre'` branch (Pre-sort tab) rather than the
+ * Post-sort page: a sibling `Label` with no `htmlFor`, a `Switch` with no
+ * `id`/`aria-label`.
+ */
+describe('QuestionBuilder - presort-toggle accessible name (Task 3.6 closing sweep)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility
+    const renderPresortBuilder = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            presort_config: {},
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<QuestionBuilder type="pre" />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    it('names the "Enable pre-sort survey" switch', () => {
+        renderPresortBuilder();
+
+        // getByRole computes the real accessible name — an unnamed switch
+        // will not match even though it's on screen (the positive baseline
+        // below proves that).
+        expect(screen.getByRole('switch', { name: /enable pre-sort survey/i })).toBeInTheDocument();
+    });
+
+    it('renders exactly one switch on this tab (positive baseline)', () => {
+        renderPresortBuilder();
+
+        expect(screen.getAllByRole('switch')).toHaveLength(1);
+    });
+});

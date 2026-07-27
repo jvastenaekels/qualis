@@ -928,6 +928,7 @@ export default function ConcourseDetailPage() {
                                                                     className="flex items-center gap-1.5 cursor-pointer"
                                                                 >
                                                                     <Checkbox
+                                                                        id={`edit-item-tag-${tag.id}`}
                                                                         checked={editTagIds.includes(
                                                                             tag.id
                                                                         )}
@@ -948,21 +949,26 @@ export default function ConcourseDetailPage() {
                                                                             );
                                                                         }}
                                                                     />
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-2xs h-5 cursor-pointer"
-                                                                        style={
-                                                                            tag.color
-                                                                                ? {
-                                                                                      borderColor:
-                                                                                          tag.color,
-                                                                                      color: tag.color,
-                                                                                  }
-                                                                                : undefined
-                                                                        }
+                                                                    <Label
+                                                                        htmlFor={`edit-item-tag-${tag.id}`}
+                                                                        className="cursor-pointer"
                                                                     >
-                                                                        {tag.name}
-                                                                    </Badge>
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="text-2xs h-5 cursor-pointer"
+                                                                            style={
+                                                                                tag.color
+                                                                                    ? {
+                                                                                          borderColor:
+                                                                                              tag.color,
+                                                                                          color: tag.color,
+                                                                                      }
+                                                                                    : undefined
+                                                                            }
+                                                                        >
+                                                                            {tag.name}
+                                                                        </Badge>
+                                                                    </Label>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1745,6 +1751,7 @@ function TagCheckboxGroup({
                 {tags.map((tag) => (
                     <div key={tag.id} className="flex items-center gap-1.5 cursor-pointer">
                         <Checkbox
+                            id={`tag-checkbox-group-${tag.id}`}
                             checked={selectedIds.includes(tag.id)}
                             onCheckedChange={(checked) => {
                                 onChange(
@@ -1754,15 +1761,19 @@ function TagCheckboxGroup({
                                 );
                             }}
                         />
-                        <Badge
-                            variant="outline"
-                            className="text-2xs h-5 cursor-pointer"
-                            style={
-                                tag.color ? { borderColor: tag.color, color: tag.color } : undefined
-                            }
-                        >
-                            {tag.name}
-                        </Badge>
+                        <Label htmlFor={`tag-checkbox-group-${tag.id}`} className="cursor-pointer">
+                            <Badge
+                                variant="outline"
+                                className="text-2xs h-5 cursor-pointer"
+                                style={
+                                    tag.color
+                                        ? { borderColor: tag.color, color: tag.color }
+                                        : undefined
+                                }
+                            >
+                                {tag.name}
+                            </Badge>
+                        </Label>
                     </div>
                 ))}
             </div>
