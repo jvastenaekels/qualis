@@ -130,6 +130,7 @@
             "export": "Export",
             "insert_template": "Insert from template",
             "entry_title_placeholder": "Section title…",
+            "entry_title_aria": "Section title",
             "entry_body_placeholder": "Document your rationale…",
             "comments_count_one": "{{n}} comment",
             "comments_count_other": "{{n}} comments",
@@ -1407,7 +1408,8 @@
                         "remove_action": "Remove"
                     },
                     "actions": {
-                        "delete": "Delete {{title}}"
+                        "delete": "Delete {{title}}",
+                        "reorder": "Reorder {{title}}"
                     }
                 },
                 "consent_title": "Consent form",
@@ -1499,6 +1501,7 @@
                     "copy_success": "Imported",
                     "copy_from_aria": "Import {{label}} from another language",
                     "delete": "Delete {{label}}",
+                    "reorder": "Reorder {{label}}",
                     "remove_option": "Remove {{option}}"
                 },
                 "logic": {
@@ -1552,7 +1555,8 @@
                     "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
                     "codes_reset": "Statement codes re-sequenced",
                     "save_item": "Save {{code}}",
-                    "cancel_edit": "Cancel editing {{code}}"
+                    "cancel_edit": "Cancel editing {{code}}",
+                    "reorder_item": "Reorder {{code}}"
                 },
                 "settings": {
                     "title": "Research settings",

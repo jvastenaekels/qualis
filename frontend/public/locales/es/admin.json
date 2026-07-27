@@ -130,6 +130,7 @@
             "export": "Exportar",
             "insert_template": "Insertar desde plantilla",
             "entry_title_placeholder": "Título de sección…",
+            "entry_title_aria": "Título de sección",
             "entry_body_placeholder": "Documente su justificación…",
             "comments_count_one": "{{n}} comentario",
             "comments_count_other": "{{n}} comentarios",
@@ -1405,7 +1406,8 @@
                         "remove_action": "Eliminar"
                     },
                     "actions": {
-                        "delete": "Eliminar {{title}}"
+                        "delete": "Eliminar {{title}}",
+                        "reorder": "Reordenar {{title}}"
                     }
                 },
                 "consent_title": "Formulario de consentimiento",
@@ -1497,6 +1499,7 @@
                     "copy_success": "Importado",
                     "copy_from_aria": "Importar {{label}} desde otro idioma",
                     "delete": "Eliminar {{label}}",
+                    "reorder": "Reordenar {{label}}",
                     "remove_option": "Quitar {{option}}"
                 },
                 "logic": {
@@ -1550,7 +1553,8 @@
                     "confirm_reset_codes": "¿Está seguro de que desea renumerar todos los códigos de enunciados (s1, s2, s3...)?",
                     "codes_reset": "Códigos de enunciados renumerados",
                     "save_item": "Guardar {{code}}",
-                    "cancel_edit": "Cancelar edición de {{code}}"
+                    "cancel_edit": "Cancelar edición de {{code}}",
+                    "reorder_item": "Reordenar {{code}}"
                 },
                 "settings": {
                     "title": "Configuración de investigación",

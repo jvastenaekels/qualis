@@ -1518,6 +1518,14 @@ export default function ConcourseDetailPage() {
                                         ` (${langDisplayName(importLocale || activeLocale)})`}
                                 </Label>
                                 <div className="flex items-center gap-1">
+                                    {/* a11y-baseline: className="hidden" is display:none, which
+                                        removes this element from the accessibility tree entirely —
+                                        verified with a getByRole probe (task 6.7h, 2026-07-28):
+                                        queryByRole finds nothing for a display:none input, though
+                                        it stays in the DOM. Triggered only via the visible, named
+                                        Button below (`fileInputRef.current?.click()`); no AT user
+                                        can reach it directly. The htmlFor="import-statements" Label
+                                        above names a different control, not this one. */}
                                     <input
                                         ref={fileInputRef}
                                         type="file"

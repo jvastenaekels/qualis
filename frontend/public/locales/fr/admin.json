@@ -1355,7 +1355,8 @@
                         "remove_action": "Supprimer"
                     },
                     "actions": {
-                        "delete": "Supprimer {{title}}"
+                        "delete": "Supprimer {{title}}",
+                        "reorder": "Réorganiser {{title}}"
                     }
                 },
                 "consent_title": "Formulaire de consentement",
@@ -1446,6 +1447,7 @@
                     "copy_success": "Importé",
                     "copy_from_aria": "Importer {{label}} depuis une autre langue",
                     "delete": "Supprimer {{label}}",
+                    "reorder": "Réorganiser {{label}}",
                     "remove_option": "Retirer {{option}}"
                 },
                 "logic": {
@@ -1499,7 +1501,8 @@
                     "confirm_reset_codes": "Êtes-vous sûr de vouloir re-sequencer tous les codes d'énoncés (S1, S2, S3...) ?",
                     "codes_reset": "Codes des énoncés réinitialisés",
                     "save_item": "Enregistrer {{code}}",
-                    "cancel_edit": "Annuler la modification de {{code}}"
+                    "cancel_edit": "Annuler la modification de {{code}}",
+                    "reorder_item": "Réorganiser {{code}}"
                 },
                 "settings": {
                     "title": "Paramètres de recherche",
@@ -2121,6 +2124,7 @@
             "export": "Exporter",
             "insert_template": "Insérer un modèle",
             "entry_title_placeholder": "Titre de la section…",
+            "entry_title_aria": "Titre de la section",
             "entry_body_placeholder": "Documentez votre raisonnement…",
             "comments_count_one": "{{n}} commentaire",
             "comments_count_other": "{{n}} commentaires",

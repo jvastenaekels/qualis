@@ -74,9 +74,21 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
         >
             <div className="flex items-start p-4 gap-4">
                 {!readOnly && (
+                    // useSortable's {...attributes} spread injects role="button" (and
+                    // tabIndex={0}) at runtime — verified against @dnd-kit/core's source:
+                    // defaultRole = 'button', and this call site passes no attributes
+                    // override. Biome infers a role from JSX statically and cannot see one a
+                    // spread injects, so it reads this as a roleless <div> and rejects
+                    // aria-label below as unsupported on it.
+                    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: see comment above
                     <div
                         {...attributes}
                         {...listeners}
+                        aria-label={t(
+                            'admin.design.intro.process_steps.actions.reorder',
+                            'Reorder {{title}}',
+                            { title: step.title || step.id }
+                        )}
                         className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-500 transition-colors"
                     >
                         <GripVertical className="h-4 w-4" />

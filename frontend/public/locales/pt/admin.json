@@ -130,6 +130,7 @@
             "export": "Exportar",
             "insert_template": "Inserir a partir de modelo",
             "entry_title_placeholder": "Título da secção…",
+            "entry_title_aria": "Título da secção",
             "entry_body_placeholder": "Documente o seu raciocínio…",
             "comments_count_one": "{{n}} comentário",
             "comments_count_other": "{{n}} comentários",
@@ -1405,7 +1406,8 @@
                         "remove_action": "Remover"
                     },
                     "actions": {
-                        "delete": "Eliminar {{title}}"
+                        "delete": "Eliminar {{title}}",
+                        "reorder": "Reordenar {{title}}"
                     }
                 },
                 "consent_title": "Formulário de consentimento",
@@ -1497,6 +1499,7 @@
                     "copy_success": "Importado",
                     "copy_from_aria": "Importar {{label}} de outro idioma",
                     "delete": "Eliminar {{label}}",
+                    "reorder": "Reordenar {{label}}",
                     "remove_option": "Remover {{option}}"
                 },
                 "logic": {
@@ -1550,7 +1553,8 @@
                     "confirm_reset_codes": "Tem a certeza de que pretende resequenciar todos os códigos de afirmações (s1, s2, s3...)?",
                     "codes_reset": "Códigos das afirmações resequenciados",
                     "save_item": "Guardar {{code}}",
-                    "cancel_edit": "Cancelar edição de {{code}}"
+                    "cancel_edit": "Cancelar edição de {{code}}",
+                    "reorder_item": "Reordenar {{code}}"
                 },
                 "settings": {
                     "title": "Definições de investigação",

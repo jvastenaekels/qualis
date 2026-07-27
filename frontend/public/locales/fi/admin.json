@@ -1317,7 +1317,8 @@
                         "remove_action": "Poista"
                     },
                     "actions": {
-                        "delete": "Poista {{title}}"
+                        "delete": "Poista {{title}}",
+                        "reorder": "Järjestä uudelleen {{title}}"
                     }
                 },
                 "consent_title": "Suostumuslomake",
@@ -1408,6 +1409,7 @@
                     "copy_success": "Kopioitu",
                     "copy_from_aria": "Tuo {{label}} toisesta kielestä",
                     "delete": "Poista {{label}}",
+                    "reorder": "Järjestä uudelleen {{label}}",
                     "remove_option": "Poista {{option}}"
                 },
                 "logic": {
@@ -1461,7 +1463,8 @@
                     "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väitekoodit (s1, s2, s3…)?",
                     "codes_reset": "Väitekoodit uudelleennumeroitu",
                     "save_item": "Tallenna {{code}}",
-                    "cancel_edit": "Peruuta kohteen {{code}} muokkaus"
+                    "cancel_edit": "Peruuta kohteen {{code}} muokkaus",
+                    "reorder_item": "Järjestä uudelleen {{code}}"
                 },
                 "settings": {
                     "title": "Tutkimusasetukset",
@@ -2067,6 +2070,7 @@
             "export": "Vie",
             "insert_template": "Lisää mallista",
             "entry_title_placeholder": "Osion otsikko…",
+            "entry_title_aria": "Osion otsikko",
             "entry_body_placeholder": "Perustele valintasi…",
             "comments_count_one": "{{n}} kommentti",
             "comments_count_other": "{{n}} kommenttia",

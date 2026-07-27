@@ -56,6 +56,7 @@ export function MemoEntry({
                         <input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            aria-label={t('admin.memo.entry_title_aria', 'Section title')}
                             className="w-full text-sm font-bold rounded-md border px-2 py-1"
                         />
                         <textarea

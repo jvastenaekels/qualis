@@ -140,6 +140,18 @@ describe('SortableCard', () => {
         expect(screen.getByText('S1')).toBeTruthy();
     });
 
+    it('renders the code watermark at a legible contrast (Task 6.7h)', () => {
+        // Task 6.7h: check-a11y-names.mjs widened CONTRAST_BEARING matching to a
+        // control's effective role, catching this role="button" div for the first
+        // time — the code watermark (the sighted user's only visible cue for a
+        // statement's code while dragging) was sitting at text-slate-300/80, below
+        // text-slate-300's own already-failing 1.45:1 (1.4.3/1.4.11 need 4.5:1/3:1).
+        render(<SortableCard {...defaultProps} code="S1" />);
+        const watermark = screen.getByText('S1');
+        expect(watermark).toHaveClass('text-slate-500/80');
+        expect(watermark).not.toHaveClass('text-slate-300/80');
+    });
+
     it('renders statement code in hover store', async () => {
         render(<SortableCard {...defaultProps} code="S1" />);
         const card = screen.getByTestId('card-123');

@@ -130,6 +130,7 @@
       "export": "Eksportuj",
       "insert_template": "Wstaw z szablonu",
       "entry_title_placeholder": "Tytuł sekcji…",
+      "entry_title_aria": "Tytuł sekcji",
       "entry_body_placeholder": "Udokumentuj swoje uzasadnienie…",
       "comments_count_one": "{{n}} komentarz",
       "comments_count_other": "{{n}} komentarzy",
@@ -1405,7 +1406,8 @@
             "remove_action": "Usuń"
           },
           "actions": {
-            "delete": "Usuń {{title}}"
+            "delete": "Usuń {{title}}",
+            "reorder": "Zmień kolejność {{title}}"
           }
         },
         "consent_title": "Formularz zgody",
@@ -1497,6 +1499,7 @@
           "copy_success": "Zaimportowano",
           "copy_from_aria": "Importuj {{label}} z innego języka",
           "delete": "Usuń {{label}}",
+          "reorder": "Zmień kolejność {{label}}",
           "remove_option": "Usuń {{option}}"
         },
         "logic": {
@@ -1550,7 +1553,8 @@
           "confirm_reset_codes": "Czy na pewno chcesz ponownie nadać numery wszystkim kodom stwierdzeń (s1, s2, s3...)?",
           "codes_reset": "Kody stwierdzeń ponownie ponumerowane",
           "save_item": "Zapisz {{code}}",
-          "cancel_edit": "Anuluj edycję {{code}}"
+          "cancel_edit": "Anuluj edycję {{code}}",
+          "reorder_item": "Zmień kolejność {{code}}"
         },
         "settings": {
           "title": "Ustawienia badawcze",
