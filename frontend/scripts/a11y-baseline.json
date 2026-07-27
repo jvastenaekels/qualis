@@ -1,9 +1,5 @@
 {
     "unnamedControls": {},
-    "lowContrastControls": {
-        "src/layouts/StudyLayout.tsx": {
-            "button#543c37a641": 1
-        }
-    },
+    "lowContrastControls": {},
     "suppressedLabelErrors": {}
 }

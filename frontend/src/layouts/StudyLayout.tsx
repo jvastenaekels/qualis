@@ -598,7 +598,7 @@ const StudyLayoutContent: React.FC = () => {
                                            w-8 h-8 shrink-0 rounded-full flex items-center justify-center border-2 transition-all duration-300 hover:scale-105
                                            ${
                                                status === 'upcoming' && !isReachable
-                                                   ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
+                                                   ? 'bg-slate-50 cursor-not-allowed pointer-events-none'
                                                    : 'cursor-pointer shadow-sm'
 }
                                        `}
