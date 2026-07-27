@@ -374,7 +374,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                 <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
                                                 <Label
                                                     htmlFor={`visibility-toggle-${id}`}
-                                                    className="text-2xs font-black text-slate-500"
+                                                    className="cursor-pointer text-2xs font-black text-slate-500"
                                                 >
                                                     {t('admin.design.questions.logic.title')}
                                                 </Label>

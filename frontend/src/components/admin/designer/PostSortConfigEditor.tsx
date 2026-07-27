@@ -378,7 +378,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 <div className="space-y-1">
                                     <Label
                                         htmlFor="random-comments-toggle"
-                                        className="block text-base font-black text-slate-900 tracking-tight"
+                                        className="block cursor-pointer text-base font-black text-slate-900 tracking-tight"
                                     >
                                         {t('admin.design.postsort.random_comments.title')}
                                     </Label>
@@ -442,7 +442,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 <div className="space-y-1">
                                     <Label
                                         htmlFor="missing-statements-toggle"
-                                        className="block text-base font-black text-slate-900 tracking-tight"
+                                        className="block cursor-pointer text-base font-black text-slate-900 tracking-tight"
                                     >
                                         {t('admin.design.postsort.missing.title')}
                                     </Label>
@@ -509,7 +509,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                 <div className="space-y-1">
                                     <Label
                                         htmlFor="audio-recording-toggle"
-                                        className="text-lg font-black text-slate-800 flex items-center gap-2"
+                                        className="flex cursor-pointer items-center gap-2 text-lg font-black text-slate-800"
                                     >
                                         <Mic className="w-5 h-5 text-indigo-600" />
                                         {t('admin.design.postsort.audio.title') ||
