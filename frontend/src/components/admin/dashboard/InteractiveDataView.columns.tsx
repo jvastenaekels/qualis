@@ -276,7 +276,7 @@ export function buildColumns({
                               ) : column.getIsSorted() === 'desc' ? (
                                   <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
                               ) : (
-                                  <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                                  <ArrowUpDown className="ml-2 h-3 w-3 text-slate-500" />
                               )}
                           </Button>
                       ),
@@ -306,7 +306,7 @@ export function buildColumns({
                         ) : column.getIsSorted() === 'desc' ? (
                             <ArrowDown className="ml-1 h-3 w-3 text-indigo-500" />
                         ) : (
-                            <ArrowUpDown className="ml-1 h-3 w-3 text-slate-300" />
+                            <ArrowUpDown className="ml-1 h-3 w-3 text-slate-500" />
                         )}
                     </Button>
                     <DropdownMenu>
@@ -732,7 +732,7 @@ export function buildColumns({
                     ) : column.getIsSorted() === 'desc' ? (
                         <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
                     ) : (
-                        <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        <ArrowUpDown className="ml-2 h-3 w-3 text-slate-500" />
                     )}
                 </Button>
             ),
@@ -771,7 +771,7 @@ export function buildColumns({
                     ) : column.getIsSorted() === 'desc' ? (
                         <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
                     ) : (
-                        <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        <ArrowUpDown className="ml-2 h-3 w-3 text-slate-500" />
                     )}
                 </Button>
             ),

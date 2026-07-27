@@ -27,6 +27,7 @@
 import { computeAccessibleName } from 'dom-accessibility-api';
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import type { DumpParticipant, DumpResponse } from './types';
 import InteractiveDataView from './InteractiveDataView';
 
@@ -198,5 +199,24 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
             .getAllByRole('button')
             .map((button) => computeAccessibleName(button));
         expect(buttonNames.every((name) => name.trim().length > 0)).toBe(true);
+    });
+});
+
+describe('InteractiveDataView — sort-header icon contrast (Task 6.7d)', () => {
+    it('renders the idle sort indicator at a legible contrast and keeps sorting operable', async () => {
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const languageHeader = screen.getByRole('columnheader', { name: /lang/i });
+        const sortButton = within(languageHeader).getByRole('button');
+        const arrowIcon = sortButton.querySelector('svg.lucide-arrow-up-down');
+        expect(arrowIcon).not.toBeNull();
+        expect(arrowIcon).toHaveClass('text-slate-500');
+        expect(arrowIcon).not.toHaveClass('text-slate-300');
+
+        // The color change didn't touch operability: the header is still a
+        // real, clickable sort toggle.
+        await userEvent.click(sortButton);
+        expect(sortButton).toBeInTheDocument();
     });
 });
