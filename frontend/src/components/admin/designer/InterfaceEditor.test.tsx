@@ -161,5 +161,31 @@ describe('InterfaceEditor', () => {
             ).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Remove Tip 2' })).toBeInTheDocument();
         });
+
+        it('renders the remove-tip icon at a legible contrast and keeps it operable (Task 6.7d)', async () => {
+            const user = userEvent.setup();
+            renderEditor({
+                draft: {
+                    translations: [
+                        {
+                            language_code: 'en',
+                            ui_labels: {},
+                            methodology_tips: ['Sort intuitively first'],
+                        },
+                    ],
+                },
+            });
+
+            const removeButton = screen.getByRole('button', {
+                name: 'Remove Sort intuitively first',
+            });
+            expect(removeButton).toHaveClass('text-slate-500');
+            expect(removeButton).not.toHaveClass('text-slate-300');
+
+            await user.click(removeButton);
+            expect(
+                screen.queryByRole('button', { name: 'Remove Sort intuitively first' })
+            ).not.toBeInTheDocument();
+        });
     });
 });

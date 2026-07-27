@@ -372,7 +372,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             }
                                         });
                                     }}
-                                    className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
+                                    className="text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
                                     aria-label={t(
                                         'admin.design.interface.hints.remove',
                                         'Remove {{tip}}',
