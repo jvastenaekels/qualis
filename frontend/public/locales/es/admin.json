@@ -475,7 +475,15 @@
             "import_csv_hint": "El CSV/TSV necesita columnas: code, language, text.",
             "import_csv_no_match": "Ninguna fila coincide con el idioma seleccionado ({{lang}}).",
             "import_csv_skipped": "Se omitieron {{count}} fila(s) en otros idiomas: {{langs}}.",
-            "import_csv_more_errors": "{{count}} problema(s) más"
+            "import_csv_more_errors": "{{count}} problema(s) más",
+            "filters": {
+                "status": "Filtrar por estado",
+                "tag": "Filtrar por etiqueta"
+            },
+            "status_for": "Estado de {{code}}",
+            "create_tag": "Crear etiqueta",
+            "delete_tag": "Eliminar {{tag}}",
+            "cancel_delete_tag": "Cancelar eliminación de {{tag}}"
         },
         "concourse_import": {
             "title": "Importar desde el concurso",

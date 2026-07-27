@@ -387,7 +387,15 @@
             "import_csv_hint": "CSV/TSV: sarakkeet code, language, text.",
             "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
             "import_csv_skipped": "Ohitettu {{count}} rivi(ä) muilla kielillä: {{langs}}.",
-            "import_csv_more_errors": "{{count}} lisää ongelmaa"
+            "import_csv_more_errors": "{{count}} lisää ongelmaa",
+            "filters": {
+                "status": "Suodata tilan mukaan",
+                "tag": "Suodata tunnisteen mukaan"
+            },
+            "status_for": "Tila: {{code}}",
+            "create_tag": "Luo tunniste",
+            "delete_tag": "Poista {{tag}}",
+            "cancel_delete_tag": "Peruuta tunnisteen {{tag}} poisto"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",

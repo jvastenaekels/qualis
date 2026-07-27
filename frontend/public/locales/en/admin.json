@@ -475,7 +475,15 @@
             "import_csv_hint": "CSV/TSV needs columns: code, language, text.",
             "import_csv_no_match": "No rows match the selected language ({{lang}}).",
             "import_csv_skipped": "Skipped {{count}} row(s) in other languages: {{langs}}.",
-            "import_csv_more_errors": "{{count}} more issues"
+            "import_csv_more_errors": "{{count}} more issues",
+            "filters": {
+                "status": "Filter by status",
+                "tag": "Filter by tag"
+            },
+            "status_for": "Status for {{code}}",
+            "create_tag": "Create tag",
+            "delete_tag": "Delete {{tag}}",
+            "cancel_delete_tag": "Cancel deleting {{tag}}"
         },
         "concourse_import": {
             "title": "Import from Concourse",

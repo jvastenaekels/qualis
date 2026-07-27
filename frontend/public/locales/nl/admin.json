@@ -475,7 +475,15 @@
             "import_csv_hint": "CSV/TSV heeft kolommen nodig: code, language, text.",
             "import_csv_no_match": "Geen rijen komen overeen met de geselecteerde taal ({{lang}}).",
             "import_csv_skipped": "{{count}} rij(en) in andere talen overgeslagen: {{langs}}.",
-            "import_csv_more_errors": "{{count}} meer problemen"
+            "import_csv_more_errors": "{{count}} meer problemen",
+            "filters": {
+                "status": "Filteren op status",
+                "tag": "Filteren op label"
+            },
+            "status_for": "Status van {{code}}",
+            "create_tag": "Label maken",
+            "delete_tag": "{{tag}} verwijderen",
+            "cancel_delete_tag": "Verwijderen van {{tag}} annuleren"
         },
         "concourse_import": {
             "title": "Importeren uit concours",
