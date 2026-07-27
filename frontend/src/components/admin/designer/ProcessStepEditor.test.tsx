@@ -203,3 +203,54 @@ describe('ProcessStepEditor — inconsistent feature flags banner', () => {
         expect(items).toHaveLength(2);
     });
 });
+
+describe('ProcessStepEditor — step field accessible names (Task 6.7b)', () => {
+    const expandTheOneStep = async (user: ReturnType<typeof userEvent.setup>) => {
+        const draft = buildDraft([otherStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+        await user.click(screen.getByRole('button', { name: /toggle/i }));
+    };
+
+    it('names the "Step title" field and lets its label focus it', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        const field = await screen.findByRole('textbox', { name: /^step title$/i });
+        await user.click(screen.getByText('Step title'));
+        expect(field).toHaveFocus();
+    });
+
+    it('names the "Short description" and "Color" fields', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        expect(
+            await screen.findByRole('textbox', { name: /^short description$/i })
+        ).toBeInTheDocument();
+        // The color swatch <input type="color"> has no ARIA role in jsdom, so
+        // getByLabelText (which also resolves via htmlFor/id) stands in for
+        // getByRole here — same as the datetime-local case elsewhere in 6.7b.
+        expect(screen.getByLabelText('Color')).toBeInTheDocument();
+    });
+
+    it('renders "Icon" as plain text heading a real, named group of icon buttons (Task 6.7b fix round 1)', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        const heading = await screen.findByText('Icon');
+        expect(heading.tagName).not.toBe('LABEL');
+
+        // IconPicker's root carries role="group" aria-labelledby={heading.id} —
+        // getByRole computes the group's real accessible name from that
+        // association, not from the heading merely sitting nearby in the DOM.
+        expect(screen.getByRole('group', { name: 'Icon' })).toBeInTheDocument();
+
+        // Each button is named via a translated word ("Person"), not the raw
+        // lucide identifier ("User") the component key uses internally —
+        // getByRole with the identifier would now fail to resolve.
+        expect(screen.getByRole('button', { name: 'Person' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'User' })).not.toBeInTheDocument();
+    });
+});

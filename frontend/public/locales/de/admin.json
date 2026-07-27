@@ -244,6 +244,26 @@
                 "preview": "Vorschau",
                 "empty": "Nichts für die Vorschau"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Person",
+                    "Zap": "Blitz",
+                    "Scale": "Waage",
+                    "MessageSquareText": "Nachricht",
+                    "ClipboardList": "Klemmbrett",
+                    "CheckCircle": "Häkchen",
+                    "Flag": "Flagge",
+                    "Info": "Information",
+                    "HelpCircle": "Hilfe",
+                    "FileText": "Dokument",
+                    "LayoutGrid": "Raster",
+                    "Rocket": "Rakete",
+                    "Target": "Ziel",
+                    "Brain": "Gehirn",
+                    "Lightbulb": "Idee",
+                    "ListChecks": "Checkliste"
+                }
+            },
             "click_to_edit": "Zum Bearbeiten klicken"
         },
         "layout": {
@@ -1420,6 +1440,7 @@
                     "question": "Fragenbezeichnung",
                     "required": "Pflichtfeld",
                     "options": "Optionen",
+                    "option_ordinal": "Option {{number}}",
                     "multiple": "(Mehrfachauswahl erlaubt)",
                     "single": "(Einfachauswahl)",
                     "placeholder": "Geben Sie hier Ihre Frage ein...",

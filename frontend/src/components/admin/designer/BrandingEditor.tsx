@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
 import { Label } from '@/components/ui/label';
@@ -261,13 +260,17 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             </div>
                                             <div className="flex-1 space-y-3">
                                                 <div className="grid gap-1.5">
-                                                    <Label className="text-2xs font-black text-slate-400">
+                                                    <Label
+                                                        htmlFor={`partner-name-${partner.id ?? index}`}
+                                                        className="text-2xs font-black text-slate-400"
+                                                    >
                                                         {t(
                                                             'admin.design.theme.partners.name_placeholder',
                                                             'Name'
                                                         )}
                                                     </Label>
                                                     <Input
+                                                        id={`partner-name-${partner.id ?? index}`}
                                                         name="partnerName"
                                                         value={partner.name}
                                                         onChange={(e) => {

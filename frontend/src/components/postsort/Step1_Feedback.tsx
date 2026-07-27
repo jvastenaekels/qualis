@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import type React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -358,7 +357,10 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             </blockquote>
 
                             <div className="relative space-y-3">
-                                <Label className="block text-sm font-semibold text-slate-700">
+                                <Label
+                                    htmlFor={`comment-${card.statementId}`}
+                                    className="block text-sm font-semibold text-slate-700"
+                                >
                                     {getPrompt(
                                         isPositive
                                             ? ['extreme_positive', 'extreme']
@@ -591,7 +593,10 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 <>
                     <hr className="border-slate-200" />
                     <div className="space-y-4">
-                        <Label className="text-xl font-bold text-slate-800 block">
+                        <Label
+                            htmlFor="missing-statements"
+                            className="text-xl font-bold text-slate-800 block"
+                        >
                             {getPrompt(
                                 'missing_statements_label',
                                 'admin.study.postsort.missing.desc',

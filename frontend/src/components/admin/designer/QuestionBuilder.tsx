@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import {
     DndContext,
     closestCenter,
@@ -316,7 +315,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                             <AccordionContent className="pt-6 pb-2 space-y-6">
                                 <div className="grid gap-2.5">
                                     <div className="flex items-center gap-2">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        <Label
+                                            htmlFor={`question-label-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.question')}
                                         </Label>
                                         <MultiLangFieldIcon
@@ -329,6 +331,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         />
                                     </div>
                                     <Input
+                                        id={`question-label-${id}`}
                                         value={label}
                                         readOnly={readOnly}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -411,7 +414,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         {question.visibility_condition && (
                                             <div className="grid gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                                 <div className="space-y-2">
-                                                    <Label className="text-2xs font-bold text-slate-500">
+                                                    <Label
+                                                        htmlFor={`depends-on-${id}`}
+                                                        className="text-2xs font-bold text-slate-500"
+                                                    >
                                                         {t(
                                                             'admin.design.questions.logic.depends_on'
                                                         )}
@@ -433,7 +439,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                             })
                                                         }
                                                     >
-                                                        <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                        <SelectTrigger
+                                                            id={`depends-on-${id}`}
+                                                            className="bg-white rounded-lg h-9 text-xs"
+                                                        >
                                                             <SelectValue
                                                                 placeholder={t(
                                                                     'admin.design.questions.logic.select_placeholder'
@@ -463,7 +472,10 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`operator-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.logic.operator'
                                                             )}
@@ -493,7 +505,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                                 })
                                                             }
                                                         >
-                                                            <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                            <SelectTrigger
+                                                                id={`operator-${id}`}
+                                                                className="bg-white rounded-lg h-9 text-xs"
+                                                            >
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent>
@@ -515,12 +530,16 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     </div>
 
                                                     <div className="space-y-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`condition-value-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.logic.value'
                                                             )}
                                                         </Label>
                                                         <Input
+                                                            id={`condition-value-${id}`}
                                                             value={
                                                                 (question.visibility_condition
                                                                     .value as string) || ''
@@ -549,12 +568,29 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                 {question.type === 'rating' && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        {/* Heads the scale-points select and the Left/Right
+                                            fields below via aria-labelledby on the group
+                                            wrapper, not htmlFor — each field already has its
+                                            own correct Label/htmlFor, so this only supplies
+                                            the group's name, same pattern as the Options
+                                            group below and QSortEditor's distribution-mode
+                                            radiogroup. */}
+                                        <p
+                                            id={`scale-heading-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.scale')}
-                                        </Label>
-                                        <div className="grid gap-4">
+                                        </p>
+                                        <div
+                                            role="group"
+                                            aria-labelledby={`scale-heading-${id}`}
+                                            className="grid gap-4"
+                                        >
                                             <div className="space-y-2">
-                                                <Label className="text-2xs font-bold text-slate-500">
+                                                <Label
+                                                    htmlFor={`scale-points-${id}`}
+                                                    className="text-2xs font-bold text-slate-500"
+                                                >
                                                     {t(
                                                         'admin.design.questions.labels.scale_points'
                                                     )}
@@ -569,7 +605,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     }
                                                     disabled={readOnly}
                                                 >
-                                                    <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                    <SelectTrigger
+                                                        id={`scale-points-${id}`}
+                                                        className="bg-white rounded-lg h-9 text-xs"
+                                                    >
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -584,7 +623,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <div className="flex items-center gap-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`scale-left-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.labels.scale_left'
                                                             )}
@@ -607,6 +649,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         />
                                                     </div>
                                                     <Input
+                                                        id={`scale-left-${id}`}
                                                         readOnly={readOnly}
                                                         value={
                                                             (typeof question.scale_labels?.left ===
@@ -655,7 +698,10 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex items-center gap-2">
-                                                        <Label className="text-2xs font-bold text-slate-500">
+                                                        <Label
+                                                            htmlFor={`scale-right-${id}`}
+                                                            className="text-2xs font-bold text-slate-500"
+                                                        >
                                                             {t(
                                                                 'admin.design.questions.labels.scale_right'
                                                             )}
@@ -678,6 +724,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         />
                                                     </div>
                                                     <Input
+                                                        id={`scale-right-${id}`}
                                                         readOnly={readOnly}
                                                         value={
                                                             (typeof question.scale_labels?.right ===
@@ -733,14 +780,28 @@ const QuestionItem = (props: QuestionItemProps) => {
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        {/* Heads the list of option Inputs below via
+                                            aria-labelledby on the group wrapper, not htmlFor —
+                                            a real heading element naming a group, not the
+                                            form-field <Label> pointing at one control. The
+                                            group name alone doesn't say WHICH option a given
+                                            input is, so each Input also gets its own ordinal
+                                            aria-label below. */}
+                                        <p
+                                            id={`options-heading-${id}`}
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
                                                 ` (${t('admin.design.questions.labels.multiple')})`}
                                             {question.type === 'radio' &&
                                                 ` (${t('admin.design.questions.labels.single')})`}
-                                        </Label>
-                                        <div className="space-y-3">
+                                        </p>
+                                        <div
+                                            role="group"
+                                            aria-labelledby={`options-heading-${id}`}
+                                            className="space-y-3"
+                                        >
                                             {(question.options || []).map((opt, idx) => (
                                                 <div
                                                     key={idx}
@@ -749,6 +810,11 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     <div className="size-1.5 rounded-full bg-slate-300 group-hover/opt:bg-indigo-400 transition-colors" />
                                                     <div className="flex-1 flex items-center gap-2">
                                                         <Input
+                                                            aria-label={t(
+                                                                'admin.design.questions.labels.option_ordinal',
+                                                                'Option {{number}}',
+                                                                { number: idx + 1 }
+                                                            )}
                                                             className={cn(
                                                                 'h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white',
                                                                 readOnly &&

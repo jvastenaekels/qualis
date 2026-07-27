@@ -244,6 +244,26 @@
                 "preview": "Voorbeeld",
                 "empty": "Niets te bekijken"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Persoon",
+                    "Zap": "Bliksem",
+                    "Scale": "Balans",
+                    "MessageSquareText": "Bericht",
+                    "ClipboardList": "Klembord",
+                    "CheckCircle": "Vinkje",
+                    "Flag": "Vlag",
+                    "Info": "Informatie",
+                    "HelpCircle": "Help",
+                    "FileText": "Document",
+                    "LayoutGrid": "Raster",
+                    "Rocket": "Raket",
+                    "Target": "Doel",
+                    "Brain": "Brein",
+                    "Lightbulb": "Idee",
+                    "ListChecks": "Checklist"
+                }
+            },
             "click_to_edit": "Klik om te bewerken"
         },
         "layout": {
@@ -1420,6 +1440,7 @@
                     "question": "Vraaglabel",
                     "required": "Verplicht veld",
                     "options": "Opties",
+                    "option_ordinal": "Optie {{number}}",
                     "multiple": "(Meerdere keuzes mogelijk)",
                     "single": "(Enkelvoudige keuze)",
                     "placeholder": "Voer uw vraag in...",

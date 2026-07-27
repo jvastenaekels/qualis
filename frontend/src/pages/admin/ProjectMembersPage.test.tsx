@@ -127,3 +127,41 @@ describe('ProjectMembersPage role select', () => {
         expect(within(row).getAllByText('nn@example.com')).toHaveLength(1);
     });
 });
+
+describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
+    beforeEach(() => {
+        removeMember.mockReset().mockResolvedValue({});
+        useAuthStore.setState({
+            user: { id: 12, email: 'grace@x.io', is_superuser: false },
+            isAuthenticated: true,
+        });
+    });
+
+    it('names the email field and lets its label focus it', async () => {
+        const user = userEvent.setup();
+        renderWithProviders(<ProjectMembersPage />);
+
+        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
+
+        const emailField = screen.getByRole('textbox', { name: /collaborator email/i });
+        await user.click(screen.getByText('Collaborator email'));
+        expect(emailField).toHaveFocus();
+    });
+
+    it('names the role select and lets its label open it', async () => {
+        const user = userEvent.setup();
+        renderWithProviders(<ProjectMembersPage />);
+
+        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
+
+        // The trigger's own content is the selected role's value ("Member");
+        // pairing the Label overrides that with the field's purpose, per
+        // accname's label priority over content — the same mechanism the a11y
+        // gate's brief verified in Chromium.
+        const roleTrigger = screen.getByRole('combobox', { name: /assigned role/i });
+        expect(roleTrigger).toHaveAttribute('aria-expanded', 'false');
+
+        await user.click(screen.getByText('Assigned role'));
+        expect(roleTrigger).toHaveAttribute('aria-expanded', 'true');
+    });
+});

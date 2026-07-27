@@ -262,4 +262,62 @@ describe('PostSortPage', () => {
         expect(screen.getByText('Spread the word')).toBeInTheDocument();
         expect(screen.getByText('Copy link')).toBeInTheDocument();
     });
+
+    describe('Step 1 label accessible names (Task 6.7b)', () => {
+        beforeEach(async () => {
+            // A prior test in this file (`Shows share links…`) permanently
+            // overrides this module-level mock's return value — restore the
+            // Step-1 default explicitly rather than depending on file order.
+            const { useSubmitStudy } = await import('../hooks/useSubmitStudy');
+            vi.mocked(useSubmitStudy).mockReturnValue({
+                submit: vi.fn(),
+                isLoading: false,
+                isSuccess: false,
+                error: null,
+                confirmationCode: null,
+            });
+        });
+
+        it('names the "missing statements" textarea and lets its label focus it', async () => {
+            const user = userEvent.setup();
+
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+                </Routes>,
+                { initialEntries: ['/study/demo/post-sort'] }
+            );
+
+            const field = await screen.findByRole('textbox', {
+                name: /are there any ideas or perspectives/i,
+            });
+            await user.click(screen.getByText(/are there any ideas or perspectives/i));
+            expect(field).toHaveFocus();
+        });
+
+        it('names each extreme-card comment textarea and lets its label focus it', async () => {
+            const user = userEvent.setup();
+
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+                </Routes>,
+                { initialEntries: ['/study/demo/post-sort'] }
+            );
+
+            // Two extreme cards (statements 1 and 2, per the base config's
+            // grid_config/qsort) each carry their own "Why" prompt label — a
+            // per-card `id={comment-${statementId}}` so the pairing must
+            // survive the .map() rather than collide on a single id.
+            const fields = await screen.findAllByRole('textbox', { name: /why/i });
+            expect(fields).toHaveLength(2);
+
+            const labels = screen.getAllByText(/why/i);
+            await user.click(labels[0]);
+            expect(fields[0]).toHaveFocus();
+
+            await user.click(labels[1]);
+            expect(fields[1]).toHaveFocus();
+        });
+    });
 });

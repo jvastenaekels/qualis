@@ -156,6 +156,26 @@
                 "preview": "Esikatselu",
                 "empty": "Ei esikatseltavaa sisältöä"
             },
+            "icon_picker": {
+                "icons": {
+                    "User": "Henkilö",
+                    "Zap": "Salama",
+                    "Scale": "Vaaka",
+                    "MessageSquareText": "Viesti",
+                    "ClipboardList": "Muistilista",
+                    "CheckCircle": "Valintamerkki",
+                    "Flag": "Lippu",
+                    "Info": "Info",
+                    "HelpCircle": "Ohje",
+                    "FileText": "Asiakirja",
+                    "LayoutGrid": "Ruudukko",
+                    "Rocket": "Raketti",
+                    "Target": "Tavoite",
+                    "Brain": "Aivot",
+                    "Lightbulb": "Idea",
+                    "ListChecks": "Tarkistuslista"
+                }
+            },
             "click_to_edit": "Napsauta muokataksesi"
         },
         "layout": {
@@ -1331,6 +1351,7 @@
                     "question": "Kysymyksen otsikko",
                     "required": "Pakollinen kenttä",
                     "options": "Vaihtoehdot",
+                    "option_ordinal": "Vaihtoehto {{number}}",
                     "multiple": "(useita valintoja sallittu)",
                     "single": "(yksi valinta)",
                     "placeholder": "Kirjoita kysymyksesi tähän...",

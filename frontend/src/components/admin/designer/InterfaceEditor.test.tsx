@@ -1,4 +1,5 @@
 import { screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import InterfaceEditor from './InterfaceEditor';
 import { renderWithStore } from '@/test-utils/renderWithStore';
@@ -93,5 +94,42 @@ describe('InterfaceEditor', () => {
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
         expect(enTranslation.ui_labels['welcome.start']).toBeUndefined();
+    });
+
+    describe('accessible names (Task 6.7b)', () => {
+        it('names the "Next step button" field and lets its label focus it', async () => {
+            const user = userEvent.setup();
+            renderEditor();
+
+            const field = screen.getByRole('textbox', { name: /next step button/i });
+            await user.click(screen.getByText('Next step button'));
+            expect(field).toHaveFocus();
+        });
+
+        it('names the terminology fields distinctly per stance and per group', () => {
+            renderEditor();
+
+            // "Agree"/"Most agree" are unique across the two term groups —
+            // getByRole computes the real accessible name, so this only
+            // passes if each group's htmlFor/id pairing resolved to the
+            // right sibling Input rather than colliding across groups.
+            expect(screen.getByRole('textbox', { name: /^agree$/i })).toBeInTheDocument();
+            expect(screen.getByRole('textbox', { name: /^most agree$/i })).toBeInTheDocument();
+            expect(screen.getByRole('textbox', { name: /^disagree$/i })).toBeInTheDocument();
+            expect(screen.getByRole('textbox', { name: /^most disagree$/i })).toBeInTheDocument();
+        });
+
+        it('names the "What we ask"/"Why it matters" step-help fields for every visible step', () => {
+            renderEditor();
+
+            // Every step in the Step Guidance card renders its own What/Why
+            // pair with a per-step id (`step-help-${step.id}-${field}`) — if
+            // any two steps collided on id, some of these would resolve to
+            // the wrong control or fail to resolve at all.
+            const whatFields = screen.getAllByRole('textbox', { name: /^what we ask$/i });
+            const whyFields = screen.getAllByRole('textbox', { name: /^why it matters$/i });
+            expect(whatFields.length).toBeGreaterThanOrEqual(2);
+            expect(whatFields).toHaveLength(whyFields.length);
+        });
     });
 });

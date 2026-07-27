@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -286,9 +285,11 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                         {/* Errors */}
                         {validation.errors.length > 0 && (
                             <div className="space-y-2">
-                                <Label className="text-red-600 font-semibold">
+                                {/* Heads a static error list, not a form control — a real
+                                    heading element, not the form-field <Label>. */}
+                                <h4 className="text-sm font-semibold text-red-600">
                                     {t('admin.import.errors', 'Errors')}:
-                                </Label>
+                                </h4>
                                 <ul className="text-sm space-y-1">
                                     {validation.errors.map((error, i) => (
                                         <li key={i} className="text-red-600 flex items-start gap-2">
@@ -303,9 +304,11 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                         {/* Warnings */}
                         {validation.warnings.length > 0 && (
                             <div className="space-y-2">
-                                <Label className="text-amber-600 font-semibold">
+                                {/* Heads a static warning list, not a form control — a real
+                                    heading element, not the form-field <Label>. */}
+                                <h4 className="text-sm font-semibold text-amber-600">
                                     {t('admin.import.warnings', 'Warnings')}:
-                                </Label>
+                                </h4>
                                 <ul className="text-sm space-y-1">
                                     {validation.warnings.map((warning, i) => (
                                         <li

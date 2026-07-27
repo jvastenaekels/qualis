@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { isPresortEnabled, isRoughSortEnabled } from '@/utils/studyConfig';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -170,7 +169,10 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 <div key={inputKey} className="space-y-2.5">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <Label className="text-2xs font-black text-slate-500">
+                                            <Label
+                                                htmlFor={`interface-nav-${inputKey}`}
+                                                className="text-2xs font-black text-slate-500"
+                                            >
                                                 {t(`admin.design.interface.nav.${tipKey}`)}
                                             </Label>
                                             <TooltipProvider>
@@ -202,6 +204,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         )}
                                     </div>
                                     <Input
+                                        id={`interface-nav-${inputKey}`}
                                         name={inputKey}
                                         value={getLabel(inputKey)}
                                         onChange={(e) => updateLabel(inputKey, e.target.value)}
@@ -285,12 +288,16 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             const inputKey = `${group.keyPrefix}.${suffix}`;
                                             return (
                                                 <div key={inputKey} className="space-y-2.5">
-                                                    <Label className="text-2xs font-black text-slate-400">
+                                                    <Label
+                                                        htmlFor={`interface-term-${inputKey}`}
+                                                        className="text-2xs font-black text-slate-400"
+                                                    >
                                                         {t(
                                                             `admin.design.interface.terms.${termKey}`
                                                         )}
                                                     </Label>
                                                     <Input
+                                                        id={`interface-term-${inputKey}`}
                                                         name={inputKey}
                                                         value={getLabel(inputKey)}
                                                         onChange={(e) =>
@@ -453,10 +460,14 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pl-6 border-l-2 border-slate-100">
                                     {(['what', 'why'] as const).map((field) => (
                                         <div key={field} className="space-y-2.5">
-                                            <Label className="text-2xs font-black text-slate-400">
+                                            <Label
+                                                htmlFor={`step-help-${step.id}-${field}`}
+                                                className="text-2xs font-black text-slate-400"
+                                            >
                                                 {t(`study.help.${field}`)}
                                             </Label>
                                             <Input
+                                                id={`step-help-${step.id}-${field}`}
                                                 value={
                                                     stepHelp[field] ||
                                                     tStudy(`study.help.step_${step.id}.${field}`)
