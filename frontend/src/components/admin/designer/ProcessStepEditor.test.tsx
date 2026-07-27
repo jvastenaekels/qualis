@@ -277,4 +277,19 @@ describe('ProcessStepEditor — delete-step control name (Task 6.7c)', () => {
 
         expect(screen.getByRole('button', { name: 'Delete step_new_1' })).toBeInTheDocument();
     });
+
+    it('renders the delete icon at a legible contrast and keeps it operable (Task 6.7d)', async () => {
+        const user = userEvent.setup();
+        const draft = buildDraft([profileStep, roughStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+
+        const deleteButton = screen.getByRole('button', { name: "Delete Let's meet" });
+        expect(deleteButton).toHaveClass('text-slate-500');
+        expect(deleteButton).not.toHaveClass('text-slate-300');
+
+        await user.click(deleteButton);
+        expect(screen.queryByRole('button', { name: "Delete Let's meet" })).not.toBeInTheDocument();
+    });
 });

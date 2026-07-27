@@ -1,9 +1,6 @@
 {
     "unnamedControls": {},
     "lowContrastControls": {
-        "src/components/admin/designer/ProcessStepEditor.tsx": {
-            "Button#08fe1834a8": 1
-        },
         "src/components/admin/designer/QSortEditor.tsx": {
             "Button#cfd0f92c60": 1
         },

@@ -121,7 +121,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onDelete();
