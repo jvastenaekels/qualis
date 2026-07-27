@@ -91,12 +91,6 @@
         }
     },
     "suppressedLabelErrors": {
-        "src/components/admin/designer/IntroductionEditor.tsx": {
-            "Label#02e66bf1f6": 1,
-            "Label#2081ca5d80": 1,
-            "Label#7ab5d8c56c": 1,
-            "Label#e4bc2d1838": 1
-        },
         "src/components/admin/designer/QuestionBuilder.tsx": {
             "Label#55a33a00e6": 1,
             "Label#5bbd85ed1f": 1,

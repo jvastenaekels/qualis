@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -88,7 +87,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="pt-6 space-y-6">
                         <div className="grid gap-2.5">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="default-language-select"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.design.intro.fields.default_lang')}
                             </Label>
                             <Select
@@ -104,7 +106,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 }
                                 disabled={readOnly}
                             >
-                                <SelectTrigger className="w-full h-11 rounded-xl font-medium">
+                                <SelectTrigger
+                                    id="default-language-select"
+                                    className="w-full h-11 rounded-xl font-medium"
+                                >
                                     <SelectValue
                                         placeholder={t('admin.design.toolbar.select_lang')}
                                     />
@@ -223,7 +228,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 />
                             </div>
                             <div className="flex items-center gap-2 mb-2">
-                                <Label className="text-2xs font-black text-slate-500">
+                                <Label
+                                    htmlFor="objective"
+                                    className="text-2xs font-black text-slate-500"
+                                >
                                     {t('admin.design.intro.fields.objective')}
                                 </Label>
                                 <MultiLangFieldIcon
@@ -270,7 +278,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Label className="text-2xs font-black text-slate-500">
+                                        <Label
+                                            htmlFor="instructions"
+                                            className="text-2xs font-black text-slate-500"
+                                        >
                                             {t('admin.design.intro.fields.task_overview')}
                                         </Label>
                                         <MultiLangFieldIcon
@@ -398,7 +409,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 />
                             </div>
                             <div className="flex items-center gap-2 mb-2">
-                                <Label className="text-2xs font-black text-slate-500">
+                                <Label
+                                    htmlFor="consent-description"
+                                    className="text-2xs font-black text-slate-500"
+                                >
                                     {t('admin.design.intro.fields.legal_text')}
                                 </Label>
                                 <MultiLangFieldIcon
