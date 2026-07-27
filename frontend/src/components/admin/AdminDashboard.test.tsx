@@ -1,5 +1,7 @@
 import { renderWithProviders, screen } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { Routes, Route } from 'react-router-dom';
 import { AdminDashboard } from './AdminDashboard';
 
 // Hoisted mocks for generated API hooks
@@ -187,5 +189,93 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Needs attention')).toBeInTheDocument();
         // Alert message includes study name and days
         expect(screen.getByText(/My Study.*closing in 3 days/)).toBeInTheDocument();
+    });
+
+    describe('keyboard-operable cards', () => {
+        // Real navigation (Routes/Route), not a mocked `useNavigate` — same
+        // pattern as AdminDashboard.onboarding.test.tsx. Proves the whole
+        // chain: focusable -> Enter -> onClick -> navigate -> route change,
+        // not just that some callback fired.
+        function renderDashboardWithRoutes() {
+            return renderWithProviders(
+                <Routes>
+                    <Route path="/app/:projectSlug/dashboard" element={<AdminDashboard />} />
+                    <Route
+                        path="/app/:projectSlug/studies/:slug"
+                        element={<div data-testid="study-detail" />}
+                    />
+                    <Route
+                        path="/app/:projectSlug/concourses"
+                        element={<div data-testid="concourse-page" />}
+                    />
+                </Routes>,
+                { initialEntries: ['/app/test-project/dashboard'] }
+            );
+        }
+
+        it('exposes the single-study card as a real, keyboard-operable button', async () => {
+            const user = userEvent.setup();
+            setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+            renderDashboardWithRoutes();
+
+            const card = screen.getByRole('button', { name: /my study/i });
+            // Positive: it is a genuine <button>, not a div faking the role.
+            expect(card.tagName).toBe('BUTTON');
+            // Negative: no hand-rolled role attribute needed — the tag itself
+            // carries the semantics.
+            expect(card).not.toHaveAttribute('role');
+            // Negative: nothing has navigated yet.
+            expect(screen.queryByTestId('study-detail')).not.toBeInTheDocument();
+
+            card.focus();
+            await user.keyboard('{Enter}');
+
+            // Positive: Enter on the focused card actually navigated.
+            expect(await screen.findByTestId('study-detail')).toBeInTheDocument();
+        });
+
+        it('exposes multi-study rows as real buttons, not ARIA-only divs', async () => {
+            const user = userEvent.setup();
+            const study1 = makeStudy({ id: 1, slug: 'study-1', state: 'active' });
+            const study2 = makeStudy({
+                id: 2,
+                slug: 'study-2',
+                state: 'draft',
+                translations: [
+                    { language_code: 'en', title: 'Second Study', pre_instruction: 'Hi' },
+                ],
+            });
+            setupDefaultHooks({ studies: [study1, study2] });
+
+            renderDashboardWithRoutes();
+
+            const row = screen.getByRole('button', { name: /second study/i });
+            expect(row.tagName).toBe('BUTTON');
+            expect(row).not.toHaveAttribute('role');
+            expect(screen.queryByTestId('study-detail')).not.toBeInTheDocument();
+
+            row.focus();
+            await user.keyboard('{Enter}');
+
+            expect(await screen.findByTestId('study-detail')).toBeInTheDocument();
+        });
+
+        it('exposes the concourse card as a real button, not an ARIA-only div', async () => {
+            const user = userEvent.setup();
+            setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+            renderDashboardWithRoutes();
+
+            const card = screen.getByRole('button', { name: /concourse/i });
+            expect(card.tagName).toBe('BUTTON');
+            expect(card).not.toHaveAttribute('role');
+            expect(screen.queryByTestId('concourse-page')).not.toBeInTheDocument();
+
+            card.focus();
+            await user.keyboard('{Enter}');
+
+            expect(await screen.findByTestId('concourse-page')).toBeInTheDocument();
+        });
     });
 });

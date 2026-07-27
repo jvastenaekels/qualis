@@ -377,17 +377,10 @@ function ConcourseCard({
     const itemCount = concourse?.item_count ?? 0;
 
     return (
-        <Card
-            className="group cursor-pointer hover:border-foreground/20 transition-colors"
+        <button
+            type="button"
             onClick={onOpen}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpen();
-                }
-            }}
-            tabIndex={0}
-            role="button"
+            className="group w-full block text-left rounded-xl border bg-card text-card-foreground shadow cursor-pointer outline-none ring-offset-background transition-colors hover:border-foreground/20 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
         >
             <CardContent className="py-3 px-4">
                 <div className="flex items-center gap-3">
@@ -411,7 +404,7 @@ function ConcourseCard({
                     <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 </div>
             </CardContent>
-        </Card>
+        </button>
     );
 }
 
@@ -509,9 +502,10 @@ function SingleStudyCard({
                 )}
             </div>
 
-            <Card
-                className="group cursor-pointer hover:border-foreground/20 transition-colors"
+            <button
+                type="button"
                 onClick={() => navigate(studyBase)}
+                className="group w-full block text-left rounded-xl border bg-card text-card-foreground shadow cursor-pointer outline-none ring-offset-background transition-colors hover:border-foreground/20 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
             >
                 <CardContent className="py-4 px-5">
                     <div className="flex items-start justify-between gap-3">
@@ -570,7 +564,7 @@ function SingleStudyCard({
                         click away via the study sidebar after opening the
                         card. */}
                 </CardContent>
-            </Card>
+            </button>
         </div>
     );
 }
@@ -715,17 +709,10 @@ function StudyRow({
     const participants = study.participant_count ?? 0;
 
     return (
-        <Card
-            className="group hover:border-foreground/20 transition-colors cursor-pointer"
+        <button
+            type="button"
             onClick={onOpen}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpen();
-                }
-            }}
-            tabIndex={0}
-            role="button"
+            className="group w-full block text-left rounded-xl border bg-card text-card-foreground shadow cursor-pointer outline-none ring-offset-background transition-colors hover:border-foreground/20 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
         >
             <CardContent className="py-3 px-4">
                 <div className="flex items-center gap-3">
@@ -781,6 +768,6 @@ function StudyRow({
                     <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 </div>
             </CardContent>
-        </Card>
+        </button>
     );
 }
