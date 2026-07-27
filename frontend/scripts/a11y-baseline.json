@@ -1,5 +1,21 @@
 {
-    "unnamedControls": {},
+    "unnamedControls": {
+        "src/components/admin/designer/ConditionOfInstructionEditor.tsx": {
+            "input#9c9b70dc01": 1
+        },
+        "src/components/admin/designer/ImageUploadInput.tsx": {
+            "input#407bf21f43": 1
+        },
+        "src/components/admin/designer/MarkdownEditor.tsx": {
+            "textarea#001b1a9107": 1
+        },
+        "src/hooks/admin/useImportExportConfig.tsx": {
+            "input#407bf21f43": 1
+        },
+        "src/pages/admin/ConcourseDetailPage.tsx": {
+            "input#407bf21f43": 1
+        }
+    },
     "lowContrastControls": {},
     "suppressedLabelErrors": {}
 }

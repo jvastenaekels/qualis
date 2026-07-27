@@ -77,6 +77,20 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                     <div
                         {...attributes}
                         {...listeners}
+                        // Literal, after the spread: useSortable's {...attributes} already
+                        // sets these (defaultRole = 'button', tabIndex default 0 — verified
+                        // against @dnd-kit/core's source) so this changes nothing at runtime.
+                        // It exists so Biome's useAriaPropsSupportedByRole can see the role
+                        // statically instead of inferring a roleless <div> from JSX and
+                        // rejecting aria-label below — matches the pattern SortableCard.tsx
+                        // already uses with no suppression needed.
+                        role="button"
+                        tabIndex={0}
+                        aria-label={t(
+                            'admin.design.intro.process_steps.actions.reorder',
+                            'Reorder {{title}}',
+                            { title: step.title || step.id }
+                        )}
                         className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-500 transition-colors"
                     >
                         <GripVertical className="h-4 w-4" />

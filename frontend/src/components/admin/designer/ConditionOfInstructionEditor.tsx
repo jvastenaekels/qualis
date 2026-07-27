@@ -176,6 +176,13 @@ const ConditionOfInstructionEditor = ({
                         </div>
                     )}
                     <label className="flex items-center gap-2">
+                        {/* a11y-baseline: no aria-label needed — this checkbox is a direct
+                            child of a native <label> whose sibling <span> is its accessible
+                            name via HTML label association, not htmlFor/id. Verified with
+                            getByRole('checkbox', { name: /enable preliminary sort/i }) against
+                            an equivalent probe (task 6.7h, 2026-07-28); the gate's own
+                            htmlFor-matching only recognises the id-pairing shape, so it still
+                            reports this as unnamed. */}
                         <input
                             type="checkbox"
                             data-testid="rough-sort-toggle"

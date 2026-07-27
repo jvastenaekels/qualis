@@ -133,6 +133,7 @@ export function MemoSection({
                         value={newEntryTitle}
                         onChange={(e) => setNewEntryTitle(e.target.value)}
                         placeholder={t('admin.memo.entry_title_placeholder', 'Section title…')}
+                        aria-label={t('admin.memo.entry_title_aria', 'Section title')}
                         className="w-full text-sm rounded-md border px-2 py-1 mb-2"
                     />
                     <div className="flex justify-end gap-2">

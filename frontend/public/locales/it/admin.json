@@ -130,12 +130,15 @@
             "export": "Esporta",
             "insert_template": "Inserisci da modello",
             "entry_title_placeholder": "Titolo della sezione…",
+            "entry_title_aria": "Titolo della sezione",
             "entry_body_placeholder": "Documenti la sua motivazione…",
+            "entry_body_aria": "Contenuto della sezione",
             "comments_count_one": "{{n}} commento",
             "comments_count_other": "{{n}} commenti",
             "show_resolved": "Mostra risolti ({{n}})",
             "hide_resolved": "Nascondi risolti",
             "comment_placeholder": "Scriva un commento. Usi @ per menzionare.",
+            "edit_comment_aria": "Modifica commento",
             "post_comment": "Pubblica",
             "edit": "Modifica",
             "delete": "Elimina",
@@ -1405,7 +1408,8 @@
                         "remove_action": "Rimuovi"
                     },
                     "actions": {
-                        "delete": "Elimina {{title}}"
+                        "delete": "Elimina {{title}}",
+                        "reorder": "Riordina {{title}}"
                     }
                 },
                 "consent_title": "Modulo di consenso",
@@ -1497,6 +1501,7 @@
                     "copy_success": "Importato",
                     "copy_from_aria": "Importa {{label}} da un'altra lingua",
                     "delete": "Elimina {{label}}",
+                    "reorder": "Riordina {{label}}",
                     "remove_option": "Rimuovi {{option}}"
                 },
                 "logic": {
@@ -1550,7 +1555,8 @@
                     "confirm_reset_codes": "È sicuro di voler risequenziare tutti i codici delle affermazioni (s1, s2, s3...)?",
                     "codes_reset": "Codici delle affermazioni risequenziati",
                     "save_item": "Salva {{code}}",
-                    "cancel_edit": "Annulla la modifica di {{code}}"
+                    "cancel_edit": "Annulla la modifica di {{code}}",
+                    "reorder_item": "Riordina {{code}}"
                 },
                 "settings": {
                     "title": "Impostazioni di ricerca",

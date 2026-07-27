@@ -210,6 +210,20 @@ const QuestionItem = (props: QuestionItemProps) => {
                     <div
                         {...attributes}
                         {...listeners}
+                        // Literal, after the spread: useSortable's {...attributes} already
+                        // sets these (defaultRole = 'button', tabIndex default 0 — verified
+                        // against @dnd-kit/core's source) so this changes nothing at runtime.
+                        // It exists so Biome's useAriaPropsSupportedByRole can see the role
+                        // statically instead of inferring a roleless <div> from JSX and
+                        // rejecting aria-label below — matches the pattern SortableCard.tsx
+                        // already uses with no suppression needed.
+                        role="button"
+                        tabIndex={0}
+                        aria-label={t(
+                            'admin.design.questions.actions.reorder',
+                            'Reorder {{label}}',
+                            { label: questionLabel }
+                        )}
                         className="mt-1 cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
                     >
                         <GripVertical className="h-5 w-5" />

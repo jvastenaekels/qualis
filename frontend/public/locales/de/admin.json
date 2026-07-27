@@ -130,12 +130,15 @@
             "export": "Exportieren",
             "insert_template": "Aus Vorlage einfügen",
             "entry_title_placeholder": "Abschnittstitel...",
+            "entry_title_aria": "Abschnittstitel",
             "entry_body_placeholder": "Begründung dokumentieren...",
+            "entry_body_aria": "Abschnittsinhalt",
             "comments_count_one": "{{n}} Kommentar",
             "comments_count_other": "{{n}} Kommentare",
             "show_resolved": "Erledigte anzeigen ({{n}})",
             "hide_resolved": "Erledigte ausblenden",
             "comment_placeholder": "Kommentar schreiben. @ verwenden, um zu erwähnen.",
+            "edit_comment_aria": "Kommentar bearbeiten",
             "post_comment": "Senden",
             "edit": "Bearbeiten",
             "delete": "Löschen",
@@ -1405,7 +1408,8 @@
                         "remove_action": "Entfernen"
                     },
                     "actions": {
-                        "delete": "{{title}} löschen"
+                        "delete": "{{title}} löschen",
+                        "reorder": "{{title}} neu anordnen"
                     }
                 },
                 "consent_title": "Einwilligungserklärung",
@@ -1497,6 +1501,7 @@
                     "copy_success": "Importiert",
                     "copy_from_aria": "{{label}} aus einer anderen Sprache importieren",
                     "delete": "{{label}} löschen",
+                    "reorder": "{{label}} neu anordnen",
                     "remove_option": "{{option}} entfernen"
                 },
                 "logic": {
@@ -1550,7 +1555,8 @@
                     "confirm_reset_codes": "Sind Sie sicher, dass Sie alle Aussagecodes neu sequenzieren möchten (s1, s2, s3...)?",
                     "codes_reset": "Aussagecodes neu sequenziert",
                     "save_item": "{{code}} speichern",
-                    "cancel_edit": "Bearbeitung von {{code}} abbrechen"
+                    "cancel_edit": "Bearbeitung von {{code}} abbrechen",
+                    "reorder_item": "{{code}} neu anordnen"
                 },
                 "settings": {
                     "title": "Forschungseinstellungen",

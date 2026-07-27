@@ -56,12 +56,14 @@ export function MemoEntry({
                         <input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            aria-label={t('admin.memo.entry_title_aria', 'Section title')}
                             className="w-full text-sm font-bold rounded-md border px-2 py-1"
                         />
                         <textarea
                             value={body}
                             onChange={(e) => setBody(e.target.value)}
                             rows={4}
+                            aria-label={t('admin.memo.entry_body_aria', 'Entry body')}
                             className="w-full text-sm rounded-md border px-2 py-1"
                         />
                         <div className="flex justify-end gap-2">

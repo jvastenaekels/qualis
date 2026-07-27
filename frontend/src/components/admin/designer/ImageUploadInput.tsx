@@ -184,7 +184,13 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                 <div className="relative">
                     {/* Kept outside the button below: a <button> may not contain
                         interactive content per the HTML content model, and a
-                        native file <input> counts as interactive even hidden. */}
+                        native file <input> counts as interactive even hidden.
+                        a11y-baseline: className="hidden" is display:none, which removes
+                        the element from the accessibility tree entirely — verified with a
+                        getByRole probe against an equivalent hidden input (task 6.7h,
+                        2026-07-28): queryByRole finds nothing, though it's still present
+                        in the DOM. No AT user can ever reach it directly; the visible,
+                        named <button> below is the only real control here. */}
                     <input
                         ref={fileInputRef}
                         type="file"

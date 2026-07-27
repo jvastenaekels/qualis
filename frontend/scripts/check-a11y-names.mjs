@@ -58,6 +58,8 @@ const SUPPRESSION_MARKER = `biome-ignore-all ${LABEL_RULE}`;
 const NAME_BEARING = new Set([
     'a',
     'button',
+    'input',
+    'textarea',
     'AccordionTrigger',
     'AlertDialogTrigger',
     'Button',
@@ -81,6 +83,44 @@ const CONTRAST_BEARING = new Set([...NAME_BEARING, 'Input', 'Textarea', 'Checkbo
 /** 1.45:1 against white — fails WCAG 1.4.3 (4.5:1) and 1.4.11 (3:1) outright. */
 const LOW_CONTRAST_CLASS = 'text-slate-300';
 
+/**
+ * ARIA widget roles that make an element operable, so it needs an accessible name —
+ * restricted to roles that are actually written as a literal `role="…"` on a
+ * non-NAME_BEARING element in this codebase (`<div role="button">` drag targets and
+ * hand-rolled grid cells). Structural/container roles (`grid`, `row`, `group`,
+ * `dialog`, `status`, `alert`, `tablist`, `listbox`, `presentation`, `img`) are
+ * deliberately excluded: they describe structure, not a control a user activates,
+ * and including them would flag containers that were never meant to have a "name"
+ * in the button/link sense.
+ */
+const INTERACTIVE_ROLES = new Set([
+    'button',
+    'checkbox',
+    'link',
+    'menuitem',
+    'menuitemcheckbox',
+    'menuitemradio',
+    'option',
+    'radio',
+    'searchbox',
+    'slider',
+    'spinbutton',
+    'switch',
+    'tab',
+    'textbox',
+]);
+
+/**
+ * The exact identifier pair dnd-kit's `useSortable`/`useDraggable` return: spreading
+ * `{...attributes} {...listeners}` onto a plain `<div>` injects `role="button"` and
+ * `tabIndex={0}` (confirmed against `@dnd-kit/core`'s source, 2026-07-28 —
+ * `attributes` is `{ role, tabIndex, 'aria-disabled', 'aria-pressed',
+ * 'aria-roledescription', 'aria-describedby' }`, never a name). A hand-maintained
+ * heuristic in the same spirit as `NAME_BEARING`: matched by variable name, not by
+ * type, so a differently-named destructure of the same hook is invisible to it.
+ */
+const DND_KIT_ROLE_SPREAD = ['attributes', 'listeners'];
+
 /* -------------------------------------------------------------------------- */
 /* AST helpers                                                                 */
 /* -------------------------------------------------------------------------- */
@@ -96,18 +136,70 @@ function tagNameOf(node, sourceFile) {
 function attributesOf(node, sourceFile) {
     const map = new Map();
     let hasSpread = false;
+    const spreadNames = [];
     for (const attribute of openingElementOf(node).attributes.properties) {
         if (ts.isJsxSpreadAttribute(attribute)) {
             hasSpread = true;
+            spreadNames.push(
+                ts.isIdentifier(attribute.expression) ? attribute.expression.text : null
+            );
             continue;
         }
         map.set(attribute.name.getText(sourceFile), attribute);
     }
-    return { map, hasSpread };
+    return { map, hasSpread, spreadNames };
 }
 
 function jsxChildrenOf(node) {
     return ts.isJsxElement(node) ? node.children : [];
+}
+
+/** The string value of `attr="x"` or `attr={"x"}` — anything else (an identifier, a
+ * template with holes, a ternary) is not statically resolvable and yields `null`. */
+function literalAttributeString(attribute) {
+    const initializer = attribute?.initializer;
+    if (!initializer) return null;
+    if (ts.isStringLiteral(initializer)) return initializer.text;
+    if (
+        ts.isJsxExpression(initializer) &&
+        initializer.expression &&
+        ts.isStringLiteral(initializer.expression)
+    ) {
+        return initializer.expression.text;
+    }
+    return null;
+}
+
+/** `tabIndex={-1}` is a script-focus target for a roving-tabindex container (dnd-kit
+ * grids, GridSort's row wrappers) — never reachable by sequential Tab navigation, so
+ * it is not "the control a user tabs to" and is excluded. Any other value —
+ * `0`, a positive number, or a dynamic expression this checker cannot resolve —
+ * counts as a tab stop. */
+function isNegativeOneTabIndex(attribute) {
+    const expression = attribute?.initializer?.expression;
+    if (!expression) return false;
+    return (
+        ts.isPrefixUnaryExpression(expression) &&
+        expression.operator === ts.SyntaxKind.MinusToken &&
+        ts.isNumericLiteral(expression.operand) &&
+        expression.operand.text === '1'
+    );
+}
+
+/**
+ * A control's *effective* role, not its tag. Matches three shapes a tag-based check
+ * cannot see: a literal `role="…"` naming an ARIA widget role, a `tabIndex` that
+ * puts the element in (or near) the tab order, or dnd-kit's own role/tabIndex-
+ * injecting prop spread. See `INTERACTIVE_ROLES` and `DND_KIT_ROLE_SPREAD` above for
+ * what each one deliberately does and does not match.
+ */
+function isEffectivelyInteractive(node, sourceFile) {
+    const { map, spreadNames } = attributesOf(node, sourceFile);
+    const role = literalAttributeString(map.get('role'));
+    if (role !== null && INTERACTIVE_ROLES.has(role)) return true;
+    const tabIndex = map.get('tabIndex');
+    if (tabIndex && !isNegativeOneTabIndex(tabIndex)) return true;
+    return DND_KIT_ROLE_SPREAD.every((name) => spreadNames.includes(name));
 }
 
 /** `t('key', 'Fallback')`, `i18n.t(…)` — anything whose callee is named `t`. */
@@ -313,6 +405,17 @@ function collectLabelTargets(sourceFile) {
 }
 
 /**
+ * A spread may carry the name from the caller — *except* dnd-kit's own
+ * `attributes`/`listeners` (see `DND_KIT_ROLE_SPREAD`), which are known never to.
+ * Any spread this checker cannot positively clear keeps the conservative "maybe
+ * named" behaviour; only spreads entirely accounted for by the known pair lose it.
+ */
+function hasUnexplainedSpread(hasSpread, spreadNames) {
+    if (!hasSpread) return false;
+    return !spreadNames.every((name) => name !== null && DND_KIT_ROLE_SPREAD.includes(name));
+}
+
+/**
  * A control counts as unnamed when nothing in the accessible-name computation can
  * reach it. Escape hatches, each deliberate and each documented:
  *
@@ -320,17 +423,19 @@ function collectLabelTargets(sourceFile) {
  *   aria-label*    an explicit name
  *   title          accname's last-resort fallback (weak, but conformant)
  *   id             ONLY when a label in the same file points at it
- *   {...props}     the name may arrive from the caller; undecidable
+ *   {...props}     the name may arrive from the caller; undecidable — EXCEPT
+ *                  dnd-kit's `{...attributes} {...listeners}`, which is known not to
+ *                  carry one (see `hasUnexplainedSpread`)
  *   dynamic child  the name is computed at runtime; undecidable
  *
  * The checker never guesses, so its count is a floor, not a ceiling.
  */
 function isUnnamed(node, sourceFile, labelTargets) {
-    const { map, hasSpread } = attributesOf(node, sourceFile);
+    const { map, hasSpread, spreadNames } = attributesOf(node, sourceFile);
     if (map.has('asChild')) return false;
     if (map.has('aria-label') || map.has('aria-labelledby')) return false;
     if (map.has('title')) return false;
-    if (hasSpread) return false;
+    if (hasUnexplainedSpread(hasSpread, spreadNames)) return false;
 
     const id = map.get('id');
     if (id?.initializer) {
@@ -351,16 +456,103 @@ function isUnnamed(node, sourceFile, labelTargets) {
 /* Contrast inspection                                                         */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Real WCAG contrast math (relative luminance + contrast ratio, WCAG 2.x), scoped
+ * tightly to a shape the codebase has already hit once: `text-slate-{shade}/{alpha}`.
+ *
+ * It is deliberately NOT applied to plain (alpha-free) tokens of any shade. Doing so
+ * would flag `text-slate-400` (2.56:1 against white — also failing 4.5:1) at every
+ * one of its ~210 existing plain usages across `src/`, a large pre-existing debt this
+ * task did not measure and is not scoped to open. An alpha modifier is the one shape
+ * that can silently degrade an otherwise-*passing* shade below the line — task 6.7h's
+ * own fix to `SortableCard.tsx`'s watermark did exactly that (`text-slate-500/80`,
+ * 3.24:1, sitting right next to the passing `text-slate-500`, 4.76:1) — so it is the
+ * one shape this checker computes rather than bans by literal string.
+ *
+ * Tailwind's default slate hex values (`tailwindcss/colors.js`, confirmed against the
+ * installed 3.4.19), composited over an assumed white background per this file's
+ * existing convention (`LOW_CONTRAST_CLASS`'s own doc comment: "1.45:1 against
+ * white"). Restricted to `slate` — the codebase's neutral/body-text palette, used for
+ * text on white/near-white surfaces — not `indigo`/`amber`/`red`/etc., which are
+ * accent colours frequently sitting on their own tinted backgrounds, where the
+ * white-background assumption this whole module makes would silently produce a wrong
+ * verdict rather than a merely incomplete one.
+ */
+const SLATE_HEX = {
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
+};
+const MIN_TEXT_CONTRAST = 4.5; // WCAG 1.4.3, normal text — every real usage here is small/body text
+
+function srgbChannelToLinear(channel) {
+    const c = channel / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hex) {
+    const r = Number.parseInt(hex.slice(1, 3), 16);
+    const g = Number.parseInt(hex.slice(3, 5), 16);
+    const b = Number.parseInt(hex.slice(5, 7), 16);
+    return (
+        0.2126 * srgbChannelToLinear(r) +
+        0.7152 * srgbChannelToLinear(g) +
+        0.0722 * srgbChannelToLinear(b)
+    );
+}
+
+function contrastRatio(hexA, hexB) {
+    const lA = relativeLuminance(hexA);
+    const lB = relativeLuminance(hexB);
+    const lighter = Math.max(lA, lB);
+    const darker = Math.min(lA, lB);
+    return (lighter + 0.05) / (darker + 0.05);
+}
+
+/** `hex` at `alphaPercent`% opacity, composited over white (`#rrggbb`). */
+function compositeOverWhite(hex, alphaPercent) {
+    const alpha = alphaPercent / 100;
+    const channel = (offset) => {
+        const c = Number.parseInt(hex.slice(offset, offset + 2), 16);
+        return Math.round(c * alpha + 255 * (1 - alpha));
+    };
+    // `#rrggbb`: red starts at index 1, green at 3, blue at 5 (index 0 is '#').
+    return `#${[1, 3, 5].map((offset) => channel(offset).toString(16).padStart(2, '0')).join('')}`;
+}
+
+const ALPHA_SLATE_TOKEN = /^text-slate-(\d+)\/(\d+)$/;
+
+/** True only for an alpha-suffixed slate token that computes below 4.5:1 on white. */
+function alphaSlateTokenFailsContrast(token) {
+    const match = ALPHA_SLATE_TOKEN.exec(token);
+    if (!match) return false;
+    const hex = SLATE_HEX[match[1]];
+    if (!hex) return false; // an unlisted shade: don't guess, this checker's count is a floor
+    const composited = compositeOverWhite(hex, Number(match[2]));
+    return contrastRatio(composited, '#ffffff') < MIN_TEXT_CONTRAST;
+}
+
 function classNameIsLowContrast(node, sourceFile) {
     const { map } = attributesOf(node, sourceFile);
     const className = map.get('className');
     if (!className) return false;
     // Only the base state matters: `hover:text-slate-300` is not the resting colour.
+    // The anchored regex in alphaSlateTokenFailsContrast has the same property: a
+    // `hover:`-prefixed token never matches `^text-slate-…`, so no separate guard
+    // is needed for it.
     return className
         .getText(sourceFile)
         .split(/[\s'"`]+/)
         .some(
-            (token) => token === LOW_CONTRAST_CLASS || token.startsWith(`${LOW_CONTRAST_CLASS}/`)
+            (token) =>
+                token === LOW_CONTRAST_CLASS ||
+                token.startsWith(`${LOW_CONTRAST_CLASS}/`) ||
+                alphaSlateTokenFailsContrast(token)
         );
 }
 
@@ -461,12 +653,20 @@ export function analyzeSource(fileName, sourceText) {
             const tag = tagNameOf(node, sourceFile);
             const line =
                 sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-            if (NAME_BEARING.has(tag) && isUnnamed(node, sourceFile, labelTargets)) {
+            // A control by tag (`Button`) or by effective role — a `<div>` dnd-kit or
+            // hand-rolled ARIA turned into a button — see `isEffectivelyInteractive`.
+            // Computed at most once per element, and only when a tag lookup alone
+            // doesn't already settle the question, since it walks the attribute list.
+            const byRole = () => isEffectivelyInteractive(node, sourceFile);
+            if (
+                (NAME_BEARING.has(tag) || byRole()) &&
+                isUnnamed(node, sourceFile, labelTargets)
+            ) {
                 unnamed.push({ line, tag, fingerprint: fingerprintOf(node, sourceFile) });
             }
             if (
                 !insideCountedControl &&
-                CONTRAST_BEARING.has(tag) &&
+                (CONTRAST_BEARING.has(tag) || byRole()) &&
                 hasLowContrastClass(node, sourceFile)
             ) {
                 lowContrast.push({ line, tag, fingerprint: fingerprintOf(node, sourceFile) });

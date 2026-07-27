@@ -75,6 +75,11 @@ export function useImportConfig() {
     );
 
     const fileInput = (
+        // a11y-baseline: className="hidden" is display:none, which removes this element
+        // from the accessibility tree entirely — verified with a getByRole probe (task
+        // 6.7h, 2026-07-28): queryByRole finds nothing for a display:none input, though
+        // it stays in the DOM. It is triggered only via `triggerImport()` -> `.click()`
+        // on a real, visibly labelled control; no AT user can reach it directly.
         <input
             type="file"
             ref={fileInputRef}

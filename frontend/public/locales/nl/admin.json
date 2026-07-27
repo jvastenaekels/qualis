@@ -130,12 +130,15 @@
             "export": "Exporteren",
             "insert_template": "Uit sjabloon invoegen",
             "entry_title_placeholder": "Sectietitel…",
+            "entry_title_aria": "Sectietitel",
             "entry_body_placeholder": "Documenteer uw redenering…",
+            "entry_body_aria": "Sectie-inhoud",
             "comments_count_one": "{{n}} opmerking",
             "comments_count_other": "{{n}} opmerkingen",
             "show_resolved": "Opgeloste tonen ({{n}})",
             "hide_resolved": "Opgeloste verbergen",
             "comment_placeholder": "Schrijf een opmerking. Gebruik @ om te vermelden.",
+            "edit_comment_aria": "Opmerking bewerken",
             "post_comment": "Plaatsen",
             "edit": "Bewerken",
             "delete": "Verwijderen",
@@ -1405,7 +1408,8 @@
                         "remove_action": "Verwijderen"
                     },
                     "actions": {
-                        "delete": "{{title}} verwijderen"
+                        "delete": "{{title}} verwijderen",
+                        "reorder": "{{title}} herschikken"
                     }
                 },
                 "consent_title": "Toestemmingsformulier",
@@ -1497,6 +1501,7 @@
                     "copy_success": "Geïmporteerd",
                     "copy_from_aria": "{{label}} uit een andere taal importeren",
                     "delete": "{{label}} verwijderen",
+                    "reorder": "{{label}} herschikken",
                     "remove_option": "{{option}} verwijderen"
                 },
                 "logic": {
@@ -1550,7 +1555,8 @@
                     "confirm_reset_codes": "Weet u zeker dat u alle stellingcodes opnieuw wilt nummeren (s1, s2, s3...)?",
                     "codes_reset": "Stellingcodes opnieuw genummerd",
                     "save_item": "{{code}} opslaan",
-                    "cancel_edit": "Bewerken van {{code}} annuleren"
+                    "cancel_edit": "Bewerken van {{code}} annuleren",
+                    "reorder_item": "{{code}} herschikken"
                 },
                 "settings": {
                     "title": "Onderzoeksinstellingen",

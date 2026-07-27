@@ -65,6 +65,7 @@ export function CommentThread({
                                 value={editDraft}
                                 onChange={(e) => setEditDraft(e.target.value)}
                                 rows={3}
+                                aria-label={t('admin.memo.edit_comment_aria', 'Edit comment')}
                                 className="w-full text-sm rounded-md border px-2 py-1"
                             />
                             <div className="flex gap-2 justify-end">

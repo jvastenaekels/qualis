@@ -51,6 +51,23 @@ describe('CardStack', () => {
         expect(screen.getByText('This is a test statement')).toBeTruthy();
     });
 
+    it('renders the code watermark at a legible contrast (Task 6.7h)', () => {
+        // Task 6.7h review response: same watermark idiom as SortableCard.tsx (the
+        // component's own comment says "Similar to SortableCard style"), same
+        // pre-existing defect — text-slate-300/80 (~1.37:1 against white), not
+        // caught by the gate because this span sits inside a purely decorative,
+        // non-interactive card stack, never inside a role-bearing control. Fixed by
+        // hand to plain text-slate-500 (4.76:1), matching SortableCard.tsx's fix.
+        const statement = { id: 1, text: 'This is a test statement', code: 'S1' };
+
+        render(<CardStackWrapper statement={statement} />);
+
+        const watermark = screen.getByText('S1');
+        expect(watermark).toHaveClass('text-slate-500');
+        expect(watermark).not.toHaveClass('text-slate-300');
+        expect(watermark).not.toHaveClass('text-slate-300/80');
+    });
+
     it('does not show read button for short text (no overflow)', () => {
         const statement = { id: 1, text: 'Short text' };
 

@@ -176,4 +176,72 @@ describe('MemoSection', () => {
 
         await waitFor(() => expect(screen.getByText('first thought')).toBeInTheDocument());
     });
+
+    it('names the new-entry title field — gate-invisible until Task 6.7h added <input> to NAME_BEARING', async () => {
+        const user = userEvent.setup();
+        const api = await import('@/api/generated');
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        (api.getConcourseMemoApiAdminConcoursesCidMemoGet as any).mockResolvedValue({
+            parent_type: 'concourse',
+            parent_id: 42,
+            entries: [],
+        });
+
+        renderWithProviders(
+            <MemoSection
+                parentType="concourse"
+                parentId={42}
+                currentUserId={1}
+                isOwner
+                canEdit
+                members={[{ user_id: 1, display_name: 'me' }]}
+            />
+        );
+        await waitFor(() => expect(screen.getByText('Add entry')).toBeInTheDocument());
+        await user.click(screen.getByText('Add entry'));
+
+        expect(screen.getByRole('textbox', { name: 'Section title' })).toBeInTheDocument();
+    });
+
+    it("names the existing entry's title field while editing it (Task 6.7h)", async () => {
+        const user = userEvent.setup();
+        const api = await import('@/api/generated');
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        (api.getConcourseMemoApiAdminConcoursesCidMemoGet as any).mockResolvedValue({
+            parent_type: 'concourse',
+            parent_id: 42,
+            entries: [
+                {
+                    id: 1,
+                    parent_type: 'concourse',
+                    parent_id: 42,
+                    title: 'Sources canvassed',
+                    body: '',
+                    position: 10,
+                    created_at: '2026-04-30T12:00:00Z',
+                    updated_at: '2026-04-30T12:00:00Z',
+                    created_by: 1,
+                    last_edited_by: 1,
+                    comments: [],
+                },
+            ],
+        });
+        // biome-ignore lint/suspicious/noExplicitAny: test mock
+        (api.getTemplatesApiAdminMemoTemplatesGet as any).mockResolvedValue([]);
+
+        renderWithProviders(
+            <MemoSection
+                parentType="concourse"
+                parentId={42}
+                currentUserId={1}
+                isOwner
+                canEdit
+                members={[{ user_id: 1, display_name: 'me' }]}
+            />
+        );
+        await waitFor(() => expect(screen.getByText('Sources canvassed')).toBeInTheDocument());
+        await user.click(screen.getByText('Edit'));
+
+        expect(screen.getByRole('textbox', { name: 'Section title' })).toBeInTheDocument();
+    });
 });

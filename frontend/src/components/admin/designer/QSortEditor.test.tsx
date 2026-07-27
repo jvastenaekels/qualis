@@ -194,14 +194,31 @@ describe('QSortEditor', () => {
 
             const statementItem = screen.getByText('Existing Statement').closest('.group');
             expect(statementItem).toBeInTheDocument();
-            // dnd-kit's useSortable spreads {...attributes} onto this div,
-            // which injects role="button" — no accessible name, so it's found
-            // by class rather than by role+name.
+            // dnd-kit's useSortable spreads {...attributes} onto this div, which injects
+            // role="button" — findable by role+name since task 6.7h's aria-label fix, but
+            // still located by class here to keep this test scoped to the contrast fix.
             // biome-ignore lint/style/noNonNullAssertion: test setup
             const dragHandle = statementItem!.querySelector('.cursor-grab');
             expect(dragHandle).not.toBeNull();
             expect(dragHandle).toHaveClass('text-slate-500');
             expect(dragHandle).not.toHaveClass('text-slate-300');
+        });
+
+        it('names the drag handle by the statement it reorders — gate-invisible until Task 6.7h', () => {
+            // Task 6.7h: dnd-kit's {...attributes}/{...listeners} spread injects
+            // role="button" and tabIndex={0} but never a name, so this control was
+            // unnamed and invisible to check-a11y-names.mjs's tag-based matching at the
+            // same time — the gate now resolves effective role, not just tag, and this
+            // is the fix it prompted.
+            renderEditor();
+
+            const statementItem = screen.getByText('Existing Statement').closest('.group');
+            expect(statementItem).toBeInTheDocument();
+            // biome-ignore lint/style/noNonNullAssertion: test setup
+            const dragHandle = within(statementItem!).getByRole('button', {
+                name: 'Reorder s1',
+            });
+            expect(dragHandle).toHaveClass('cursor-grab');
         });
 
         it('names the save/cancel controls by the statement code being edited (Task 6.7c)', async () => {
