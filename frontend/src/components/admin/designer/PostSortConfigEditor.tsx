@@ -376,14 +376,18 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader className={allowRandomComments ? 'pb-4' : ''}>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
+                                    <Label
+                                        htmlFor="random-comments-toggle"
+                                        className="block cursor-pointer text-base font-black text-slate-900 tracking-tight"
+                                    >
                                         {t('admin.design.postsort.random_comments.title')}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.random_comments.desc')}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="random-comments-toggle"
                                     data-testid="allow-random-comments-toggle"
                                     checked={allowRandomComments}
                                     onCheckedChange={(checked: boolean) => {
@@ -436,14 +440,18 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base font-black text-slate-900 tracking-tight">
+                                    <Label
+                                        htmlFor="missing-statements-toggle"
+                                        className="block cursor-pointer text-base font-black text-slate-900 tracking-tight"
+                                    >
                                         {t('admin.design.postsort.missing.title')}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.missing.desc')}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="missing-statements-toggle"
                                     data-testid="allow-missing-statements-toggle"
                                     checked={allowMissingStatements}
                                     onCheckedChange={(checked: boolean) => {
@@ -499,17 +507,21 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                    <Label
+                                        htmlFor="audio-recording-toggle"
+                                        className="flex cursor-pointer items-center gap-2 text-lg font-black text-slate-800"
+                                    >
                                         <Mic className="w-5 h-5 text-indigo-600" />
                                         {t('admin.design.postsort.audio.title') ||
                                             'Audio Recording'}
-                                    </CardTitle>
+                                    </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.audio.desc') ||
                                             'Allow participants to record audio responses instead of text'}
                                     </CardDescription>
                                 </div>
                                 <Switch
+                                    id="audio-recording-toggle"
                                     data-testid="audio-recording-toggle"
                                     checked={config?.audio?.enabled || false}
                                     onCheckedChange={(checked: boolean) => {
@@ -635,7 +647,10 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                     {/* Email/Contact Section */}
                     <div className="flex items-center justify-between rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6 mt-6 shadow-sm group hover:border-indigo-200 hover:shadow-md transition-all">
                         <div className="space-y-1.5 text-indigo-900">
-                            <Label className="text-base font-bold flex items-center gap-3 tracking-tight">
+                            <Label
+                                htmlFor="email-collection-toggle"
+                                className="flex cursor-pointer items-center gap-3 text-base font-bold tracking-tight"
+                            >
                                 {t('admin.design.postsort.email.title')}
                                 <Badge
                                     variant="outline"
@@ -649,6 +664,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                             </p>
                         </div>
                         <Switch
+                            id="email-collection-toggle"
                             data-testid="email-collection-toggle"
                             checked={config?.email_collection_enabled || false}
                             onCheckedChange={(checked: boolean) => {
@@ -667,10 +683,14 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                         <div className="ml-8 mt-4 space-y-4 border-l-2 border-indigo-100 pl-8 animate-in slide-in-from-left-4 duration-500">
                             <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 shadow-sm">
                                 <div className="flex items-center justify-between group/item mb-2">
-                                    <Label className="text-sm font-bold text-amber-900 group-hover/item:text-amber-950 transition-colors tracking-tight">
+                                    <Label
+                                        htmlFor="interview-consent-toggle"
+                                        className="cursor-pointer text-sm font-bold text-amber-900 transition-colors group-hover/item:text-amber-950"
+                                    >
                                         {t('admin.design.postsort.email.interview')}
                                     </Label>
                                     <Switch
+                                        id="interview-consent-toggle"
                                         data-testid="interview-consent-toggle"
                                         checked={config?.interview_consent_enabled ?? true}
                                         onCheckedChange={(checked: boolean) => {
@@ -694,7 +714,10 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
 
                             <div className="flex items-center justify-between group/item py-4 px-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
                                 <div className="space-y-1">
-                                    <Label className="text-sm font-bold text-slate-800 group-hover/item:text-indigo-600 transition-all tracking-tight">
+                                    <Label
+                                        htmlFor="newsletter-consent-toggle"
+                                        className="cursor-pointer text-sm font-bold text-slate-800 transition-all group-hover/item:text-indigo-600"
+                                    >
                                         {t('admin.design.postsort.email.results')}
                                     </Label>
                                     <p className="text-xs font-medium text-slate-500">
@@ -702,6 +725,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                     </p>
                                 </div>
                                 <Switch
+                                    id="newsletter-consent-toggle"
                                     data-testid="newsletter-consent-toggle"
                                     checked={config?.newsletter_consent_enabled ?? true}
                                     onCheckedChange={(checked: boolean) => {

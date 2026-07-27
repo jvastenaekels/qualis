@@ -569,7 +569,9 @@ git commit -m "fix(participants): stop rendering raw question keys on the detail
 
 ### Task 3.1: Row actions are invisible but tabbable
 
-**The defect:** each concourse row carries four 32×32 buttons (History, Comments, Edit, Delete). Three sit at `opacity: 0`, revealed by `group-hover` only — no `group-focus-within`. Across 36 statements that is ~108 tab stops on invisible targets, and the actions are undiscoverable on touch. "Edit" is permanently at `opacity-50` on `text-slate-400`, roughly 1.4:1 against white.
+**The defect:** each concourse row carries four 32×32 buttons (History, Comments, Edit, Delete). Three sit at `opacity: 0`, revealed by `group-hover` only, and are undiscoverable on touch, where there is no hover at all. "Edit" is permanently visible but at `text-slate-300` — **1.49:1** against white, against a 4.5:1 AA threshold; the mobile variant of the same control is 2.56:1.
+
+> **Audit correction.** The original finding claimed ~108 invisible tab stops and "no visible focus anywhere". That was wrong: the pre-fix source already carried `focus-visible:opacity-100` on all three hover-only buttons, so keyboard focus did reveal the focused button. The measurement behind the claim read resting opacity and never exercised focus. What this task adds is that the whole cluster reveals together on focus, matching hover — an improvement, not a rescue. The contrast defect is the real accessibility failure here, and it was worse than first described.
 
 **Files:**
 - Test: `frontend/src/pages/admin/ConcourseDetailPage.test.tsx`
@@ -720,7 +722,12 @@ git commit -m "fix(a11y): make dashboard study cards keyboard-operable"
 
 ### Task 3.4: Unlabelled switches
 
-**The defect:** both switches in `Access → Access rules` return an empty accessible name. A screen reader announces "switch" with no indication of what it toggles.
+**The defect — retracted.** The original finding claimed both switches in `Access → Access rules` returned an empty accessible name. That was wrong, on two counts:
+
+- `<button>` is a **labelable element** (WHATWG HTML §4.10.2, which lists it first), so the existing `<Label htmlFor="password-toggle">` / `<Switch id="password-toggle">` pairing names them legitimately. The claim in this task's original text that "`htmlFor`/`<label>` association does not apply to buttons" is simply false.
+- The measurement behind it read the absent `aria-label` **attribute** and mistook it for the computed accessible **name**. Verified two ways: live Chromium, and the project's own happy-dom test environment (which implements `HTMLButtonElement.labels`), both resolve the names pre-fix.
+
+What shipped is therefore **hardening, not a bug fix**: an explicit `aria-labelledby` so the name no longer depends on a single `id`/`htmlFor` pairing that a future edit could silently break. Keep it, but do not cite this task as having fixed a silent control.
 
 **Files:**
 - Modify: `frontend/src/pages/admin/RecruitmentPage.tsx:376-390`, `:465-…`
@@ -808,6 +815,49 @@ Expected: PASS.
 git add frontend/src/pages/LoginPage.tsx frontend/src/pages/LoginPage.test.tsx \
         frontend/src/components/admin/AdminDashboard.tsx frontend/public/locales/en/admin.json
 git commit -m "fix(a11y): repair heading hierarchy and login form affordances"
+```
+
+---
+
+### Task 3.6: Controls that genuinely have no accessible name
+
+**The defect:** found while retracting Task 3.4. Six controls have **no `id`, no `htmlFor`, and no `aria-label`** anywhere near them — unlike the Access switches, these are real, unambiguous accessible-name gaps, confirmed by reading each one:
+
+- `frontend/src/components/admin/designer/PostSortConfigEditor.tsx:386`, `:446`, `:512`
+- `frontend/src/components/admin/designer/QuestionBuilder.tsx:380`
+- `frontend/src/pages/admin/ConcourseDetailPage.tsx:655`, `:696`
+
+A screen-reader user hears "switch" or "checkbox" with nothing to identify it.
+
+**Do not blanket-fix every switch in the codebase.** Task 3.4's retraction exists precisely because a control that looks unlabelled in source may be correctly labelled through `<label for>`. `QuestionBuilder.tsx:346` (`req-${id}`) is one such false positive — it has a matching pair. Verify each candidate's computed accessible name before changing it.
+
+**Files:**
+- Modify: the six sites above
+- Test: the corresponding test files
+
+- [ ] **Step 1: Confirm each one is genuinely unnamed**
+
+```tsx
+it('names every settings toggle', () => {
+    renderWithProviders(<PostSortConfigEditor {...props} />);
+    // getByRole computes the real accessible name — an unnamed control will not match.
+    expect(screen.getByRole('switch', { name: /allow audio/i })).toBeInTheDocument();
+});
+```
+
+Run it first: it must fail because the name does not resolve, not because the element is absent.
+
+- [ ] **Step 2: Add the label association**
+
+Prefer a visible `<Label htmlFor>` pointing at an `id` on the control — that names it *and* gives a click target. Use `aria-label` only where no visible text exists to point at.
+
+- [ ] **Step 3: Confirm the tests pass, and that no control gained a name that differs from its visible text**
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/src/components/admin/designer frontend/src/pages/admin/ConcourseDetailPage.tsx
+git commit -m "fix(a11y): name the designer and concourse controls that had none"
 ```
 
 ---
@@ -1455,7 +1505,44 @@ git commit -m "fix(access): unfreeze the clear-date buttons under React Compiler
 
 ---
 
-### Task 6.7: Charts mounting at zero size
+### Task 6.7: A lint gate for accessible names
+
+**Why:** Phase 3's whole-branch review called this *"the highest-leverage follow-up in the whole remediation"*. Biome's a11y rules are clearly enabled (the repo carries `biome-ignore lint/a11y/*` comments), but **nothing enforces that an interactive control has an accessible name**. That is why the class kept regrowing: Phase 3 named 12 controls by hand, and a sweep immediately found ~76 more.
+
+Without a gate, every later phase re-introduces the defect at whatever rate new controls are written. With one, the 22 icon-only buttons below would have been caught mechanically, on the commit that created them.
+
+**Files:**
+- Modify: `frontend/biome.json` (or the equivalent lint config)
+- Modify: whatever the rule then flags
+
+- [ ] **Step 1: Turn the rule on and count the damage**
+
+Enable Biome's `a11y/useButtonType`, `a11y/useAriaPropsForRole`, and above all the rules covering accessible names on interactive elements. Run `npm run lint` and record the count — the review's own enumeration put it at ~76 unnamed controls out of ~465.
+
+- [ ] **Step 2: Fix by cluster, highest impact first**
+
+The review enumerated these; verify each before changing it (Task 3.4's retraction exists because a control that *looks* unnamed in source may be correctly named by `<label for>`):
+
+1. **`InteractiveDataView.columns.tsx:504, 516, 531, 636, 652, 664, 676`** — seven `<TooltipTrigger>` without `asChild`. Radix renders each as a real focusable `<button>` containing only a `<div>` and an icon; the descriptive text lives in `TooltipContent`, wired as `aria-describedby` only while open. That is **up to seven unnamed tab stops per participant row** on the Data table — the single largest instance of this defect in the product.
+2. **22 icon-only `<Button>`s**, several destructive: delete a survey question (`QuestionBuilder.tsx:300`), delete a choice option (`:808`), delete a process step (`ProcessStepEditor.tsx:121`), delete a methodology tip (`InterfaceEditor.tsx:346`), delete a tag (`ConcourseDetailPage.tsx:1648`), remove a partner (`BrandingEditor.tsx:304`), save/cancel inline statement edit (`QSortEditor.tsx:179, 187`), copy TOTP secret (`AccountSettingsPage.tsx:338`), copy invite link (`ProjectMembersPage.tsx:572`), play/pause participant audio (`AudioPlayer.tsx:106`), table paging (`InteractiveDataView.tsx:932, 944`), and the six accent-colour swatches at `BrandingEditor.tsx:135`, which currently announce identically to each other.
+3. **`StudyDesignPage.tsx:188`** — the designer's language switcher. Its only text sits in a `<span className="hidden sm:inline">`, so **below the `sm` breakpoint it has no accessible name at all**.
+4. **~40 `<Input>`/`<Textarea>`** with a visually adjacent `<Label>` carrying no `htmlFor` — systemic across `ConcourseDetailPage` (11), `QuestionBuilder` (5), `QSortEditor` (3), `InterfaceEditor` (4), `ProcessStepEditor` (4), `BrandingEditor` (2), the memo module, and `ProjectMembersPage.tsx:508` (the invite form's only field).
+5. **`ImportFromConcourseDialog.tsx:262`** — the one unnamed `<Checkbox>` left in the admin.
+
+- [ ] **Step 3: Also ban `text-slate-300` on interactive elements**
+
+Task 3.1 fixed the contrast on one file. `text-slate-300` (1.45:1 on white) still sits on interactive controls in `QuestionBuilder.tsx:209, 273, 303, 811`, `ProcessStepEditor.tsx:80, 124`, `InterfaceEditor.tsx:357`, `QSortEditor.tsx:139, 290`, `BrandingEditor.tsx:313` — several of them delete buttons.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/biome.json frontend/src
+git commit -m "fix(a11y): enforce accessible names with a lint gate and clear the backlog"
+```
+
+---
+
+### Task 6.8: Charts mounting at zero size
 
 **The defect:** loading the `Data` screen logs the Recharts warning *"The width(-1) and height(-1) of chart should be greater than 0"* five times — charts are mounting inside collapsed containers. Harmless today, but it is console noise that will mask a real warning later.
 

@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Sähköpostiosoite",
             "password_label": "Salasana",
-            "submit": "Jatka",
+            "submit": "Kirjaudu sisään",
             "cta": "Kirjaudu sisään",
             "forgot_password": "Unohditko?",
             "loading": "Tunnistaudutaan...",
@@ -332,6 +332,7 @@
             "field_language": "Kieli",
             "import_language": "Kieli",
             "select_all": "Valitse kaikki",
+            "select_item": "Valitse {{code}}",
             "bulk_selected": "{{count}} valittu",
             "bulk_set_status": "Aseta tila:",
             "bulk_clear": "Tyhjennä",
@@ -1456,6 +1457,8 @@
                     "locked_active": "Tämä tutkimus on aktiivinen. Vaihda luonnostilaan muokataksesi.",
                     "locked_paused": "Tämä tutkimus on tauolla. Vaihda luonnostilaan muokataksesi.",
                     "locked_closed": "Tämä tutkimus on suljettu. Suunnittelu on arkistoitu.",
+                    "view_read_only": "Katso vain luku -tilassa",
+                    "locked_dialog_desc": "Muokkaus on lukittu, kun tutkimus on tässä tilassa. Sulje tämä ilmoitus, niin voit lukea asetukset muuttamatta niitä.",
                     "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"

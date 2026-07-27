@@ -653,6 +653,7 @@ export default function ConcourseDetailPage() {
                             {canEdit && filteredItems.length > 0 && (
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50/80 border-b border-slate-100">
                                     <Checkbox
+                                        id="concourse-select-all"
                                         checked={
                                             filteredItems.length > 0 &&
                                             filteredItems.every((item) =>
@@ -661,9 +662,12 @@ export default function ConcourseDetailPage() {
                                         }
                                         onCheckedChange={toggleSelectAll}
                                     />
-                                    <span className="text-2xs font-bold text-slate-500">
+                                    <Label
+                                        htmlFor="concourse-select-all"
+                                        className="text-2xs font-bold text-slate-500 cursor-pointer"
+                                    >
                                         {t('admin.concourse.select_all', 'Select all')}
-                                    </span>
+                                    </Label>
                                 </div>
                             )}
                             {/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: row rendering — many cooperating visual states (selection, edit mode, status, missing translation, mobile/desktop layouts, hover-only actions). Same shell-suppression precedent as the page-level biome-ignore on line 78 (CLAUDE.md). */}
@@ -694,6 +698,11 @@ export default function ConcourseDetailPage() {
                                             {canEdit && (
                                                 <div className="flex-shrink-0 sm:pt-0.5">
                                                     <Checkbox
+                                                        aria-label={t(
+                                                            'admin.concourse.select_item',
+                                                            'Select {{code}}',
+                                                            { code: item.code }
+                                                        )}
                                                         checked={selectedItems.has(item.id)}
                                                         onCheckedChange={() =>
                                                             toggleSelectItem(item.id)
@@ -852,7 +861,7 @@ export default function ConcourseDetailPage() {
                                                                     'common.edit',
                                                                     'Edit'
                                                                 )}
-                                                                className="size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                className="size-8 p-0 text-slate-500 hover:text-slate-700"
                                                                 onClick={() => startEdit(item)}
                                                             >
                                                                 <Pencil className="size-3.5" />
@@ -919,6 +928,7 @@ export default function ConcourseDetailPage() {
                                                                     className="flex items-center gap-1.5 cursor-pointer"
                                                                 >
                                                                     <Checkbox
+                                                                        id={`edit-item-tag-${tag.id}`}
                                                                         checked={editTagIds.includes(
                                                                             tag.id
                                                                         )}
@@ -939,21 +949,26 @@ export default function ConcourseDetailPage() {
                                                                             );
                                                                         }}
                                                                     />
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-2xs h-5 cursor-pointer"
-                                                                        style={
-                                                                            tag.color
-                                                                                ? {
-                                                                                      borderColor:
-                                                                                          tag.color,
-                                                                                      color: tag.color,
-                                                                                  }
-                                                                                : undefined
-                                                                        }
+                                                                    <Label
+                                                                        htmlFor={`edit-item-tag-${tag.id}`}
+                                                                        className="cursor-pointer"
                                                                     >
-                                                                        {tag.name}
-                                                                    </Badge>
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="text-2xs h-5 cursor-pointer"
+                                                                            style={
+                                                                                tag.color
+                                                                                    ? {
+                                                                                          borderColor:
+                                                                                              tag.color,
+                                                                                          color: tag.color,
+                                                                                      }
+                                                                                    : undefined
+                                                                            }
+                                                                        >
+                                                                            {tag.name}
+                                                                        </Badge>
+                                                                    </Label>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1070,7 +1085,10 @@ export default function ConcourseDetailPage() {
 
                                         {/* Actions (desktop only — mobile shown in top row) */}
                                         {canEdit && (
-                                            <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
+                                            <div
+                                                className="hidden sm:flex items-center gap-1 flex-shrink-0"
+                                                data-row-actions
+                                            >
                                                 {isEditing ? (
                                                     <>
                                                         <Button
@@ -1109,7 +1127,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.history',
                                                                 'History'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'history')
                                                             }
@@ -1123,7 +1141,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.comments',
                                                                 'Comments'
                                                             )}
-                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'comments')
                                                             }
@@ -1139,7 +1157,7 @@ export default function ConcourseDetailPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             aria-label={t('common.edit', 'Edit')}
-                                                            className="size-8 p-0 text-slate-300 hover:text-slate-700 transition-colors"
+                                                            className="size-8 p-0 text-slate-500 hover:text-slate-700 transition-colors"
                                                             onClick={() => startEdit(item)}
                                                         >
                                                             <Pencil className="size-3.5" />
@@ -1151,7 +1169,7 @@ export default function ConcourseDetailPage() {
                                                                 'common.delete',
                                                                 'Delete'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 setDeleteConfirmId(item.id)
                                                             }
@@ -1733,6 +1751,7 @@ function TagCheckboxGroup({
                 {tags.map((tag) => (
                     <div key={tag.id} className="flex items-center gap-1.5 cursor-pointer">
                         <Checkbox
+                            id={`tag-checkbox-group-${tag.id}`}
                             checked={selectedIds.includes(tag.id)}
                             onCheckedChange={(checked) => {
                                 onChange(
@@ -1742,15 +1761,19 @@ function TagCheckboxGroup({
                                 );
                             }}
                         />
-                        <Badge
-                            variant="outline"
-                            className="text-2xs h-5 cursor-pointer"
-                            style={
-                                tag.color ? { borderColor: tag.color, color: tag.color } : undefined
-                            }
-                        >
-                            {tag.name}
-                        </Badge>
+                        <Label htmlFor={`tag-checkbox-group-${tag.id}`} className="cursor-pointer">
+                            <Badge
+                                variant="outline"
+                                className="text-2xs h-5 cursor-pointer"
+                                style={
+                                    tag.color
+                                        ? { borderColor: tag.color, color: tag.color }
+                                        : undefined
+                                }
+                            >
+                                {tag.name}
+                            </Badge>
+                        </Label>
                     </div>
                 ))}
             </div>

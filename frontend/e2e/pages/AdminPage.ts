@@ -10,7 +10,7 @@ export class AdminPage extends BasePage {
         await this.page.goto('/login');
         await this.page.getByLabel(/email/i).fill(email);
         await this.page.getByLabel(/password/i).fill(password);
-        await this.page.getByRole('button', { name: /continue/i }).click();
+        await this.page.getByRole('button', { name: /sign in/i }).click();
         await expect(this.page).toHaveURL(/\/(admin|app\/)/);
     }
 

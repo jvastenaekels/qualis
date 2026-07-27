@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Indirizzo e-mail",
             "password_label": "Password",
-            "submit": "Continua",
+            "submit": "Accedi",
             "cta": "Accedi",
             "forgot_password": "Dimenticata?",
             "loading": "Autenticazione in corso...",
@@ -420,6 +420,7 @@
             "field_language": "Lingua",
             "import_language": "Lingua",
             "select_all": "Seleziona tutto",
+            "select_item": "Seleziona {{code}}",
             "bulk_selected": "{{count}} selezionate",
             "bulk_set_status": "Imposta stato:",
             "bulk_clear": "Cancella",
@@ -1545,6 +1546,8 @@
                     "locked_active": "Questo studio è attivo. Passi alla modalità bozza per modificare.",
                     "locked_paused": "Questo studio è in pausa. Passi alla modalità bozza per modificare.",
                     "locked_closed": "Questo studio è chiuso. La progettazione è archiviata.",
+                    "view_read_only": "Visualizza in sola lettura",
+                    "locked_dialog_desc": "La modifica è bloccata finché lo studio si trova in questo stato. Chiuda questo avviso per leggere la configurazione senza modificarla.",
                     "mismatch_title": "Capacità della griglia non corrispondente",
                     "mismatch_desc": "Ha {{statements}} affermazioni ma la griglia ha posizioni solo per {{slots}} voci. Regoli le colonne qui sotto per corrispondere.",
                     "unlock_hint": "Vada all'esploratore dati per eliminare le sessioni e sbloccare la struttura"

@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Endereço de email",
             "password_label": "Palavra-passe",
-            "submit": "Continuar",
+            "submit": "Iniciar sessão",
             "cta": "Iniciar sessão",
             "forgot_password": "Esqueceu?",
             "loading": "A autenticar...",
@@ -420,6 +420,7 @@
             "field_language": "Idioma",
             "import_language": "Idioma",
             "select_all": "Selecionar tudo",
+            "select_item": "Selecionar {{code}}",
             "bulk_selected": "{{count}} selecionados",
             "bulk_set_status": "Definir estado:",
             "bulk_clear": "Limpar",
@@ -1545,6 +1546,8 @@
                     "locked_active": "Este estudo está ativo. Mude para modo de rascunho para editar.",
                     "locked_paused": "Este estudo está pausado. Mude para modo de rascunho para editar.",
                     "locked_closed": "Este estudo está fechado. O desenho está arquivado.",
+                    "view_read_only": "Ver em modo de leitura apenas",
+                    "locked_dialog_desc": "A edição está bloqueada enquanto o estudo estiver neste estado. Feche este aviso para ler a configuração sem a alterar.",
                     "mismatch_title": "Capacidade da grelha incorreta",
                     "mismatch_desc": "Tem {{statements}} afirmações mas a grelha só tem posições para {{slots}} itens. Ajuste as colunas abaixo para corrigir.",
                     "unlock_hint": "Aceda ao explorador de dados para eliminar sessões e desbloquear a estrutura"

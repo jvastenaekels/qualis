@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Dirección de correo electrónico",
             "password_label": "Contraseña",
-            "submit": "Continuar",
+            "submit": "Iniciar sesión",
             "cta": "Iniciar sesión",
             "forgot_password": "¿Olvidó?",
             "loading": "Autenticando...",
@@ -420,6 +420,7 @@
             "field_language": "Idioma",
             "import_language": "Idioma",
             "select_all": "Seleccionar todo",
+            "select_item": "Seleccionar {{code}}",
             "bulk_selected": "{{count}} seleccionados",
             "bulk_set_status": "Establecer estado:",
             "bulk_clear": "Limpiar",
@@ -1545,6 +1546,8 @@
                     "locked_active": "Este estudio está activo. Cambie al modo borrador para editar.",
                     "locked_paused": "Este estudio está pausado. Cambie al modo borrador para editar.",
                     "locked_closed": "Este estudio está cerrado. El diseño está archivado.",
+                    "view_read_only": "Ver en modo solo lectura",
+                    "locked_dialog_desc": "La edición está bloqueada mientras el estudio esté en este estado. Cierre este aviso para leer la configuración sin modificarla.",
                     "mismatch_title": "Discrepancia en la capacidad de la cuadrícula",
                     "mismatch_desc": "Tiene {{statements}} enunciados pero la cuadrícula solo tiene posiciones para {{slots}} elementos. Por favor, ajuste las columnas a continuación para que coincidan.",
                     "unlock_hint": "Vaya al explorador de datos para eliminar sesiones y desbloquear la estructura"

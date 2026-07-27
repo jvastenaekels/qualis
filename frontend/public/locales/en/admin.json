@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Email address",
             "password_label": "Password",
-            "submit": "Continue",
+            "submit": "Sign in",
             "cta": "Sign in",
             "forgot_password": "Forgot?",
             "loading": "Authenticating...",
@@ -420,6 +420,7 @@
             "field_language": "Language",
             "import_language": "Language",
             "select_all": "Select all",
+            "select_item": "Select {{code}}",
             "bulk_selected": "{{count}} selected",
             "bulk_set_status": "Set status:",
             "bulk_clear": "Clear",
@@ -1547,6 +1548,8 @@
                     "locked_active": "This study is active. Switch to draft mode to edit.",
                     "locked_paused": "This study is paused. Switch to draft mode to edit.",
                     "locked_closed": "This study is closed. The design is archived.",
+                    "view_read_only": "View read-only",
+                    "locked_dialog_desc": "Editing is locked while the study is in this state. Close this notice to read the configuration without changing it.",
                     "mismatch_title": "Grid capacity mismatch",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
                     "unlock_hint": "Go to data explorer to purge sessions and unlock structure"

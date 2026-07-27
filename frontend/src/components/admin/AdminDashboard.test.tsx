@@ -1,5 +1,7 @@
 import { renderWithProviders, screen } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { Routes, Route } from 'react-router-dom';
 import { AdminDashboard } from './AdminDashboard';
 
 // Hoisted mocks for generated API hooks
@@ -170,6 +172,75 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Second Study')).toBeInTheDocument();
     });
 
+    it('keeps the Concourse heading level with Studies, with no skipped level', () => {
+        const study = makeStudy({ state: 'active' });
+        setupDefaultHooks({ studies: [study] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        // Positive: Concourse sits at the same level as the Studies heading.
+        expect(screen.getByRole('heading', { level: 2, name: 'Concourse' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 2, name: 'Studies' })).toBeInTheDocument();
+
+        // Negative: it is no longer demoted to level 3, which skipped a level
+        // under the page's level-1 heading and preceded its level-2 sibling.
+        expect(
+            screen.queryByRole('heading', { level: 3, name: 'Concourse' })
+        ).not.toBeInTheDocument();
+    });
+
+    // ── Headings must survive the accessibility tree (review finding 2) ──
+    // WAI-ARIA §5.2.7 gives `button` presentational children: Chrome and
+    // Firefox prune heading descendants of a button from the accessibility
+    // tree. `dom-testing-library`'s role engine does not implement that rule,
+    // so `getByRole('heading', …)` alone cannot tell a real heading from one
+    // a screen reader will never hear. These tests assert the structure the
+    // rule turns on — the heading must not sit inside the card button — and
+    // pair it with the card staying operable.
+    it('keeps the card headings outside the card button, so AT can hear them', () => {
+        setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        const concourseHeading = screen.getByRole('heading', { level: 2, name: 'Concourse' });
+        const studyHeading = screen.getByRole('heading', { level: 3, name: 'My Study' });
+
+        // Negative: neither heading is pruned by an ancestor button role.
+        expect(concourseHeading.closest('button')).toBeNull();
+        expect(studyHeading.closest('button')).toBeNull();
+
+        // Positive: each card is still a real button, and now takes its
+        // accessible name from the heading it labels rather than from the
+        // whole card blurb.
+        expect(screen.getByRole('button', { name: 'Concourse' }).tagName).toBe('BUTTON');
+        expect(screen.getByRole('button', { name: 'My Study' }).tagName).toBe('BUTTON');
+    });
+
+    it('keeps multi-study row headings outside the row button', () => {
+        setupDefaultHooks({
+            studies: [
+                makeStudy({ id: 1, slug: 'study-1', state: 'active' }),
+                makeStudy({
+                    id: 2,
+                    slug: 'study-2',
+                    state: 'draft',
+                    translations: [
+                        { language_code: 'en', title: 'Second Study', pre_instruction: 'Hi' },
+                    ],
+                }),
+            ],
+        });
+
+        renderWithProviders(<AdminDashboard />);
+
+        const rowHeading = screen.getByRole('heading', { level: 3, name: 'Second Study' });
+
+        // Negative: not pruned by an ancestor button role.
+        expect(rowHeading.closest('button')).toBeNull();
+        // Positive: the row is still operable and named by its heading.
+        expect(screen.getByRole('button', { name: 'Second Study' }).tagName).toBe('BUTTON');
+    });
+
     it('shows alert when active study is near deadline', () => {
         const now = new Date();
         const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
@@ -187,5 +258,93 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Needs attention')).toBeInTheDocument();
         // Alert message includes study name and days
         expect(screen.getByText(/My Study.*closing in 3 days/)).toBeInTheDocument();
+    });
+
+    describe('keyboard-operable cards', () => {
+        // Real navigation (Routes/Route), not a mocked `useNavigate` — same
+        // pattern as AdminDashboard.onboarding.test.tsx. Proves the whole
+        // chain: focusable -> Enter -> onClick -> navigate -> route change,
+        // not just that some callback fired.
+        function renderDashboardWithRoutes() {
+            return renderWithProviders(
+                <Routes>
+                    <Route path="/app/:projectSlug/dashboard" element={<AdminDashboard />} />
+                    <Route
+                        path="/app/:projectSlug/studies/:slug"
+                        element={<div data-testid="study-detail" />}
+                    />
+                    <Route
+                        path="/app/:projectSlug/concourses"
+                        element={<div data-testid="concourse-page" />}
+                    />
+                </Routes>,
+                { initialEntries: ['/app/test-project/dashboard'] }
+            );
+        }
+
+        it('exposes the single-study card as a real, keyboard-operable button', async () => {
+            const user = userEvent.setup();
+            setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+            renderDashboardWithRoutes();
+
+            const card = screen.getByRole('button', { name: /my study/i });
+            // Positive: it is a genuine <button>, not a div faking the role.
+            expect(card.tagName).toBe('BUTTON');
+            // Negative: no hand-rolled role attribute needed — the tag itself
+            // carries the semantics.
+            expect(card).not.toHaveAttribute('role');
+            // Negative: nothing has navigated yet.
+            expect(screen.queryByTestId('study-detail')).not.toBeInTheDocument();
+
+            card.focus();
+            await user.keyboard('{Enter}');
+
+            // Positive: Enter on the focused card actually navigated.
+            expect(await screen.findByTestId('study-detail')).toBeInTheDocument();
+        });
+
+        it('exposes multi-study rows as real buttons, not ARIA-only divs', async () => {
+            const user = userEvent.setup();
+            const study1 = makeStudy({ id: 1, slug: 'study-1', state: 'active' });
+            const study2 = makeStudy({
+                id: 2,
+                slug: 'study-2',
+                state: 'draft',
+                translations: [
+                    { language_code: 'en', title: 'Second Study', pre_instruction: 'Hi' },
+                ],
+            });
+            setupDefaultHooks({ studies: [study1, study2] });
+
+            renderDashboardWithRoutes();
+
+            const row = screen.getByRole('button', { name: /second study/i });
+            expect(row.tagName).toBe('BUTTON');
+            expect(row).not.toHaveAttribute('role');
+            expect(screen.queryByTestId('study-detail')).not.toBeInTheDocument();
+
+            row.focus();
+            await user.keyboard('{Enter}');
+
+            expect(await screen.findByTestId('study-detail')).toBeInTheDocument();
+        });
+
+        it('exposes the concourse card as a real button, not an ARIA-only div', async () => {
+            const user = userEvent.setup();
+            setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+            renderDashboardWithRoutes();
+
+            const card = screen.getByRole('button', { name: /concourse/i });
+            expect(card.tagName).toBe('BUTTON');
+            expect(card).not.toHaveAttribute('role');
+            expect(screen.queryByTestId('concourse-page')).not.toBeInTheDocument();
+
+            card.focus();
+            await user.keyboard('{Enter}');
+
+            expect(await screen.findByTestId('concourse-page')).toBeInTheDocument();
+        });
     });
 });

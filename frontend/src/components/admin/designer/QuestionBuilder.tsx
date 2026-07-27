@@ -372,12 +372,16 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
-                                                <Label className="text-2xs font-black text-slate-500">
+                                                <Label
+                                                    htmlFor={`visibility-toggle-${id}`}
+                                                    className="cursor-pointer text-2xs font-black text-slate-500"
+                                                >
                                                     {t('admin.design.questions.logic.title')}
                                                 </Label>
                                             </div>
                                             {!readOnly && (
                                                 <Switch
+                                                    id={`visibility-toggle-${id}`}
                                                     checked={!!question.visibility_condition}
                                                     onCheckedChange={(checked) => {
                                                         if (checked) {
@@ -1045,7 +1049,10 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="p-6 flex items-center justify-between">
                         <div className="space-y-1">
-                            <Label className="text-base font-bold text-slate-900 tracking-tight">
+                            <Label
+                                htmlFor="presort-toggle"
+                                className="cursor-pointer text-base font-bold text-slate-900 tracking-tight"
+                            >
                                 {t('admin.design.questions.enable_presort')}
                             </Label>
                             <p className="text-sm font-medium text-slate-500">
@@ -1053,6 +1060,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                             </p>
                         </div>
                         <Switch
+                            id="presort-toggle"
                             data-testid="presort-toggle"
                             checked={!!isPresortEnabled}
                             onCheckedChange={handlePresortToggle}

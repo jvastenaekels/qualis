@@ -32,6 +32,29 @@ import type { ConcourseRead } from '@/api/model/concourseRead';
 
 type TranslateFn = ReturnType<typeof useTranslation>['t'];
 
+/*
+ * Card-as-button shape, shared by the concourse card and the two study cards.
+ *
+ * The whole card used to *be* the `<button>`, with the title heading nested
+ * inside it. WAI-ARIA §5.2.7 gives `button` presentational children, so Chrome
+ * and Firefox prune `<h2>`/`<h3>` descendants of a button from the
+ * accessibility tree: the heading a screen reader saw was nothing at all. (The
+ * role engine in `dom-testing-library` does not implement that rule, which is
+ * why the DOM-level heading assertions kept passing.)
+ *
+ * So the heading now wraps the button and the button stretches over the card
+ * with an `::after` overlay — the standard card pattern. Three consequences,
+ * all wanted: the heading is real in the accessibility tree; the button's
+ * accessible name is the title alone instead of the whole card blurb; and the
+ * card stays clickable edge to edge. The focus ring moves to the card shell via
+ * `has-[:focus-visible]` so it still tracks keyboard focus only, not mouse.
+ */
+const CARD_SHELL =
+    'group relative rounded-xl border bg-card text-card-foreground shadow ring-offset-background transition-colors hover:border-foreground/20 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-500 has-[:focus-visible]:ring-offset-2';
+
+const CARD_TITLE_BUTTON =
+    'block max-w-full truncate text-left cursor-pointer outline-none transition-colors group-hover:text-indigo-600 after:absolute after:inset-0 after:rounded-xl';
+
 function getStateColor(state: string | undefined): string {
     switch (state) {
         case 'active':
@@ -377,25 +400,16 @@ function ConcourseCard({
     const itemCount = concourse?.item_count ?? 0;
 
     return (
-        <Card
-            className="group cursor-pointer hover:border-foreground/20 transition-colors"
-            onClick={onOpen}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpen();
-                }
-            }}
-            tabIndex={0}
-            role="button"
-        >
+        <div className={CARD_SHELL}>
             <CardContent className="py-3 px-4">
                 <div className="flex items-center gap-3">
                     <Library className="h-5 w-5 text-indigo-500 shrink-0" />
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold truncate group-hover:text-indigo-600 transition-colors">
-                            {t('admin.concourse.title', 'Concourse')}
-                        </h3>
+                        <h2 className="text-sm font-semibold min-w-0">
+                            <button type="button" onClick={onOpen} className={CARD_TITLE_BUTTON}>
+                                {t('admin.concourse.title', 'Concourse')}
+                            </button>
+                        </h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                             {concourse
                                 ? t('admin.dashboard.concourse_n_items', {
@@ -411,7 +425,7 @@ function ConcourseCard({
                     <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 </div>
             </CardContent>
-        </Card>
+        </div>
     );
 }
 
@@ -509,17 +523,20 @@ function SingleStudyCard({
                 )}
             </div>
 
-            <Card
-                className="group cursor-pointer hover:border-foreground/20 transition-colors"
-                onClick={() => navigate(studyBase)}
-            >
+            <div className={CARD_SHELL}>
                 <CardContent className="py-4 px-5">
                     <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                                 <div className="shrink-0">{getStateIcon(study.state)}</div>
-                                <h3 className="text-base font-semibold truncate group-hover:text-indigo-600 transition-colors">
-                                    {title}
+                                <h3 className="text-base font-semibold min-w-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate(studyBase)}
+                                        className={CARD_TITLE_BUTTON}
+                                    >
+                                        {title}
+                                    </button>
                                 </h3>
                                 <Badge
                                     variant="outline"
@@ -570,7 +587,7 @@ function SingleStudyCard({
                         click away via the study sidebar after opening the
                         card. */}
                 </CardContent>
-            </Card>
+            </div>
         </div>
     );
 }
@@ -715,18 +732,7 @@ function StudyRow({
     const participants = study.participant_count ?? 0;
 
     return (
-        <Card
-            className="group hover:border-foreground/20 transition-colors cursor-pointer"
-            onClick={onOpen}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpen();
-                }
-            }}
-            tabIndex={0}
-            role="button"
-        >
+        <div className={CARD_SHELL}>
             <CardContent className="py-3 px-4">
                 <div className="flex items-center gap-3">
                     {/* State indicator */}
@@ -735,8 +741,14 @@ function StudyRow({
                     {/* Main content */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold truncate group-hover:text-indigo-600 transition-colors">
-                                {title}
+                            <h3 className="text-sm font-semibold min-w-0">
+                                <button
+                                    type="button"
+                                    onClick={onOpen}
+                                    className={CARD_TITLE_BUTTON}
+                                >
+                                    {title}
+                                </button>
                             </h3>
                             <Badge
                                 variant="outline"
@@ -781,6 +793,6 @@ function StudyRow({
                     <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                 </div>
             </CardContent>
-        </Card>
+        </div>
     );
 }

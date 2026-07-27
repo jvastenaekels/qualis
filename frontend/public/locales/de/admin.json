@@ -3,7 +3,7 @@
         "login": {
             "email_label": "E-Mail-Adresse",
             "password_label": "Passwort",
-            "submit": "Weiter",
+            "submit": "Anmelden",
             "cta": "Anmelden",
             "forgot_password": "Vergessen?",
             "loading": "Authentifizierung läuft...",
@@ -420,6 +420,7 @@
             "field_language": "Sprache",
             "import_language": "Sprache",
             "select_all": "Alle auswählen",
+            "select_item": "{{code}} auswählen",
             "bulk_selected": "{{count}} ausgewählt",
             "bulk_set_status": "Status setzen:",
             "bulk_clear": "Auswahl aufheben",
@@ -1545,6 +1546,8 @@
                     "locked_active": "Diese Studie ist aktiv. Wechseln Sie in den Entwurfsmodus, um zu bearbeiten.",
                     "locked_paused": "Diese Studie ist pausiert. Wechseln Sie in den Entwurfsmodus, um zu bearbeiten.",
                     "locked_closed": "Diese Studie ist geschlossen. Das Design ist archiviert.",
+                    "view_read_only": "Nur lesend anzeigen",
+                    "locked_dialog_desc": "Die Bearbeitung ist gesperrt, solange sich die Studie in diesem Status befindet. Schließen Sie diesen Hinweis, um die Konfiguration zu lesen, ohne sie zu ändern.",
                     "mismatch_title": "Rasterkapazität stimmt nicht überein",
                     "mismatch_desc": "Sie haben {{statements}} Aussagen, aber das Raster hat nur Positionen für {{slots}} Elemente. Bitte passen Sie die unten stehenden Spalten entsprechend an.",
                     "unlock_hint": "Gehen Sie zum Daten-Explorer, um Sitzungen zu löschen und die Struktur freizuschalten"

@@ -75,6 +75,11 @@ const StudyDesignPage = () => {
     const { t, i18n } = useTranslation();
     const [activateDialogOpen, setActivateDialogOpen] = useState(false);
     const [memoOpen, setMemoOpen] = useState(false);
+    // The design-lock notice (study active/paused/closed) must be a real,
+    // dismissible dialog — not a hand-rolled overlay a researcher can't
+    // escape without acting on it. Dismissal leaves the configuration
+    // legible but inert: every editor already receives readOnly={isFullyReadOnly}.
+    const [isLockNoticeDismissed, setIsLockNoticeDismissed] = useState(false);
     const api = useStudyDesignPage();
     const original = useStudyDesigner((s) => s.original);
     const { user: currentUser } = useAuthStore();
@@ -130,6 +135,16 @@ const StudyDesignPage = () => {
     const { draft } = api;
 
     if (!draft) return <div>{t('common.errors.study_not_found.title')}</div>;
+
+    // Shared by the lock dialog and the persistent lock banner below it, so the
+    // researcher reads the same sentence whether the notice is still up or has
+    // been dismissed.
+    const lockNoticeTitle =
+        draft.state === 'active'
+            ? t('admin.design.qsort.grid.locked_active')
+            : draft.state === 'paused'
+              ? t('admin.design.qsort.grid.locked_paused')
+              : t('admin.design.qsort.grid.locked_closed');
 
     return (
         <div
@@ -409,39 +424,122 @@ const StudyDesignPage = () => {
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
-                {/* Read-only Overlay - For non-draft studies */}
-                {api.isFullyReadOnly && (
-                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-start justify-center p-4 sm:p-8 pt-24">
-                        <div className="bg-white border-none shadow-2xl rounded-3xl p-6 sm:p-10 max-w-sm sm:max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
-                            <div
+                {/*
+                 * Design Lock Notice - For non-draft studies.
+                 * A real Radix Dialog rather than a hand-rolled overlay: role="dialog",
+                 * aria-modal, focus trapping, Escape-to-close and a labelled close
+                 * button all come for free. Two ways out: dismiss to a read-only view
+                 * (every editor below already receives readOnly={isFullyReadOnly}, so
+                 * the underlying fields stay legible but inert), or the deliberate
+                 * "Draft Mode" action (active studies only) — its side effect
+                 * (suspending data collection) is unchanged.
+                 */}
+                <Dialog
+                    open={api.isFullyReadOnly && !isLockNoticeDismissed}
+                    onOpenChange={(open) => {
+                        if (!open) setIsLockNoticeDismissed(true);
+                    }}
+                >
+                    <DialogContent className="max-w-sm sm:max-w-lg rounded-3xl p-6 sm:p-10 text-center">
+                        <div
+                            className={cn(
+                                'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-inner border',
+                                draft.state === 'closed'
+                                    ? 'bg-rose-50 border-rose-100'
+                                    : 'bg-amber-50 border-amber-100'
+                            )}
+                        >
+                            <Lock
                                 className={cn(
-                                    'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner border',
-                                    draft.state === 'active'
-                                        ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                        : draft.state === 'paused'
-                                          ? 'bg-amber-50 border-amber-100 text-amber-600'
-                                          : 'bg-rose-50 border-rose-100 text-rose-600'
+                                    'h-10 w-10',
+                                    draft.state === 'closed' ? 'text-rose-600' : 'text-amber-600'
                                 )}
+                            />
+                        </div>
+                        <DialogHeader className="items-center text-center sm:text-center gap-1.5">
+                            <DialogTitle className="text-2xl font-bold text-slate-800 tracking-normal">
+                                {lockNoticeTitle}
+                            </DialogTitle>
+                            {/*
+                             * Unconditional, and its own copy. Gating it on
+                             * `state === 'active'` left the paused and closed
+                             * dialogs with no accessible description at all;
+                             * and the string it borrowed —
+                             * `study_status.dialog.draft.desc` — was written for
+                             * the Draft-Mode *confirm* dialog, so as the
+                             * aria-describedby of a two-button dialog it
+                             * announced "this will stop data collection" just
+                             * before "View read-only".
+                             */}
+                            <DialogDescription>
+                                {t(
+                                    'admin.design.qsort.grid.locked_dialog_desc',
+                                    'Editing is locked while the study is in this state. Close this notice to read the configuration without changing it.'
+                                )}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+                            <Button
+                                variant="outline"
+                                className="h-11 px-6 rounded-xl font-bold"
+                                onClick={() => setIsLockNoticeDismissed(true)}
                             >
-                                {draft.state === 'active' ? (
-                                    <Globe className="h-10 w-10" />
-                                ) : (
-                                    <Lock className="h-10 w-10" />
-                                )}
-                            </div>
-                            <h3 className="text-2xl font-bold text-slate-800 tracking-normal mb-8">
-                                {draft.state === 'active'
-                                    ? t('admin.design.qsort.grid.locked_active')
-                                    : draft.state === 'paused'
-                                      ? t('admin.design.qsort.grid.locked_paused')
-                                      : t('admin.design.qsort.grid.locked_closed')}
-                            </h3>
+                                {t('admin.design.qsort.grid.view_read_only', 'View read-only')}
+                            </Button>
                             {draft.state === 'active' && (
-                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <Button
+                                    variant="default"
+                                    disabled={api.isSwitchingToDraft}
+                                    className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-amber-200 bg-amber-500 hover:bg-amber-600 text-white"
+                                    onClick={api.handleSwitchToDraft}
+                                >
+                                    {api.isSwitchingToDraft && (
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    )}
+                                    {t('admin.study_status.state.switch_to_draft', 'Draft Mode')}
+                                </Button>
+                            )}
+                        </div>
+                    </DialogContent>
+                </Dialog>
+                {/* Left Pane: Editor */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
+                    {/*
+                     * Persistent lock banner — the unlock affordance has to
+                     * survive dismissal of the dialog above. `handleSwitchToDraft`
+                     * used to be reachable from exactly one place: inside that
+                     * dialog. A researcher who took the "View read-only" escape
+                     * to inspect an active study, then decided to edit it, found
+                     * every field disabled and no control anywhere on the page
+                     * to unlock them — recovery meant a page reload or a detour
+                     * to the study overview's status control, neither signposted.
+                     *
+                     * A banner rather than turning the toolbar status badge into
+                     * a control: the badge is `hidden md:flex`, so it would leave
+                     * narrow viewports with no escape at all, and it carries
+                     * role="status" — making it a button too would muddle both
+                     * semantics. The banner also keeps the *reason* the fields
+                     * are inert on screen, not just the way out.
+                     */}
+                    {api.isFullyReadOnly && isLockNoticeDismissed && (
+                        <div className="max-w-full lg:max-w-5xl mx-auto mb-4">
+                            <div
+                                data-testid="design-lock-banner"
+                                className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 rounded-md text-sm bg-amber-50 border border-amber-200 text-amber-900"
+                            >
+                                <Lock
+                                    className="h-4 w-4 flex-shrink-0 text-amber-700"
+                                    aria-hidden="true"
+                                />
+                                <span className="flex-1 min-w-0 font-medium">
+                                    {lockNoticeTitle}
+                                </span>
+                                {draft.state === 'active' && (
                                     <Button
-                                        variant="default"
+                                        variant="outline"
+                                        size="sm"
                                         disabled={api.isSwitchingToDraft}
-                                        className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-amber-200 bg-amber-500 hover:bg-amber-600 text-white"
+                                        className="h-8 shrink-0 rounded-lg font-bold bg-white border-amber-300 text-amber-900 hover:bg-amber-100 hover:text-amber-900"
                                         onClick={api.handleSwitchToDraft}
                                     >
                                         {api.isSwitchingToDraft && (
@@ -452,13 +550,10 @@ const StudyDesignPage = () => {
                                             'Draft Mode'
                                         )}
                                     </Button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
-                {/* Left Pane: Editor */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
+                    )}
                     {(() => {
                         // Banner: chrome locale ≠ language being edited.
                         // Researchers are editing one language while reading the

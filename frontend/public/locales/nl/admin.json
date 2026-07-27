@@ -3,7 +3,7 @@
         "login": {
             "email_label": "E-mailadres",
             "password_label": "Wachtwoord",
-            "submit": "Doorgaan",
+            "submit": "Aanmelden",
             "cta": "Aanmelden",
             "forgot_password": "Vergeten?",
             "loading": "Authenticeren...",
@@ -420,6 +420,7 @@
             "field_language": "Taal",
             "import_language": "Taal",
             "select_all": "Alles selecteren",
+            "select_item": "{{code}} selecteren",
             "bulk_selected": "{{count}} geselecteerd",
             "bulk_set_status": "Status instellen:",
             "bulk_clear": "Wissen",
@@ -1545,6 +1546,8 @@
                     "locked_active": "Dit onderzoek is actief. Schakel over naar conceptmodus om te bewerken.",
                     "locked_paused": "Dit onderzoek is gepauzeerd. Schakel over naar conceptmodus om te bewerken.",
                     "locked_closed": "Dit onderzoek is gesloten. Het ontwerp is gearchiveerd.",
+                    "view_read_only": "Bekijken (alleen-lezen)",
+                    "locked_dialog_desc": "Bewerken is geblokkeerd zolang het onderzoek in deze status is. Sluit deze melding om de configuratie te lezen zonder deze te wijzigen.",
                     "mismatch_title": "Rastercapaciteit komt niet overeen",
                     "mismatch_desc": "U heeft {{statements}} stellingen, maar het raster heeft slechts posities voor {{slots}} items. Pas de kolommen hieronder aan.",
                     "unlock_hint": "Ga naar de data-verkenner om sessies te wissen en de structuur te ontgrendelen"

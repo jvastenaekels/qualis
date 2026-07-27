@@ -247,3 +247,116 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
         expect(screen.queryByText(/Prompt for statements \(-\)/)).not.toBeInTheDocument();
     });
 });
+
+describe('PostSortConfigEditor - accessible names (Task 3.6)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing
+    const renderEditor = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            postsort_config: {},
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<PostSortConfigEditor />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    // These three switches sit next to a CardTitle/CardDescription pair with
+    // no `id`/`htmlFor`/`aria-label` anywhere — getByRole computes the real
+    // accessible name, so an unnamed switch fails to resolve even though
+    // three switches exist on the page (this isn't a missing-element check).
+    it('names the "Allow random comments" switch', () => {
+        renderEditor();
+
+        expect(screen.getByRole('switch', { name: /allow random comments/i })).toBeInTheDocument();
+    });
+
+    it('names the "Ask about missing statements" switch', () => {
+        renderEditor();
+
+        expect(
+            screen.getByRole('switch', { name: /ask about missing statements/i })
+        ).toBeInTheDocument();
+    });
+
+    it('names the "Audio Recording" switch', () => {
+        renderEditor();
+
+        expect(screen.getByRole('switch', { name: /audio recording/i })).toBeInTheDocument();
+    });
+});
+
+// Follow-up sweep (coordinator request): the email/contact section on the
+// same Post-sort page carries three more switches with the identical defect
+// — a sibling `Label` with no `htmlFor` and a `Switch` with no `id`. Found
+// while verifying the six controls above; folded into this task rather than
+// split into a follow-up, since it's the same file, same defect, same fix.
+describe('PostSortConfigEditor - accessible names (Task 3.6 follow-up: email section)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing
+    const renderEditor = (initialStateOverrides: any = {}) => {
+        const mergedDraft = {
+            slug: 'test',
+            state: 'draft',
+            postsort_config: {},
+            ...(initialStateOverrides.draft || {}),
+        };
+
+        return renderWithStore(<PostSortConfigEditor />, {
+            initialState: {
+                ...initialStateOverrides,
+                draft: mergedDraft,
+                activeLocale: 'en',
+            },
+        });
+    };
+
+    // biome-ignore lint/suspicious/noExplicitAny: testing user utilities mock
+    const switchToStep2 = async (user: any) => {
+        await user.click(screen.getByText('Step 2: questions'));
+        await screen.findByText('Participant follow-up');
+    };
+
+    it('names the "Participant follow-up" (email collection) switch', async () => {
+        const user = userEvent.setup();
+        renderEditor({ draft: { postsort_config: {}, grid_config: [] } });
+        await switchToStep2(user);
+
+        expect(screen.getByRole('switch', { name: /participant follow-up/i })).toBeInTheDocument();
+    });
+
+    it('names the "Offer follow-up" (interview consent) switch', async () => {
+        const user = userEvent.setup();
+        renderEditor({
+            draft: {
+                postsort_config: { email_collection_enabled: true },
+                grid_config: [],
+            },
+        });
+        await switchToStep2(user);
+
+        expect(screen.getByRole('switch', { name: /^offer follow-up$/i })).toBeInTheDocument();
+    });
+
+    it('names the "Offer to subscribe..." (newsletter consent) switch', async () => {
+        const user = userEvent.setup();
+        renderEditor({
+            draft: {
+                postsort_config: { email_collection_enabled: true },
+                grid_config: [],
+            },
+        });
+        await switchToStep2(user);
+
+        expect(
+            screen.getByRole('switch', {
+                name: /offer to subscribe to a mailing list about study outcomes/i,
+            })
+        ).toBeInTheDocument();
+    });
+});
