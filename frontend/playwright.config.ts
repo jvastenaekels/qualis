@@ -94,7 +94,29 @@ export default defineConfig({
         {
             name: 'Accessibility Smoke',
             testMatch: /accessibility\/.*\.spec\.ts/,
-            use: { ...devices['Desktop Chrome'] },
+            use: {
+                ...devices['Desktop Chrome'],
+                /*
+                 * Audit as a reduced-motion user sees the page (task 6.7e). Every admin
+                 * route wraps its content in a `tailwindcss-animate` entry fade
+                 * (`animate-in fade-in …`); axe's `color-contrast` reads the actual
+                 * computed opacity at scan time, so a scan that lands mid-fade measures a
+                 * foreground blended toward the background and reports a spuriously low
+                 * ratio for a color that is fine once settled. Investigation
+                 * (task-6.7e-animation-investigation.md) measured this directly: on the
+                 * worst route (study design, desktop) the committed spec's own
+                 * `waitForAnimationsToSettle()` still let axe run at ancestor opacity
+                 * 0.00, reporting 24 `color-contrast` violations; `reducedMotion: 'reduce'`
+                 * collapses that to 1 (the one real failure), matching the settled ground
+                 * truth exactly — deterministic (no polling race) and faster than waiting.
+                 * `src/index.css:209` already honours `prefers-reduced-motion`, so this
+                 * does not hide anything a real user with that OS preference would not
+                 * also see; it does not conceal a defect (no palette survives opacity 0 —
+                 * `text-slate-900` measures 4.35:1 mid-fade — so no color change could fix
+                 * this, confirming the artifact is in the scan timing, not the tokens).
+                 */
+                reducedMotion: 'reduce',
+            },
         },
     ],
 
