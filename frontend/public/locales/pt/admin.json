@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Endereço de email",
             "password_label": "Palavra-passe",
-            "submit": "Continuar",
+            "submit": "Iniciar sessão",
             "cta": "Iniciar sessão",
             "forgot_password": "Esqueceu?",
             "loading": "A autenticar...",

@@ -386,9 +386,9 @@ function ConcourseCard({
                 <div className="flex items-center gap-3">
                     <Library className="h-5 w-5 text-indigo-500 shrink-0" />
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold truncate group-hover:text-indigo-600 transition-colors">
+                        <h2 className="text-sm font-semibold truncate group-hover:text-indigo-600 transition-colors">
                             {t('admin.concourse.title', 'Concourse')}
-                        </h3>
+                        </h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                             {concourse
                                 ? t('admin.dashboard.concourse_n_items', {

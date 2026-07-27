@@ -172,6 +172,23 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Second Study')).toBeInTheDocument();
     });
 
+    it('keeps the Concourse heading level with Studies, with no skipped level', () => {
+        const study = makeStudy({ state: 'active' });
+        setupDefaultHooks({ studies: [study] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        // Positive: Concourse sits at the same level as the Studies heading.
+        expect(screen.getByRole('heading', { level: 2, name: 'Concourse' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 2, name: 'Studies' })).toBeInTheDocument();
+
+        // Negative: it is no longer demoted to level 3, which skipped a level
+        // under the page's level-1 heading and preceded its level-2 sibling.
+        expect(
+            screen.queryByRole('heading', { level: 3, name: 'Concourse' })
+        ).not.toBeInTheDocument();
+    });
+
     it('shows alert when active study is near deadline', () => {
         const now = new Date();
         const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);

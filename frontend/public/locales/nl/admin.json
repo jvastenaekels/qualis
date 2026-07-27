@@ -3,7 +3,7 @@
         "login": {
             "email_label": "E-mailadres",
             "password_label": "Wachtwoord",
-            "submit": "Doorgaan",
+            "submit": "Aanmelden",
             "cta": "Aanmelden",
             "forgot_password": "Vergeten?",
             "loading": "Authenticeren...",

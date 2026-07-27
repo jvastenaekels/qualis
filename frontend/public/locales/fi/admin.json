@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Sähköpostiosoite",
             "password_label": "Salasana",
-            "submit": "Jatka",
+            "submit": "Kirjaudu sisään",
             "cta": "Kirjaudu sisään",
             "forgot_password": "Unohditko?",
             "loading": "Tunnistaudutaan...",

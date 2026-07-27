@@ -3,7 +3,7 @@
         "login": {
             "email_label": "Dirección de correo electrónico",
             "password_label": "Contraseña",
-            "submit": "Continuar",
+            "submit": "Iniciar sesión",
             "cta": "Iniciar sesión",
             "forgot_password": "¿Olvidó?",
             "loading": "Autenticando...",

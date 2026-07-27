@@ -8,7 +8,7 @@ import { customInstance } from '@/api/mutator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2, Lock, AtSign, ArrowRight, ShieldCheck, Info, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -163,7 +163,6 @@ const LoginPage = () => {
 
     return (
         <div className="flex-1 w-full flex items-center justify-center bg-[#fafafa] p-4">
-            <h1 className="sr-only">{t('auth.login.card_title')}</h1>
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full" />
@@ -186,9 +185,9 @@ const LoginPage = () => {
                     {stage === 'credentials' && (
                         <form onSubmit={handleLogin}>
                             <CardHeader className="pb-4">
-                                <CardTitle className="text-xl font-black">
+                                <h1 className="font-semibold leading-none tracking-tight text-xl font-black">
                                     {t('auth.login.card_title')}
-                                </CardTitle>
+                                </h1>
                             </CardHeader>
                             {resetSuccess && (
                                 <div className="px-6 pb-2">
@@ -275,7 +274,6 @@ const LoginPage = () => {
                                         <Input
                                             id="password"
                                             type="password"
-                                            placeholder={t('auth.register.placeholder_password')}
                                             className="pl-10 h-11 bg-white border-slate-300 text-slate-900 placeholder:text-slate-600 focus:bg-white transition-all shadow-sm"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
@@ -298,7 +296,7 @@ const LoginPage = () => {
                                         </>
                                     ) : (
                                         <>
-                                            {t('auth.login.submit')}
+                                            {t('auth.login.submit', 'Sign in')}
                                             <ArrowRight className="ml-2 h-4 w-4" />
                                         </>
                                     )}
@@ -310,9 +308,9 @@ const LoginPage = () => {
                     {stage === 'two_factor' && (
                         <form onSubmit={handleOtpSubmit}>
                             <CardHeader className="pb-4">
-                                <CardTitle className="text-xl font-black">
+                                <h1 className="font-semibold leading-none tracking-tight text-xl font-black">
                                     {t('auth.login.two_factor_title', 'Two-factor authentication')}
-                                </CardTitle>
+                                </h1>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-slate-700">
