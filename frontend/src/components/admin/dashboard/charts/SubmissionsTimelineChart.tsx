@@ -108,11 +108,13 @@ export const SubmissionsTimelineChart = ({
                     {/*
                      * data-[state=inactive]:text-slate-600, not the inherited
                      * text-muted-foreground (task 6.7e): TabsList's own base class sets
-                     * text-muted-foreground, which axe measured at 3.79-3.91:1 on white
-                     * elsewhere in the admin — below WCAG AA's 4.5:1. Scoped to the
-                     * inactive state (rather than an unconditional text-slate-600) so it
-                     * cannot out-specificity TabsTrigger's own
-                     * data-[state=active]:text-foreground.
+                     * text-muted-foreground, which here sits on this card's bg-muted tab
+                     * strip, not white — axe measured that pairing (text-muted-foreground
+                     * on bg-muted) at 4.34:1, below WCAG AA's 4.5:1. (text-muted-foreground
+                     * on a plain white background settles closer to 4.75:1 and passes —
+                     * this is specifically the on-bg-muted case.) Scoped to the inactive
+                     * state (rather than an unconditional text-slate-600) so it cannot
+                     * out-specificity TabsTrigger's own data-[state=active]:text-foreground.
                      */}
                     <TabsList className="grid grid-cols-4 w-full sm:w-[240px]">
                         <TabsTrigger

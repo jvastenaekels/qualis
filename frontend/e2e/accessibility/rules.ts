@@ -44,8 +44,13 @@ export async function expectNoA11yViolations(page: Page) {
     // Only `violations` is asserted. `results.incomplete` — checks axe could not decide
     // automatically (e.g. `color-contrast` over a background gradient or an image, where
     // it cannot compute a single foreground/background pair) — is silently dropped, so
-    // this spec would pass over such a case rather than flag it for manual review. None
-    // of the routes audited here are known to have one today, but it's a real gap in
-    // what a green run proves, not a hypothetical one.
+    // this spec would pass over such a case rather than flag it for manual review. This
+    // is not hypothetical: instrumenting `results.incomplete` shows every route in this
+    // suite reports `color-contrast` incompletes (13 nodes on analysis desktop, 12
+    // mobile, 10 on data). Most are benign, but on the two chart routes (dashboard,
+    // analysis) recharts renders axis/legend text ("Factor", "Eigenvalue", date labels)
+    // as SVG text nodes axe reports as "background color could not be determined
+    // because element contains an image node" — so chart text contrast is never
+    // actually checked by a green run here.
     expect(results.violations).toEqual([]);
 }
