@@ -59,6 +59,7 @@ const NAME_BEARING = new Set([
     'a',
     'button',
     'input',
+    'textarea',
     'AccordionTrigger',
     'AlertDialogTrigger',
     'Button',
@@ -455,16 +456,103 @@ function isUnnamed(node, sourceFile, labelTargets) {
 /* Contrast inspection                                                         */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Real WCAG contrast math (relative luminance + contrast ratio, WCAG 2.x), scoped
+ * tightly to a shape the codebase has already hit once: `text-slate-{shade}/{alpha}`.
+ *
+ * It is deliberately NOT applied to plain (alpha-free) tokens of any shade. Doing so
+ * would flag `text-slate-400` (2.56:1 against white — also failing 4.5:1) at every
+ * one of its ~210 existing plain usages across `src/`, a large pre-existing debt this
+ * task did not measure and is not scoped to open. An alpha modifier is the one shape
+ * that can silently degrade an otherwise-*passing* shade below the line — task 6.7h's
+ * own fix to `SortableCard.tsx`'s watermark did exactly that (`text-slate-500/80`,
+ * 3.24:1, sitting right next to the passing `text-slate-500`, 4.76:1) — so it is the
+ * one shape this checker computes rather than bans by literal string.
+ *
+ * Tailwind's default slate hex values (`tailwindcss/colors.js`, confirmed against the
+ * installed 3.4.19), composited over an assumed white background per this file's
+ * existing convention (`LOW_CONTRAST_CLASS`'s own doc comment: "1.45:1 against
+ * white"). Restricted to `slate` — the codebase's neutral/body-text palette, used for
+ * text on white/near-white surfaces — not `indigo`/`amber`/`red`/etc., which are
+ * accent colours frequently sitting on their own tinted backgrounds, where the
+ * white-background assumption this whole module makes would silently produce a wrong
+ * verdict rather than a merely incomplete one.
+ */
+const SLATE_HEX = {
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
+};
+const MIN_TEXT_CONTRAST = 4.5; // WCAG 1.4.3, normal text — every real usage here is small/body text
+
+function srgbChannelToLinear(channel) {
+    const c = channel / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hex) {
+    const r = Number.parseInt(hex.slice(1, 3), 16);
+    const g = Number.parseInt(hex.slice(3, 5), 16);
+    const b = Number.parseInt(hex.slice(5, 7), 16);
+    return (
+        0.2126 * srgbChannelToLinear(r) +
+        0.7152 * srgbChannelToLinear(g) +
+        0.0722 * srgbChannelToLinear(b)
+    );
+}
+
+function contrastRatio(hexA, hexB) {
+    const lA = relativeLuminance(hexA);
+    const lB = relativeLuminance(hexB);
+    const lighter = Math.max(lA, lB);
+    const darker = Math.min(lA, lB);
+    return (lighter + 0.05) / (darker + 0.05);
+}
+
+/** `hex` at `alphaPercent`% opacity, composited over white (`#rrggbb`). */
+function compositeOverWhite(hex, alphaPercent) {
+    const alpha = alphaPercent / 100;
+    const channel = (offset) => {
+        const c = Number.parseInt(hex.slice(offset, offset + 2), 16);
+        return Math.round(c * alpha + 255 * (1 - alpha));
+    };
+    // `#rrggbb`: red starts at index 1, green at 3, blue at 5 (index 0 is '#').
+    return `#${[1, 3, 5].map((offset) => channel(offset).toString(16).padStart(2, '0')).join('')}`;
+}
+
+const ALPHA_SLATE_TOKEN = /^text-slate-(\d+)\/(\d+)$/;
+
+/** True only for an alpha-suffixed slate token that computes below 4.5:1 on white. */
+function alphaSlateTokenFailsContrast(token) {
+    const match = ALPHA_SLATE_TOKEN.exec(token);
+    if (!match) return false;
+    const hex = SLATE_HEX[match[1]];
+    if (!hex) return false; // an unlisted shade: don't guess, this checker's count is a floor
+    const composited = compositeOverWhite(hex, Number(match[2]));
+    return contrastRatio(composited, '#ffffff') < MIN_TEXT_CONTRAST;
+}
+
 function classNameIsLowContrast(node, sourceFile) {
     const { map } = attributesOf(node, sourceFile);
     const className = map.get('className');
     if (!className) return false;
     // Only the base state matters: `hover:text-slate-300` is not the resting colour.
+    // The anchored regex in alphaSlateTokenFailsContrast has the same property: a
+    // `hover:`-prefixed token never matches `^text-slate-…`, so no separate guard
+    // is needed for it.
     return className
         .getText(sourceFile)
         .split(/[\s'"`]+/)
         .some(
-            (token) => token === LOW_CONTRAST_CLASS || token.startsWith(`${LOW_CONTRAST_CLASS}/`)
+            (token) =>
+                token === LOW_CONTRAST_CLASS ||
+                token.startsWith(`${LOW_CONTRAST_CLASS}/`) ||
+                alphaSlateTokenFailsContrast(token)
         );
 }
 
