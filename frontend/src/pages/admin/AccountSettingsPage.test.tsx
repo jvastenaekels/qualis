@@ -70,4 +70,19 @@ describe('AccountSettingsPage 2FA (authenticator app)', () => {
 
         expect(enableMutate).toHaveBeenCalledWith({ data: { token: '123456' } });
     });
+
+    it('names the copy-secret control and copies the TOTP secret (Task 6.7c)', async () => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: { writeText: vi.fn().mockResolvedValue(undefined) },
+            writable: true,
+            configurable: true,
+        });
+        renderWithProviders(<AccountSettingsPage />);
+        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+
+        const copyButton = await screen.findByRole('button', { name: 'Copy secret' });
+        fireEvent.click(copyButton);
+
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith('XYZ123');
+    });
 });

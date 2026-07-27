@@ -254,3 +254,27 @@ describe('ProcessStepEditor — step field accessible names (Task 6.7b)', () => 
         expect(screen.queryByRole('button', { name: 'User' })).not.toBeInTheDocument();
     });
 });
+
+describe('ProcessStepEditor — delete-step control name (Task 6.7c)', () => {
+    it('discriminates the delete button by each step’s own title', () => {
+        const draft = buildDraft([profileStep, roughStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+
+        expect(screen.getByRole('button', { name: "Delete Let's meet" })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: 'Delete First impressions' })
+        ).toBeInTheDocument();
+    });
+
+    it('falls back to the step id when the step has no title yet', () => {
+        const untitledStep = { id: 'step_new_1', title: '', description: '', icon: 'Circle' };
+        const draft = buildDraft([untitledStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+
+        expect(screen.getByRole('button', { name: 'Delete step_new_1' })).toBeInTheDocument();
+    });
+});

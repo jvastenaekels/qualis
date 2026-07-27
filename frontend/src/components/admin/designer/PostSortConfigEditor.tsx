@@ -205,6 +205,11 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                                     type="button"
                                                     onClick={() => removeExtremeColumn(score)}
                                                     className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
+                                                    aria-label={t(
+                                                        'admin.design.postsort.extreme.remove',
+                                                        'Remove {{score}}',
+                                                        { score: `${score > 0 ? '+' : ''}${score}` }
+                                                    )}
                                                 >
                                                     <X className="h-3.5 w-3.5" />
                                                 </button>

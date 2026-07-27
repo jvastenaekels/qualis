@@ -314,7 +314,8 @@
                 "disabled_success": "Autenticazione a due fattori disabilitata",
                 "secret_copied": "Segreto copiato",
                 "invalid_token": "Codice di verifica non valido",
-                "disable_error": "Disabilitazione del 2FA non riuscita"
+                "disable_error": "Disabilitazione del 2FA non riuscita",
+                "copy_secret": "Copia segreto"
             },
             "password": {
                 "title": "Gestione password",
@@ -1392,6 +1393,9 @@
                         "rough_disabled": "Il passo 'Prime impressioni' (classificazione iniziale) è in questo elenco ma lo studio ha la classificazione iniziale disabilitata. I partecipanti non lo vedranno.",
                         "presort_disabled": "Il passo 'Facciamoci conoscere' (sondaggio pre-classificazione) è in questo elenco ma lo studio ha il sondaggio pre-classificazione disabilitato. I partecipanti non lo vedranno.",
                         "remove_action": "Rimuovi"
+                    },
+                    "actions": {
+                        "delete": "Elimina {{title}}"
                     }
                 },
                 "consent_title": "Modulo di consenso",
@@ -1588,7 +1592,8 @@
                     "prompt_placeholder": "Perché ha posizionato questa affermazione qui?",
                     "add": "Aggiungi",
                     "add_defaults": "Aggiungi estremi predefiniti",
-                    "select_placeholder": "Seleziona..."
+                    "select_placeholder": "Seleziona...",
+                    "remove": "Rimuovi {{score}}"
                 },
                 "random_comments": {
                     "title": "Consenti commenti liberi",
@@ -1673,7 +1678,9 @@
                     "title": "Colore di accento",
                     "desc": "Questo colore verrà utilizzato per pulsanti, link e highlights in tutto lo studio.",
                     "pick": "Scegli un colore",
-                    "reset": "Ripristina valore predefinito"
+                    "reset": "Ripristina valore predefinito",
+                    "info_label": "Informazioni sul colore di accento",
+                    "swatch": "Imposta il colore di accento su {{color}}"
                 },
                 "logo": {
                     "title": "Logo dello studio",
@@ -1682,7 +1689,9 @@
                     "hint": "Dimensione consigliata: 200x50px. Supporta PNG, SVG, JPG.",
                     "preview": "Anteprima logo",
                     "help_title": "Dove appare questo logo?",
-                    "help_desc": "Il logo viene visualizzato in cima a ogni pagina dello studio (barra di navigazione) e nella pagina di benvenuto. Rafforza l'identità visiva del suo progetto."
+                    "help_desc": "Il logo viene visualizzato in cima a ogni pagina dello studio (barra di navigazione) e nella pagina di benvenuto. Rafforza l'identità visiva del suo progetto.",
+                    "info_label": "Informazioni sul logo dello studio",
+                    "remove": "Rimuovi logo"
                 },
                 "partners": {
                     "title": "Partner istituzionali",
@@ -1694,7 +1703,11 @@
                     "url_label": "Sito web (facoltativo)",
                     "url_placeholder": "Https://...",
                     "help_title": "Visualizzazione dei loghi",
-                    "help_desc": "I loghi dei partner vengono visualizzati nella pagina di destinazione e nell'intestazione dello studio, accanto al logo principale."
+                    "help_desc": "I loghi dei partner vengono visualizzati nella pagina di destinazione e nell'intestazione dello studio, accanto al logo principale.",
+                    "info_label": "Informazioni sui partner istituzionali",
+                    "remove_logo": "Rimuovi il logo di {{name}}",
+                    "remove": "Rimuovi {{name}}",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Carica",
@@ -1704,7 +1717,8 @@
                     "conversion_error": "Elaborazione dell'immagine non riuscita.",
                     "processing": "Elaborazione immagine...",
                     "drag_drop": "Trascini e rilasci o clicchi per caricare",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Rimuovi immagine"
                 }
             },
             "activate_dialog": {

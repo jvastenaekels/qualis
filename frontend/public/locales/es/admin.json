@@ -314,7 +314,8 @@
                 "disabled_success": "Autenticación de dos factores desactivada",
                 "secret_copied": "Secreto copiado",
                 "invalid_token": "Código de verificación incorrecto",
-                "disable_error": "Error al desactivar el 2FA"
+                "disable_error": "Error al desactivar el 2FA",
+                "copy_secret": "Copiar secreto"
             },
             "password": {
                 "title": "Gestión de contraseña",
@@ -1392,6 +1393,9 @@
                         "rough_disabled": "El paso 'Primeras impresiones' (clasificación inicial) está en esta lista pero el estudio tiene la clasificación inicial desactivada. Los participantes no lo verán.",
                         "presort_disabled": "El paso 'Conociéndonos' (encuesta pre-clasificación) está en esta lista pero el estudio tiene la encuesta pre-clasificación desactivada. Los participantes no lo verán.",
                         "remove_action": "Eliminar"
+                    },
+                    "actions": {
+                        "delete": "Eliminar {{title}}"
                     }
                 },
                 "consent_title": "Formulario de consentimiento",
@@ -1588,7 +1592,8 @@
                     "prompt_placeholder": "¿Por qué colocó este enunciado aquí?",
                     "add": "Añadir",
                     "add_defaults": "Añadir extremos predeterminados",
-                    "select_placeholder": "Seleccionar..."
+                    "select_placeholder": "Seleccionar...",
+                    "remove": "Quitar {{score}}"
                 },
                 "random_comments": {
                     "title": "Permitir comentarios aleatorios",
@@ -1673,7 +1678,9 @@
                     "title": "Color de acento",
                     "desc": "Este color se usará para botones, enlaces y destacados en todo el estudio.",
                     "pick": "Elegir un color",
-                    "reset": "Restablecer valor predeterminado"
+                    "reset": "Restablecer valor predeterminado",
+                    "info_label": "Acerca del color de acento",
+                    "swatch": "Establecer el color de acento en {{color}}"
                 },
                 "logo": {
                     "title": "Logotipo del estudio",
@@ -1682,7 +1689,9 @@
                     "hint": "Tamaño recomendado: 200x50px. Admite PNG, SVG, JPG.",
                     "preview": "Vista previa del logotipo",
                     "help_title": "¿Dónde aparece este logotipo?",
-                    "help_desc": "El logotipo se muestra en la parte superior de cada página del estudio (barra de navegación) y en la página de bienvenida. Refuerza la identidad visual de su proyecto."
+                    "help_desc": "El logotipo se muestra en la parte superior de cada página del estudio (barra de navegación) y en la página de bienvenida. Refuerza la identidad visual de su proyecto.",
+                    "info_label": "Acerca del logotipo del estudio",
+                    "remove": "Quitar logotipo"
                 },
                 "partners": {
                     "title": "Socios institucionales",
@@ -1694,7 +1703,11 @@
                     "url_label": "Sitio web (opcional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Visualización de logotipos",
-                    "help_desc": "Los logotipos de los socios se muestran en la página de inicio así como en el encabezado del estudio, junto al logotipo principal."
+                    "help_desc": "Los logotipos de los socios se muestran en la página de inicio así como en el encabezado del estudio, junto al logotipo principal.",
+                    "info_label": "Acerca de los socios institucionales",
+                    "remove_logo": "Quitar logotipo de {{name}}",
+                    "remove": "Quitar {{name}}",
+                    "unnamed": "Socio {{number}}"
                 },
                 "upload": {
                     "upload": "Cargar",
@@ -1704,7 +1717,8 @@
                     "conversion_error": "Error al procesar la imagen.",
                     "processing": "Procesando imagen...",
                     "drag_drop": "Arrastre y suelte o haga clic para cargar",
-                    "max": "Máx"
+                    "max": "Máx",
+                    "remove_default": "Quitar imagen"
                 }
             },
             "activate_dialog": {

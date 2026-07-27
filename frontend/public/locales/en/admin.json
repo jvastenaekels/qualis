@@ -314,7 +314,8 @@
                 "disabled_success": "Two-factor authentication disabled",
                 "secret_copied": "Secret copied",
                 "invalid_token": "Invalid verification code",
-                "disable_error": "Failed to disable 2FA"
+                "disable_error": "Failed to disable 2FA",
+                "copy_secret": "Copy secret"
             },
             "password": {
                 "title": "Password management",
@@ -1394,6 +1395,9 @@
                         "rough_disabled": "The 'First impressions' (rough sort) step is in this list but the study has rough sort disabled. Participants will not see it.",
                         "presort_disabled": "The 'Let's meet' (pre-sort survey) step is in this list but the study has the pre-sort survey disabled. Participants will not see it.",
                         "remove_action": "Remove"
+                    },
+                    "actions": {
+                        "delete": "Delete {{title}}"
                     }
                 },
                 "consent_title": "Consent form",
@@ -1590,7 +1594,8 @@
                     "prompt_placeholder": "Why did you place this statement here?",
                     "add": "Add",
                     "add_defaults": "Add default extremes",
-                    "select_placeholder": "Select..."
+                    "select_placeholder": "Select...",
+                    "remove": "Remove {{score}}"
                 },
                 "random_comments": {
                     "title": "Allow random comments",
@@ -1675,7 +1680,9 @@
                     "title": "Accent color",
                     "desc": "This color will be used for buttons, links, and highlights throughout the study.",
                     "pick": "Pick a color",
-                    "reset": "Reset to default"
+                    "reset": "Reset to default",
+                    "info_label": "About accent color",
+                    "swatch": "Set accent color to {{color}}"
                 },
                 "logo": {
                     "title": "Study logo",
@@ -1684,7 +1691,9 @@
                     "hint": "Recommended size: 200x50px. Supports PNG, SVG, JPG.",
                     "preview": "Logo preview",
                     "help_title": "Where does this logo appear?",
-                    "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity."
+                    "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity.",
+                    "info_label": "About the study logo",
+                    "remove": "Remove logo"
                 },
                 "partners": {
                     "title": "Institutional partners",
@@ -1696,7 +1705,11 @@
                     "url_label": "Website (optional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Display of logos",
-                    "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo."
+                    "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo.",
+                    "info_label": "About institutional partners",
+                    "remove_logo": "Remove logo for {{name}}",
+                    "remove": "Remove {{name}}",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Upload",
@@ -1706,7 +1719,8 @@
                     "conversion_error": "Failed to process image.",
                     "processing": "Processing image...",
                     "drag_drop": "Drag & drop or click to upload",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Remove image"
                 }
             },
             "activate_dialog": {

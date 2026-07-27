@@ -226,7 +226,8 @@
                 "enabled_success": "Authentification à deux facteurs activée",
                 "disabled_success": "Authentification à deux facteurs désactivée",
                 "invalid_token": "Code de vérification invalide",
-                "disable_error": "Impossible de désactiver le 2FA"
+                "disable_error": "Impossible de désactiver le 2FA",
+                "copy_secret": "Copier le secret"
             },
             "password": {
                 "title": "Mot de passe",
@@ -1342,6 +1343,9 @@
                         "rough_disabled": "L'étape « Premières impressions » (pré-tri) est dans cette liste mais l'étude a le pré-tri désactivé. Les participants ne la verront pas.",
                         "presort_disabled": "L'étape « Faisons connaissance » (questionnaire pré-tri) est dans cette liste mais l'étude a le questionnaire pré-tri désactivé. Les participants ne la verront pas.",
                         "remove_action": "Supprimer"
+                    },
+                    "actions": {
+                        "delete": "Supprimer {{title}}"
                     }
                 },
                 "consent_title": "Formulaire de consentement",
@@ -1537,7 +1541,8 @@
                     "prompt_placeholder": "Pourquoi avez-vous placé cet énoncé ici ?",
                     "add": "Ajouter",
                     "add_defaults": "Ajouter les extrêmes par défaut",
-                    "select_placeholder": "Sélectionner..."
+                    "select_placeholder": "Sélectionner...",
+                    "remove": "Retirer {{score}}"
                 },
                 "random_comments": {
                     "title": "Autoriser les commentaires libres",
@@ -1622,7 +1627,9 @@
                     "title": "Couleur d'accentuation",
                     "desc": "Cette couleur sera utilisée pour les boutons, liens et mises en évidence dans toute l'étude.",
                     "pick": "Choisir une couleur",
-                    "reset": "Réinitialiser"
+                    "reset": "Réinitialiser",
+                    "info_label": "À propos de la couleur d'accentuation",
+                    "swatch": "Définir la couleur d'accentuation sur {{color}}"
                 },
                 "logo": {
                     "title": "Logo de l'étude",
@@ -1631,7 +1638,9 @@
                     "hint": "Taille recommandée : 200x50px. Supporte PNG, SVG, JPG.",
                     "preview": "Aperçu du logo",
                     "help_title": "Où apparaît ce logo ?",
-                    "help_desc": "Le logo s'affiche en haut de chaque page de l'étude (barre de navigation) et sur la page de bienvenue. Il renforce l'identité visuelle de votre projet."
+                    "help_desc": "Le logo s'affiche en haut de chaque page de l'étude (barre de navigation) et sur la page de bienvenue. Il renforce l'identité visuelle de votre projet.",
+                    "info_label": "À propos du logo de l'étude",
+                    "remove": "Retirer le logo"
                 },
                 "partners": {
                     "title": "Logos des partenaires",
@@ -1643,7 +1652,11 @@
                     "url_label": "Site web (optionnel)",
                     "url_placeholder": "https://...",
                     "help_title": "Affichage des logos",
-                    "help_desc": "Les logos des partenaires sont affichés sur la page d'accueil ainsi que dans l'entête de l'étude, à côté du logo principal."
+                    "help_desc": "Les logos des partenaires sont affichés sur la page d'accueil ainsi que dans l'entête de l'étude, à côté du logo principal.",
+                    "info_label": "À propos des partenaires institutionnels",
+                    "remove_logo": "Retirer le logo de {{name}}",
+                    "remove": "Retirer {{name}}",
+                    "unnamed": "Partenaire {{number}}"
                 },
                 "upload": {
                     "upload": "Télécharger",
@@ -1653,7 +1666,8 @@
                     "conversion_error": "Échec du traitement de l'image.",
                     "processing": "Traitement de l'image...",
                     "drag_drop": "Glissez-déposez ou cliquez pour télécharger",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Retirer l'image"
                 }
             },
             "title": "Conception de l'étude",

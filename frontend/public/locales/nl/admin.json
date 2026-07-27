@@ -314,7 +314,8 @@
                 "disabled_success": "Tweestapsverificatie uitgeschakeld",
                 "secret_copied": "Geheim gekopieerd",
                 "invalid_token": "Ongeldige verificatiecode",
-                "disable_error": "2FA uitschakelen mislukt"
+                "disable_error": "2FA uitschakelen mislukt",
+                "copy_secret": "Geheim kopiëren"
             },
             "password": {
                 "title": "Wachtwoordbeheer",
@@ -1392,6 +1393,9 @@
                         "rough_disabled": "De stap 'Eerste indrukken' (grove sortering) staat in deze lijst, maar de grove sortering is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
                         "presort_disabled": "De stap 'Laten we kennismaken' (voorsorteringsvragenlijst) staat in deze lijst, maar de voorsorteringsvragenlijst is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
                         "remove_action": "Verwijderen"
+                    },
+                    "actions": {
+                        "delete": "{{title}} verwijderen"
                     }
                 },
                 "consent_title": "Toestemmingsformulier",
@@ -1588,7 +1592,8 @@
                     "prompt_placeholder": "Waarom heeft u deze stelling hier geplaatst?",
                     "add": "Toevoegen",
                     "add_defaults": "Standaard extremen toevoegen",
-                    "select_placeholder": "Selecteren..."
+                    "select_placeholder": "Selecteren...",
+                    "remove": "{{score}} verwijderen"
                 },
                 "random_comments": {
                     "title": "Willekeurige opmerkingen toestaan",
@@ -1673,7 +1678,9 @@
                     "title": "Accentkleur",
                     "desc": "Deze kleur wordt gebruikt voor knoppen, links en markeringen in het hele onderzoek.",
                     "pick": "Kleur kiezen",
-                    "reset": "Standaardkleur herstellen"
+                    "reset": "Standaardkleur herstellen",
+                    "info_label": "Over de accentkleur",
+                    "swatch": "Accentkleur instellen op {{color}}"
                 },
                 "logo": {
                     "title": "Onderzoekslogo",
@@ -1682,7 +1689,9 @@
                     "hint": "Aanbevolen formaat: 200x50px. Ondersteunt PNG, SVG, JPG.",
                     "preview": "Logovoorbeeld",
                     "help_title": "Waar verschijnt dit logo?",
-                    "help_desc": "Het logo wordt bovenaan elke onderzoekspagina (navigatiebalk) en op de welkomstpagina weergegeven. Het versterkt de visuele identiteit van uw project."
+                    "help_desc": "Het logo wordt bovenaan elke onderzoekspagina (navigatiebalk) en op de welkomstpagina weergegeven. Het versterkt de visuele identiteit van uw project.",
+                    "info_label": "Over het onderzoekslogo",
+                    "remove": "Logo verwijderen"
                 },
                 "partners": {
                     "title": "Institutionele partners",
@@ -1694,7 +1703,11 @@
                     "url_label": "Website (optioneel)",
                     "url_placeholder": "Https://...",
                     "help_title": "Weergave van logo's",
-                    "help_desc": "Partnerlogo's worden weergegeven op de landingspagina en in de onderzoeksheader, naast het hoofdlogo."
+                    "help_desc": "Partnerlogo's worden weergegeven op de landingspagina en in de onderzoeksheader, naast het hoofdlogo.",
+                    "info_label": "Over institutionele partners",
+                    "remove_logo": "Logo van {{name}} verwijderen",
+                    "remove": "{{name}} verwijderen",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Uploaden",
@@ -1704,7 +1717,8 @@
                     "conversion_error": "Verwerking van afbeelding mislukt.",
                     "processing": "Afbeelding verwerken...",
                     "drag_drop": "Slepen & neerzetten of klikken om te uploaden",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Afbeelding verwijderen"
                 }
             },
             "activate_dialog": {

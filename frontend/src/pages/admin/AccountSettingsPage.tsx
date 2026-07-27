@@ -349,6 +349,10 @@ const AccountSettingsPage = () => {
                                                             )
                                                         );
                                                     }}
+                                                    aria-label={t(
+                                                        'admin.account.security.copy_secret',
+                                                        'Copy secret'
+                                                    )}
                                                 >
                                                     <Copy size={14} className="text-slate-500" />
                                                 </button>

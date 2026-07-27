@@ -126,6 +126,11 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                                 e.stopPropagation();
                                                 onDelete();
                                             }}
+                                            aria-label={t(
+                                                'admin.design.intro.process_steps.actions.delete',
+                                                'Delete {{title}}',
+                                                { title: step.title || step.id }
+                                            )}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>

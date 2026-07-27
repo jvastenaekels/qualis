@@ -314,7 +314,8 @@
                 "disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
                 "secret_copied": "Secret kopiert",
                 "invalid_token": "Ungültiger Bestätigungscode",
-                "disable_error": "2FA konnte nicht deaktiviert werden"
+                "disable_error": "2FA konnte nicht deaktiviert werden",
+                "copy_secret": "Secret kopieren"
             },
             "password": {
                 "title": "Passwortverwaltung",
@@ -1392,6 +1393,9 @@
                         "rough_disabled": "Der Schritt 'Erste Eindrücke' (Grobsortierung) ist in dieser Liste enthalten, aber die Studie hat die Grobsortierung deaktiviert. Teilnehmer werden ihn nicht sehen.",
                         "presort_disabled": "Der Schritt 'Kennenlernen' (Vorsortierungsumfrage) ist in dieser Liste enthalten, aber die Studie hat die Vorsortierungsumfrage deaktiviert. Teilnehmer werden ihn nicht sehen.",
                         "remove_action": "Entfernen"
+                    },
+                    "actions": {
+                        "delete": "{{title}} löschen"
                     }
                 },
                 "consent_title": "Einwilligungserklärung",
@@ -1588,7 +1592,8 @@
                     "prompt_placeholder": "Warum haben Sie diese Aussage hier platziert?",
                     "add": "Hinzufügen",
                     "add_defaults": "Standard-Extreme hinzufügen",
-                    "select_placeholder": "Auswählen..."
+                    "select_placeholder": "Auswählen...",
+                    "remove": "{{score}} entfernen"
                 },
                 "random_comments": {
                     "title": "Zufällige Kommentare erlauben",
@@ -1673,7 +1678,9 @@
                     "title": "Akzentfarbe",
                     "desc": "Diese Farbe wird für Schaltflächen, Links und Hervorhebungen in der gesamten Studie verwendet.",
                     "pick": "Farbe wählen",
-                    "reset": "Auf Standard zurücksetzen"
+                    "reset": "Auf Standard zurücksetzen",
+                    "info_label": "Über die Akzentfarbe",
+                    "swatch": "Akzentfarbe auf {{color}} setzen"
                 },
                 "logo": {
                     "title": "Studienlogo",
@@ -1682,7 +1689,9 @@
                     "hint": "Empfohlene Größe: 200x50px. Unterstützt PNG, SVG, JPG.",
                     "preview": "Logovorschau",
                     "help_title": "Wo erscheint dieses Logo?",
-                    "help_desc": "Das Logo wird oben auf jeder Studieninhalt-Seite (Navigationsleiste) und auf der Willkommensseite angezeigt. Es stärkt die visuelle Identität Ihres Projekts."
+                    "help_desc": "Das Logo wird oben auf jeder Studieninhalt-Seite (Navigationsleiste) und auf der Willkommensseite angezeigt. Es stärkt die visuelle Identität Ihres Projekts.",
+                    "info_label": "Über das Studienlogo",
+                    "remove": "Logo entfernen"
                 },
                 "partners": {
                     "title": "Institutionelle Partner",
@@ -1694,7 +1703,11 @@
                     "url_label": "Website (optional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Anzeige der Logos",
-                    "help_desc": "Partnerlogos werden auf der Einstiegsseite sowie im Studienheader neben dem Hauptlogo angezeigt."
+                    "help_desc": "Partnerlogos werden auf der Einstiegsseite sowie im Studienheader neben dem Hauptlogo angezeigt.",
+                    "info_label": "Über institutionelle Partner",
+                    "remove_logo": "Logo für {{name}} entfernen",
+                    "remove": "{{name}} entfernen",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Hochladen",
@@ -1704,7 +1717,8 @@
                     "conversion_error": "Bild konnte nicht verarbeitet werden.",
                     "processing": "Bild wird verarbeitet...",
                     "drag_drop": "Ziehen & ablegen oder klicken zum Hochladen",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Bild entfernen"
                 }
             },
             "activate_dialog": {

@@ -314,7 +314,8 @@
                 "disabled_success": "Autenticação de dois fatores desativada",
                 "secret_copied": "Segredo copiado",
                 "invalid_token": "Código de verificação inválido",
-                "disable_error": "Falha ao desativar a 2FA"
+                "disable_error": "Falha ao desativar a 2FA",
+                "copy_secret": "Copiar segredo"
             },
             "password": {
                 "title": "Gestão de palavra-passe",
@@ -1392,6 +1393,9 @@
                         "rough_disabled": "O passo «Primeiras impressões» (classificação inicial) está nesta lista, mas a classificação inicial está desativada no estudo. Os participantes não o verão.",
                         "presort_disabled": "O passo «Vamos conhecer-nos» (questionário de pré-classificação) está nesta lista, mas o questionário de pré-classificação está desativado. Os participantes não o verão.",
                         "remove_action": "Remover"
+                    },
+                    "actions": {
+                        "delete": "Eliminar {{title}}"
                     }
                 },
                 "consent_title": "Formulário de consentimento",
@@ -1588,7 +1592,8 @@
                     "prompt_placeholder": "Porque colocou esta afirmação aqui?",
                     "add": "Adicionar",
                     "add_defaults": "Adicionar extremos predefinidos",
-                    "select_placeholder": "Selecionar..."
+                    "select_placeholder": "Selecionar...",
+                    "remove": "Remover {{score}}"
                 },
                 "random_comments": {
                     "title": "Permitir comentários livres",
@@ -1673,7 +1678,9 @@
                     "title": "Cor de destaque",
                     "desc": "Esta cor será usada nos botões, ligações e destaques em todo o estudo.",
                     "pick": "Escolher uma cor",
-                    "reset": "Repor valor predefinido"
+                    "reset": "Repor valor predefinido",
+                    "info_label": "Sobre a cor de destaque",
+                    "swatch": "Definir a cor de destaque para {{color}}"
                 },
                 "logo": {
                     "title": "Logótipo do estudo",
@@ -1682,7 +1689,9 @@
                     "hint": "Tamanho recomendado: 200x50px. Suporta PNG, SVG, JPG.",
                     "preview": "Pré-visualização do logótipo",
                     "help_title": "Onde aparece este logótipo?",
-                    "help_desc": "O logótipo é exibido no topo de cada página do estudo (barra de navegação) e na página de boas-vindas. Reforça a identidade visual do seu projeto."
+                    "help_desc": "O logótipo é exibido no topo de cada página do estudo (barra de navegação) e na página de boas-vindas. Reforça a identidade visual do seu projeto.",
+                    "info_label": "Sobre o logótipo do estudo",
+                    "remove": "Remover logótipo"
                 },
                 "partners": {
                     "title": "Parceiros institucionais",
@@ -1694,7 +1703,11 @@
                     "url_label": "Website (opcional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Apresentação dos logótipos",
-                    "help_desc": "Os logótipos dos parceiros são exibidos na página de entrada e no cabeçalho do estudo, junto ao logótipo principal."
+                    "help_desc": "Os logótipos dos parceiros são exibidos na página de entrada e no cabeçalho do estudo, junto ao logótipo principal.",
+                    "info_label": "Sobre os parceiros institucionais",
+                    "remove_logo": "Remover logótipo de {{name}}",
+                    "remove": "Remover {{name}}",
+                    "unnamed": "Parceiro {{number}}"
                 },
                 "upload": {
                     "upload": "Carregar",
@@ -1704,7 +1717,8 @@
                     "conversion_error": "Falha ao processar a imagem.",
                     "processing": "A processar imagem...",
                     "drag_drop": "Arraste e largue ou clique para carregar",
-                    "max": "Máx"
+                    "max": "Máx",
+                    "remove_default": "Remover imagem"
                 }
             },
             "activate_dialog": {

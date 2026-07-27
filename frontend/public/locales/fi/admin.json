@@ -226,7 +226,8 @@
                 "disabled_success": "Kaksivaiheinen todennus poistettu käytöstä",
                 "secret_copied": "Salaisuus kopioitu",
                 "invalid_token": "Virheellinen vahvistuskoodi",
-                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui"
+                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui",
+                "copy_secret": "Kopioi salaisuus"
             },
             "password": {
                 "title": "Salasanan hallinta",
@@ -1304,6 +1305,9 @@
                         "rough_disabled": "Vaihe 'Ensivaikutelma' (esilajittelu) on tässä luettelossa, mutta tutkimuksessa esilajittelu on poistettu käytöstä. Osallistujat eivät näe sitä.",
                         "presort_disabled": "Vaihe 'Tutustutaan' (esilajittelukysely) on tässä luettelossa, mutta tutkimuksessa esilajittelukysely on poistettu käytöstä. Osallistujat eivät näe sitä.",
                         "remove_action": "Poista"
+                    },
+                    "actions": {
+                        "delete": "Poista {{title}}"
                     }
                 },
                 "consent_title": "Suostumuslomake",
@@ -1499,7 +1503,8 @@
                     "prompt_placeholder": "Miksi sijoitit tämän väittämän tähän?",
                     "add": "Lisää",
                     "add_defaults": "Lisää oletusarvot (ääripäät)",
-                    "select_placeholder": "Valitse..."
+                    "select_placeholder": "Valitse...",
+                    "remove": "Poista {{score}}"
                 },
                 "random_comments": {
                     "title": "Salli vapaat kommentit",
@@ -1584,7 +1589,9 @@
                     "title": "Korostusväri",
                     "desc": "Tätä väriä käytetään painikkeissa, linkeissä ja korostuksissa koko tutkimuksen ajan.",
                     "pick": "Valitse väri",
-                    "reset": "Palauta oletus"
+                    "reset": "Palauta oletus",
+                    "info_label": "Tietoa korostusväristä",
+                    "swatch": "Aseta korostusväriksi {{color}}"
                 },
                 "logo": {
                     "title": "Tutkimuksen logo",
@@ -1593,7 +1600,9 @@
                     "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG.",
                     "preview": "Logon esikatselu",
                     "help_title": "Missä tämä logo näkyy?",
-                    "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä."
+                    "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä.",
+                    "info_label": "Tietoa tutkimuksen logosta",
+                    "remove": "Poista logo"
                 },
                 "partners": {
                     "title": "Institutionaaliset kumppanit",
@@ -1605,7 +1614,11 @@
                     "url_label": "Verkkosivusto (valinnainen)",
                     "url_placeholder": "https://...",
                     "help_title": "Logojen näyttäminen",
-                    "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä."
+                    "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä.",
+                    "info_label": "Tietoa institutionaalisista kumppaneista",
+                    "remove_logo": "Poista logo kumppanilta {{name}}",
+                    "remove": "Poista {{name}}",
+                    "unnamed": "Kumppani {{number}}"
                 },
                 "upload": {
                     "upload": "Lataa",
@@ -1615,7 +1628,8 @@
                     "conversion_error": "Kuvan käsittely epäonnistui.",
                     "processing": "Käsitellään kuvaa...",
                     "drag_drop": "Vedä ja pudota tai napsauta ladataksesi",
-                    "max": "Maks"
+                    "max": "Maks",
+                    "remove_default": "Poista kuva"
                 }
             },
             "title": "Tutkimuksen suunnittelu",

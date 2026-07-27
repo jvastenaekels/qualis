@@ -314,7 +314,8 @@
         "disabled_success": "Weryfikacja dwuetapowa wyłączona",
         "secret_copied": "Sekret skopiowany",
         "invalid_token": "Nieprawidłowy kod weryfikacyjny",
-        "disable_error": "Nie udało się wyłączyć weryfikacji dwuetapowej"
+        "disable_error": "Nie udało się wyłączyć weryfikacji dwuetapowej",
+        "copy_secret": "Kopiuj sekret"
       },
       "password": {
         "title": "Zarządzanie hasłem",
@@ -1392,6 +1393,9 @@
             "rough_disabled": "Krok 'Pierwsze wrażenia' (sortowanie zgrubne) jest na tej liście, ale sortowanie zgrubne jest w badaniu wyłączone. Uczestnicy go nie zobaczą.",
             "presort_disabled": "Krok 'Poznajmy się' (ankieta wstępna) jest na tej liście, ale ankieta wstępna jest wyłączona. Uczestnicy go nie zobaczą.",
             "remove_action": "Usuń"
+          },
+          "actions": {
+            "delete": "Usuń {{title}}"
           }
         },
         "consent_title": "Formularz zgody",
@@ -1588,7 +1592,8 @@
           "prompt_placeholder": "Dlaczego umieścił/a Pan/Pani to stwierdzenie w tym miejscu?",
           "add": "Dodaj",
           "add_defaults": "Dodaj domyślne skrajności",
-          "select_placeholder": "Wybierz..."
+          "select_placeholder": "Wybierz...",
+          "remove": "Usuń {{score}}"
         },
         "random_comments": {
           "title": "Zezwalaj na swobodne komentarze",
@@ -1673,7 +1678,9 @@
           "title": "Kolor akcentu",
           "desc": "Ten kolor będzie używany dla przycisków, linków i wyróżnień w całym badaniu.",
           "pick": "Wybierz kolor",
-          "reset": "Przywróć domyślny"
+          "reset": "Przywróć domyślny",
+          "info_label": "O kolorze akcentu",
+          "swatch": "Ustaw kolor akcentu na {{color}}"
         },
         "logo": {
           "title": "Logo badania",
@@ -1682,7 +1689,9 @@
           "hint": "Zalecany rozmiar: 200×50 px. Obsługiwane formaty: PNG, SVG, JPG.",
           "preview": "Podgląd logo",
           "help_title": "Gdzie pojawia się to logo?",
-          "help_desc": "Logo jest wyświetlane na górze każdej strony badania (pasek nawigacyjny) i na stronie powitalnej. Wzmacnia identyfikację wizualną projektu."
+          "help_desc": "Logo jest wyświetlane na górze każdej strony badania (pasek nawigacyjny) i na stronie powitalnej. Wzmacnia identyfikację wizualną projektu.",
+          "info_label": "O logo badania",
+          "remove": "Usuń logo"
         },
         "partners": {
           "title": "Partnerzy instytucjonalni",
@@ -1694,7 +1703,11 @@
           "url_label": "Strona internetowa (opcjonalnie)",
           "url_placeholder": "https://...",
           "help_title": "Wyświetlanie logo",
-          "help_desc": "Logo partnerów są wyświetlane na stronie startowej oraz w nagłówku badania, obok głównego logo."
+          "help_desc": "Logo partnerów są wyświetlane na stronie startowej oraz w nagłówku badania, obok głównego logo.",
+          "info_label": "O partnerach instytucjonalnych",
+          "remove_logo": "Usuń logo dla {{name}}",
+          "remove": "Usuń {{name}}",
+          "unnamed": "Partner {{number}}"
         },
         "upload": {
           "upload": "Prześlij",
@@ -1704,7 +1717,8 @@
           "conversion_error": "Nie udało się przetworzyć obrazu.",
           "processing": "Przetwarzanie obrazu...",
           "drag_drop": "Przeciągnij i upuść lub kliknij, aby przesłać",
-          "max": "Maks."
+          "max": "Maks.",
+          "remove_default": "Usuń obraz"
         }
       },
       "activate_dialog": {
