@@ -28,8 +28,19 @@ import { computeAccessibleName } from 'dom-accessibility-api';
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import type { DumpParticipant, DumpResponse } from './types';
 import InteractiveDataView from './InteractiveDataView';
+
+// The submitted_at cell renders `format(date, 'MMM d, HH:mm', { locale })`
+// (InteractiveDataView.columns.tsx) in the *local* timezone of whatever
+// machine runs the test — computing the expected label the same way the
+// component does (rather than hardcoding a string like "Jan 1, 00:10")
+// keeps these assertions correct regardless of the runner's TZ.
+function expectedSubmittedLabel(iso: string): string {
+    return format(new Date(iso), 'MMM d, HH:mm', { locale: enUS });
+}
 
 const { mockDumpQuery } = vi.hoisted(() => ({ mockDumpQuery: vi.fn() }));
 
@@ -244,17 +255,74 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         const row = screen.getByText('p1').closest('tr');
         if (!row) throw new Error('participant row not found');
 
-        // Before this task: 7 status chips + the OS/browser chip (unreachable
-        // today via a bare `asChild` div, so it doesn't add to the count) +
+        // Before 6.7g: 7 status chips + the OS/browser chip (unreachable at
+        // the time via a bare `asChild` div, so it didn't add to the count) +
         // the submitted_at tooltip trigger = 8 focusable `button`s in this
-        // row. After: only the out-of-scope submitted_at trigger remains.
-        const focusable = within(row).getAllByRole('button');
-        expect(focusable).toHaveLength(1);
+        // row. After 6.7g: only the (then out-of-scope) submitted_at trigger
+        // remained. After this task's chip conversion (this row has no
+        // duplicate IP, so that badge never renders here): the submitted_at
+        // trigger is converted too — role="img" like the rest — so the row
+        // has zero focusable buttons. (A follow-up task gives the row its
+        // first real, operable action; see the 6.7i report.)
+        const focusable = within(row).queryAllByRole('button');
+        expect(focusable).toHaveLength(0);
 
         // The OS/browser fact is still announced, with the name it never had.
         expect(
             within(row).getByRole('img', { name: 'Device: Windows, Chrome' })
         ).toBeInTheDocument();
+
+        // The submitted_at date is also still announced, just no longer a
+        // tab stop (Task 6.7i).
+        expect(
+            within(row).getByRole('img', {
+                name: expectedSubmittedLabel('2026-01-01T00:10:19Z'),
+            })
+        ).toBeInTheDocument();
+    });
+
+    it('drops the duplicate-IP badge as an inert tab stop too: a duplicate-IP row loses both of its remaining phantom buttons (Task 6.7i)', async () => {
+        // The fixture must actually trip the duplicate-IP badge, or this
+        // count would already read "0 focusable buttons" from the
+        // submitted_at conversion alone, proving nothing about whether the
+        // badge itself got fixed. Two participants sharing an IP is what
+        // populates duplicateIpGroups (useInteractiveDataView.ts).
+        const participants = [
+            makeParticipant({ id: 'p1', db_id: 1, ip_address: '203.0.113.5' }),
+            makeParticipant({ id: 'p2', db_id: 2, ip_address: '203.0.113.5' }),
+        ];
+        mockDumpQuery.mockReturnValue({
+            data: { ...dumpResponseWithTranslations(['en']), participants },
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const row = screen.getByText('p1').closest('tr');
+        if (!row) throw new Error('participant row not found');
+
+        // The duplicate-IP badge is a fact, not a control: named via
+        // role="img", absent from the button role.
+        expect(within(row).getByRole('img', { name: 'Duplicate IP #1' })).toBeInTheDocument();
+        expect(within(row).queryByRole('button', { name: /Duplicate IP/ })).not.toBeInTheDocument();
+
+        // Same for the submitted_at date: was a TooltipTrigger button
+        // revealing the full timestamp on hover, now a named,
+        // non-focusable fact.
+        expect(
+            within(row).getByRole('img', {
+                name: expectedSubmittedLabel('2026-01-01T00:10:19Z'),
+            })
+        ).toBeInTheDocument();
+
+        // Before this task, a duplicate-IP row carried two inert tab stops
+        // (this badge's own TooltipTrigger, plus the untouched submitted_at
+        // trigger from 6.7g). After: zero — this row has no real action yet
+        // either (that's the companion 6.7i task), so it is, for now,
+        // entirely unreachable by keyboard. That gap is closed next.
+        expect(within(row).queryAllByRole('button')).toHaveLength(0);
     });
 });
 

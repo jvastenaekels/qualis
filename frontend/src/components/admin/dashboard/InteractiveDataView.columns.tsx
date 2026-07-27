@@ -61,7 +61,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { parseUA } from '@/utils/uaParser';
 import { useTranslation } from 'react-i18next';
@@ -180,27 +179,27 @@ export function ParticipantCell({
                 )}
             </div>
             {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            {/* text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1. */}
-                            <Badge
-                                variant="outline"
-                                className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
-                            >
-                                {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
-                                {duplicateIpGroups.get(p.ip_address)}
-                            </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {t(
-                                'admin.data.table.duplicate_ip_hint',
-                                'Shares IP hash with other participants'
-                            )}{' '}
-                            ({p.ip_address.substring(0, 8)}...)
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                // role="img", not a TooltipTrigger button (Task 6.7i, same
+                // defect shape as the seven chips 6.7g converted): this badge
+                // did nothing on activation, it only ever announced a fact.
+                // aria-label keeps the exact wording the badge's own text
+                // already computed as its accessible name; title carries the
+                // extra hint that used to live in TooltipContent, for mouse
+                // users hovering.
+                // text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1.
+                <Badge
+                    variant="outline"
+                    role="img"
+                    aria-label={`${t('admin.data.table.duplicate_ip', 'Duplicate IP')} #${duplicateIpGroups.get(p.ip_address)}`}
+                    title={`${t(
+                        'admin.data.table.duplicate_ip_hint',
+                        'Shares IP hash with other participants'
+                    )} (${p.ip_address.substring(0, 8)}...)`}
+                    className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
+                >
+                    {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
+                    {duplicateIpGroups.get(p.ip_address)}
+                </Badge>
             )}
         </div>
     );
@@ -746,21 +745,22 @@ export function buildColumns({
                 const val = info.getValue();
                 if (!val) return <span className="text-slate-300">—</span>;
                 const date = new Date(val);
+                const shortLabel = format(date, 'MMM d, HH:mm', { locale: currentLocale });
+                const fullLabel = format(date, 'PPpp', { locale: currentLocale });
+                // role="img", not a TooltipTrigger button (Task 6.7i, same
+                // defect shape 6.7g fixed elsewhere in this file): the short
+                // date was already the accessible name via visible text; the
+                // full timestamp that used to live in TooltipContent is now
+                // the native `title` a mouse user hovers to see.
                 return (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <div className="flex flex-col text-xs text-slate-500 font-medium">
-                                    <span>
-                                        {format(date, 'MMM d, HH:mm', { locale: currentLocale })}
-                                    </span>
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {format(date, 'PPpp', { locale: currentLocale })}
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <span
+                        role="img"
+                        aria-label={shortLabel}
+                        title={fullLabel}
+                        className="flex flex-col text-xs text-slate-500 font-medium"
+                    >
+                        {shortLabel}
+                    </span>
                 );
             },
         }),
