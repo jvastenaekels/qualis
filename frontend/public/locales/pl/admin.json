@@ -355,7 +355,10 @@
       "select_project": "Wybierz projekt",
       "concourses": "Konkursy",
       "concourse": "Konkurs",
-      "members": "Członkowie zespołu"
+      "members": "Członkowie zespołu",
+      "mobile_title": "Pasek boczny",
+      "mobile_description": "Wyświetla mobilny pasek boczny.",
+      "toggle": "Przełącz pasek boczny"
     },
     "concourse": {
       "title": "Konkurs",
@@ -939,7 +942,8 @@
       "analysis": "Analysis",
       "settings": "Settings",
       "concourse": "Concourse",
-      "members": "Team members"
+      "members": "Team members",
+      "nav_label": "ścieżka nawigacji"
     },
     "command_menu": {
       "title": "Globalne menu poleceń",
@@ -1357,7 +1361,9 @@
         "statements": "Stwierdzenia",
         "grid": "Siatka",
         "survey": "Ankieta",
-        "branding": "Identyfikacja wizualna"
+        "branding": "Identyfikacja wizualna",
+        "scroll_left": "Przewiń w lewo",
+        "scroll_right": "Przewiń w prawo"
       },
       "view_mode": {
         "mobile": "Widok mobilny",

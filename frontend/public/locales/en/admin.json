@@ -355,7 +355,10 @@
             "select_project": "Select project",
             "concourses": "Concourses",
             "concourse": "Concourse",
-            "members": "Team members"
+            "members": "Team members",
+            "mobile_title": "Sidebar",
+            "mobile_description": "Displays the mobile sidebar.",
+            "toggle": "Toggle Sidebar"
         },
         "concourse": {
             "title": "Concourse",
@@ -941,7 +944,8 @@
             "analysis": "Analysis",
             "settings": "Settings",
             "concourse": "Concourse",
-            "members": "Team members"
+            "members": "Team members",
+            "nav_label": "breadcrumb"
         },
         "command_menu": {
             "title": "Global command menu",
@@ -1359,7 +1363,9 @@
                 "statements": "Statements",
                 "grid": "Grid",
                 "survey": "Survey",
-                "branding": "Branding"
+                "branding": "Branding",
+                "scroll_left": "Scroll left",
+                "scroll_right": "Scroll right"
             },
             "view_mode": {
                 "mobile": "Mobile view",

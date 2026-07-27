@@ -355,7 +355,10 @@
             "select_project": "Project selecteren",
             "concourses": "Concoursen",
             "concourse": "Concours",
-            "members": "Teamleden"
+            "members": "Teamleden",
+            "mobile_title": "Zijbalk",
+            "mobile_description": "Toont de mobiele zijbalk.",
+            "toggle": "Zijbalk wisselen"
         },
         "concourse": {
             "title": "Concours",
@@ -939,7 +942,8 @@
             "analysis": "Analyse",
             "settings": "Instellingen",
             "concourse": "Concours",
-            "members": "Teamleden"
+            "members": "Teamleden",
+            "nav_label": "kruimelpad"
         },
         "command_menu": {
             "title": "Globaal opdrachtenmenu",
@@ -1357,7 +1361,9 @@
                 "statements": "Stellingen",
                 "grid": "Raster",
                 "survey": "Vragenlijst",
-                "branding": "Huisstijl"
+                "branding": "Huisstijl",
+                "scroll_left": "Naar links scrollen",
+                "scroll_right": "Naar rechts scrollen"
             },
             "view_mode": {
                 "mobile": "Mobiele weergave",
