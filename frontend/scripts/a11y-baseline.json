@@ -1,9 +1,6 @@
 {
     "unnamedControls": {},
     "lowContrastControls": {
-        "src/components/admin/analysis/AnalysisHistoryPanel.tsx": {
-            "button#74bf5e335c": 1
-        },
         "src/components/admin/dashboard/InteractiveDataView.columns.tsx": {
             "Button#2af1b92949": 1,
             "Button#51bc640990": 1,
