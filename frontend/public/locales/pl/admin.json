@@ -1547,6 +1547,7 @@
           "locked_paused": "To badanie jest wstrzymane. Przełącz na tryb szkicu, aby edytować.",
           "locked_closed": "To badanie jest zamknięte. Projekt jest zarchiwizowany.",
           "view_read_only": "Podgląd tylko do odczytu",
+          "locked_dialog_desc": "Edycja jest zablokowana, gdy badanie jest w tym stanie. Zamknij to powiadomienie, aby przeczytać konfigurację bez wprowadzania zmian.",
           "mismatch_title": "Niezgodność pojemności siatki",
           "mismatch_desc": "Masz {{statements}} stwierdzeń, ale siatka ma tylko miejsca dla {{slots}} elementów. Dostosuj kolumny poniżej.",
           "unlock_hint": "Przejdź do eksploratora danych, aby wyczyścić sesje i odblokować strukturę"

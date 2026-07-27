@@ -1458,6 +1458,7 @@
                     "locked_paused": "Tämä tutkimus on tauolla. Vaihda luonnostilaan muokataksesi.",
                     "locked_closed": "Tämä tutkimus on suljettu. Suunnittelu on arkistoitu.",
                     "view_read_only": "Katso vain luku -tilassa",
+                    "locked_dialog_desc": "Muokkaus on lukittu, kun tutkimus on tässä tilassa. Sulje tämä ilmoitus, niin voit lukea asetukset muuttamatta niitä.",
                     "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"

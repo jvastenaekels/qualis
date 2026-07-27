@@ -1549,6 +1549,7 @@
                     "locked_paused": "This study is paused. Switch to draft mode to edit.",
                     "locked_closed": "This study is closed. The design is archived.",
                     "view_read_only": "View read-only",
+                    "locked_dialog_desc": "Editing is locked while the study is in this state. Close this notice to read the configuration without changing it.",
                     "mismatch_title": "Grid capacity mismatch",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
                     "unlock_hint": "Go to data explorer to purge sessions and unlock structure"

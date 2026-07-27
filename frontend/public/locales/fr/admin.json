@@ -1496,6 +1496,7 @@
                     "locked_paused": "Cette étude est en pause. Pour la modifier, passez-la en brouillon.",
                     "locked_closed": "Cette étude est clôturée. La conception est archivée.",
                     "view_read_only": "Voir en lecture seule",
+                    "locked_dialog_desc": "La modification est verrouillée tant que l'étude est dans cet état. Fermez ce message pour consulter la configuration sans la modifier.",
                     "mismatch_title": "Capacité de grille incorrecte",
                     "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
                     "unlock_hint": "Aller dans l'explorateur de données pour purger les sessions et débloquer la structure"

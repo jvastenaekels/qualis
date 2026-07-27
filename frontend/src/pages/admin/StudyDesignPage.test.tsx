@@ -1,4 +1,4 @@
-import { renderWithProviders, screen, waitFor, fireEvent } from '@/test-utils/test-utils';
+import { renderWithProviders, screen, waitFor, within, fireEvent } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
@@ -235,6 +235,80 @@ describe('StudyDesignPage Feature Tests', () => {
         const titleField = screen.getByLabelText(/study title/i);
         expect(titleField).toBeInTheDocument();
         expect(titleField).toBeDisabled();
+    });
+
+    // ── Dismissal must not strand the researcher (review finding 1) ──
+    // `handleSwitchToDraft` used to be called from exactly one place: inside
+    // the lock dialog. A researcher who took the "View read-only" escape to
+    // inspect an active study, then decided to edit it, had every field
+    // disabled and no control anywhere on the page to unlock them — recovery
+    // required a page reload or a detour to the study overview.
+    it('keeps an unlock affordance on the page after the lock dialog is dismissed', async () => {
+        const user = userEvent.setup();
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        const dialog = await screen.findByRole('dialog');
+        // Before dismissal the dialog owns the unlock action.
+        expect(within(dialog).getByRole('button', { name: /draft mode/i })).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: /view read-only/i }));
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+
+        // Positive: the unlock action survives dismissal, outside any dialog.
+        const unlock = screen.getByRole('button', { name: /draft mode/i });
+        expect(unlock).toBeEnabled();
+        expect(unlock.closest('[role="dialog"]')).toBeNull();
+        // ...and the notice that explains *why* the fields are inert stays on
+        // screen with it, so the affordance is not an unexplained button.
+        expect(screen.getByTestId('design-lock-banner')).toHaveTextContent(/this study is active/i);
+
+        // Negative: dismissing the dialog does not silently unlock the design.
+        expect(screen.getByLabelText(/study title/i)).toBeDisabled();
+    });
+
+    // ── The lock dialog describes itself (review findings 5 and 6) ──
+    it('gives the lock dialog a description in every locked state', async () => {
+        // The paused state used to render no DialogDescription at all, so
+        // Radix warned and the dialog shipped with no accessible description.
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'paused' });
+            })
+        );
+
+        renderPage();
+
+        const dialog = await screen.findByRole('dialog');
+        expect(dialog).toHaveAccessibleDescription(/read the configuration without changing it/i);
+        // Negative: it is not left undescribed, as the paused branch was.
+        expect(dialog).not.toHaveAccessibleDescription('');
+    });
+
+    it('describes the lock dialog, not the consequence of one of its buttons', async () => {
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer', () => {
+                return HttpResponse.json({ ...mockStudy, state: 'active' });
+            })
+        );
+
+        renderPage();
+
+        const dialog = await screen.findByRole('dialog');
+        // Negative: the Draft-Mode *confirm* copy is no longer the dialog's
+        // description. Announced before "View read-only", it invited a
+        // screen-reader user to attribute "stops data collection" to the
+        // wrong button.
+        expect(dialog).not.toHaveAccessibleDescription(/stop data collection/i);
+        // Positive: the description now describes the dialog.
+        expect(dialog).toHaveAccessibleDescription(/read the configuration without changing it/i);
     });
 
     it('uses an amber lock icon on the lock notice instead of the green globe', async () => {

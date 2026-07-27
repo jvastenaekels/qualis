@@ -136,6 +136,16 @@ const StudyDesignPage = () => {
 
     if (!draft) return <div>{t('common.errors.study_not_found.title')}</div>;
 
+    // Shared by the lock dialog and the persistent lock banner below it, so the
+    // researcher reads the same sentence whether the notice is still up or has
+    // been dismissed.
+    const lockNoticeTitle =
+        draft.state === 'active'
+            ? t('admin.design.qsort.grid.locked_active')
+            : draft.state === 'paused'
+              ? t('admin.design.qsort.grid.locked_paused')
+              : t('admin.design.qsort.grid.locked_closed');
+
     return (
         <div
             className="flex flex-col h-full animate-in fade-in duration-500 overflow-hidden max-w-full"
@@ -448,20 +458,25 @@ const StudyDesignPage = () => {
                         </div>
                         <DialogHeader className="items-center text-center sm:text-center gap-1.5">
                             <DialogTitle className="text-2xl font-bold text-slate-800 tracking-normal">
-                                {draft.state === 'active'
-                                    ? t('admin.design.qsort.grid.locked_active')
-                                    : draft.state === 'paused'
-                                      ? t('admin.design.qsort.grid.locked_paused')
-                                      : t('admin.design.qsort.grid.locked_closed')}
+                                {lockNoticeTitle}
                             </DialogTitle>
-                            {draft.state === 'active' && (
-                                <DialogDescription>
-                                    {t(
-                                        'admin.study_status.dialog.draft.desc',
-                                        'This will stop data collection but allow you to modify the study design. Existing data is preserved.'
-                                    )}
-                                </DialogDescription>
-                            )}
+                            {/*
+                             * Unconditional, and its own copy. Gating it on
+                             * `state === 'active'` left the paused and closed
+                             * dialogs with no accessible description at all;
+                             * and the string it borrowed —
+                             * `study_status.dialog.draft.desc` — was written for
+                             * the Draft-Mode *confirm* dialog, so as the
+                             * aria-describedby of a two-button dialog it
+                             * announced "this will stop data collection" just
+                             * before "View read-only".
+                             */}
+                            <DialogDescription>
+                                {t(
+                                    'admin.design.qsort.grid.locked_dialog_desc',
+                                    'Editing is locked while the study is in this state. Close this notice to read the configuration without changing it.'
+                                )}
+                            </DialogDescription>
                         </DialogHeader>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
                             <Button
@@ -489,6 +504,56 @@ const StudyDesignPage = () => {
                 </Dialog>
                 {/* Left Pane: Editor */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
+                    {/*
+                     * Persistent lock banner — the unlock affordance has to
+                     * survive dismissal of the dialog above. `handleSwitchToDraft`
+                     * used to be reachable from exactly one place: inside that
+                     * dialog. A researcher who took the "View read-only" escape
+                     * to inspect an active study, then decided to edit it, found
+                     * every field disabled and no control anywhere on the page
+                     * to unlock them — recovery meant a page reload or a detour
+                     * to the study overview's status control, neither signposted.
+                     *
+                     * A banner rather than turning the toolbar status badge into
+                     * a control: the badge is `hidden md:flex`, so it would leave
+                     * narrow viewports with no escape at all, and it carries
+                     * role="status" — making it a button too would muddle both
+                     * semantics. The banner also keeps the *reason* the fields
+                     * are inert on screen, not just the way out.
+                     */}
+                    {api.isFullyReadOnly && isLockNoticeDismissed && (
+                        <div className="max-w-full lg:max-w-5xl mx-auto mb-4">
+                            <div
+                                data-testid="design-lock-banner"
+                                className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 rounded-md text-sm bg-amber-50 border border-amber-200 text-amber-900"
+                            >
+                                <Lock
+                                    className="h-4 w-4 flex-shrink-0 text-amber-700"
+                                    aria-hidden="true"
+                                />
+                                <span className="flex-1 min-w-0 font-medium">
+                                    {lockNoticeTitle}
+                                </span>
+                                {draft.state === 'active' && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={api.isSwitchingToDraft}
+                                        className="h-8 shrink-0 rounded-lg font-bold bg-white border-amber-300 text-amber-900 hover:bg-amber-100 hover:text-amber-900"
+                                        onClick={api.handleSwitchToDraft}
+                                    >
+                                        {api.isSwitchingToDraft && (
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        )}
+                                        {t(
+                                            'admin.study_status.state.switch_to_draft',
+                                            'Draft Mode'
+                                        )}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    )}
                     {(() => {
                         // Banner: chrome locale ≠ language being edited.
                         // Researchers are editing one language while reading the

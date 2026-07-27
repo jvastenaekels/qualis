@@ -1547,6 +1547,7 @@
                     "locked_paused": "Dit onderzoek is gepauzeerd. Schakel over naar conceptmodus om te bewerken.",
                     "locked_closed": "Dit onderzoek is gesloten. Het ontwerp is gearchiveerd.",
                     "view_read_only": "Bekijken (alleen-lezen)",
+                    "locked_dialog_desc": "Bewerken is geblokkeerd zolang het onderzoek in deze status is. Sluit deze melding om de configuratie te lezen zonder deze te wijzigen.",
                     "mismatch_title": "Rastercapaciteit komt niet overeen",
                     "mismatch_desc": "U heeft {{statements}} stellingen, maar het raster heeft slechts posities voor {{slots}} items. Pas de kolommen hieronder aan.",
                     "unlock_hint": "Ga naar de data-verkenner om sessies te wissen en de structuur te ontgrendelen"
