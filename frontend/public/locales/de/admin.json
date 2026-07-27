@@ -264,11 +264,7 @@
                     "ListChecks": "Checkliste"
                 }
             },
-            "click_to_edit": "Zum Bearbeiten klicken",
-            "audio_player": {
-                "play": "Audio abspielen",
-                "pause": "Audio pausieren"
-            }
+            "click_to_edit": "Zum Bearbeiten klicken"
         },
         "layout": {
             "title": "Admin",
@@ -2316,6 +2312,13 @@
                 "success": "E-Mail aktualisiert.",
                 "title": "Benutzer-E-Mail festlegen"
             }
+        },
+        "audio": {
+            "download": "Audio herunterladen",
+            "recording": "Audioaufnahme",
+            "play": "Audio abspielen",
+            "pause": "Audio pausieren",
+            "seek": "Wiedergabeposition"
         }
     }
 }

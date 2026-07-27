@@ -176,11 +176,7 @@
                     "ListChecks": "Tarkistuslista"
                 }
             },
-            "click_to_edit": "Napsauta muokataksesi",
-            "audio_player": {
-                "play": "Toista ääni",
-                "pause": "Keskeytä ääni"
-            }
+            "click_to_edit": "Napsauta muokataksesi"
         },
         "layout": {
             "title": "Ylläpito",
@@ -2316,6 +2312,13 @@
                 "success": "Sähköposti päivitetty.",
                 "title": "Aseta käyttäjän sähköposti"
             }
+        },
+        "audio": {
+            "download": "Lataa ääni",
+            "recording": "Äänitallenne",
+            "play": "Toista ääni",
+            "pause": "Keskeytä ääni",
+            "seek": "Toistokohta"
         }
     }
 }

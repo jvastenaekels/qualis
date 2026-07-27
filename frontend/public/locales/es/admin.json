@@ -264,11 +264,7 @@
                     "ListChecks": "Lista de verificación"
                 }
             },
-            "click_to_edit": "Haga clic para editar",
-            "audio_player": {
-                "play": "Reproducir audio",
-                "pause": "Pausar audio"
-            }
+            "click_to_edit": "Haga clic para editar"
         },
         "layout": {
             "title": "Administración",
@@ -2316,6 +2312,13 @@
                 "success": "Correo electrónico actualizado.",
                 "title": "Establecer el correo electrónico del usuario"
             }
+        },
+        "audio": {
+            "download": "Descargar audio",
+            "recording": "Grabación de audio",
+            "play": "Reproducir audio",
+            "pause": "Pausar audio",
+            "seek": "Posición de reproducción"
         }
     }
 }

@@ -264,11 +264,7 @@
                     "ListChecks": "Checklist"
                 }
             },
-            "click_to_edit": "Klik om te bewerken",
-            "audio_player": {
-                "play": "Audio afspelen",
-                "pause": "Audio pauzeren"
-            }
+            "click_to_edit": "Klik om te bewerken"
         },
         "layout": {
             "title": "Beheer",
@@ -2316,6 +2312,13 @@
                 "success": "E-mail bijgewerkt.",
                 "title": "E-mail van gebruiker instellen"
             }
+        },
+        "audio": {
+            "download": "Audio downloaden",
+            "recording": "Audio-opname",
+            "play": "Audio afspelen",
+            "pause": "Audio pauzeren",
+            "seek": "Afspeelpositie"
         }
     }
 }

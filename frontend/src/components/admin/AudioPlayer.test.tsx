@@ -29,4 +29,13 @@ describe('AudioPlayer', () => {
 
         expect(screen.getByRole('button', { name: 'Download audio' })).toBeInTheDocument();
     });
+
+    it('names the seek slider (review fix round 1: <input> is invisible to the a11y gate)', () => {
+        renderWithProviders(<AudioPlayer url="https://example.com/audio.webm" />);
+
+        // <input type="range"> computes an implicit ARIA role of "slider" —
+        // getByRole resolves it the same way a screen reader would, not via
+        // an attribute check.
+        expect(screen.getByRole('slider', { name: 'Seek audio position' })).toBeInTheDocument();
+    });
 });

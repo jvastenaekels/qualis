@@ -110,8 +110,8 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
                     className="h-10 w-10 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700"
                     aria-label={
                         isPlaying
-                            ? t('admin.components.audio_player.pause', 'Pause audio')
-                            : t('admin.components.audio_player.play', 'Play audio')
+                            ? t('admin.audio.pause', 'Pause audio')
+                            : t('admin.audio.play', 'Play audio')
                     }
                 >
                     {isPlaying ? (
@@ -132,6 +132,7 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
                         max={audioDuration || 0}
                         value={currentTime}
                         onChange={handleSeek}
+                        aria-label={t('admin.audio.seek', 'Seek audio position')}
                         className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                     />
                 </div>

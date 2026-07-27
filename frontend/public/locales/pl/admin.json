@@ -264,11 +264,7 @@
           "ListChecks": "Lista kontrolna"
         }
       },
-      "click_to_edit": "Kliknij, aby edytować",
-      "audio_player": {
-        "play": "Odtwórz audio",
-        "pause": "Wstrzymaj audio"
-      }
+      "click_to_edit": "Kliknij, aby edytować"
     },
     "layout": {
       "title": "Admin",
@@ -2316,6 +2312,13 @@
         "success": "Zaktualizowano e-mail.",
         "title": "Ustaw e-mail użytkownika"
       }
+    },
+    "audio": {
+      "download": "Pobierz audio",
+      "recording": "Nagranie audio",
+      "play": "Odtwórz audio",
+      "pause": "Wstrzymaj audio",
+      "seek": "Pozycja odtwarzania"
     }
   }
 }

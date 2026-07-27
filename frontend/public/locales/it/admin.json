@@ -264,11 +264,7 @@
                     "ListChecks": "Lista di controllo"
                 }
             },
-            "click_to_edit": "Clicchi per modificare",
-            "audio_player": {
-                "play": "Riproduci audio",
-                "pause": "Metti in pausa l'audio"
-            }
+            "click_to_edit": "Clicchi per modificare"
         },
         "layout": {
             "title": "Admin",
@@ -2316,6 +2312,13 @@
                 "success": "E-mail aggiornata.",
                 "title": "Imposta l'e-mail dell'utente"
             }
+        },
+        "audio": {
+            "download": "Scarica audio",
+            "recording": "Registrazione audio",
+            "play": "Riproduci audio",
+            "pause": "Metti in pausa l'audio",
+            "seek": "Posizione di riproduzione"
         }
     }
 }

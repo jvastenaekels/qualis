@@ -264,11 +264,7 @@
                     "ListChecks": "Checklist"
                 }
             },
-            "click_to_edit": "Click to edit",
-            "audio_player": {
-                "play": "Play audio",
-                "pause": "Pause audio"
-            }
+            "click_to_edit": "Click to edit"
         },
         "layout": {
             "title": "Admin",
@@ -2318,6 +2314,13 @@
                 "promote_title": "Grant superuser access?",
                 "promote_body": "Grant {{email}} full superuser privileges over the platform."
             }
+        },
+        "audio": {
+            "download": "Download audio",
+            "recording": "Audio recording",
+            "play": "Play audio",
+            "pause": "Pause audio",
+            "seek": "Seek audio position"
         }
     }
 }
