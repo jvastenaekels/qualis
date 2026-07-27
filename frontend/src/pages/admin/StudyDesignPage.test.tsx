@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/test-utils/server';
+import i18n from '@/test-utils/i18n-test';
+import frAdmin from '../../../public/locales/fr/admin.json';
 import StudyDesignPage from './StudyDesignPage';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -397,5 +399,53 @@ describe('StudyDesignPage Feature Tests', () => {
         await waitFor(() => {
             expect(screen.getByText(/👋/)).toBeInTheDocument();
         });
+    });
+
+    // The tab-bar scroll chevrons' aria-label used to be a hardcoded English
+    // literal ("Scroll left" / "Scroll right"), so a screen reader on a
+    // translated interface would announce them in English regardless of the
+    // researcher's chosen language. jsdom/happy-dom don't compute real
+    // scroll geometry, so the arrows' visibility is forced by stubbing the
+    // tablist's scroll metrics directly and firing the same `scroll` event
+    // the real DOM would dispatch, which drives the component's own
+    // `checkScroll` handler — not a shortcut around it.
+    it('names the scroll chevrons via t(), not a hardcoded literal', async () => {
+        renderPage();
+        const tablist = await screen.findByRole('tablist');
+
+        Object.defineProperty(tablist, 'clientWidth', { value: 300, configurable: true });
+        Object.defineProperty(tablist, 'scrollWidth', { value: 900, configurable: true });
+        Object.defineProperty(tablist, 'scrollLeft', { value: 100, configurable: true });
+        fireEvent.scroll(tablist);
+
+        expect(await screen.findByRole('button', { name: 'Scroll left' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Scroll right' })).toBeInTheDocument();
+    });
+
+    // The English names alone can't distinguish a real t() call from a
+    // literal that happens to already read "Scroll left" / "Scroll right"
+    // in English (the canonical fallback text is unchanged from the
+    // original hardcoded value). Assert the real fr/admin.json translation.
+    it("resolves the scroll chevrons to the researcher's active language", async () => {
+        i18n.addResourceBundle('fr', 'admin', frAdmin, true, true);
+        await i18n.changeLanguage('fr');
+        try {
+            renderPage();
+            const tablist = await screen.findByRole('tablist');
+
+            Object.defineProperty(tablist, 'clientWidth', { value: 300, configurable: true });
+            Object.defineProperty(tablist, 'scrollWidth', { value: 900, configurable: true });
+            Object.defineProperty(tablist, 'scrollLeft', { value: 100, configurable: true });
+            fireEvent.scroll(tablist);
+
+            expect(
+                await screen.findByRole('button', { name: 'Défiler vers la gauche' })
+            ).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: 'Défiler vers la droite' })
+            ).toBeInTheDocument();
+        } finally {
+            await i18n.changeLanguage('en');
+        }
     });
 });

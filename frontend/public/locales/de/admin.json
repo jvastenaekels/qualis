@@ -355,7 +355,10 @@
             "select_project": "Projekt auswählen",
             "concourses": "Aussagenpools",
             "concourse": "Aussagenpool",
-            "members": "Teammitglieder"
+            "members": "Teammitglieder",
+            "mobile_title": "Seitenleiste",
+            "mobile_description": "Zeigt die mobile Seitenleiste an.",
+            "toggle": "Seitenleiste umschalten"
         },
         "concourse": {
             "title": "Aussagenpool",
@@ -939,7 +942,8 @@
             "analysis": "Analyse",
             "settings": "Einstellungen",
             "concourse": "Aussagenpool",
-            "members": "Teammitglieder"
+            "members": "Teammitglieder",
+            "nav_label": "Brotkrümelnavigation"
         },
         "command_menu": {
             "title": "Globales Befehlsmenü",
@@ -1357,7 +1361,9 @@
                 "statements": "Aussagen",
                 "grid": "Raster",
                 "survey": "Umfrage",
-                "branding": "Branding"
+                "branding": "Branding",
+                "scroll_left": "Nach links scrollen",
+                "scroll_right": "Nach rechts scrollen"
             },
             "view_mode": {
                 "mobile": "Mobil-Ansicht",

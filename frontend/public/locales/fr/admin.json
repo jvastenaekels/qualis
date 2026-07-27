@@ -267,7 +267,10 @@
             "study_tools": "Outils d'étude",
             "concourses": "Concours",
             "concourse": "Concours",
-            "members": "Membres de l'équipe"
+            "members": "Membres de l'équipe",
+            "mobile_title": "Barre latérale",
+            "mobile_description": "Affiche la barre latérale mobile.",
+            "toggle": "Basculer la barre latérale"
         },
         "concourse": {
             "title": "Concours",
@@ -851,7 +854,8 @@
             "analysis": "Analyse",
             "settings": "Réglages",
             "concourse": "Concours",
-            "members": "Membres de l'équipe"
+            "members": "Membres de l'équipe",
+            "nav_label": "fil d'Ariane"
         },
         "command_menu": {
             "title": "Menu de commandes global",
@@ -1306,7 +1310,9 @@
                 "statements": "Énoncés",
                 "grid": "Grille",
                 "survey": "Questionnaire",
-                "branding": "Identité visuelle"
+                "branding": "Identité visuelle",
+                "scroll_left": "Défiler vers la gauche",
+                "scroll_right": "Défiler vers la droite"
             },
             "view_mode": {
                 "mobile": "Vue mobile",

@@ -267,7 +267,10 @@
             "concourses": "Lausekokoelmat",
             "concourse": "Lausekokoelma",
             "privacy": "Tietosuoja",
-            "members": "Tiimin jäsenet"
+            "members": "Tiimin jäsenet",
+            "mobile_title": "Sivupalkki",
+            "mobile_description": "Näyttää mobiilisivupalkin.",
+            "toggle": "Vaihda sivupalkki"
         },
         "concourse": {
             "title": "Lausekokoelma",
@@ -851,7 +854,8 @@
             "analysis": "Analyysi",
             "settings": "Asetukset",
             "concourse": "Concourse",
-            "members": "Tiimin jäsenet"
+            "members": "Tiimin jäsenet",
+            "nav_label": "murupolku"
         },
         "command_menu": {
             "title": "Globaali komentovalikko",
@@ -1268,7 +1272,9 @@
                 "statements": "Väitteet",
                 "grid": "Ruudukko",
                 "survey": "Kysely",
-                "branding": "Visuaalinen ilme"
+                "branding": "Visuaalinen ilme",
+                "scroll_left": "Vieritä vasemmalle",
+                "scroll_right": "Vieritä oikealle"
             },
             "view_mode": {
                 "mobile": "Mobiilinäkymä",

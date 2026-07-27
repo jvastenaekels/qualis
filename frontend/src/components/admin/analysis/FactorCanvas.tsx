@@ -188,7 +188,10 @@ export function FactorCanvas({
                                         <span
                                             className="text-2xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
                                             role="img"
-                                            aria-label="distinguishing statement"
+                                            aria-label={t(
+                                                'admin.analysis.distinguishing_legend',
+                                                'Distinguishing statement'
+                                            )}
                                         >
                                             D
                                         </span>

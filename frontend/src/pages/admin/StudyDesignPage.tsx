@@ -595,7 +595,7 @@ const StudyDesignPage = () => {
                                     type="button"
                                     onClick={() => scrollTabs('left')}
                                     className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-9 w-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
-                                    aria-label="Scroll left"
+                                    aria-label={t('admin.design.tabs.scroll_left', 'Scroll left')}
                                 >
                                     <ChevronLeft size={18} strokeWidth={2.5} />
                                 </button>
@@ -716,7 +716,7 @@ const StudyDesignPage = () => {
                                     type="button"
                                     onClick={() => scrollTabs('right')}
                                     className="absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
-                                    aria-label="Scroll right"
+                                    aria-label={t('admin.design.tabs.scroll_right', 'Scroll right')}
                                 >
                                     <ChevronRight size={20} strokeWidth={3} />
                                 </button>
