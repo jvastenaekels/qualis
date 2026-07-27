@@ -1801,7 +1801,8 @@
                 "email_provided": "Email fourni",
                 "newsletter_consent": "Souhaite les résultats",
                 "interview_consent": "Accepte suivi",
-                "recruitment_link": "Lien de recrutement"
+                "recruitment_link": "Lien de recrutement",
+                "device_info": "Appareil : {{os}}, {{browser}}"
             },
             "toast": {
                 "discarded": "Participant écarté",

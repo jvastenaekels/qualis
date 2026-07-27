@@ -1851,7 +1851,8 @@
                 "email_provided": "E-mailadres opgegeven",
                 "newsletter_consent": "Wil resultaten",
                 "interview_consent": "Accepteert vervolg",
-                "recruitment_link": "Wervingslink"
+                "recruitment_link": "Wervingslink",
+                "device_info": "Apparaat: {{os}}, {{browser}}"
             },
             "toast": {
                 "discarded": "Deelnemer verwijderd",

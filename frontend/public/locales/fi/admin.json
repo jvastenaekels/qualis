@@ -1763,7 +1763,8 @@
                 "email_provided": "Sähköposti annettu",
                 "newsletter_consent": "Haluaa tulokset",
                 "interview_consent": "Hyväksyy seurannan",
-                "recruitment_link": "Rekrytointilinkki"
+                "recruitment_link": "Rekrytointilinkki",
+                "device_info": "Laite: {{os}}, {{browser}}"
             },
             "toast": {
                 "discarded": "Osallistuja hylätty",
