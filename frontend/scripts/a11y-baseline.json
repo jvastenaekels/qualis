@@ -57,7 +57,7 @@
         },
         "src/pages/admin/ProjectMembersPage.tsx": {
             "Button#d8507040f1": 1,
-            "SelectTrigger#872cdad358": 2
+            "SelectTrigger#872cdad358": 1
         }
     },
     "lowContrastControls": {
@@ -132,10 +132,6 @@
             "Label#dd23d8021a": 1,
             "Label#e4d9b72f77": 1,
             "Label#efa4e00bc8": 1
-        },
-        "src/pages/admin/ProjectMembersPage.tsx": {
-            "Label#302a87c2cf": 1,
-            "Label#9eade0b790": 1
         },
         "src/pages/admin/RecruitmentPage.tsx": {
             "Label#5e73029fe1": 1,

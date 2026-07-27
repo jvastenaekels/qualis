@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { Users, Trash2, UserPlus, Shield, Mail, Check, Copy, Loader2 } from 'lucide-react';
 import { useLoaderData } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -503,10 +502,14 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                     {!inviteUrl ? (
                         <form onSubmit={handleInvite} className="space-y-4 pt-4">
                             <div className="space-y-2">
-                                <Label className="text-2xs font-black text-slate-700">
+                                <Label
+                                    htmlFor="invite-email"
+                                    className="text-2xs font-black text-slate-700"
+                                >
                                     {t('admin.projects.settings.team.invite_modal.email_label')}
                                 </Label>
                                 <Input
+                                    id="invite-email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -516,14 +519,20 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-2xs font-black text-slate-700">
+                                <Label
+                                    htmlFor="invite-role"
+                                    className="text-2xs font-black text-slate-700"
+                                >
                                     {t('admin.projects.settings.team.invite_modal.role_label')}
                                 </Label>
                                 <Select
                                     value={role}
                                     onValueChange={(val) => setRole(val as ProjectRole)}
                                 >
-                                    <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-slate-200">
+                                    <SelectTrigger
+                                        id="invite-role"
+                                        className="h-11 rounded-xl bg-slate-50 border-slate-200"
+                                    >
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl border-slate-200 bg-white shadow-2xl">
