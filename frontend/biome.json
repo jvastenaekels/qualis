@@ -44,7 +44,21 @@
             },
             "a11y": {
                 "recommended": true,
-                "useSemanticElements": "off"
+                "useSemanticElements": "off",
+                "noLabelWithoutControl": {
+                    "level": "error",
+                    "options": {
+                        "labelComponents": ["Label"],
+                        "inputComponents": [
+                            "Input",
+                            "Textarea",
+                            "Checkbox",
+                            "Switch",
+                            "RadioGroupItem",
+                            "SelectTrigger"
+                        ]
+                    }
+                }
             }
         }
     },

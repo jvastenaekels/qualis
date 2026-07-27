@@ -25,6 +25,7 @@
         "check-interpolations": "python3 scripts/i18n/check_interpolations.py",
         "lint:duplication": "jscpd --config ../.jscpd.json",
         "lint:deadcode": "knip",
+        "lint:a11y": "node scripts/check-a11y-names.mjs",
         "lint:architecture": "depcruise src --include-only \"^src\" --config .dependency-cruiser.cjs",
         "visualize:deps": "madge --image graph.svg src",
         "check:api": "orval && biome check --fix src/api/generated.ts src/api/model && git diff --exit-code src/api/generated.ts src/api/model",

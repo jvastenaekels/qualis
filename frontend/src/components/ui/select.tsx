@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noLabelWithoutControl: SelectLabel wraps Radix SelectPrimitive.Label, a listbox group label, not a form label — the rule matches on the `.Label` member name only.
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';

@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noLabelWithoutControl: FormLabel forwards children via props spread; the htmlFor is set from useFormField.
 import * as React from 'react';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';

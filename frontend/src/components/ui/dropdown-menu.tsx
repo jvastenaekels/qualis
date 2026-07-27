@@ -1,3 +1,4 @@
+// biome-ignore-all lint/a11y/noLabelWithoutControl: DropdownMenuLabel wraps Radix DropdownMenuPrimitive.Label, a menu group label, not a form label — the rule matches on the `.Label` member name only.
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
