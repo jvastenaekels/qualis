@@ -1646,7 +1646,8 @@
                         "next": "Pasar al siguiente paso",
                         "submit": "Enviar los resultados al final",
                         "confirm": "Botón de validación genérico"
-                    }
+                    },
+                    "info_label": "Acerca de {{label}}"
                 },
                 "terms": {
                     "title": "Terminología de clasificación",
@@ -1664,7 +1665,9 @@
                     "desc": "Añada o modifique sugerencias flotantes para ayudar a los participantes durante la fase de clasificación en cuadrícula.",
                     "placeholder": "Introduzca un consejo metodológico...",
                     "add": "Añadir consejo",
-                    "reset": "Restablecer valores predeterminados"
+                    "reset": "Restablecer valores predeterminados",
+                    "remove": "Quitar {{tip}}",
+                    "unnamed": "Consejo {{number}}"
                 },
                 "help": {
                     "title": "Orientación por paso (qué/por qué)",
@@ -2147,8 +2150,11 @@
                         "success": "¡Enlace de invitación generado!",
                         "error": "Error al crear la invitación.",
                         "send": "Crear y enviar invitación",
-                        "copy_success": "¡Enlace copiado al portapapeles!"
-                    }
+                        "copy_success": "¡Enlace copiado al portapapeles!",
+                        "copy_link": "Copiar enlace",
+                        "copied": "Copiado"
+                    },
+                    "role_for": "Rol de {{name}}"
                 }
             }
         },

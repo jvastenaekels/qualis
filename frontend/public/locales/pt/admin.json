@@ -1646,7 +1646,8 @@
                         "next": "Avançar para o passo seguinte",
                         "submit": "Submeter resultados no final",
                         "confirm": "Botão de validação genérico"
-                    }
+                    },
+                    "info_label": "Sobre {{label}}"
                 },
                 "terms": {
                     "title": "Terminologia de classificação",
@@ -1664,7 +1665,9 @@
                     "desc": "Adicione ou modifique dicas flutuantes para ajudar os participantes durante a fase de classificação na grelha.",
                     "placeholder": "Introduza uma dica metodológica...",
                     "add": "Adicionar dica",
-                    "reset": "Repor valores predefinidos"
+                    "reset": "Repor valores predefinidos",
+                    "remove": "Remover {{tip}}",
+                    "unnamed": "Dica {{number}}"
                 },
                 "help": {
                     "title": "Orientação por passo (o quê/porquê)",
@@ -2147,8 +2150,11 @@
                         "success": "Link de convite gerado!",
                         "error": "Falha ao criar o convite.",
                         "send": "Criar e enviar convite",
-                        "copy_success": "Link copiado para a área de transferência!"
-                    }
+                        "copy_success": "Link copiado para a área de transferência!",
+                        "copy_link": "Copiar link",
+                        "copied": "Copiado"
+                    },
+                    "role_for": "Função de {{name}}"
                 }
             }
         },

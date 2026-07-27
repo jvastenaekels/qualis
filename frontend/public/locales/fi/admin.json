@@ -1557,7 +1557,8 @@
                         "next": "Siirry seuraavaan vaiheeseen",
                         "submit": "Lähetä tulokset lopussa",
                         "confirm": "Yleinen vahvistuspainike"
-                    }
+                    },
+                    "info_label": "Tietoa: {{label}}"
                 },
                 "terms": {
                     "title": "Lajittelutermistö",
@@ -1575,7 +1576,9 @@
                     "desc": "Lisää tai muokkaa kelluvia vinkkejä auttaaksesi osallistujia ruudukkolajitteluvaiheessa.",
                     "placeholder": "Kirjoita metodologinen vinkki...",
                     "add": "Lisää vinkki",
-                    "reset": "Palauta oletukset"
+                    "reset": "Palauta oletukset",
+                    "remove": "Poista {{tip}}",
+                    "unnamed": "Vihje {{number}}"
                 },
                 "help": {
                     "title": "Vaiheittainen ohjaus (Mitä/Miksi)",
@@ -2005,8 +2008,11 @@
                         "success": "Kutsulinkki luotu!",
                         "error": "Kutsun luominen epäonnistui.",
                         "send": "Luo ja lähetä kutsu",
-                        "copy_success": "Linkki kopioitu leikepöydälle!"
-                    }
+                        "copy_success": "Linkki kopioitu leikepöydälle!",
+                        "copy_link": "Kopioi linkki",
+                        "copied": "Kopioitu"
+                    },
+                    "role_for": "Rooli: {{name}}"
                 }
             }
         },

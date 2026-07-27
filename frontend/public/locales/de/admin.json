@@ -1646,7 +1646,8 @@
                         "next": "Zum nächsten Schritt wechseln",
                         "submit": "Ergebnisse am Ende einreichen",
                         "confirm": "Allgemeine Bestätigungsschaltfläche"
-                    }
+                    },
+                    "info_label": "Über {{label}}"
                 },
                 "terms": {
                     "title": "Sortierbegriffe",
@@ -1664,7 +1665,9 @@
                     "desc": "Fügen Sie schwebende Hinweise hinzu oder ändern Sie diese, um Teilnehmern während der Rastersortierungsphase zu helfen.",
                     "placeholder": "Methodologie-Hinweis eingeben...",
                     "add": "Hinweis hinzufügen",
-                    "reset": "Auf Standard zurücksetzen"
+                    "reset": "Auf Standard zurücksetzen",
+                    "remove": "{{tip}} entfernen",
+                    "unnamed": "Tipp {{number}}"
                 },
                 "help": {
                     "title": "Schrittführung (Was/Warum)",
@@ -2147,8 +2150,11 @@
                         "success": "Einladungslink erstellt!",
                         "error": "Einladung konnte nicht erstellt werden.",
                         "send": "Einladung erstellen und senden",
-                        "copy_success": "Link in die Zwischenablage kopiert!"
-                    }
+                        "copy_success": "Link in die Zwischenablage kopiert!",
+                        "copy_link": "Link kopieren",
+                        "copied": "Kopiert"
+                    },
+                    "role_for": "Rolle für {{name}}"
                 }
             }
         },

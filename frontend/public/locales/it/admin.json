@@ -1646,7 +1646,8 @@
                         "next": "Passa al passo successivo",
                         "submit": "Invia i risultati alla fine",
                         "confirm": "Pulsante di validazione generico"
-                    }
+                    },
+                    "info_label": "Informazioni su {{label}}"
                 },
                 "terms": {
                     "title": "Terminologia di classificazione",
@@ -1664,7 +1665,9 @@
                     "desc": "Aggiunga o modifichi i suggerimenti visualizzati durante la fase di classificazione nella griglia.",
                     "placeholder": "Inserisca un suggerimento metodologico...",
                     "add": "Aggiungi suggerimento",
-                    "reset": "Ripristina valori predefiniti"
+                    "reset": "Ripristina valori predefiniti",
+                    "remove": "Rimuovi {{tip}}",
+                    "unnamed": "Suggerimento {{number}}"
                 },
                 "help": {
                     "title": "Guida del passo (cosa/perché)",
@@ -2147,8 +2150,11 @@
                         "success": "Link di invito generato!",
                         "error": "Creazione dell'invito non riuscita.",
                         "send": "Crea e invia invito",
-                        "copy_success": "Link copiato negli appunti!"
-                    }
+                        "copy_success": "Link copiato negli appunti!",
+                        "copy_link": "Copia link",
+                        "copied": "Copiato"
+                    },
+                    "role_for": "Ruolo di {{name}}"
                 }
             }
         },

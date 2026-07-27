@@ -1646,7 +1646,8 @@
             "next": "Przejście do następnego kroku",
             "submit": "Wyślij wyniki na końcu",
             "confirm": "Ogólny przycisk zatwierdzania"
-          }
+          },
+          "info_label": "O {{label}}"
         },
         "terms": {
           "title": "Terminologia sortowania",
@@ -1664,7 +1665,9 @@
           "desc": "Dodaj lub zmodyfikuj pływające wskazówki pomagające uczestnikom podczas fazy sortowania na siatce.",
           "placeholder": "Wpisz wskazówkę metodologiczną...",
           "add": "Dodaj wskazówkę",
-          "reset": "Przywróć wartości domyślne"
+          "reset": "Przywróć wartości domyślne",
+          "remove": "Usuń {{tip}}",
+          "unnamed": "Wskazówka {{number}}"
         },
         "help": {
           "title": "Wskazówki dla kroków (co/dlaczego)",
@@ -2147,8 +2150,11 @@
             "success": "Link zaproszenia wygenerowany!",
             "error": "Nie udało się utworzyć zaproszenia.",
             "send": "Utwórz i wyślij zaproszenie",
-            "copy_success": "Link skopiowany do schowka!"
-          }
+            "copy_success": "Link skopiowany do schowka!",
+            "copy_link": "Kopiuj link",
+            "copied": "Skopiowano"
+          },
+          "role_for": "Rola: {{name}}"
         }
       }
     },

@@ -1646,7 +1646,8 @@
                         "next": "Naar de volgende stap gaan",
                         "submit": "Resultaten verzenden aan het einde",
                         "confirm": "Algemene validatieknop"
-                    }
+                    },
+                    "info_label": "Over {{label}}"
                 },
                 "terms": {
                     "title": "Sorteringsterminologie",
@@ -1664,7 +1665,9 @@
                     "desc": "Voeg zwevende hints toe of pas ze aan om deelnemers te helpen tijdens de rasterdsorteringsfase.",
                     "placeholder": "Voer een methodologietip in...",
                     "add": "Tip toevoegen",
-                    "reset": "Standaardinstellingen herstellen"
+                    "reset": "Standaardinstellingen herstellen",
+                    "remove": "{{tip}} verwijderen",
+                    "unnamed": "Tip {{number}}"
                 },
                 "help": {
                     "title": "Stapbegeleiding (wat/waarom)",
@@ -2147,8 +2150,11 @@
                         "success": "Uitnodigingslink gegenereerd!",
                         "error": "Uitnodiging aanmaken mislukt.",
                         "send": "Uitnodiging aanmaken en versturen",
-                        "copy_success": "Link gekopieerd naar klembord!"
-                    }
+                        "copy_success": "Link gekopieerd naar klembord!",
+                        "copy_link": "Link kopiëren",
+                        "copied": "Gekopieerd"
+                    },
+                    "role_for": "Rol van {{name}}"
                 }
             }
         },

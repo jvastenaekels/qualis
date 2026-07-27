@@ -1648,7 +1648,8 @@
                         "next": "Move to the next step",
                         "submit": "Submit results at the end",
                         "confirm": "Generic validation button"
-                    }
+                    },
+                    "info_label": "About {{label}}"
                 },
                 "terms": {
                     "title": "Sorting terminology",
@@ -1666,7 +1667,9 @@
                     "desc": "Add or modify floating hints to help participants during the grid sort phase.",
                     "placeholder": "Enter a methodology tip...",
                     "add": "Add tip",
-                    "reset": "Reset to defaults"
+                    "reset": "Reset to defaults",
+                    "remove": "Remove {{tip}}",
+                    "unnamed": "Tip {{number}}"
                 },
                 "help": {
                     "title": "Step guidance (what/why)",
@@ -2149,8 +2152,11 @@
                         "success": "Invitation link generated!",
                         "error": "Failed to create invitation.",
                         "send": "Create & send invitation",
-                        "copy_success": "Link copied to clipboard!"
-                    }
+                        "copy_success": "Link copied to clipboard!",
+                        "copy_link": "Copy link",
+                        "copied": "Copied"
+                    },
+                    "role_for": "Role for {{name}}"
                 }
             }
         },

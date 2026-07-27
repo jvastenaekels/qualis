@@ -177,7 +177,17 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             </Label>
                                             <TooltipProvider>
                                                 <Tooltip>
-                                                    <TooltipTrigger>
+                                                    <TooltipTrigger
+                                                        aria-label={t(
+                                                            'admin.design.interface.nav.info_label',
+                                                            'About {{label}}',
+                                                            {
+                                                                label: t(
+                                                                    `admin.design.interface.nav.${tipKey}`
+                                                                ),
+                                                            }
+                                                        )}
+                                                    >
                                                         <Info className="size-3 text-slate-400" />
                                                     </TooltipTrigger>
                                                     <TooltipContent className="text-2xs">
@@ -363,6 +373,19 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         });
                                     }}
                                     className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
+                                    aria-label={t(
+                                        'admin.design.interface.hints.remove',
+                                        'Remove {{tip}}',
+                                        {
+                                            tip:
+                                                tip.trim() ||
+                                                t(
+                                                    'admin.design.interface.hints.unnamed',
+                                                    'Tip {{number}}',
+                                                    { number: index + 1 }
+                                                ),
+                                        }
+                                    )}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>

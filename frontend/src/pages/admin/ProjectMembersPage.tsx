@@ -260,6 +260,15 @@ export default function ProjectMembersPage() {
                                                                     ? 'bg-emerald-50 text-emerald-700'
                                                                     : 'bg-slate-100 text-slate-600'
                                                             )}
+                                                            aria-label={t(
+                                                                'admin.projects.settings.team.role_for',
+                                                                'Role for {{name}}',
+                                                                {
+                                                                    name:
+                                                                        member.user.full_name ||
+                                                                        member.user.email,
+                                                                }
+                                                            )}
                                                         >
                                                             <SelectValue />
                                                         </SelectTrigger>
@@ -584,6 +593,17 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                                         variant="ghost"
                                         className="absolute right-1 top-1/2 -translate-y-1/2 size-8 p-0"
                                         onClick={copyToClipboard}
+                                        aria-label={
+                                            copied
+                                                ? t(
+                                                      'admin.projects.settings.team.invite_modal.copied',
+                                                      'Copied'
+                                                  )
+                                                : t(
+                                                      'admin.projects.settings.team.invite_modal.copy_link',
+                                                      'Copy link'
+                                                  )
+                                        }
                                     >
                                         {copied ? (
                                             <Check className="size-3 text-emerald-600" />

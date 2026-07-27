@@ -1595,7 +1595,8 @@
                         "next": "Bouton standard utilisé pour passer d'une étape à l'autre.",
                         "submit": "Bouton final pour enregistrer la participation.",
                         "confirm": "Utilisé dans le tri sur grille pour valider le placement des cartes."
-                    }
+                    },
+                    "info_label": "À propos de {{label}}"
                 },
                 "terms": {
                     "title": "Terminologie du tri",
@@ -1613,7 +1614,9 @@
                     "desc": "Ajoutez ou modifiez des conseils flottants pour aider les participants pendant la phase de tri sur grille.",
                     "placeholder": "Entrez un conseil méthodologique...",
                     "add": "Ajouter un conseil",
-                    "reset": "Réinitialiser"
+                    "reset": "Réinitialiser",
+                    "remove": "Retirer {{tip}}",
+                    "unnamed": "Astuce {{number}}"
                 },
                 "help": {
                     "title": "Guidage par étape (Quoi/Pourquoi)",
@@ -2059,8 +2062,11 @@
                         "success": "Lien d'invitation généré !",
                         "error": "Échec de la création de l'invitation.",
                         "send": "Créer et envoyer l'invitation",
-                        "copy_success": "Lien copié dans le presse-papier !"
-                    }
+                        "copy_success": "Lien copié dans le presse-papier !",
+                        "copy_link": "Copier le lien",
+                        "copied": "Copié"
+                    },
+                    "role_for": "Rôle de {{name}}"
                 }
             }
         },

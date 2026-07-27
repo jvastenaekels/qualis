@@ -18,9 +18,10 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 // this test needs to exercise. It has been verified stable in this
 // React 19 + happy-dom environment for this page.
 
-const { removeMember, refetchMembers } = vi.hoisted(() => ({
+const { removeMember, refetchMembers, createInvitation } = vi.hoisted(() => ({
     removeMember: vi.fn().mockResolvedValue({}),
     refetchMembers: vi.fn(),
+    createInvitation: vi.fn().mockResolvedValue({ invite_url: 'https://example.com/join/abc' }),
 }));
 
 vi.mock('@/api/generated', () => ({
@@ -63,7 +64,7 @@ vi.mock('@/api/generated', () => ({
         isPending: false,
     }),
     useCreateInvitationApiAdminProjectsSlugInvitationsPost: () => ({
-        mutateAsync: vi.fn(),
+        mutateAsync: createInvitation,
         isPending: false,
     }),
 }));
@@ -126,6 +127,19 @@ describe('ProjectMembersPage role select', () => {
         // instead of just presence.
         expect(within(row).getAllByText('nn@example.com')).toHaveLength(1);
     });
+
+    it('names each row role select by that member, not a shared generic name (Task 6.7c)', async () => {
+        renderWithProviders(<ProjectMembersPage />);
+
+        expect(
+            await screen.findByRole('combobox', { name: 'Role for Ada Lovelace' })
+        ).toBeInTheDocument();
+        // The no-name member falls back to the email, matching the visible
+        // display-name cell one column over.
+        expect(
+            screen.getByRole('combobox', { name: 'Role for nn@example.com' })
+        ).toBeInTheDocument();
+    });
 });
 
 describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
@@ -163,5 +177,26 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
 
         await user.click(screen.getByText('Assigned role'));
         expect(roleTrigger).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('names the copy-invite-link control and flips the name once copied (Task 6.7c)', async () => {
+        const user = userEvent.setup();
+        Object.defineProperty(navigator, 'clipboard', {
+            value: { writeText: vi.fn() },
+            writable: true,
+            configurable: true,
+        });
+        renderWithProviders(<ProjectMembersPage />);
+
+        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
+        await user.type(screen.getByRole('textbox', { name: /collaborator email/i }), 'x@y.io');
+        await user.click(screen.getByRole('button', { name: /create & send invitation/i }));
+
+        const copyButton = await screen.findByRole('button', { name: 'Copy link' });
+        await user.click(copyButton);
+
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://example.com/join/abc');
+        expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Copy link' })).not.toBeInTheDocument();
     });
 });
