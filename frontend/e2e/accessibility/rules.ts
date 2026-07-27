@@ -41,5 +41,11 @@ export const SMOKE_RULES = [...STRUCTURE_RULES, ...NAME_RULES];
 export async function expectNoA11yViolations(page: Page) {
     const results = await new AxeBuilder({ page }).withRules(SMOKE_RULES).analyze();
 
+    // Only `violations` is asserted. `results.incomplete` — checks axe could not decide
+    // automatically (e.g. `color-contrast` over a background gradient or an image, where
+    // it cannot compute a single foreground/background pair) — is silently dropped, so
+    // this spec would pass over such a case rather than flag it for manual review. None
+    // of the routes audited here are known to have one today, but it's a real gap in
+    // what a green run proves, not a hypothetical one.
     expect(results.violations).toEqual([]);
 }

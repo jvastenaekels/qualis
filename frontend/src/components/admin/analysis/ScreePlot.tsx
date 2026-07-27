@@ -121,7 +121,8 @@ export function ScreePlot({
                 ))}
             </div>
 
-            <p className="text-xs text-slate-400 text-center">
+            {/* text-slate-600, not -400 — axe (task 6.7e) measured 2.56:1. */}
+            <p className="text-xs text-slate-600 text-center">
                 {t(
                     'admin.analysis.kaiser_suggestion',
                     '{{n}} factor(s) have eigenvalues above 1 (Kaiser criterion)',

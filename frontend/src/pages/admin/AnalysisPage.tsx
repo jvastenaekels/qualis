@@ -423,6 +423,16 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                 value="advanced"
                                 className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30"
                             >
+                                {/*
+                                 * Deliberately still the default <h3> (task 6.7e): this
+                                 * accordion is nested inside `advancedContent`, itself
+                                 * rendered inside ExplorerPanel's own "Advanced
+                                 * configuration" accordion (fixed to <h2> there) — so <h3>
+                                 * here is one level deeper than its <h2> parent, not a skip.
+                                 * axe never reaches this one anyway while the outer
+                                 * accordion starts collapsed; it's set correctly for when a
+                                 * user opens both.
+                                 */}
                                 <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200">
                                     <div className="flex flex-col items-start text-left">
                                         <span className="text-sm font-bold text-slate-700">

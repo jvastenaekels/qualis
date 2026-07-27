@@ -258,6 +258,7 @@ export default function ConcourseDetailPage() {
                                 size="sm"
                                 className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                                 onClick={openAddItemDialog}
+                                aria-label={t('admin.concourse.add_item', 'Add Item')}
                             >
                                 <Plus className="size-4 sm:mr-1" />
                                 <span className="hidden sm:inline">
@@ -271,6 +272,7 @@ export default function ConcourseDetailPage() {
                                 size="sm"
                                 className="rounded-xl"
                                 onClick={openImportDialog}
+                                aria-label={t('admin.concourse.bulk_import', 'Bulk Import')}
                             >
                                 <Upload className="size-4 sm:mr-1" />
                                 <span className="hidden sm:inline">
@@ -284,6 +286,7 @@ export default function ConcourseDetailPage() {
                             className="rounded-xl"
                             onClick={exportCsv}
                             disabled={!concourse.items?.length}
+                            aria-label={t('admin.concourse.export_csv', 'Export CSV')}
                         >
                             <Download className="size-4 sm:mr-1" />
                             <span className="hidden sm:inline">
@@ -435,7 +438,7 @@ export default function ConcourseDetailPage() {
                     ) : (
                         <>
                             {languages.length === 1 && languages[0] && (
-                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                <span className="text-xs text-slate-600 flex items-center gap-1">
                                     <Globe className="size-3" />
                                     {langDisplayName(languages[0])}
                                 </span>
@@ -444,7 +447,7 @@ export default function ConcourseDetailPage() {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-9 rounded-xl text-xs text-slate-400 hover:text-indigo-600"
+                                    className="h-9 rounded-xl text-xs text-slate-600 hover:text-indigo-600"
                                     onClick={() => setAddLangOpen(true)}
                                     title={t(
                                         'admin.concourse.add_language_tooltip',
@@ -456,7 +459,7 @@ export default function ConcourseDetailPage() {
                             )}
                         </>
                     )}
-                    <span className="text-xs text-slate-400 ml-auto">
+                    <span className="text-xs text-slate-600 ml-auto">
                         {filteredItems.length} / {concourse.items?.length ?? 0}{' '}
                         {t('admin.concourse.items_label', 'items')}
                     </span>
@@ -646,7 +649,7 @@ export default function ConcourseDetailPage() {
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardContent className="p-0">
                     {filteredItems.length === 0 ? (
-                        <div className="py-16 text-center text-slate-400 text-sm">
+                        <div className="py-16 text-center text-slate-600 text-sm">
                             {(concourse.items?.length ?? 0) === 0
                                 ? t(
                                       'admin.concourse.no_items',

@@ -18,9 +18,21 @@ AccordionItem.displayName = 'AccordionItem';
 
 const AccordionTrigger = React.forwardRef<
     React.ElementRef<typeof AccordionPrimitive.Trigger>,
-    React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-    <AccordionPrimitive.Header className="flex">
+    React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
+        /**
+         * Radix's `Accordion.Header` renders a hardcoded `<h3>`. Fine when an
+         * `<h2>` precedes it in the document outline, but at least one call site
+         * (`ExplorerPanel`'s "Advanced configuration" accordion) nests it directly
+         * under a page's `<h1>` with nothing at `<h2>` in between — axe's
+         * `heading-order` rule (task 6.7e) flags the resulting skip. Opt in per
+         * call site rather than changing the default, since the right level
+         * depends on what's around each accordion — a nested accordion one level
+         * further in should stay at the default `<h3>`.
+         */
+        headingLevel?: 2;
+    }
+>(({ className, children, headingLevel, ...props }, ref) => {
+    const trigger = (
         <AccordionPrimitive.Trigger
             ref={ref}
             className={cn(
@@ -32,8 +44,18 @@ const AccordionTrigger = React.forwardRef<
             {children}
             <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
         </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-));
+    );
+
+    if (headingLevel === 2) {
+        return (
+            <AccordionPrimitive.Header asChild>
+                <h2 className="flex">{trigger}</h2>
+            </AccordionPrimitive.Header>
+        );
+    }
+
+    return <AccordionPrimitive.Header className="flex">{trigger}</AccordionPrimitive.Header>;
+});
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<

@@ -99,7 +99,16 @@ export const GuidanceCard: React.FC<GuidanceCardProps> = ({
                     {icons[type]}
                 </div>
                 <div className="space-y-1.5">
-                    <h4 className="text-base font-bold tracking-tight">{title}</h4>
+                    {/*
+                     * Not a real <h#> (task 6.7e). GuidanceCard is a decorative tip/info
+                     * callout, not document-outline content, and it is used at arbitrary
+                     * nesting depths across many pages — a hardcoded level (this was
+                     * `<h4>`) reliably skips a level wherever the surrounding page has no
+                     * heading between its own <h1>/<h2> and this card (axe: heading-order).
+                     * A plain paragraph with the same styling carries the same visual
+                     * weight without asserting a place in the outline.
+                     */}
+                    <p className="text-base font-bold tracking-tight">{title}</p>
                     {body}
                 </div>
             </div>

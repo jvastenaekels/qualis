@@ -53,6 +53,30 @@ test.setTimeout(120_000);
 const MOBILE_VIEWPORT = { width: 375, height: 800 };
 
 /**
+ * Every one of these pages wraps its content in Tailwind's `animate-in fade-in`
+ * (`tailwindcss-animate`), typically `duration-500`/`duration-700`, sometimes nested
+ * (a card inside the page's own fade-in animating a second time on top). Playwright's
+ * `toBeVisible()` does not wait out a CSS transition — an element mid-fade already has
+ * a bounding box and non-zero opacity, so it satisfies "visible" well before the
+ * animation settles. axe's `color-contrast`, in contrast, reads the *actual* computed
+ * opacity at scan time, so scanning mid-fade measures a foreground blended toward the
+ * background and reports a spuriously low ratio for a color that is fine once settled
+ * — confirmed by reproducing it: the same route audited with a generous fixed wait
+ * instead of `waitReady()` alone comes back clean. `public-pages.spec.ts` already hits
+ * this on the login page's fade-in and waits it out with a single
+ * `toHaveCSS('opacity', '1')` on the one container that animates there; the admin
+ * pages routinely animate several independent elements (the page shell, individual
+ * `GuidanceCard`s, dashboard cards), so this waits out every `.animate-in` element
+ * still short of full opacity instead of hardcoding one selector per route.
+ */
+async function waitForAnimationsToSettle(page: Page) {
+    await page.waitForFunction(() => {
+        const animating = document.querySelectorAll('.animate-in');
+        return Array.from(animating).every((el) => getComputedStyle(el).opacity === '1');
+    });
+}
+
+/**
  * Runs the smoke rule set at the project's default desktop viewport, then again at
  * 375px. `waitReady` is re-run after the resize (rather than a fixed sleep) because
  * the defect this spec exists to catch — a name that only exists above `sm` — only
@@ -61,10 +85,12 @@ const MOBILE_VIEWPORT = { width: 375, height: 800 };
  */
 async function auditAtBothWidths(page: Page, waitReady: () => Promise<unknown>) {
     await waitReady();
+    await waitForAnimationsToSettle(page);
     await expectNoA11yViolations(page);
 
     await page.setViewportSize(MOBILE_VIEWPORT);
     await waitReady();
+    await waitForAnimationsToSettle(page);
     await expectNoA11yViolations(page);
 }
 
@@ -169,10 +195,15 @@ test.describe('Admin accessibility', () => {
         const projectSlug = testDb.getWorkspaceSlug();
         await page.goto(`/app/${projectSlug}/studies/${study.slug}/data`);
 
-        await auditAtBothWidths(page, async () => {
-            await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-            await expect(page.locator('table')).toBeVisible();
-        });
+        // Anchored on the table, not a heading: DataExportsPage renders
+        // StudyPageHeader's <h1> only in its zero-participant branch, so with
+        // participants seeded (as here) a heading-based wait would time out
+        // before axe ever runs — the table is the one thing guaranteed to exist
+        // in this seeded state. (page-has-heading-one is still checked — by axe
+        // itself, against the <h1> InteractiveDataView now provides; a locator
+        // wait on it here would just be re-asserting what the scan below
+        // already verifies.)
+        await auditAtBothWidths(page, () => expect(page.locator('table')).toBeVisible());
     });
 
     test('analysis', async ({ page, testDb, authToken }) => {

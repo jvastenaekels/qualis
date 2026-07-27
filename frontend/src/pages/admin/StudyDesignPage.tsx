@@ -984,7 +984,8 @@ const StudyDesignPage = () => {
                             </div>
                         </div>
                         <div className="pt-6 border-t border-slate-100">
-                            <h4 className="text-2xs font-black text-slate-400 mb-3">
+                            {/* text-slate-600, not -400 — axe (task 6.7e) measured 2.56:1. */}
+                            <h4 className="text-2xs font-black text-slate-600 mb-3">
                                 {t('admin.design.checklist.languages', 'Languages')}
                             </h4>
                             <div className="space-y-2">

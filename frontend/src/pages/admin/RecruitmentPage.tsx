@@ -224,7 +224,7 @@ const RecruitmentPage = () => {
                                             )}
                                         />
                                     </div>
-                                    <p className="text-xs text-slate-400 font-mono break-all text-center px-4">
+                                    <p className="text-xs text-slate-600 font-mono break-all text-center px-4">
                                         {studyUrl}
                                     </p>
                                 </DialogContent>
@@ -257,20 +257,30 @@ const RecruitmentPage = () => {
                                                 'URL slug'
                                             )}
                                         </FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs select-none">
-                                                    /study/
-                                                </div>
+                                        {/*
+                                         * FormControl now wraps the <Input> directly, not the
+                                         * decorative wrapper div (task 6.7e). shadcn's
+                                         * FormControl uses Radix Slot to attach id/
+                                         * aria-describedby/aria-invalid to its *only* child —
+                                         * with the div as that child, those landed on the div
+                                         * instead of the input, so FormLabel's htmlFor pointed
+                                         * at a non-labelable element and the real <input> had
+                                         * no accessible name at all (axe: label).
+                                         */}
+                                        <div className="relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 font-mono text-xs select-none">
+                                                /study/
+                                            </div>
+                                            <FormControl>
                                                 <Input
                                                     {...field}
                                                     disabled={isSlugLocked}
                                                     className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
                                                 />
-                                            </div>
-                                        </FormControl>
+                                            </FormControl>
+                                        </div>
                                         {isSlugLocked ? (
-                                            <p className="text-xs text-amber-600 flex items-center gap-1.5 mt-1.5">
+                                            <p className="text-xs text-amber-800 flex items-center gap-1.5 mt-1.5">
                                                 <Info className="size-3 shrink-0" />
                                                 {t(
                                                     'admin.recruitment.study_url.slug_locked',
@@ -460,7 +470,7 @@ const RecruitmentPage = () => {
                                             'Limit collection window'
                                         )}
                                     </Label>
-                                    <p className="text-xs text-slate-400 font-medium">
+                                    <p className="text-xs text-slate-600 font-medium">
                                         {t(
                                             'admin.recruitment.access_rules.window_toggle_help',
                                             'Restrict participant access to a specific time range.'
@@ -494,7 +504,7 @@ const RecruitmentPage = () => {
                                     {/* Heads the "Opens at"/"Closes at" pair below, both of
                                         which already carry their own Label/htmlFor — a real
                                         heading element, not the form-field <Label>. */}
-                                    <p className="text-2xs font-black text-slate-400 uppercase tracking-wider">
+                                    <p className="text-2xs font-black text-slate-600 uppercase tracking-wider">
                                         {t(
                                             'admin.recruitment.access_rules.collection_window',
                                             'Collection window'
@@ -578,7 +588,7 @@ const RecruitmentPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-slate-400 font-medium">
+                                    <p className="text-xs text-slate-600 font-medium">
                                         {t(
                                             'admin.recruitment.access_rules.date_hint',
                                             'Leave empty for no time restriction.'
@@ -818,13 +828,13 @@ const RecruitmentPage = () => {
                             <TableRow className="hover:bg-transparent border-slate-100">
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400 pl-6"
+                                    className="py-4 text-2xs font-black text-slate-600 pl-6"
                                 >
                                     {t('admin.recruitment.table.name', 'Name / Cohort')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400 cursor-help"
+                                    className="py-4 text-2xs font-black text-slate-600 cursor-help"
                                     title={t(
                                         'admin.recruitment.table.type_help',
                                         'Public, Single-use, or Capacity-limited. See strategy descriptions in the “New access link” dialog.'
@@ -834,25 +844,25 @@ const RecruitmentPage = () => {
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-600"
                                 >
                                     {t('admin.recruitment.table.token', 'Token')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-600"
                                 >
                                     {t('admin.recruitment.table.usage', 'Usage')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-600"
                                 >
                                     {t('admin.recruitment.table.status', 'Status')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400 text-right pr-6"
+                                    className="py-4 text-2xs font-black text-slate-600 text-right pr-6"
                                 >
                                     {t('admin.recruitment.table.actions', 'Actions')}
                                 </TableHead>
@@ -882,6 +892,12 @@ const RecruitmentPage = () => {
                                                     onClick: () => setIsCreateModalOpen(true),
                                                 }}
                                                 variant="inline"
+                                                // The page's only other heading is the
+                                                // StudyPageHeader <h1> — nothing else claims
+                                                // h2, so this is that page's first section
+                                                // heading, not the inline default's h3 (axe:
+                                                // heading-order, task 6.7e).
+                                                headingLevel={2}
                                             />
                                         </div>
                                     </TableCell>
@@ -965,7 +981,7 @@ const RecruitmentPage = () => {
                                                     ) : (
                                                         <Badge
                                                             variant="secondary"
-                                                            className="bg-slate-50 text-slate-400 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
+                                                            className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
                                                         >
                                                             {t(
                                                                 'admin.recruitment.usage.unused',
@@ -1036,7 +1052,7 @@ const RecruitmentPage = () => {
                                             ) : (
                                                 <Badge
                                                     variant="secondary"
-                                                    className="bg-slate-50 text-slate-400 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
+                                                    className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
                                                 >
                                                     {t('admin.recruitment.revoked', 'Revoked')}
                                                 </Badge>
@@ -1082,7 +1098,7 @@ const RecruitmentPage = () => {
                                                             />
                                                         </div>
                                                         <div className="flex flex-col items-center gap-2 w-full">
-                                                            <p className="text-xs text-slate-400 font-mono break-all text-center px-4">
+                                                            <p className="text-xs text-slate-600 font-mono break-all text-center px-4">
                                                                 {getFullUrl(link.token)}
                                                             </p>
                                                             <Button

@@ -120,7 +120,8 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
                                             <span className="text-sm font-bold text-slate-900">
                                                 {item.value}
                                             </span>
-                                            <span className="text-xs font-medium text-slate-400">
+                                            {/* text-slate-600, not -400 — axe (task 6.7e) measured 2.56:1. */}
+                                            <span className="text-xs font-medium text-slate-600">
                                                 {percentage}%
                                             </span>
                                         </div>
