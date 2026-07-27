@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 /*
  * Qualis - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
@@ -1199,10 +1198,14 @@ export default function ConcourseDetailPage() {
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="add-item-code"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse.field_code', 'Code')}
                             </Label>
                             <Input
+                                id="add-item-code"
                                 value={newCode}
                                 onChange={(e) => setNewCode(e.target.value)}
                                 placeholder="C1"
@@ -1212,14 +1215,20 @@ export default function ConcourseDetailPage() {
                         </div>
                         {!activeLocale && (
                             <div className="space-y-1">
-                                <Label className="text-2xs font-black text-slate-500">
+                                <Label
+                                    htmlFor="add-item-language"
+                                    className="text-2xs font-black text-slate-500"
+                                >
                                     {t('admin.concourse.field_language', 'Language')}
                                 </Label>
                                 <Select
                                     value={newItemLocale}
                                     onValueChange={(val) => setNewItemLocale(val)}
                                 >
-                                    <SelectTrigger className="h-10 rounded-xl">
+                                    <SelectTrigger
+                                        id="add-item-language"
+                                        className="h-10 rounded-xl"
+                                    >
                                         <SelectValue
                                             placeholder={t(
                                                 'admin.concourse.select_language',
@@ -1249,12 +1258,16 @@ export default function ConcourseDetailPage() {
                             </div>
                         )}
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="add-item-text"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse.field_text', 'Statement text')}{' '}
                                 {(activeLocale || newItemLocale) &&
                                     `(${langDisplayName(activeLocale || newItemLocale)})`}
                             </Label>
                             <Textarea
+                                id="add-item-text"
                                 value={newText}
                                 onChange={(e) => setNewText(e.target.value)}
                                 placeholder={t(
@@ -1265,13 +1278,17 @@ export default function ConcourseDetailPage() {
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="add-item-source"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse.field_source', 'Source')}
                                 <span className="text-slate-400 font-normal ml-1">
                                     ({t('common.optional', 'optional')})
                                 </span>
                             </Label>
                             <Input
+                                id="add-item-source"
                                 value={newSource}
                                 onChange={(e) => setNewSource(e.target.value)}
                                 placeholder={t(
@@ -1427,24 +1444,34 @@ export default function ConcourseDetailPage() {
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="import-code-prefix"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse.import_prefix', 'Code prefix')}
                             </Label>
                             <Input
+                                id="import-code-prefix"
                                 value={importPrefix}
                                 onChange={(e) => setImportPrefix(e.target.value)}
                                 className="h-10 rounded-xl w-32"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="import-language"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse.import_language', 'Language')}
                             </Label>
                             <Select
                                 value={importLocale || activeLocale}
                                 onValueChange={(val) => setImportLocale(val)}
                             >
-                                <SelectTrigger className="h-10 rounded-xl w-48">
+                                <SelectTrigger
+                                    id="import-language"
+                                    className="h-10 rounded-xl w-48"
+                                >
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl max-h-60">
@@ -1463,7 +1490,10 @@ export default function ConcourseDetailPage() {
                         </div>
                         <div className="space-y-1">
                             <div className="flex items-center justify-between gap-2">
-                                <Label className="text-2xs font-black text-slate-500">
+                                <Label
+                                    htmlFor="import-statements"
+                                    className="text-2xs font-black text-slate-500"
+                                >
                                     {t('admin.concourse.import_statements', 'Statements')}
                                     {(importLocale || activeLocale) &&
                                         ` (${langDisplayName(importLocale || activeLocale)})`}
@@ -1495,6 +1525,7 @@ export default function ConcourseDetailPage() {
                                 </div>
                             </div>
                             <Textarea
+                                id="import-statements"
                                 value={importText}
                                 onChange={(e) => setImportText(e.target.value)}
                                 placeholder={t(
@@ -1742,12 +1773,15 @@ function TagCheckboxGroup({
 }) {
     return (
         <div className="space-y-1">
-            <Label className="text-2xs font-black text-slate-500">
+            {/* Heads a group of individually-labelled checkboxes (each tag
+                already has its own Label/htmlFor below), not one control —
+                a real heading element, not the form-field <Label>. */}
+            <p className="text-2xs font-black text-slate-500">
                 {label}
                 <span className="text-slate-400 font-normal ml-1">
                     ({selectedIds.length}/{tags.length})
                 </span>
-            </Label>
+            </p>
             <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                     <div key={tag.id} className="flex items-center gap-1.5 cursor-pointer">

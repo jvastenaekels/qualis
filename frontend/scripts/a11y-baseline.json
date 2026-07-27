@@ -52,7 +52,7 @@
             "Button#1dd7a5d308": 1,
             "Button#81017c5def": 1,
             "Button#a1f3efb8f5": 1,
-            "SelectTrigger#872cdad358": 4,
+            "SelectTrigger#872cdad358": 3,
             "SelectTrigger#bb89cca4e9": 1
         },
         "src/pages/admin/ProjectMembersPage.tsx": {
@@ -101,16 +101,6 @@
             "Label#b70312b797": 1,
             "Label#eb3e025ad6": 1,
             "Label#ff10c47a50": 1
-        },
-        "src/pages/admin/ConcourseDetailPage.tsx": {
-            "Label#03f1e6a441": 1,
-            "Label#0612b2c469": 1,
-            "Label#5015a98ae6": 1,
-            "Label#b8819b4553": 1,
-            "Label#bac85b7720": 1,
-            "Label#dd23d8021a": 1,
-            "Label#e4d9b72f77": 1,
-            "Label#efa4e00bc8": 1
         }
     }
 }

@@ -5,6 +5,7 @@
  */
 
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import ConcourseDetailPage from './ConcourseDetailPage';
 import type { ConcourseDetailPageApi } from '@/hooks/admin/useConcourseDetailPage';
@@ -350,5 +351,69 @@ describe('ConcourseDetailPage tag-picker checkboxes (a11y, Task 3.6)', () => {
 
         expect(screen.getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
         expect(screen.getByRole('checkbox', { name: /risk/i })).toBeInTheDocument();
+    });
+});
+
+describe('ConcourseDetailPage — Add Item / Bulk Import label accessible names (Task 6.7b)', () => {
+    it('names the "Code" field in the Add Item dialog and lets its label focus it', async () => {
+        const user = userEvent.setup();
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        const field = screen.getByRole('textbox', { name: /^code$/i });
+        await user.click(screen.getByText('Code'));
+        expect(field).toHaveFocus();
+    });
+
+    it('names the "Statement text" and "Source" fields in the Add Item dialog', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('textbox', { name: /^statement text$/i })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /^source \(optional\)$/i })).toBeInTheDocument();
+    });
+
+    it('names the "Code prefix" and "Statements" fields in the Bulk Import dialog', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            importOpen: true,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('textbox', { name: /^code prefix$/i })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /^statements$/i })).toBeInTheDocument();
+    });
+
+    it('renders the tag-picker group heading as plain text, not a dangling label', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+            tags: [{ id: 1, name: 'Vision', color: '#6366f1', project_id: 1 }],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        // "Tags(0/1)" used to be a <Label> with no htmlFor target at all,
+        // sitting above a group of individually-labelled checkboxes — a
+        // dangling form label announced as pointing nowhere. Scoped to the
+        // dialog: the page's filter toolbar has its own unrelated "Tags"
+        // text outside it.
+        const dialog = screen.getByRole('dialog');
+        const heading = within(dialog).getByText(/^Tags/);
+        expect(heading.tagName).not.toBe('LABEL');
+        expect(within(dialog).getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
     });
 });
