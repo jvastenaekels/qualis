@@ -321,8 +321,11 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
             )}
 
             {explore.eigenvaluesIsLoading && (
+                // text-slate-600, not -400 — axe (task 6.7e) measured text-slate-400 on
+                // white at 2.56:1, a nominal-token reading (not an animation artifact:
+                // this survives settling). Same defect as ScreePlot/RecruitmentPage/etc.
                 <div
-                    className="flex items-center justify-center py-8 text-slate-400"
+                    className="flex items-center justify-center py-8 text-slate-600"
                     role="status"
                     aria-live="polite"
                 >
@@ -986,8 +989,10 @@ function InterpretShell({
                     )}
                     icon={ChartColumnStacked}
                 />
+                {/* text-slate-600, not -400 — same real (not animation-artifact) defect
+                    as the eigenvalues loading state above. */}
                 <div
-                    className="flex items-center justify-center py-12 text-slate-400"
+                    className="flex items-center justify-center py-12 text-slate-600"
                     role="status"
                     aria-live="polite"
                     data-testid="interpret-phase"
