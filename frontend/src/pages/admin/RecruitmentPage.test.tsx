@@ -13,6 +13,7 @@
  */
 
 import { renderHook } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders, screen } from '@/test-utils/test-utils';
@@ -121,5 +122,41 @@ describe('RecruitmentPage — access rule switches (a11y)', () => {
         const windowSwitch = screen.getByRole('switch', { name: /limit collection window/i });
         expect(windowSwitch).toBeInTheDocument();
         expect(windowSwitch).toHaveAttribute('aria-labelledby', 'window-toggle-label');
+    });
+});
+
+describe('RecruitmentPage — group headings are real text, not dangling labels (Task 6.7b)', () => {
+    // "Full URL" and "Collection window" head a read-only URL readout and a
+    // pair of already-individually-labelled date fields, respectively —
+    // neither is a single control a <Label htmlFor> could truthfully point
+    // at. They were <Label> elements with no `for` target at all (a dangling
+    // form label announced as pointing nowhere); the fix drops the <Label>
+    // component for plain text, which this test confirms structurally.
+
+    it('renders "Full URL" as plain text next to the read-only URL readout', () => {
+        mockUseRecruitmentPage.mockReturnValue(baseApi());
+        renderWithProviders(<RecruitmentPage />);
+
+        const heading = screen.getByText('Full URL');
+        expect(heading.tagName).not.toBe('LABEL');
+        expect(screen.getByText('https://example.com/study/demo-study')).toBeInTheDocument();
+    });
+
+    it('renders "Collection window" as plain text, and still lets "Opens at" focus its input', async () => {
+        const user = userEvent.setup();
+        mockUseRecruitmentPage.mockReturnValue(baseApi({ showWindowPickers: true }));
+        renderWithProviders(<RecruitmentPage />);
+
+        const heading = screen.getByText('Collection window');
+        expect(heading.tagName).not.toBe('LABEL');
+
+        // The two date fields beneath the heading already carry their own
+        // Label/htmlFor and are untouched by this fix — confirm the edit
+        // above them didn't collateral-damage that real pairing. (A
+        // `datetime-local` input has no ARIA role, so getByLabelText —
+        // which also resolves via htmlFor/id — stands in for getByRole here.)
+        const opensAt = screen.getByLabelText('Opens at');
+        await user.click(screen.getByText('Opens at'));
+        expect(opensAt).toHaveFocus();
     });
 });

@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import {
     QrCode,
     Plus,
@@ -172,9 +171,11 @@ const RecruitmentPage = () => {
                 <CardContent className="p-6 space-y-5">
                     {/* Full URL display */}
                     <div className="space-y-1.5">
-                        <Label className="text-2xs font-black text-slate-500">
+                        {/* Heads a read-only URL readout, not an editable control — a
+                            real heading element, not the form-field <Label>. */}
+                        <p className="text-2xs font-black text-slate-500">
                             {t('admin.recruitment.study_url.full_url_label', 'Full URL')}
-                        </Label>
+                        </p>
                         <div className="flex items-center gap-2">
                             <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 font-mono text-sm text-slate-700 truncate">
                                 {studyUrl}
@@ -490,12 +491,15 @@ const RecruitmentPage = () => {
                             </div>
                             {showWindowPickers && (
                                 <>
-                                    <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
+                                    {/* Heads the "Opens at"/"Closes at" pair below, both of
+                                        which already carry their own Label/htmlFor — a real
+                                        heading element, not the form-field <Label>. */}
+                                    <p className="text-2xs font-black text-slate-400 uppercase tracking-wider">
                                         {t(
                                             'admin.recruitment.access_rules.collection_window',
                                             'Collection window'
                                         )}
-                                    </Label>
+                                    </p>
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         <div className="space-y-2">
                                             <Label
