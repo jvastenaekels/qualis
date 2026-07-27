@@ -311,4 +311,18 @@ describe('QSortEditor', () => {
             expect(screen.getByTestId('grid-column-4-slots').children).toHaveLength(1);
         });
     });
+
+    describe('Distribution mode group name (Task 6.7b)', () => {
+        it('names the distribution-mode radiogroup via aria-labelledby', () => {
+            renderEditor({ activeSubStep: 'grid' });
+
+            // "Distribution mode" headed a group of three radios with no
+            // association at all before this fix — getByRole computes the real
+            // accessible name of the `radiogroup`, so this only passes because
+            // aria-labelledby now resolves to the heading text.
+            expect(
+                screen.getByRole('radiogroup', { name: /distribution mode/i })
+            ).toBeInTheDocument();
+        });
+    });
 });

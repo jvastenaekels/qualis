@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useState, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
@@ -1340,12 +1339,19 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                             <div className="mb-8 px-4 py-4 sm:px-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
                                 <div className="flex items-start gap-3 mb-3">
                                     <div className="flex-1">
-                                        <Label className="text-xs font-black uppercase tracking-wide text-slate-500">
+                                        {/* Names the radiogroup below via aria-labelledby, not htmlFor —
+                                            this heads a group of three radios, not one control, so a
+                                            <Label>/htmlFor pairing would misleadingly imply it selects
+                                            a specific option. */}
+                                        <p
+                                            id="distribution-mode-heading"
+                                            className="leading-none text-xs font-black uppercase tracking-wide text-slate-500"
+                                        >
                                             {t(
                                                 'admin.study_design.distribution_mode.title',
                                                 'Distribution mode'
                                             )}
-                                        </Label>
+                                        </p>
                                         <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                                             {t(
                                                 'admin.study_design.distribution_mode.helper',
@@ -1355,6 +1361,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                     </div>
                                 </div>
                                 <RadioGroup
+                                    aria-labelledby="distribution-mode-heading"
                                     value={draft.distribution_mode ?? 'forced'}
                                     onValueChange={(value) => {
                                         if (
