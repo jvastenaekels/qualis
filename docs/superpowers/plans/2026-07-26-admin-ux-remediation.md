@@ -1633,6 +1633,29 @@ Independent of 6.7c and 6.7d; touches no file they touch, so it can run in paral
 
 ---
 
+### Task 6.7h: Teach the gate to see role-bearing divs
+
+**Why:** the gate's contrast and name checks are **tag-based** (`CONTRAST_BEARING`, `NAME_BEARING` in `check-a11y-names.mjs`), so a `<div>` made interactive by a spread — `{...attributes} {...listeners}` from dnd-kit, which injects `role="button"` and `tabIndex={0}` — is invisible to it.
+
+Task 6.7d hit this concretely: three drag handles sat at 1.45:1 contrast, forty pixels from delete buttons the same task was fixing, and the gate reported zero. They were only found because a reviewer read the files by hand.
+
+This is the third shape of the same structural problem, and it is worth naming as a class:
+- `<input>` is not in `NAME_BEARING` — an unnamed audio seek slider survived Task 6.7c
+- a **named** button is axe-clean — the Data table's phantom tab stops survive Task 6.7g
+- a **role-bearing div** is in neither set — the drag handles survived Task 6.7d
+
+Each time, the instrument certified a surface it could not see.
+
+**The work:** make the checker resolve a control's *effective role* rather than its tag — matching `role="button"`, a `tabIndex` attribute, or a spread that is known to inject them — and add `<input>` to the name-bearing set. Then re-baseline and report what the wider net catches.
+
+- [ ] **Step 1: Extend the matching, and count what appears**
+- [ ] **Step 2: Triage the new findings** — expect false positives; the retraction in Task 3.4 exists because a control that looks unnamed in source may be correctly named
+- [ ] **Step 3: Fix or baseline each, with the baseline entry explaining why anything is left**
+- [ ] **Step 4: Add a test per new matcher** to `check-a11y-names.test.mjs`
+- [ ] **Step 5: Commit** — `fix(a11y): match controls by effective role, not by tag`
+
+---
+
 ### Task 6.7g: The Data table's status chips should not be buttons at all
 
 **The defect, and why no automated check will find it.** Task 6.7c named the seven per-row indicator `TooltipTrigger`s in `InteractiveDataView.columns.tsx` — a strict improvement over seven anonymous tab stops. But naming them was the wrong end state: **they are pure status indicators, and activating them does nothing.** Seven focusable buttons × 25 rows is up to **175 phantom tab stops per page**, each announcing a fact the researcher cannot act on.
