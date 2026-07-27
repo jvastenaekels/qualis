@@ -1851,7 +1851,8 @@
         "email_provided": "Podano e-mail",
         "newsletter_consent": "Chce wyniki",
         "interview_consent": "Akceptuje kontakt uzupełniający",
-        "recruitment_link": "Link rekrutacyjny"
+        "recruitment_link": "Link rekrutacyjny",
+        "device_info": "Urządzenie: {{os}}, {{browser}}"
       },
       "toast": {
         "discarded": "Uczestnik odrzucony",

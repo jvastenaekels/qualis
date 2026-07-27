@@ -1853,7 +1853,8 @@
                 "email_provided": "Email provided",
                 "newsletter_consent": "Wants results",
                 "interview_consent": "Accepts follow-up",
-                "recruitment_link": "Recruitment link"
+                "recruitment_link": "Recruitment link",
+                "device_info": "Device: {{os}}, {{browser}}"
             },
             "toast": {
                 "discarded": "Participant discarded",

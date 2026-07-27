@@ -142,36 +142,36 @@ export function ParticipantCell({
                     {participantId}
                 </span>
                 {ua && DeviceIcon && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex items-center gap-1">
-                                    <span className="inline-flex items-center text-slate-400">
-                                        {OsIcon ? (
-                                            <OsIcon className="w-3 h-3" />
-                                        ) : (
-                                            <DeviceIcon className="w-3 h-3" />
-                                        )}
-                                    </span>
-                                    {ua.browser !== 'Unknown' && (
-                                        <span className="inline-flex items-center text-slate-400">
-                                            {BrowserIcon ? (
-                                                <BrowserIcon className="w-3 h-3" />
-                                            ) : (
-                                                <Globe className="w-3 h-3" />
-                                            )}
-                                        </span>
-                                    )}
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent
-                                side="bottom"
-                                className="max-w-xs break-all font-mono text-2xs"
-                            >
-                                {p.user_agent}
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <span
+                        role="img"
+                        aria-label={t(
+                            'admin.data.tooltips.device_info',
+                            'Device: {{os}}, {{browser}}',
+                            {
+                                os: ua.os,
+                                browser: ua.browser,
+                            }
+                        )}
+                        title={p.user_agent}
+                        className="flex items-center gap-1"
+                    >
+                        <span className="inline-flex items-center text-slate-400">
+                            {OsIcon ? (
+                                <OsIcon className="w-3 h-3" />
+                            ) : (
+                                <DeviceIcon className="w-3 h-3" />
+                            )}
+                        </span>
+                        {ua.browser !== 'Unknown' && (
+                            <span className="inline-flex items-center text-slate-400">
+                                {BrowserIcon ? (
+                                    <BrowserIcon className="w-3 h-3" />
+                                ) : (
+                                    <Globe className="w-3 h-3" />
+                                )}
+                            </span>
+                        )}
+                    </span>
                 )}
                 {p.is_discarded && (
                     <Badge variant="destructive" className="h-4 text-2xs px-1.5 font-semibold">
@@ -500,72 +500,55 @@ export function buildColumns({
             cell: ({ row }) => {
                 const p = row.original;
                 return (
-                    <TooltipProvider>
-                        <div className="flex items-center gap-1.5">
-                            {p.postsort.email && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={t(
-                                            'admin.data.tooltips.email_provided',
-                                            'Email provided'
-                                        )}
-                                    >
-                                        <div className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100">
-                                            <Mail className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t('admin.data.tooltips.email_provided', 'Email provided')}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {p.postsort.newsletter_consent && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={t(
-                                            'admin.data.tooltips.newsletter_consent',
-                                            'Wants results'
-                                        )}
-                                    >
-                                        <div className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100">
-                                            <FileText className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t(
-                                            'admin.data.tooltips.newsletter_consent',
-                                            'Wants results'
-                                        )}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {p.postsort.interview_consent && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={t(
-                                            'admin.data.tooltips.interview_consent',
-                                            'Accepts follow-up'
-                                        )}
-                                    >
-                                        <div className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100">
-                                            <MessagesSquare className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t(
-                                            'admin.data.tooltips.interview_consent',
-                                            'Accepts follow-up'
-                                        )}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {!p.postsort.email &&
-                                !p.postsort.newsletter_consent &&
-                                !p.postsort.interview_consent && (
-                                    <span className="text-2xs text-slate-300 font-medium">—</span>
+                    <div className="flex items-center gap-1.5">
+                        {p.postsort.email && (
+                            <span
+                                role="img"
+                                aria-label={t(
+                                    'admin.data.tooltips.email_provided',
+                                    'Email provided'
                                 )}
-                        </div>
-                    </TooltipProvider>
+                                title={t('admin.data.tooltips.email_provided', 'Email provided')}
+                                className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100"
+                            >
+                                <Mail className="h-3 w-3" />
+                            </span>
+                        )}
+                        {p.postsort.newsletter_consent && (
+                            <span
+                                role="img"
+                                aria-label={t(
+                                    'admin.data.tooltips.newsletter_consent',
+                                    'Wants results'
+                                )}
+                                title={t('admin.data.tooltips.newsletter_consent', 'Wants results')}
+                                className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100"
+                            >
+                                <FileText className="h-3 w-3" />
+                            </span>
+                        )}
+                        {p.postsort.interview_consent && (
+                            <span
+                                role="img"
+                                aria-label={t(
+                                    'admin.data.tooltips.interview_consent',
+                                    'Accepts follow-up'
+                                )}
+                                title={t(
+                                    'admin.data.tooltips.interview_consent',
+                                    'Accepts follow-up'
+                                )}
+                                className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100"
+                            >
+                                <MessagesSquare className="h-3 w-3" />
+                            </span>
+                        )}
+                        {!p.postsort.email &&
+                            !p.postsort.newsletter_consent &&
+                            !p.postsort.interview_consent && (
+                                <span className="text-2xs text-slate-300 font-medium">—</span>
+                            )}
+                    </div>
                 );
             },
         }),
@@ -646,77 +629,58 @@ export function buildColumns({
                 const hasAudio = p.audio_recordings && Object.keys(p.audio_recordings).length > 0;
                 const hasRecruitmentLink = !!p.recruitment_token;
 
+                const recruitmentLinkLabel = `${t(
+                    'admin.data.tooltips.recruitment_link',
+                    'Recruitment link'
+                )}: ${p.recruitment_token}`;
+                const suspectLabel = t('admin.data.tooltips.suspect');
+                const hasCommentsLabel = t('admin.data.tooltips.has_comments');
+                const hasAudioLabel = t('admin.data.tooltips.has_audio', 'Has audio responses');
                 return (
                     <div className="flex items-center gap-1.5">
-                        <TooltipProvider>
-                            {hasRecruitmentLink && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={`${t(
-                                            'admin.data.tooltips.recruitment_link',
-                                            'Recruitment link'
-                                        )}: ${p.recruitment_token}`}
-                                    >
-                                        <div className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200">
-                                            <Tag className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t(
-                                            'admin.data.tooltips.recruitment_link',
-                                            'Recruitment link'
-                                        )}
-                                        : {p.recruitment_token}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {isSuspect && (
-                                <Tooltip>
-                                    <TooltipTrigger aria-label={t('admin.data.tooltips.suspect')}>
-                                        <div className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100">
-                                            <AlertTriangle className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t('admin.data.tooltips.suspect')}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {hasComments && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={t('admin.data.tooltips.has_comments')}
-                                    >
-                                        <div className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100">
-                                            <MessageSquare className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t('admin.data.tooltips.has_comments')}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {hasAudio && (
-                                <Tooltip>
-                                    <TooltipTrigger
-                                        aria-label={t(
-                                            'admin.data.tooltips.has_audio',
-                                            'Has audio responses'
-                                        )}
-                                    >
-                                        <div className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100">
-                                            <Mic className="h-3 w-3" />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {t('admin.data.tooltips.has_audio', 'Has audio responses')}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {!isSuspect && !hasComments && !hasAudio && !hasRecruitmentLink && (
-                                <span className="text-2xs text-slate-300 font-medium">—</span>
-                            )}
-                        </TooltipProvider>
+                        {hasRecruitmentLink && (
+                            <span
+                                role="img"
+                                aria-label={recruitmentLinkLabel}
+                                title={recruitmentLinkLabel}
+                                className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200"
+                            >
+                                <Tag className="h-3 w-3" />
+                            </span>
+                        )}
+                        {isSuspect && (
+                            <span
+                                role="img"
+                                aria-label={suspectLabel}
+                                title={suspectLabel}
+                                className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100"
+                            >
+                                <AlertTriangle className="h-3 w-3" />
+                            </span>
+                        )}
+                        {hasComments && (
+                            <span
+                                role="img"
+                                aria-label={hasCommentsLabel}
+                                title={hasCommentsLabel}
+                                className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100"
+                            >
+                                <MessageSquare className="h-3 w-3" />
+                            </span>
+                        )}
+                        {hasAudio && (
+                            <span
+                                role="img"
+                                aria-label={hasAudioLabel}
+                                title={hasAudioLabel}
+                                className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100"
+                            >
+                                <Mic className="h-3 w-3" />
+                            </span>
+                        )}
+                        {!isSuspect && !hasComments && !hasAudio && !hasRecruitmentLink && (
+                            <span className="text-2xs text-slate-300 font-medium">—</span>
+                        )}
                     </div>
                 );
             },

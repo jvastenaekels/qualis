@@ -167,38 +167,94 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         renderWithProviders(<InteractiveDataView slug="demo" />);
         await screen.findByRole('table');
 
-        expect(screen.getByRole('button', { name: 'Email provided' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Wants results' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Accepts follow-up' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Email provided' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Wants results' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Accepts follow-up' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Recruitment link: REF123' })).toBeInTheDocument();
         expect(
-            screen.getByRole('button', { name: 'Recruitment link: REF123' })
-        ).toBeInTheDocument();
-        expect(
-            screen.getByRole('button', {
+            screen.getByRole('img', {
                 name: 'Potentially suspect: session duration < 2 minutes',
             })
         ).toBeInTheDocument();
         expect(
-            screen.getByRole('button', {
+            screen.getByRole('img', {
                 name: 'Contains participant comments on cards',
             })
         ).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Has audio responses' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Has audio responses' })).toBeInTheDocument();
 
-        // The user-visible claim: this participant's row used to carry seven
-        // anonymous tab stops (a screen reader announcing only "button" x7)
-        // across the Consent and Flags columns. Scope to the row via the
-        // participant-id badge, then compute each button's *real* accessible
-        // name the way accname/browsers do (not an attribute-presence proxy)
-        // and assert none resolve to empty — not just the seven asserted
-        // above by exact text, which would miss a regression on an eighth,
-        // unasserted button.
+        // The user-visible claim (Task 6.7g): these seven facts are still
+        // announced during table navigation, but none of them are tab stops
+        // any more — a screen reader user tabbing through this row no longer
+        // hits seven anonymous-purpose "button"s that do nothing on
+        // activation. Scope to the row via the participant-id badge and
+        // assert none of the seven names resolve on `button` (they moved
+        // role, not just gained a label) while every one of them still
+        // resolves via `img` — the real accname algorithm, not an
+        // attribute-presence proxy.
         const row = screen.getByText('p1').closest('tr');
         if (!row) throw new Error('participant row not found');
-        const buttonNames = within(row)
-            .getAllByRole('button')
-            .map((button) => computeAccessibleName(button));
-        expect(buttonNames.every((name) => name.trim().length > 0)).toBe(true);
+        for (const name of [
+            'Email provided',
+            'Wants results',
+            'Accepts follow-up',
+            'Recruitment link: REF123',
+            'Potentially suspect: session duration < 2 minutes',
+            'Contains participant comments on cards',
+            'Has audio responses',
+        ]) {
+            expect(within(row).queryByRole('button', { name })).not.toBeInTheDocument();
+            expect(computeAccessibleName(within(row).getByRole('img', { name }))).toBe(name);
+        }
+    });
+
+    it('drops the row focusable-control count from 8 to 1 by converting per-row status chips into non-focusable indicators (Task 6.7g)', async () => {
+        // Same fixture as above, plus a user_agent so ParticipantCell's
+        // OS/browser chip (also in scope for 6.7g) renders too, and a
+        // submitted_at timestamp (already present via makeParticipant's
+        // default) whose own TooltipTrigger is explicitly OUT of this
+        // task's scope and must remain a real tab stop.
+        const participant = makeParticipant({
+            id: 'p1',
+            db_id: 1,
+            duration_seconds: 30, // < SUSPECT_DURATION_THRESHOLD (120)
+            recruitment_token: 'REF123',
+            user_agent:
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
+            postsort: {
+                email: 'ada@example.com',
+                newsletter_consent: true,
+                interview_consent: true,
+                card_comments: { s1: 'a comment' },
+            },
+            audio_recordings: { s1: {} },
+        });
+        mockDumpQuery.mockReturnValue({
+            data: {
+                ...dumpResponseWithTranslations(['en']),
+                participants: [participant],
+            },
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const row = screen.getByText('p1').closest('tr');
+        if (!row) throw new Error('participant row not found');
+
+        // Before this task: 7 status chips + the OS/browser chip (unreachable
+        // today via a bare `asChild` div, so it doesn't add to the count) +
+        // the submitted_at tooltip trigger = 8 focusable `button`s in this
+        // row. After: only the out-of-scope submitted_at trigger remains.
+        const focusable = within(row).getAllByRole('button');
+        expect(focusable).toHaveLength(1);
+
+        // The OS/browser fact is still announced, with the name it never had.
+        expect(
+            within(row).getByRole('img', { name: 'Device: Windows, Chrome' })
+        ).toBeInTheDocument();
     });
 });
 
