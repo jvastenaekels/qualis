@@ -4,11 +4,6 @@
         "src/components/admin/designer/QSortEditor.tsx": {
             "Button#cfd0f92c60": 1
         },
-        "src/components/admin/designer/QuestionBuilder.tsx": {
-            "Button#b8299f38ab": 1,
-            "Button#ed2885af3a": 1,
-            "DropdownMenuTrigger#f1cda76386": 1
-        },
         "src/layouts/StudyLayout.tsx": {
             "button#543c37a641": 1
         }

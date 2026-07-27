@@ -274,7 +274,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-9 w-9 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                                        className="h-9 w-9 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                                                         onClick={(e) => e.stopPropagation()}
                                                         aria-label={t(
                                                             'admin.design.questions.actions.copy_from_aria',
@@ -309,7 +309,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onDelete();
@@ -889,7 +889,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                                            className="h-10 w-10 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
                                                             aria-label={t(
                                                                 'admin.design.questions.actions.remove_option',
                                                                 'Remove {{option}}',
