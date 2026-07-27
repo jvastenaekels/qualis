@@ -61,7 +61,12 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </CardTitle>
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger
+                                            aria-label={t(
+                                                'admin.design.theme.accent.info_label',
+                                                'About accent color'
+                                            )}
+                                        >
                                             <Info className="h-3.5 w-3.5 text-slate-400 hover:text-indigo-500 transition-colors" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right" className="max-w-xs">
@@ -144,6 +149,12 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         style={{ backgroundColor: color }}
                                         disabled={readOnly}
                                         onClick={() => updateBranding('accent_color', color)}
+                                        aria-label={t(
+                                            'admin.design.theme.accent.swatch',
+                                            'Set accent color to {{color}}',
+                                            { color }
+                                        )}
+                                        aria-pressed={branding.accent_color === color}
                                     >
                                         {branding.accent_color === color && (
                                             <div className="w-2 h-2 bg-white rounded-full shadow-inner" />
@@ -164,7 +175,12 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </CardTitle>
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger
+                                            aria-label={t(
+                                                'admin.design.theme.logo.info_label',
+                                                'About the study logo'
+                                            )}
+                                        >
                                             <Info className="h-3.5 w-3.5 text-slate-400" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right">
@@ -185,6 +201,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 label={t('admin.design.theme.logo.label')}
                                 recommendedSize="200x50px"
                                 maxFileSize={500 * 1024}
+                                removeAriaLabel={t('admin.design.theme.logo.remove', 'Remove logo')}
                             />
 
                             <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 text-sm text-blue-900">
@@ -224,7 +241,12 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </CardTitle>
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger
+                                            aria-label={t(
+                                                'admin.design.theme.partners.info_label',
+                                                'About institutional partners'
+                                            )}
+                                        >
                                             <Info className="h-3.5 w-3.5 text-slate-400" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right">
@@ -242,84 +264,106 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <CardContent className="space-y-6">
                             <div className="grid gap-4">
                                 {(branding.partners || []).map(
-                                    (partner: PartnerLogo, index: number) => (
-                                        <div
-                                            key={partner.id || index}
-                                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start p-3 sm:p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
-                                        >
-                                            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-100 shrink-0 shadow-sm">
-                                                {partner.logo_url ? (
-                                                    <img
-                                                        src={partner.logo_url}
-                                                        alt={partner.name}
-                                                        className="max-w-full max-h-full object-contain"
-                                                    />
-                                                ) : (
-                                                    <ImageIcon className="text-slate-300 w-6 h-6" />
-                                                )}
-                                            </div>
-                                            <div className="flex-1 space-y-3">
-                                                <div className="grid gap-1.5">
-                                                    <Label
-                                                        htmlFor={`partner-name-${partner.id ?? index}`}
-                                                        className="text-2xs font-black text-slate-400"
-                                                    >
-                                                        {t(
-                                                            'admin.design.theme.partners.name_placeholder',
-                                                            'Name'
-                                                        )}
-                                                    </Label>
-                                                    <Input
-                                                        id={`partner-name-${partner.id ?? index}`}
-                                                        name="partnerName"
-                                                        value={partner.name}
-                                                        onChange={(e) => {
+                                    (partner: PartnerLogo, index: number) => {
+                                        const partnerDisplayName = partner.name?.trim()
+                                            ? partner.name
+                                            : t(
+                                                  'admin.design.theme.partners.unnamed',
+                                                  'Partner {{number}}',
+                                                  { number: index + 1 }
+                                              );
+                                        return (
+                                            <div
+                                                key={partner.id || index}
+                                                className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start p-3 sm:p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
+                                            >
+                                                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-100 shrink-0 shadow-sm">
+                                                    {partner.logo_url ? (
+                                                        <img
+                                                            src={partner.logo_url}
+                                                            alt={partner.name}
+                                                            className="max-w-full max-h-full object-contain"
+                                                        />
+                                                    ) : (
+                                                        <ImageIcon className="text-slate-300 w-6 h-6" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 space-y-3">
+                                                    <div className="grid gap-1.5">
+                                                        <Label
+                                                            htmlFor={`partner-name-${partner.id ?? index}`}
+                                                            className="text-2xs font-black text-slate-400"
+                                                        >
+                                                            {t(
+                                                                'admin.design.theme.partners.name_placeholder',
+                                                                'Name'
+                                                            )}
+                                                        </Label>
+                                                        <Input
+                                                            id={`partner-name-${partner.id ?? index}`}
+                                                            name="partnerName"
+                                                            value={partner.name}
+                                                            onChange={(e) => {
+                                                                const newPartners = [
+                                                                    ...(branding.partners || []),
+                                                                ];
+                                                                newPartners[index] = {
+                                                                    ...partner,
+                                                                    name: e.target.value,
+                                                                };
+                                                                updateBranding(
+                                                                    'partners',
+                                                                    newPartners
+                                                                );
+                                                            }}
+                                                            placeholder="Institution Name"
+                                                            disabled={readOnly}
+                                                            className="h-9 text-sm font-bold rounded-xl"
+                                                        />
+                                                    </div>
+                                                    <ImageUploadInput
+                                                        name="partnerLogoUrl"
+                                                        value={partner.logo_url}
+                                                        onChange={(value) => {
                                                             const newPartners = [
                                                                 ...(branding.partners || []),
                                                             ];
                                                             newPartners[index] = {
                                                                 ...partner,
-                                                                name: e.target.value,
+                                                                logo_url: value,
                                                             };
                                                             updateBranding('partners', newPartners);
                                                         }}
-                                                        placeholder="Institution Name"
-                                                        disabled={readOnly}
-                                                        className="h-9 text-sm font-bold rounded-xl"
+                                                        recommendedSize="120x40px"
+                                                        maxFileSize={300 * 1024}
+                                                        removeAriaLabel={t(
+                                                            'admin.design.theme.partners.remove_logo',
+                                                            'Remove logo for {{name}}',
+                                                            { name: partnerDisplayName }
+                                                        )}
                                                     />
                                                 </div>
-                                                <ImageUploadInput
-                                                    name="partnerLogoUrl"
-                                                    value={partner.logo_url}
-                                                    onChange={(value) => {
-                                                        const newPartners = [
-                                                            ...(branding.partners || []),
-                                                        ];
-                                                        newPartners[index] = {
-                                                            ...partner,
-                                                            logo_url: value,
-                                                        };
+                                                <button
+                                                    type="button"
+                                                    disabled={readOnly}
+                                                    onClick={() => {
+                                                        const newPartners = (
+                                                            branding.partners || []
+                                                        ).filter((_, i) => i !== index);
                                                         updateBranding('partners', newPartners);
                                                     }}
-                                                    recommendedSize="120x40px"
-                                                    maxFileSize={300 * 1024}
-                                                />
+                                                    className="text-slate-300 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
+                                                    aria-label={t(
+                                                        'admin.design.theme.partners.remove',
+                                                        'Remove {{name}}',
+                                                        { name: partnerDisplayName }
+                                                    )}
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </button>
                                             </div>
-                                            <button
-                                                type="button"
-                                                disabled={readOnly}
-                                                onClick={() => {
-                                                    const newPartners = (
-                                                        branding.partners || []
-                                                    ).filter((_, i) => i !== index);
-                                                    updateBranding('partners', newPartners);
-                                                }}
-                                                className="text-slate-300 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
-                                            >
-                                                <Trash2 className="size-4" />
-                                            </button>
-                                        </div>
-                                    )
+                                        );
+                                    }
                                 )}
 
                                 <button

@@ -150,6 +150,10 @@ const QuestionItem = (props: QuestionItemProps) => {
         typeof question.label === 'string'
             ? question.label
             : question.label?.[activeLocale] || question.label?.en || '';
+    // Discriminator for this question's action buttons (delete, copy-from-
+    // language) — falls back to the stable item id when the question has no
+    // label yet, same convention as ProcessStepEditor's step.title || step.id.
+    const questionLabel = label || id;
 
     const handleLabelChange = (val: string) => {
         if (readOnly) return;
@@ -272,6 +276,11 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                         size="icon"
                                                         className="h-9 w-9 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                                                         onClick={(e) => e.stopPropagation()}
+                                                        aria-label={t(
+                                                            'admin.design.questions.actions.copy_from_aria',
+                                                            'Import {{label}} from another language',
+                                                            { label: questionLabel }
+                                                        )}
                                                     >
                                                         <Languages className="h-4 w-4" />
                                                     </Button>
@@ -305,6 +314,11 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                 e.stopPropagation();
                                                 onDelete();
                                             }}
+                                            aria-label={t(
+                                                'admin.design.questions.actions.delete',
+                                                'Delete {{label}}',
+                                                { label: questionLabel }
+                                            )}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -876,6 +890,17 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                                                            aria-label={t(
+                                                                'admin.design.questions.actions.remove_option',
+                                                                'Remove {{option}}',
+                                                                {
+                                                                    option: t(
+                                                                        'admin.design.questions.labels.option_ordinal',
+                                                                        'Option {{number}}',
+                                                                        { number: idx + 1 }
+                                                                    ),
+                                                                }
+                                                            )}
                                                             onClick={() => {
                                                                 const newOpts =
                                                                     question.options?.filter(

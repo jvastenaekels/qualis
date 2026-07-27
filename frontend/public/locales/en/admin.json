@@ -310,7 +310,8 @@
                 "disabled_success": "Two-factor authentication disabled",
                 "secret_copied": "Secret copied",
                 "invalid_token": "Invalid verification code",
-                "disable_error": "Failed to disable 2FA"
+                "disable_error": "Failed to disable 2FA",
+                "copy_secret": "Copy secret"
             },
             "password": {
                 "title": "Password management",
@@ -470,7 +471,15 @@
             "import_csv_hint": "CSV/TSV needs columns: code, language, text.",
             "import_csv_no_match": "No rows match the selected language ({{lang}}).",
             "import_csv_skipped": "Skipped {{count}} row(s) in other languages: {{langs}}.",
-            "import_csv_more_errors": "{{count}} more issues"
+            "import_csv_more_errors": "{{count}} more issues",
+            "filters": {
+                "status": "Filter by status",
+                "tag": "Filter by tag"
+            },
+            "status_for": "Status for {{code}}",
+            "create_tag": "Create tag",
+            "delete_tag": "Delete {{tag}}",
+            "cancel_delete_tag": "Cancel deleting {{tag}}"
         },
         "concourse_import": {
             "title": "Import from Concourse",
@@ -1390,6 +1399,9 @@
                         "rough_disabled": "The 'First impressions' (rough sort) step is in this list but the study has rough sort disabled. Participants will not see it.",
                         "presort_disabled": "The 'Let's meet' (pre-sort survey) step is in this list but the study has the pre-sort survey disabled. Participants will not see it.",
                         "remove_action": "Remove"
+                    },
+                    "actions": {
+                        "delete": "Delete {{title}}"
                     }
                 },
                 "consent_title": "Consent form",
@@ -1478,7 +1490,10 @@
                 "actions": {
                     "add_option": "Add option",
                     "copy_from": "Import from language",
-                    "copy_success": "Imported"
+                    "copy_success": "Imported",
+                    "copy_from_aria": "Import {{label}} from another language",
+                    "delete": "Delete {{label}}",
+                    "remove_option": "Remove {{option}}"
                 },
                 "logic": {
                     "title": "Visibility logic",
@@ -1529,7 +1544,9 @@
                     "imported": "Successfully imported {{count}} statements",
                     "reset_codes": "Reset codes",
                     "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
-                    "codes_reset": "Statement codes re-sequenced"
+                    "codes_reset": "Statement codes re-sequenced",
+                    "save_item": "Save {{code}}",
+                    "cancel_edit": "Cancel editing {{code}}"
                 },
                 "settings": {
                     "title": "Research settings",
@@ -1586,7 +1603,8 @@
                     "prompt_placeholder": "Why did you place this statement here?",
                     "add": "Add",
                     "add_defaults": "Add default extremes",
-                    "select_placeholder": "Select..."
+                    "select_placeholder": "Select...",
+                    "remove": "Remove {{score}}"
                 },
                 "random_comments": {
                     "title": "Allow random comments",
@@ -1639,7 +1657,8 @@
                         "next": "Move to the next step",
                         "submit": "Submit results at the end",
                         "confirm": "Generic validation button"
-                    }
+                    },
+                    "info_label": "About {{label}}"
                 },
                 "terms": {
                     "title": "Sorting terminology",
@@ -1657,7 +1676,9 @@
                     "desc": "Add or modify floating hints to help participants during the grid sort phase.",
                     "placeholder": "Enter a methodology tip...",
                     "add": "Add tip",
-                    "reset": "Reset to defaults"
+                    "reset": "Reset to defaults",
+                    "remove": "Remove {{tip}}",
+                    "unnamed": "Tip {{number}}"
                 },
                 "help": {
                     "title": "Step guidance (what/why)",
@@ -1671,7 +1692,9 @@
                     "title": "Accent color",
                     "desc": "This color will be used for buttons, links, and highlights throughout the study.",
                     "pick": "Pick a color",
-                    "reset": "Reset to default"
+                    "reset": "Reset to default",
+                    "info_label": "About accent color",
+                    "swatch": "Set accent color to {{color}}"
                 },
                 "logo": {
                     "title": "Study logo",
@@ -1680,7 +1703,9 @@
                     "hint": "Recommended size: 200x50px. Supports PNG, SVG, JPG.",
                     "preview": "Logo preview",
                     "help_title": "Where does this logo appear?",
-                    "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity."
+                    "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity.",
+                    "info_label": "About the study logo",
+                    "remove": "Remove logo"
                 },
                 "partners": {
                     "title": "Institutional partners",
@@ -1692,7 +1717,11 @@
                     "url_label": "Website (optional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Display of logos",
-                    "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo."
+                    "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo.",
+                    "info_label": "About institutional partners",
+                    "remove_logo": "Remove logo for {{name}}",
+                    "remove": "Remove {{name}}",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Upload",
@@ -1702,7 +1731,8 @@
                     "conversion_error": "Failed to process image.",
                     "processing": "Processing image...",
                     "drag_drop": "Drag & drop or click to upload",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Remove image"
                 }
             },
             "activate_dialog": {
@@ -1816,7 +1846,8 @@
                 "has_audio": "Has audio responses",
                 "email_provided": "Email provided",
                 "newsletter_consent": "Wants results",
-                "interview_consent": "Accepts follow-up"
+                "interview_consent": "Accepts follow-up",
+                "recruitment_link": "Recruitment link"
             },
             "toast": {
                 "discarded": "Participant discarded",
@@ -1893,7 +1924,9 @@
                 "contract_cta": "Open study overview"
             },
             "pagination": {
-                "showing": "Showing {{from}}–{{to}} of {{total}}"
+                "showing": "Showing {{from}}–{{to}} of {{total}}",
+                "previous": "Previous page",
+                "next": "Next page"
             }
         },
         "team": {
@@ -2131,8 +2164,11 @@
                         "success": "Invitation link generated!",
                         "error": "Failed to create invitation.",
                         "send": "Create & send invitation",
-                        "copy_success": "Link copied to clipboard!"
-                    }
+                        "copy_success": "Link copied to clipboard!",
+                        "copy_link": "Copy link",
+                        "copied": "Copied"
+                    },
+                    "role_for": "Role for {{name}}"
                 }
             }
         },
@@ -2278,6 +2314,13 @@
                 "promote_title": "Grant superuser access?",
                 "promote_body": "Grant {{email}} full superuser privileges over the platform."
             }
+        },
+        "audio": {
+            "download": "Download audio",
+            "recording": "Audio recording",
+            "play": "Play audio",
+            "pause": "Pause audio",
+            "seek": "Seek audio position"
         }
     }
 }

@@ -310,7 +310,8 @@
                 "disabled_success": "Tweestapsverificatie uitgeschakeld",
                 "secret_copied": "Geheim gekopieerd",
                 "invalid_token": "Ongeldige verificatiecode",
-                "disable_error": "2FA uitschakelen mislukt"
+                "disable_error": "2FA uitschakelen mislukt",
+                "copy_secret": "Geheim kopiëren"
             },
             "password": {
                 "title": "Wachtwoordbeheer",
@@ -470,7 +471,15 @@
             "import_csv_hint": "CSV/TSV heeft kolommen nodig: code, language, text.",
             "import_csv_no_match": "Geen rijen komen overeen met de geselecteerde taal ({{lang}}).",
             "import_csv_skipped": "{{count}} rij(en) in andere talen overgeslagen: {{langs}}.",
-            "import_csv_more_errors": "{{count}} meer problemen"
+            "import_csv_more_errors": "{{count}} meer problemen",
+            "filters": {
+                "status": "Filteren op status",
+                "tag": "Filteren op label"
+            },
+            "status_for": "Status van {{code}}",
+            "create_tag": "Label maken",
+            "delete_tag": "{{tag}} verwijderen",
+            "cancel_delete_tag": "Verwijderen van {{tag}} annuleren"
         },
         "concourse_import": {
             "title": "Importeren uit concours",
@@ -1388,6 +1397,9 @@
                         "rough_disabled": "De stap 'Eerste indrukken' (grove sortering) staat in deze lijst, maar de grove sortering is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
                         "presort_disabled": "De stap 'Laten we kennismaken' (voorsorteringsvragenlijst) staat in deze lijst, maar de voorsorteringsvragenlijst is uitgeschakeld voor dit onderzoek. Deelnemers zullen deze stap niet zien.",
                         "remove_action": "Verwijderen"
+                    },
+                    "actions": {
+                        "delete": "{{title}} verwijderen"
                     }
                 },
                 "consent_title": "Toestemmingsformulier",
@@ -1476,7 +1488,10 @@
                 "actions": {
                     "add_option": "Optie toevoegen",
                     "copy_from": "Importeren vanuit taal",
-                    "copy_success": "Geïmporteerd"
+                    "copy_success": "Geïmporteerd",
+                    "copy_from_aria": "{{label}} uit een andere taal importeren",
+                    "delete": "{{label}} verwijderen",
+                    "remove_option": "{{option}} verwijderen"
                 },
                 "logic": {
                     "title": "Zichtbaarheidslogica",
@@ -1527,7 +1542,9 @@
                     "imported": "{{count}} stellingen succesvol geïmporteerd",
                     "reset_codes": "Codes herstellen",
                     "confirm_reset_codes": "Weet u zeker dat u alle stellingcodes opnieuw wilt nummeren (s1, s2, s3...)?",
-                    "codes_reset": "Stellingcodes opnieuw genummerd"
+                    "codes_reset": "Stellingcodes opnieuw genummerd",
+                    "save_item": "{{code}} opslaan",
+                    "cancel_edit": "Bewerken van {{code}} annuleren"
                 },
                 "settings": {
                     "title": "Onderzoeksinstellingen",
@@ -1584,7 +1601,8 @@
                     "prompt_placeholder": "Waarom heeft u deze stelling hier geplaatst?",
                     "add": "Toevoegen",
                     "add_defaults": "Standaard extremen toevoegen",
-                    "select_placeholder": "Selecteren..."
+                    "select_placeholder": "Selecteren...",
+                    "remove": "{{score}} verwijderen"
                 },
                 "random_comments": {
                     "title": "Willekeurige opmerkingen toestaan",
@@ -1637,7 +1655,8 @@
                         "next": "Naar de volgende stap gaan",
                         "submit": "Resultaten verzenden aan het einde",
                         "confirm": "Algemene validatieknop"
-                    }
+                    },
+                    "info_label": "Over {{label}}"
                 },
                 "terms": {
                     "title": "Sorteringsterminologie",
@@ -1655,7 +1674,9 @@
                     "desc": "Voeg zwevende hints toe of pas ze aan om deelnemers te helpen tijdens de rasterdsorteringsfase.",
                     "placeholder": "Voer een methodologietip in...",
                     "add": "Tip toevoegen",
-                    "reset": "Standaardinstellingen herstellen"
+                    "reset": "Standaardinstellingen herstellen",
+                    "remove": "{{tip}} verwijderen",
+                    "unnamed": "Tip {{number}}"
                 },
                 "help": {
                     "title": "Stapbegeleiding (wat/waarom)",
@@ -1669,7 +1690,9 @@
                     "title": "Accentkleur",
                     "desc": "Deze kleur wordt gebruikt voor knoppen, links en markeringen in het hele onderzoek.",
                     "pick": "Kleur kiezen",
-                    "reset": "Standaardkleur herstellen"
+                    "reset": "Standaardkleur herstellen",
+                    "info_label": "Over de accentkleur",
+                    "swatch": "Accentkleur instellen op {{color}}"
                 },
                 "logo": {
                     "title": "Onderzoekslogo",
@@ -1678,7 +1701,9 @@
                     "hint": "Aanbevolen formaat: 200x50px. Ondersteunt PNG, SVG, JPG.",
                     "preview": "Logovoorbeeld",
                     "help_title": "Waar verschijnt dit logo?",
-                    "help_desc": "Het logo wordt bovenaan elke onderzoekspagina (navigatiebalk) en op de welkomstpagina weergegeven. Het versterkt de visuele identiteit van uw project."
+                    "help_desc": "Het logo wordt bovenaan elke onderzoekspagina (navigatiebalk) en op de welkomstpagina weergegeven. Het versterkt de visuele identiteit van uw project.",
+                    "info_label": "Over het onderzoekslogo",
+                    "remove": "Logo verwijderen"
                 },
                 "partners": {
                     "title": "Institutionele partners",
@@ -1690,7 +1715,11 @@
                     "url_label": "Website (optioneel)",
                     "url_placeholder": "Https://...",
                     "help_title": "Weergave van logo's",
-                    "help_desc": "Partnerlogo's worden weergegeven op de landingspagina en in de onderzoeksheader, naast het hoofdlogo."
+                    "help_desc": "Partnerlogo's worden weergegeven op de landingspagina en in de onderzoeksheader, naast het hoofdlogo.",
+                    "info_label": "Over institutionele partners",
+                    "remove_logo": "Logo van {{name}} verwijderen",
+                    "remove": "{{name}} verwijderen",
+                    "unnamed": "Partner {{number}}"
                 },
                 "upload": {
                     "upload": "Uploaden",
@@ -1700,7 +1729,8 @@
                     "conversion_error": "Verwerking van afbeelding mislukt.",
                     "processing": "Afbeelding verwerken...",
                     "drag_drop": "Slepen & neerzetten of klikken om te uploaden",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Afbeelding verwijderen"
                 }
             },
             "activate_dialog": {
@@ -1814,7 +1844,8 @@
                 "has_audio": "Heeft audio-antwoorden",
                 "email_provided": "E-mailadres opgegeven",
                 "newsletter_consent": "Wil resultaten",
-                "interview_consent": "Accepteert vervolg"
+                "interview_consent": "Accepteert vervolg",
+                "recruitment_link": "Wervingslink"
             },
             "toast": {
                 "discarded": "Deelnemer verwijderd",
@@ -1891,7 +1922,9 @@
                 "contract_cta": "Onderzoeksoverzicht openen"
             },
             "pagination": {
-                "showing": "{{from}}–{{to}} van {{total}} weergegeven"
+                "showing": "{{from}}–{{to}} van {{total}} weergegeven",
+                "previous": "Vorige pagina",
+                "next": "Volgende pagina"
             }
         },
         "team": {
@@ -2129,8 +2162,11 @@
                         "success": "Uitnodigingslink gegenereerd!",
                         "error": "Uitnodiging aanmaken mislukt.",
                         "send": "Uitnodiging aanmaken en versturen",
-                        "copy_success": "Link gekopieerd naar klembord!"
-                    }
+                        "copy_success": "Link gekopieerd naar klembord!",
+                        "copy_link": "Link kopiëren",
+                        "copied": "Gekopieerd"
+                    },
+                    "role_for": "Rol van {{name}}"
                 }
             }
         },
@@ -2276,6 +2312,13 @@
                 "success": "E-mail bijgewerkt.",
                 "title": "E-mail van gebruiker instellen"
             }
+        },
+        "audio": {
+            "download": "Audio downloaden",
+            "recording": "Audio-opname",
+            "play": "Audio afspelen",
+            "pause": "Audio pauzeren",
+            "seek": "Afspeelpositie"
         }
     }
 }

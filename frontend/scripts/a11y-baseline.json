@@ -1,64 +1,5 @@
 {
-    "unnamedControls": {
-        "src/components/admin/AudioPlayer.tsx": {
-            "Button#9eaa609dff": 1
-        },
-        "src/components/admin/dashboard/InteractiveDataView.columns.tsx": {
-            "TooltipTrigger#07b7bb5f30": 1,
-            "TooltipTrigger#64528336d1": 1,
-            "TooltipTrigger#66bd021c8d": 1,
-            "TooltipTrigger#991c394724": 1,
-            "TooltipTrigger#d1a4ff6af5": 1,
-            "TooltipTrigger#ef4eaf74a9": 1,
-            "TooltipTrigger#f738eb0490": 1
-        },
-        "src/components/admin/dashboard/InteractiveDataView.tsx": {
-            "Button#0bacf4658c": 1,
-            "Button#e38e166000": 1,
-            "Button#f08923f571": 1
-        },
-        "src/components/admin/designer/BrandingEditor.tsx": {
-            "button#aa40493fca": 1,
-            "button#acb2a0d0e8": 1,
-            "TooltipTrigger#ee8b70d151": 3
-        },
-        "src/components/admin/designer/ImageUploadInput.tsx": {
-            "button#c142fb7ba6": 1
-        },
-        "src/components/admin/designer/InterfaceEditor.tsx": {
-            "Button#5a9712977a": 1,
-            "TooltipTrigger#ee8b70d151": 1
-        },
-        "src/components/admin/designer/PostSortConfigEditor.tsx": {
-            "button#c142fb7ba6": 1
-        },
-        "src/components/admin/designer/ProcessStepEditor.tsx": {
-            "Button#81017c5def": 1
-        },
-        "src/components/admin/designer/QSortEditor.tsx": {
-            "Button#afbf633168": 1,
-            "Button#b1a1a82138": 1,
-            "Button#e81d9b56d8": 1
-        },
-        "src/components/admin/designer/QuestionBuilder.tsx": {
-            "Button#81017c5def": 2,
-            "Button#83b5f464b1": 1
-        },
-        "src/pages/admin/AccountSettingsPage.tsx": {
-            "button#3ddd1d5369": 1
-        },
-        "src/pages/admin/ConcourseDetailPage.tsx": {
-            "Button#1dd7a5d308": 1,
-            "Button#81017c5def": 1,
-            "Button#a1f3efb8f5": 1,
-            "SelectTrigger#872cdad358": 3,
-            "SelectTrigger#bb89cca4e9": 1
-        },
-        "src/pages/admin/ProjectMembersPage.tsx": {
-            "Button#d8507040f1": 1,
-            "SelectTrigger#872cdad358": 1
-        }
-    },
+    "unnamedControls": {},
     "lowContrastControls": {
         "src/components/admin/analysis/AnalysisHistoryPanel.tsx": {
             "button#74bf5e335c": 1
@@ -70,20 +11,21 @@
             "Button#ff3d58c3b9": 1
         },
         "src/components/admin/designer/BrandingEditor.tsx": {
-            "button#acb2a0d0e8": 1
+            "button#9fdeea95db": 1
         },
         "src/components/admin/designer/InterfaceEditor.tsx": {
-            "Button#5a9712977a": 1
+            "Button#5417b42698": 1
         },
         "src/components/admin/designer/ProcessStepEditor.tsx": {
-            "Button#81017c5def": 1
+            "Button#08fe1834a8": 1
         },
         "src/components/admin/designer/QSortEditor.tsx": {
             "Button#cfd0f92c60": 1
         },
         "src/components/admin/designer/QuestionBuilder.tsx": {
-            "Button#81017c5def": 2,
-            "DropdownMenuTrigger#f0edeb0f8a": 1
+            "Button#b8299f38ab": 1,
+            "Button#ed2885af3a": 1,
+            "DropdownMenuTrigger#f1cda76386": 1
         },
         "src/layouts/StudyLayout.tsx": {
             "button#543c37a641": 1

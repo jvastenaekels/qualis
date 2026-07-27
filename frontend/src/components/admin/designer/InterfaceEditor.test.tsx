@@ -132,4 +132,34 @@ describe('InterfaceEditor', () => {
             expect(whatFields).toHaveLength(whyFields.length);
         });
     });
+
+    describe('control names (Task 6.7c)', () => {
+        it('names the navigation-button info tooltip trigger per field', () => {
+            renderEditor();
+
+            expect(screen.getByRole('button', { name: 'About Start button' })).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: 'About Next step button' })
+            ).toBeInTheDocument();
+        });
+
+        it('discriminates the remove-tip button by the tip text, falling back to an ordinal when empty', () => {
+            renderEditor({
+                draft: {
+                    translations: [
+                        {
+                            language_code: 'en',
+                            ui_labels: {},
+                            methodology_tips: ['Sort intuitively first', ''],
+                        },
+                    ],
+                },
+            });
+
+            expect(
+                screen.getByRole('button', { name: 'Remove Sort intuitively first' })
+            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Remove Tip 2' })).toBeInTheDocument();
+        });
+    });
 });

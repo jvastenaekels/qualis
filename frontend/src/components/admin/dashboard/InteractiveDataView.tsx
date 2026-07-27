@@ -749,6 +749,7 @@ export default function InteractiveDataView({
                                         variant="ghost"
                                         size="icon"
                                         className="h-9 w-9 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                                        aria-label={t('admin.design.toolbar.more_actions')}
                                     >
                                         <MoreVertical className="h-4 w-4" />
                                     </Button>
@@ -935,6 +936,10 @@ export default function InteractiveDataView({
                                     onClick={() => table.previousPage()}
                                     disabled={!table.getCanPreviousPage()}
                                     className="h-8 w-8 p-0 rounded-lg"
+                                    aria-label={t(
+                                        'admin.data.pagination.previous',
+                                        'Previous page'
+                                    )}
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
@@ -947,6 +952,7 @@ export default function InteractiveDataView({
                                     onClick={() => table.nextPage()}
                                     disabled={!table.getCanNextPage()}
                                     className="h-8 w-8 p-0 rounded-lg"
+                                    aria-label={t('admin.data.pagination.next', 'Next page')}
                                 >
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>

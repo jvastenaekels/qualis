@@ -12,11 +12,20 @@ import type { ConcourseDetailPageApi } from '@/hooks/admin/useConcourseDetailPag
 import type { ConcourseDetailRead, ConcourseItemRead, ConcourseItemStatus } from '@/api/model';
 
 // Radix Select triggers a compose-refs loop in React 19 + happy-dom — stub it
-// (same approach as ProjectMembersPage.remove-member-dialog.test.tsx).
+// (same approach as ProjectMembersPage.remove-member-dialog.test.tsx). The
+// stub forwards the rest of the props (aria-label, className, ...) rather
+// than only `children` — a stub that drops aria-label would make every
+// accessible-name assertion against a SelectTrigger pass vacuously, whether
+// the real component carries the label or not (Task 6.7c).
 vi.mock('@/components/ui/select', () => ({
     Select: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    SelectTrigger: ({ children }: { children: React.ReactNode }) => (
-        <button type="button">{children}</button>
+    SelectTrigger: ({
+        children,
+        ...props
+    }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children: React.ReactNode }) => (
+        <button type="button" {...props}>
+            {children}
+        </button>
     ),
     SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
@@ -420,5 +429,83 @@ describe('ConcourseDetailPage — Add Item / Bulk Import label accessible names 
         // association, not from the heading merely sitting nearby.
         expect(within(dialog).getByRole('group', { name: /^Tags/ })).toBeInTheDocument();
         expect(within(dialog).getByRole('checkbox', { name: /vision/i })).toBeInTheDocument();
+    });
+});
+
+describe('ConcourseDetailPage — control accessible names (Task 6.7c)', () => {
+    it('names the status and tag filter-bar selects', () => {
+        const concourse = concourseWith(1, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            filteredItems: concourse.items ?? [],
+            tags: [{ id: 1, name: 'Vision', color: '#6366f1', project_id: 1 }],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('button', { name: 'Filter by status' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Filter by tag' })).toBeInTheDocument();
+    });
+
+    it("discriminates each row's status select by the item code, not a shared generic name", () => {
+        const concourse = concourseWith(2, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        const codes = (concourse.items ?? []).map((item) => item.code);
+        expect(codes).toHaveLength(2);
+        for (const code of codes) {
+            // Both a mobile and a desktop copy of the row render simultaneously
+            // (CSS toggles visibility) — getAllByRole confirms at least one
+            // resolves under this exact name rather than none at all.
+            expect(
+                screen.getAllByRole('button', { name: `Status for ${code}` }).length
+            ).toBeGreaterThan(0);
+        }
+    });
+
+    it('names the create-tag control in the Tag Manager dialog', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            tagManagerOpen: true,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('button', { name: 'Create tag' })).toBeInTheDocument();
+    });
+
+    it('names the per-tag delete control by the tag name', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            tagManagerOpen: true,
+            tags: [{ id: 1, name: 'Vision', color: '#6366f1', project_id: 1 }],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('button', { name: 'Delete Vision' })).toBeInTheDocument();
+    });
+
+    it('names the per-tag cancel-delete control by the tag name, once delete is armed', () => {
+        const concourse = concourseWith(0, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            tagManagerOpen: true,
+            tags: [{ id: 1, name: 'Vision', color: '#6366f1', project_id: 1 }],
+            // Mirrors the post-click state (setDeleteTagId(tag.id)) directly,
+            // since setDeleteTagId is a mock and won't re-render the hook.
+            deleteTagId: 1,
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expect(screen.getByRole('button', { name: 'Cancel deleting Vision' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Delete Vision' })).not.toBeInTheDocument();
     });
 });

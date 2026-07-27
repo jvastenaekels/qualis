@@ -178,6 +178,16 @@ describe('QSortEditor', () => {
             expect(screen.queryByText('Existing Statement')).not.toBeInTheDocument();
         });
 
+        it('names the save/cancel controls by the statement code being edited (Task 6.7c)', async () => {
+            const user = userEvent.setup();
+            renderEditor();
+
+            await user.click(screen.getByText('Existing Statement'));
+
+            expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Cancel editing s1' })).toBeInTheDocument();
+        });
+
         it('clears all statements with confirmation', async () => {
             const user = userEvent.setup();
             const confirmSpy = vi.spyOn(window, 'confirm').mockImplementation(() => true);
@@ -236,6 +246,13 @@ describe('QSortEditor', () => {
             expect(screen.getByText('Q-Sort distribution grid')).toBeInTheDocument();
             // Should see input fields for the grid
             // (Assuming grid editor renders inputs implies it's working)
+        });
+
+        it('names the "why forced distribution" help control (Task 6.7c)', () => {
+            renderEditor({ activeSubStep: 'grid' });
+            expect(
+                screen.getByRole('button', { name: 'Why forced distribution?' })
+            ).toBeInTheDocument();
         });
     });
 

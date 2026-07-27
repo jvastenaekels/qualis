@@ -222,7 +222,8 @@
                 "enabled_success": "Authentification à deux facteurs activée",
                 "disabled_success": "Authentification à deux facteurs désactivée",
                 "invalid_token": "Code de vérification invalide",
-                "disable_error": "Impossible de désactiver le 2FA"
+                "disable_error": "Impossible de désactiver le 2FA",
+                "copy_secret": "Copier le secret"
             },
             "password": {
                 "title": "Mot de passe",
@@ -382,7 +383,15 @@
             "import_csv_hint": "CSV/TSV : colonnes code, language, text.",
             "import_csv_no_match": "Aucune ligne ne correspond à la langue sélectionnée ({{lang}}).",
             "import_csv_skipped": "{{count}} ligne(s) ignorée(s) dans d’autres langues : {{langs}}.",
-            "import_csv_more_errors": "{{count}} autres problèmes"
+            "import_csv_more_errors": "{{count}} autres problèmes",
+            "filters": {
+                "status": "Filtrer par statut",
+                "tag": "Filtrer par étiquette"
+            },
+            "status_for": "Statut de {{code}}",
+            "create_tag": "Créer une étiquette",
+            "delete_tag": "Supprimer {{tag}}",
+            "cancel_delete_tag": "Annuler la suppression de {{tag}}"
         },
         "concourse_import": {
             "title": "Importer depuis un concours",
@@ -1338,6 +1347,9 @@
                         "rough_disabled": "L'étape « Premières impressions » (pré-tri) est dans cette liste mais l'étude a le pré-tri désactivé. Les participants ne la verront pas.",
                         "presort_disabled": "L'étape « Faisons connaissance » (questionnaire pré-tri) est dans cette liste mais l'étude a le questionnaire pré-tri désactivé. Les participants ne la verront pas.",
                         "remove_action": "Supprimer"
+                    },
+                    "actions": {
+                        "delete": "Supprimer {{title}}"
                     }
                 },
                 "consent_title": "Formulaire de consentement",
@@ -1425,7 +1437,10 @@
                 "actions": {
                     "add_option": "Ajouter une option",
                     "copy_from": "Importer d'une langue",
-                    "copy_success": "Importé"
+                    "copy_success": "Importé",
+                    "copy_from_aria": "Importer {{label}} depuis une autre langue",
+                    "delete": "Supprimer {{label}}",
+                    "remove_option": "Retirer {{option}}"
                 },
                 "logic": {
                     "title": "Logique d'affichage",
@@ -1476,7 +1491,9 @@
                     "imported": "{{count}} énoncés importés avec succès",
                     "reset_codes": "Réinitialiser les codes",
                     "confirm_reset_codes": "Êtes-vous sûr de vouloir re-sequencer tous les codes d'énoncés (S1, S2, S3...) ?",
-                    "codes_reset": "Codes des énoncés réinitialisés"
+                    "codes_reset": "Codes des énoncés réinitialisés",
+                    "save_item": "Enregistrer {{code}}",
+                    "cancel_edit": "Annuler la modification de {{code}}"
                 },
                 "settings": {
                     "title": "Paramètres de recherche",
@@ -1533,7 +1550,8 @@
                     "prompt_placeholder": "Pourquoi avez-vous placé cet énoncé ici ?",
                     "add": "Ajouter",
                     "add_defaults": "Ajouter les extrêmes par défaut",
-                    "select_placeholder": "Sélectionner..."
+                    "select_placeholder": "Sélectionner...",
+                    "remove": "Retirer {{score}}"
                 },
                 "random_comments": {
                     "title": "Autoriser les commentaires libres",
@@ -1586,7 +1604,8 @@
                         "next": "Bouton standard utilisé pour passer d'une étape à l'autre.",
                         "submit": "Bouton final pour enregistrer la participation.",
                         "confirm": "Utilisé dans le tri sur grille pour valider le placement des cartes."
-                    }
+                    },
+                    "info_label": "À propos de {{label}}"
                 },
                 "terms": {
                     "title": "Terminologie du tri",
@@ -1604,7 +1623,9 @@
                     "desc": "Ajoutez ou modifiez des conseils flottants pour aider les participants pendant la phase de tri sur grille.",
                     "placeholder": "Entrez un conseil méthodologique...",
                     "add": "Ajouter un conseil",
-                    "reset": "Réinitialiser"
+                    "reset": "Réinitialiser",
+                    "remove": "Retirer {{tip}}",
+                    "unnamed": "Astuce {{number}}"
                 },
                 "help": {
                     "title": "Guidage par étape (Quoi/Pourquoi)",
@@ -1618,7 +1639,9 @@
                     "title": "Couleur d'accentuation",
                     "desc": "Cette couleur sera utilisée pour les boutons, liens et mises en évidence dans toute l'étude.",
                     "pick": "Choisir une couleur",
-                    "reset": "Réinitialiser"
+                    "reset": "Réinitialiser",
+                    "info_label": "À propos de la couleur d'accentuation",
+                    "swatch": "Définir la couleur d'accentuation sur {{color}}"
                 },
                 "logo": {
                     "title": "Logo de l'étude",
@@ -1627,7 +1650,9 @@
                     "hint": "Taille recommandée : 200x50px. Supporte PNG, SVG, JPG.",
                     "preview": "Aperçu du logo",
                     "help_title": "Où apparaît ce logo ?",
-                    "help_desc": "Le logo s'affiche en haut de chaque page de l'étude (barre de navigation) et sur la page de bienvenue. Il renforce l'identité visuelle de votre projet."
+                    "help_desc": "Le logo s'affiche en haut de chaque page de l'étude (barre de navigation) et sur la page de bienvenue. Il renforce l'identité visuelle de votre projet.",
+                    "info_label": "À propos du logo de l'étude",
+                    "remove": "Retirer le logo"
                 },
                 "partners": {
                     "title": "Logos des partenaires",
@@ -1639,7 +1664,11 @@
                     "url_label": "Site web (optionnel)",
                     "url_placeholder": "https://...",
                     "help_title": "Affichage des logos",
-                    "help_desc": "Les logos des partenaires sont affichés sur la page d'accueil ainsi que dans l'entête de l'étude, à côté du logo principal."
+                    "help_desc": "Les logos des partenaires sont affichés sur la page d'accueil ainsi que dans l'entête de l'étude, à côté du logo principal.",
+                    "info_label": "À propos des partenaires institutionnels",
+                    "remove_logo": "Retirer le logo de {{name}}",
+                    "remove": "Retirer {{name}}",
+                    "unnamed": "Partenaire {{number}}"
                 },
                 "upload": {
                     "upload": "Télécharger",
@@ -1649,7 +1678,8 @@
                     "conversion_error": "Échec du traitement de l'image.",
                     "processing": "Traitement de l'image...",
                     "drag_drop": "Glissez-déposez ou cliquez pour télécharger",
-                    "max": "Max"
+                    "max": "Max",
+                    "remove_default": "Retirer l'image"
                 }
             },
             "title": "Conception de l'étude",
@@ -1764,7 +1794,8 @@
                 "has_audio": "A des réponses audio",
                 "email_provided": "Email fourni",
                 "newsletter_consent": "Souhaite les résultats",
-                "interview_consent": "Accepte suivi"
+                "interview_consent": "Accepte suivi",
+                "recruitment_link": "Lien de recrutement"
             },
             "toast": {
                 "discarded": "Participant écarté",
@@ -1841,7 +1872,9 @@
                 "contract_cta": "Ouvrir la vue d'ensemble"
             },
             "pagination": {
-                "showing": "{{from}}–{{to}} sur {{total}}"
+                "showing": "{{from}}–{{to}} sur {{total}}",
+                "previous": "Page précédente",
+                "next": "Page suivante"
             }
         },
         "empty_states": {
@@ -2041,8 +2074,11 @@
                         "success": "Lien d'invitation généré !",
                         "error": "Échec de la création de l'invitation.",
                         "send": "Créer et envoyer l'invitation",
-                        "copy_success": "Lien copié dans le presse-papier !"
-                    }
+                        "copy_success": "Lien copié dans le presse-papier !",
+                        "copy_link": "Copier le lien",
+                        "copied": "Copié"
+                    },
+                    "role_for": "Rôle de {{name}}"
                 }
             }
         },
@@ -2276,6 +2312,13 @@
                 "success": "E-mail mis à jour.",
                 "title": "Définir l'e-mail de l'utilisateur"
             }
+        },
+        "audio": {
+            "download": "Télécharger l'audio",
+            "recording": "Enregistrement audio",
+            "play": "Lire l'audio",
+            "pause": "Mettre l'audio en pause",
+            "seek": "Position de lecture"
         }
     }
 }

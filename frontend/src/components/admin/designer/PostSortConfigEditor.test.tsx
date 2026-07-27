@@ -213,6 +213,17 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
         expect(negativeLabel).toBeInTheDocument();
     });
 
+    it('names each selected-column remove control by its own score (Task 6.7c)', () => {
+        renderEditor({
+            draft: {
+                postsort_config: { extreme_columns: [-2, 2] },
+            },
+        });
+
+        expect(screen.getByRole('button', { name: 'Remove +2' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Remove -2' })).toBeInTheDocument();
+    });
+
     it('updates specific prompt values in store', () => {
         renderEditor({
             draft: {

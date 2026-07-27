@@ -310,7 +310,8 @@
                 "disabled_success": "Autenticación de dos factores desactivada",
                 "secret_copied": "Secreto copiado",
                 "invalid_token": "Código de verificación incorrecto",
-                "disable_error": "Error al desactivar el 2FA"
+                "disable_error": "Error al desactivar el 2FA",
+                "copy_secret": "Copiar secreto"
             },
             "password": {
                 "title": "Gestión de contraseña",
@@ -470,7 +471,15 @@
             "import_csv_hint": "El CSV/TSV necesita columnas: code, language, text.",
             "import_csv_no_match": "Ninguna fila coincide con el idioma seleccionado ({{lang}}).",
             "import_csv_skipped": "Se omitieron {{count}} fila(s) en otros idiomas: {{langs}}.",
-            "import_csv_more_errors": "{{count}} problema(s) más"
+            "import_csv_more_errors": "{{count}} problema(s) más",
+            "filters": {
+                "status": "Filtrar por estado",
+                "tag": "Filtrar por etiqueta"
+            },
+            "status_for": "Estado de {{code}}",
+            "create_tag": "Crear etiqueta",
+            "delete_tag": "Eliminar {{tag}}",
+            "cancel_delete_tag": "Cancelar eliminación de {{tag}}"
         },
         "concourse_import": {
             "title": "Importar desde el concurso",
@@ -1388,6 +1397,9 @@
                         "rough_disabled": "El paso 'Primeras impresiones' (clasificación inicial) está en esta lista pero el estudio tiene la clasificación inicial desactivada. Los participantes no lo verán.",
                         "presort_disabled": "El paso 'Conociéndonos' (encuesta pre-clasificación) está en esta lista pero el estudio tiene la encuesta pre-clasificación desactivada. Los participantes no lo verán.",
                         "remove_action": "Eliminar"
+                    },
+                    "actions": {
+                        "delete": "Eliminar {{title}}"
                     }
                 },
                 "consent_title": "Formulario de consentimiento",
@@ -1476,7 +1488,10 @@
                 "actions": {
                     "add_option": "Añadir opción",
                     "copy_from": "Importar desde idioma",
-                    "copy_success": "Importado"
+                    "copy_success": "Importado",
+                    "copy_from_aria": "Importar {{label}} desde otro idioma",
+                    "delete": "Eliminar {{label}}",
+                    "remove_option": "Quitar {{option}}"
                 },
                 "logic": {
                     "title": "Lógica de visibilidad",
@@ -1527,7 +1542,9 @@
                     "imported": "{{count}} enunciados importados correctamente",
                     "reset_codes": "Restablecer códigos",
                     "confirm_reset_codes": "¿Está seguro de que desea renumerar todos los códigos de enunciados (s1, s2, s3...)?",
-                    "codes_reset": "Códigos de enunciados renumerados"
+                    "codes_reset": "Códigos de enunciados renumerados",
+                    "save_item": "Guardar {{code}}",
+                    "cancel_edit": "Cancelar edición de {{code}}"
                 },
                 "settings": {
                     "title": "Configuración de investigación",
@@ -1584,7 +1601,8 @@
                     "prompt_placeholder": "¿Por qué colocó este enunciado aquí?",
                     "add": "Añadir",
                     "add_defaults": "Añadir extremos predeterminados",
-                    "select_placeholder": "Seleccionar..."
+                    "select_placeholder": "Seleccionar...",
+                    "remove": "Quitar {{score}}"
                 },
                 "random_comments": {
                     "title": "Permitir comentarios aleatorios",
@@ -1637,7 +1655,8 @@
                         "next": "Pasar al siguiente paso",
                         "submit": "Enviar los resultados al final",
                         "confirm": "Botón de validación genérico"
-                    }
+                    },
+                    "info_label": "Acerca de {{label}}"
                 },
                 "terms": {
                     "title": "Terminología de clasificación",
@@ -1655,7 +1674,9 @@
                     "desc": "Añada o modifique sugerencias flotantes para ayudar a los participantes durante la fase de clasificación en cuadrícula.",
                     "placeholder": "Introduzca un consejo metodológico...",
                     "add": "Añadir consejo",
-                    "reset": "Restablecer valores predeterminados"
+                    "reset": "Restablecer valores predeterminados",
+                    "remove": "Quitar {{tip}}",
+                    "unnamed": "Consejo {{number}}"
                 },
                 "help": {
                     "title": "Orientación por paso (qué/por qué)",
@@ -1669,7 +1690,9 @@
                     "title": "Color de acento",
                     "desc": "Este color se usará para botones, enlaces y destacados en todo el estudio.",
                     "pick": "Elegir un color",
-                    "reset": "Restablecer valor predeterminado"
+                    "reset": "Restablecer valor predeterminado",
+                    "info_label": "Acerca del color de acento",
+                    "swatch": "Establecer el color de acento en {{color}}"
                 },
                 "logo": {
                     "title": "Logotipo del estudio",
@@ -1678,7 +1701,9 @@
                     "hint": "Tamaño recomendado: 200x50px. Admite PNG, SVG, JPG.",
                     "preview": "Vista previa del logotipo",
                     "help_title": "¿Dónde aparece este logotipo?",
-                    "help_desc": "El logotipo se muestra en la parte superior de cada página del estudio (barra de navegación) y en la página de bienvenida. Refuerza la identidad visual de su proyecto."
+                    "help_desc": "El logotipo se muestra en la parte superior de cada página del estudio (barra de navegación) y en la página de bienvenida. Refuerza la identidad visual de su proyecto.",
+                    "info_label": "Acerca del logotipo del estudio",
+                    "remove": "Quitar logotipo"
                 },
                 "partners": {
                     "title": "Socios institucionales",
@@ -1690,7 +1715,11 @@
                     "url_label": "Sitio web (opcional)",
                     "url_placeholder": "Https://...",
                     "help_title": "Visualización de logotipos",
-                    "help_desc": "Los logotipos de los socios se muestran en la página de inicio así como en el encabezado del estudio, junto al logotipo principal."
+                    "help_desc": "Los logotipos de los socios se muestran en la página de inicio así como en el encabezado del estudio, junto al logotipo principal.",
+                    "info_label": "Acerca de los socios institucionales",
+                    "remove_logo": "Quitar logotipo de {{name}}",
+                    "remove": "Quitar {{name}}",
+                    "unnamed": "Socio {{number}}"
                 },
                 "upload": {
                     "upload": "Cargar",
@@ -1700,7 +1729,8 @@
                     "conversion_error": "Error al procesar la imagen.",
                     "processing": "Procesando imagen...",
                     "drag_drop": "Arrastre y suelte o haga clic para cargar",
-                    "max": "Máx"
+                    "max": "Máx",
+                    "remove_default": "Quitar imagen"
                 }
             },
             "activate_dialog": {
@@ -1814,7 +1844,8 @@
                 "has_audio": "Tiene respuestas de audio",
                 "email_provided": "Correo electrónico proporcionado",
                 "newsletter_consent": "Quiere resultados",
-                "interview_consent": "Acepta seguimiento"
+                "interview_consent": "Acepta seguimiento",
+                "recruitment_link": "Enlace de reclutamiento"
             },
             "toast": {
                 "discarded": "Participante descartado",
@@ -1891,7 +1922,9 @@
                 "contract_cta": "Abrir resumen del estudio"
             },
             "pagination": {
-                "showing": "Mostrando {{from}}–{{to}} de {{total}}"
+                "showing": "Mostrando {{from}}–{{to}} de {{total}}",
+                "previous": "Página anterior",
+                "next": "Página siguiente"
             }
         },
         "team": {
@@ -2129,8 +2162,11 @@
                         "success": "¡Enlace de invitación generado!",
                         "error": "Error al crear la invitación.",
                         "send": "Crear y enviar invitación",
-                        "copy_success": "¡Enlace copiado al portapapeles!"
-                    }
+                        "copy_success": "¡Enlace copiado al portapapeles!",
+                        "copy_link": "Copiar enlace",
+                        "copied": "Copiado"
+                    },
+                    "role_for": "Rol de {{name}}"
                 }
             }
         },
@@ -2276,6 +2312,13 @@
                 "success": "Correo electrónico actualizado.",
                 "title": "Establecer el correo electrónico del usuario"
             }
+        },
+        "audio": {
+            "download": "Descargar audio",
+            "recording": "Grabación de audio",
+            "play": "Reproducir audio",
+            "pause": "Pausar audio",
+            "seek": "Posición de reproducción"
         }
     }
 }

@@ -222,7 +222,8 @@
                 "disabled_success": "Kaksivaiheinen todennus poistettu käytöstä",
                 "secret_copied": "Salaisuus kopioitu",
                 "invalid_token": "Virheellinen vahvistuskoodi",
-                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui"
+                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui",
+                "copy_secret": "Kopioi salaisuus"
             },
             "password": {
                 "title": "Salasanan hallinta",
@@ -382,7 +383,15 @@
             "import_csv_hint": "CSV/TSV: sarakkeet code, language, text.",
             "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
             "import_csv_skipped": "Ohitettu {{count}} rivi(ä) muilla kielillä: {{langs}}.",
-            "import_csv_more_errors": "{{count}} lisää ongelmaa"
+            "import_csv_more_errors": "{{count}} lisää ongelmaa",
+            "filters": {
+                "status": "Suodata tilan mukaan",
+                "tag": "Suodata tunnisteen mukaan"
+            },
+            "status_for": "Tila: {{code}}",
+            "create_tag": "Luo tunniste",
+            "delete_tag": "Poista {{tag}}",
+            "cancel_delete_tag": "Peruuta tunnisteen {{tag}} poisto"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
@@ -1300,6 +1309,9 @@
                         "rough_disabled": "Vaihe 'Ensivaikutelma' (esilajittelu) on tässä luettelossa, mutta tutkimuksessa esilajittelu on poistettu käytöstä. Osallistujat eivät näe sitä.",
                         "presort_disabled": "Vaihe 'Tutustutaan' (esilajittelukysely) on tässä luettelossa, mutta tutkimuksessa esilajittelukysely on poistettu käytöstä. Osallistujat eivät näe sitä.",
                         "remove_action": "Poista"
+                    },
+                    "actions": {
+                        "delete": "Poista {{title}}"
                     }
                 },
                 "consent_title": "Suostumuslomake",
@@ -1387,7 +1399,10 @@
                 "actions": {
                     "add_option": "Lisää vaihtoehto",
                     "copy_from": "Kopioi kielestä",
-                    "copy_success": "Kopioitu"
+                    "copy_success": "Kopioitu",
+                    "copy_from_aria": "Tuo {{label}} toisesta kielestä",
+                    "delete": "Poista {{label}}",
+                    "remove_option": "Poista {{option}}"
                 },
                 "logic": {
                     "title": "Näkyvyyslogiikka",
@@ -1438,7 +1453,9 @@
                     "imported": "{{count}} väittämää tuotu onnistuneesti",
                     "reset_codes": "Reset Codes",
                     "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väitekoodit (s1, s2, s3…)?",
-                    "codes_reset": "Väitekoodit uudelleennumeroitu"
+                    "codes_reset": "Väitekoodit uudelleennumeroitu",
+                    "save_item": "Tallenna {{code}}",
+                    "cancel_edit": "Peruuta kohteen {{code}} muokkaus"
                 },
                 "settings": {
                     "title": "Tutkimusasetukset",
@@ -1495,7 +1512,8 @@
                     "prompt_placeholder": "Miksi sijoitit tämän väittämän tähän?",
                     "add": "Lisää",
                     "add_defaults": "Lisää oletusarvot (ääripäät)",
-                    "select_placeholder": "Valitse..."
+                    "select_placeholder": "Valitse...",
+                    "remove": "Poista {{score}}"
                 },
                 "random_comments": {
                     "title": "Salli vapaat kommentit",
@@ -1548,7 +1566,8 @@
                         "next": "Siirry seuraavaan vaiheeseen",
                         "submit": "Lähetä tulokset lopussa",
                         "confirm": "Yleinen vahvistuspainike"
-                    }
+                    },
+                    "info_label": "Tietoa: {{label}}"
                 },
                 "terms": {
                     "title": "Lajittelutermistö",
@@ -1566,7 +1585,9 @@
                     "desc": "Lisää tai muokkaa kelluvia vinkkejä auttaaksesi osallistujia ruudukkolajitteluvaiheessa.",
                     "placeholder": "Kirjoita metodologinen vinkki...",
                     "add": "Lisää vinkki",
-                    "reset": "Palauta oletukset"
+                    "reset": "Palauta oletukset",
+                    "remove": "Poista {{tip}}",
+                    "unnamed": "Vihje {{number}}"
                 },
                 "help": {
                     "title": "Vaiheittainen ohjaus (Mitä/Miksi)",
@@ -1580,7 +1601,9 @@
                     "title": "Korostusväri",
                     "desc": "Tätä väriä käytetään painikkeissa, linkeissä ja korostuksissa koko tutkimuksen ajan.",
                     "pick": "Valitse väri",
-                    "reset": "Palauta oletus"
+                    "reset": "Palauta oletus",
+                    "info_label": "Tietoa korostusväristä",
+                    "swatch": "Aseta korostusväriksi {{color}}"
                 },
                 "logo": {
                     "title": "Tutkimuksen logo",
@@ -1589,7 +1612,9 @@
                     "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG.",
                     "preview": "Logon esikatselu",
                     "help_title": "Missä tämä logo näkyy?",
-                    "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä."
+                    "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä.",
+                    "info_label": "Tietoa tutkimuksen logosta",
+                    "remove": "Poista logo"
                 },
                 "partners": {
                     "title": "Institutionaaliset kumppanit",
@@ -1601,7 +1626,11 @@
                     "url_label": "Verkkosivusto (valinnainen)",
                     "url_placeholder": "https://...",
                     "help_title": "Logojen näyttäminen",
-                    "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä."
+                    "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä.",
+                    "info_label": "Tietoa institutionaalisista kumppaneista",
+                    "remove_logo": "Poista logo kumppanilta {{name}}",
+                    "remove": "Poista {{name}}",
+                    "unnamed": "Kumppani {{number}}"
                 },
                 "upload": {
                     "upload": "Lataa",
@@ -1611,7 +1640,8 @@
                     "conversion_error": "Kuvan käsittely epäonnistui.",
                     "processing": "Käsitellään kuvaa...",
                     "drag_drop": "Vedä ja pudota tai napsauta ladataksesi",
-                    "max": "Maks"
+                    "max": "Maks",
+                    "remove_default": "Poista kuva"
                 }
             },
             "title": "Tutkimuksen suunnittelu",
@@ -1726,7 +1756,8 @@
                 "has_audio": "Sisältää äänivastauksia",
                 "email_provided": "Sähköposti annettu",
                 "newsletter_consent": "Haluaa tulokset",
-                "interview_consent": "Hyväksyy seurannan"
+                "interview_consent": "Hyväksyy seurannan",
+                "recruitment_link": "Rekrytointilinkki"
             },
             "toast": {
                 "discarded": "Osallistuja hylätty",
@@ -1803,7 +1834,9 @@
                 "contract_cta": "Avaa tutkimuksen yleisnäkymä"
             },
             "pagination": {
-                "showing": "Näytetään {{from}}–{{to}} / {{total}}"
+                "showing": "Näytetään {{from}}–{{to}} / {{total}}",
+                "previous": "Edellinen sivu",
+                "next": "Seuraava sivu"
             }
         },
         "team": {
@@ -1987,8 +2020,11 @@
                         "success": "Kutsulinkki luotu!",
                         "error": "Kutsun luominen epäonnistui.",
                         "send": "Luo ja lähetä kutsu",
-                        "copy_success": "Linkki kopioitu leikepöydälle!"
-                    }
+                        "copy_success": "Linkki kopioitu leikepöydälle!",
+                        "copy_link": "Kopioi linkki",
+                        "copied": "Kopioitu"
+                    },
+                    "role_for": "Rooli: {{name}}"
                 }
             }
         },
@@ -2276,6 +2312,13 @@
                 "success": "Sähköposti päivitetty.",
                 "title": "Aseta käyttäjän sähköposti"
             }
+        },
+        "audio": {
+            "download": "Lataa ääni",
+            "recording": "Äänitallenne",
+            "play": "Toista ääni",
+            "pause": "Keskeytä ääni",
+            "seek": "Toistokohta"
         }
     }
 }

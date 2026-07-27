@@ -501,7 +501,12 @@ export function buildColumns({
                         <div className="flex items-center gap-1.5">
                             {p.postsort.email && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={t(
+                                            'admin.data.tooltips.email_provided',
+                                            'Email provided'
+                                        )}
+                                    >
                                         <div className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100">
                                             <Mail className="h-3 w-3" />
                                         </div>
@@ -513,7 +518,12 @@ export function buildColumns({
                             )}
                             {p.postsort.newsletter_consent && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={t(
+                                            'admin.data.tooltips.newsletter_consent',
+                                            'Wants results'
+                                        )}
+                                    >
                                         <div className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100">
                                             <FileText className="h-3 w-3" />
                                         </div>
@@ -528,7 +538,12 @@ export function buildColumns({
                             )}
                             {p.postsort.interview_consent && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={t(
+                                            'admin.data.tooltips.interview_consent',
+                                            'Accepts follow-up'
+                                        )}
+                                    >
                                         <div className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100">
                                             <MessagesSquare className="h-3 w-3" />
                                         </div>
@@ -633,7 +648,12 @@ export function buildColumns({
                         <TooltipProvider>
                             {hasRecruitmentLink && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={`${t(
+                                            'admin.data.tooltips.recruitment_link',
+                                            'Recruitment link'
+                                        )}: ${p.recruitment_token}`}
+                                    >
                                         <div className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200">
                                             <Tag className="h-3 w-3" />
                                         </div>
@@ -649,7 +669,7 @@ export function buildColumns({
                             )}
                             {isSuspect && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger aria-label={t('admin.data.tooltips.suspect')}>
                                         <div className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100">
                                             <AlertTriangle className="h-3 w-3" />
                                         </div>
@@ -661,7 +681,9 @@ export function buildColumns({
                             )}
                             {hasComments && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={t('admin.data.tooltips.has_comments')}
+                                    >
                                         <div className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100">
                                             <MessageSquare className="h-3 w-3" />
                                         </div>
@@ -673,7 +695,12 @@ export function buildColumns({
                             )}
                             {hasAudio && (
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger
+                                        aria-label={t(
+                                            'admin.data.tooltips.has_audio',
+                                            'Has audio responses'
+                                        )}
+                                    >
                                         <div className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100">
                                             <Mic className="h-3 w-3" />
                                         </div>

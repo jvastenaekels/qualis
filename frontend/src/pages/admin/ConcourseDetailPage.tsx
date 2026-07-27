@@ -347,7 +347,10 @@ export default function ConcourseDetailPage() {
                         className="h-9 rounded-xl w-full sm:w-64 bg-white"
                     />
                     <Select value={filterStatus} onValueChange={setFilterStatus}>
-                        <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
+                        <SelectTrigger
+                            className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold"
+                            aria-label={t('admin.concourse.filters.status', 'Filter by status')}
+                        >
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -365,7 +368,10 @@ export default function ConcourseDetailPage() {
                     </Select>
                     {tags && tags.length > 0 && (
                         <Select value={filterTag} onValueChange={setFilterTag}>
-                            <SelectTrigger className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold">
+                            <SelectTrigger
+                                className="h-9 w-full sm:w-36 rounded-xl bg-white text-xs font-bold"
+                                aria-label={t('admin.concourse.filters.tag', 'Filter by tag')}
+                            >
                                 <Tag className="size-3 mr-1" />
                                 <SelectValue />
                             </SelectTrigger>
@@ -747,6 +753,11 @@ export default function ConcourseDetailPage() {
                                                                 'h-7 w-[100px] rounded-lg text-2xs font-bold border',
                                                                 STATUS_COLORS[item.status] ?? ''
                                                             )}
+                                                            aria-label={t(
+                                                                'admin.concourse.status_for',
+                                                                'Status for {{code}}',
+                                                                { code: item.code }
+                                                            )}
                                                         >
                                                             <SelectValue />
                                                         </SelectTrigger>
@@ -1045,6 +1056,11 @@ export default function ConcourseDetailPage() {
                                                         className={cn(
                                                             'h-7 w-[100px] rounded-lg text-2xs font-bold border',
                                                             STATUS_COLORS[item.status] ?? ''
+                                                        )}
+                                                        aria-label={t(
+                                                            'admin.concourse.status_for',
+                                                            'Status for {{code}}',
+                                                            { code: item.code }
                                                         )}
                                                     >
                                                         <SelectValue />
@@ -1628,6 +1644,7 @@ export default function ConcourseDetailPage() {
                                 className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                                 disabled={!newTagName.trim() || isCreatingTag}
                                 onClick={handleCreateTag}
+                                aria-label={t('admin.concourse.create_tag', 'Create tag')}
                             >
                                 {isCreatingTag ? (
                                     <Loader2 className="size-3.5 animate-spin" />
@@ -1672,6 +1689,11 @@ export default function ConcourseDetailPage() {
                                                     size="sm"
                                                     className="h-7 px-2 text-slate-400 text-xs"
                                                     onClick={() => setDeleteTagId(null)}
+                                                    aria-label={t(
+                                                        'admin.concourse.cancel_delete_tag',
+                                                        'Cancel deleting {{tag}}',
+                                                        { tag: tag.name }
+                                                    )}
                                                 >
                                                     <X className="size-3" />
                                                 </Button>
@@ -1682,6 +1704,11 @@ export default function ConcourseDetailPage() {
                                                 size="sm"
                                                 className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
                                                 onClick={() => setDeleteTagId(tag.id)}
+                                                aria-label={t(
+                                                    'admin.concourse.delete_tag',
+                                                    'Delete {{tag}}',
+                                                    { tag: tag.name }
+                                                )}
                                             >
                                                 <Trash2 className="size-3.5" />
                                             </Button>

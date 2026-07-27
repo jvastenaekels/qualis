@@ -14,6 +14,13 @@ interface ImageUploadInputProps {
     maxFileSize?: number; // in bytes, default 500KB
     id?: string;
     name?: string;
+    /**
+     * Accessible name for the "remove image" button. Callers that render more
+     * than one ImageUploadInput side by side (e.g. one per partner logo) should
+     * pass a discriminator here — otherwise every instance reads identically to
+     * a screen reader. Falls back to a generic "Remove image".
+     */
+    removeAriaLabel?: string;
 }
 
 const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
@@ -24,6 +31,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
     maxFileSize = 500 * 1024, // 500KB default
     id,
     name,
+    removeAriaLabel,
 }) => {
     const { t } = useTranslation();
     const [mode, setMode] = useState<'url' | 'upload'>('url');
@@ -256,6 +264,10 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                         type="button"
                         onClick={handleClear}
                         className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                        aria-label={
+                            removeAriaLabel ??
+                            t('admin.design.theme.upload.remove_default', 'Remove image')
+                        }
                     >
                         <X className="h-3.5 w-3.5" />
                     </button>
