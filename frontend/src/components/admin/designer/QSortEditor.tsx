@@ -136,7 +136,7 @@ function SortableStatementItem({
                 <div
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
+                    className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
                 >
                     <GripVertical className="h-4 w-4" />
                 </div>
@@ -204,31 +204,34 @@ function SortableStatementItem({
                 </>
             ) : (
                 <>
-                    <div
-                        role="button"
-                        tabIndex={0}
+                    <button
+                        type="button"
+                        aria-disabled={readOnly}
                         className={cn(
-                            'flex-1 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
+                            'flex-1 block w-full text-left select-text px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
                             !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
                         )}
                         onClick={() => {
+                            // A native `disabled` button blocks the mouse
+                            // events a text-selection drag needs, in every
+                            // browser, regardless of `user-select` — so
+                            // read-only inertness is enforced here instead
+                            // (the guard the original <div> already had),
+                            // keeping the element focusable and its text
+                            // selectable/copyable while a study is
+                            // collecting. `aria-disabled` communicates the
+                            // non-operability to assistive tech; Enter/Space
+                            // route through this same onClick, so both are
+                            // inert too.
                             if (readOnly) return;
                             setEditingId(item.code);
                             setEditingText(item.text);
                             setEditingCode(item.code);
                         }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                setEditingId(item.code);
-                                setEditingText(item.text);
-                                setEditingCode(item.code);
-                                e.preventDefault();
-                            }
-                        }}
                         title={t('admin.components.click_to_edit')}
                     >
                         {item.text}
-                    </div>
+                    </button>
                     {staleInfo && !readOnly && !structureLocked && (
                         <TooltipProvider>
                             <Tooltip>
@@ -295,7 +298,7 @@ function SortableStatementItem({
                                 });
                             }}
                             aria-label={t('common.delete', 'Delete')}
-                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all"
+                            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>

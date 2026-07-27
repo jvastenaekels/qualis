@@ -282,7 +282,7 @@ export function AnalysisHistoryPanel({
                                             <span className="text-xs text-slate-500">
                                                 {run.extraction_method.toUpperCase()}
                                             </span>
-                                            <span className="text-slate-300 text-xs">·</span>
+                                            <span className="text-slate-500 text-xs">·</span>
                                             <span className="text-xs text-slate-500">
                                                 {t(
                                                     'admin.analysis.history.n_factors_label',
@@ -290,17 +290,17 @@ export function AnalysisHistoryPanel({
                                                     { n: run.n_factors }
                                                 )}
                                             </span>
-                                            <span className="text-slate-300 text-xs">·</span>
+                                            <span className="text-slate-500 text-xs">·</span>
                                             <span className="text-xs text-slate-500">
                                                 {run.rotation_method}
                                             </span>
-                                            <span className="text-slate-300 text-xs">·</span>
+                                            <span className="text-slate-500 text-xs">·</span>
                                             <span className="text-xs text-slate-500">
                                                 {run.flagging_mode}
                                             </span>
                                             {run.ran_by_email && (
                                                 <>
-                                                    <span className="text-slate-300 text-xs">
+                                                    <span className="text-slate-500 text-xs">
                                                         ·
                                                     </span>
                                                     <span className="text-xs text-slate-400 italic">

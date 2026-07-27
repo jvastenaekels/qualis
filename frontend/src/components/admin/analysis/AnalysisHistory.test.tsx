@@ -255,6 +255,39 @@ describe('AnalysisHistoryPanel', () => {
         expect(screen.getByText('manual')).toBeInTheDocument();
     });
 
+    // ── Test 4b: The metadata separators are legible, not 1.45:1 (Task 6.7d) ──
+    it('renders the metadata separator dots at a legible contrast', () => {
+        const run = makeRun({ id: 1 });
+        mockListRunsHook.mockReturnValue({
+            data: [run],
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+        });
+
+        renderWithProviders(
+            <AnalysisHistoryPanel
+                slug="test-study"
+                viewedRunId={null}
+                latestRunId={null}
+                onLoadRun={vi.fn()}
+            />
+        );
+
+        // Four "·" separators sit between extraction/n_factors/rotation/flagging,
+        // plus one before the researcher email (ran_by_email is set by makeRun).
+        const dots = screen.getAllByText('·');
+        expect(dots).toHaveLength(4);
+        for (const dot of dots) {
+            expect(dot).toHaveClass('text-slate-500');
+            expect(dot).not.toHaveClass('text-slate-300');
+        }
+        // The row itself stays a real, named, clickable control — the color
+        // change didn't touch the control's operability (proven end-to-end by
+        // Test 2's click-to-load assertion above).
+        expect(screen.getByRole('button', { name: /Load analysis run from/i })).toBeInTheDocument();
+    });
+
     // ── Test 5: Current tag shown when latestRunId matches a run ──────────
     it('shows "current" tag on the run matching latestRunId', () => {
         const run = makeRun({ id: 99 });

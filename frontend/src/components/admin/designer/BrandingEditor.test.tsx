@@ -84,3 +84,33 @@ describe('BrandingEditor — control names (Task 6.7c)', () => {
         expect(screen.getByRole('button', { name: 'Remove Partner 2' })).toBeInTheDocument();
     });
 });
+
+describe('BrandingEditor — remove-partner button contrast (Task 6.7d)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: convenient partial mock
+    const mockDraft: any = {
+        slug: 'test-study',
+        state: 'draft',
+        branding: {
+            logo_url: null,
+            accent_color: null,
+            partners: [{ id: 'partner-1', name: 'Acme University', logo_url: null }],
+        },
+    };
+
+    it('renders the remove-partner icon at a legible contrast and keeps it operable', async () => {
+        const user = userEvent.setup();
+        renderWithStore(<BrandingEditor />, {
+            initialState: { draft: mockDraft, activeLocale: 'en' },
+        });
+
+        const removeButton = screen.getByRole('button', { name: 'Remove Acme University' });
+        expect(removeButton).toHaveClass('text-slate-500');
+        expect(removeButton).not.toHaveClass('text-slate-300');
+
+        await user.click(removeButton);
+        // Operable end to end: the partner row is gone from the DOM.
+        expect(
+            screen.queryByRole('button', { name: 'Remove Acme University' })
+        ).not.toBeInTheDocument();
+    });
+});

@@ -181,30 +181,10 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
 
             {/* Upload Mode */}
             {mode === 'upload' && (
-                <div
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    className={cn(
-                        'border-2 border-dashed rounded-xl p-6 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-                        isDragging
-                            ? 'border-indigo-400 bg-indigo-50'
-                            : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
-                    )}
-                    onClick={() => fileInputRef.current?.click()}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            fileInputRef.current?.click();
-                        }
-                    }}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={t(
-                        'admin.design.theme.upload.drag_drop',
-                        'Drag & drop or click to upload'
-                    )}
-                >
+                <div className="relative">
+                    {/* Kept outside the button below: a <button> may not contain
+                        interactive content per the HTML content model, and a
+                        native file <input> counts as interactive even hidden. */}
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -212,33 +192,51 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                         onChange={handleFileInputChange}
                         className="hidden"
                     />
-                    <div className="flex flex-col items-center justify-center gap-2 text-center">
-                        {isConverting ? (
-                            <>
-                                <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
-                                <p className="text-xs font-medium text-slate-600">
-                                    {t(
-                                        'admin.design.theme.upload.processing',
-                                        'Processing image...'
-                                    )}
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <Upload className="h-8 w-8 text-slate-400" />
-                                <p className="text-sm font-medium text-slate-700">
-                                    {t(
-                                        'admin.design.theme.upload.drag_drop',
-                                        'Drag & drop or click to upload'
-                                    )}
-                                </p>
-                                <p className="text-xs text-slate-500">
-                                    PNG, JPG, SVG • {t('admin.design.theme.upload.max', 'Max')}{' '}
-                                    {Math.round(maxFileSize / 1024)}KB
-                                </p>
-                            </>
+                    <button
+                        type="button"
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onClick={() => fileInputRef.current?.click()}
+                        className={cn(
+                            'block w-full text-left border-2 border-dashed rounded-xl p-6 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
+                            isDragging
+                                ? 'border-indigo-400 bg-indigo-50'
+                                : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
                         )}
-                    </div>
+                        aria-label={t(
+                            'admin.design.theme.upload.drag_drop',
+                            'Drag & drop or click to upload'
+                        )}
+                    >
+                        <div className="flex flex-col items-center justify-center gap-2 text-center">
+                            {isConverting ? (
+                                <>
+                                    <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
+                                    <p className="text-xs font-medium text-slate-600">
+                                        {t(
+                                            'admin.design.theme.upload.processing',
+                                            'Processing image...'
+                                        )}
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload className="h-8 w-8 text-slate-400" />
+                                    <p className="text-sm font-medium text-slate-700">
+                                        {t(
+                                            'admin.design.theme.upload.drag_drop',
+                                            'Drag & drop or click to upload'
+                                        )}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                        PNG, JPG, SVG • {t('admin.design.theme.upload.max', 'Max')}{' '}
+                                        {Math.round(maxFileSize / 1024)}KB
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </button>
                 </div>
             )}
 

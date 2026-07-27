@@ -300,6 +300,27 @@ describe('QuestionBuilder — action-button accessible names (Task 6.7c)', () =>
         expect(screen.getByRole('button', { name: 'Delete First question' })).toBeInTheDocument();
     });
 
+    it('renders the drag-handle icon at a legible contrast (review fix-round, Task 6.7d)', () => {
+        renderBuilder({
+            draft: {
+                postsort_config: {
+                    questions: {
+                        q1: { type: 'text', label: 'First question', required: false },
+                    },
+                },
+            },
+        });
+
+        const item = screen.getByTestId('question-item');
+        // dnd-kit's useSortable spreads {...attributes} onto this div, which
+        // injects role="button" — no accessible name, so it's found by class
+        // rather than by role+name.
+        const dragHandle = item.querySelector('.cursor-grab');
+        expect(dragHandle).not.toBeNull();
+        expect(dragHandle).toHaveClass('text-slate-500');
+        expect(dragHandle).not.toHaveClass('text-slate-300');
+    });
+
     it('discriminates the "import from another language" trigger by the question label', () => {
         renderBuilder({
             draft: {
@@ -355,5 +376,41 @@ describe('QuestionBuilder — action-button accessible names (Task 6.7c)', () =>
 
         expect(screen.getByRole('button', { name: 'Remove Option 1' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Remove Option 2' })).toBeInTheDocument();
+    });
+
+    it('renders the delete/import/remove-option icons at a legible contrast (Task 6.7d)', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                translations: [{ language_code: 'en' }, { language_code: 'fr' }],
+                postsort_config: {
+                    questions: {
+                        q1: {
+                            type: 'select',
+                            label: 'Pick one',
+                            required: false,
+                            options: ['Alpha', 'Beta'],
+                        },
+                    },
+                },
+            },
+        });
+
+        const deleteButton = screen.getByRole('button', { name: 'Delete Pick one' });
+        expect(deleteButton).toHaveClass('text-slate-500');
+        expect(deleteButton).not.toHaveClass('text-slate-300');
+
+        const importButton = screen.getByRole('button', {
+            name: 'Import Pick one from another language',
+        });
+        expect(importButton).toHaveClass('text-slate-500');
+        expect(importButton).not.toHaveClass('text-slate-300');
+
+        const trigger = await screen.findByTestId('question-accordion-trigger');
+        await user.click(trigger);
+
+        const removeOption = screen.getByRole('button', { name: 'Remove Option 1' });
+        expect(removeOption).toHaveClass('text-slate-500');
+        expect(removeOption).not.toHaveClass('text-slate-300');
     });
 });

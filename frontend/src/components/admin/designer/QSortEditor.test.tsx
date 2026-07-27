@@ -178,6 +178,32 @@ describe('QSortEditor', () => {
             expect(screen.queryByText('Existing Statement')).not.toBeInTheDocument();
         });
 
+        it('renders the delete-statement icon at a legible contrast (Task 6.7d)', () => {
+            renderEditor();
+
+            const statementItem = screen.getByText('Existing Statement').closest('.group');
+            expect(statementItem).toBeInTheDocument();
+            // biome-ignore lint/style/noNonNullAssertion: test setup
+            const deleteButton = within(statementItem!).getByRole('button', { name: 'Delete' });
+            expect(deleteButton).toHaveClass('text-slate-500');
+            expect(deleteButton).not.toHaveClass('text-slate-300');
+        });
+
+        it('renders the drag-handle icon at a legible contrast (review fix-round, Task 6.7d)', () => {
+            renderEditor();
+
+            const statementItem = screen.getByText('Existing Statement').closest('.group');
+            expect(statementItem).toBeInTheDocument();
+            // dnd-kit's useSortable spreads {...attributes} onto this div,
+            // which injects role="button" — no accessible name, so it's found
+            // by class rather than by role+name.
+            // biome-ignore lint/style/noNonNullAssertion: test setup
+            const dragHandle = statementItem!.querySelector('.cursor-grab');
+            expect(dragHandle).not.toBeNull();
+            expect(dragHandle).toHaveClass('text-slate-500');
+            expect(dragHandle).not.toHaveClass('text-slate-300');
+        });
+
         it('names the save/cancel controls by the statement code being edited (Task 6.7c)', async () => {
             const user = userEvent.setup();
             renderEditor();
@@ -186,6 +212,92 @@ describe('QSortEditor', () => {
 
             expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Cancel editing s1' })).toBeInTheDocument();
+        });
+
+        describe('click-to-edit control is a real, keyboard-operable button (Task 6.7d)', () => {
+            it('is a native <button> with no hand-rolled role/tabIndex, and enters edit mode on Enter', async () => {
+                const user = userEvent.setup();
+                renderEditor();
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl.tagName).toBe('BUTTON');
+                expect(editControl).not.toHaveAttribute('role');
+                expect(editControl).not.toHaveAttribute('tabindex');
+
+                editControl.focus();
+                await user.keyboard('{Enter}');
+
+                expect(screen.getByRole('button', { name: 'Save s1' })).toBeInTheDocument();
+            });
+
+            // Review fix-round 2: a native `disabled` button blocks the mouse
+            // events a text-selection drag needs, in every browser,
+            // regardless of `user-select` (verified live — see the
+            // select-text entry below and the report). Since a read-only
+            // study is exactly the state where statements get read and
+            // quoted, this control now stays focusable and selectable —
+            // `aria-disabled` communicates non-operability to assistive tech,
+            // and the `onClick` guard (restored — the original <div> already
+            // had it) keeps Enter/Space inert without removing the element
+            // from the tab order or from `window.getSelection()`'s reach.
+            it('is aria-disabled — not natively disabled — when the editor is read-only, so its text stays selectable', () => {
+                renderWithStore(
+                    <TooltipProvider>
+                        <QSortEditor readOnly />
+                    </TooltipProvider>,
+                    { initialState: { draft: mockDraft, activeLocale: 'en' } }
+                );
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl).toHaveAttribute('aria-disabled', 'true');
+                expect(editControl).not.toBeDisabled();
+            });
+
+            it('no-ops on click and on Enter when read-only — the guard does what `disabled` used to', async () => {
+                const user = userEvent.setup();
+                renderWithStore(
+                    <TooltipProvider>
+                        <QSortEditor readOnly />
+                    </TooltipProvider>,
+                    { initialState: { draft: mockDraft, activeLocale: 'en' } }
+                );
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+
+                await user.click(editControl);
+                expect(screen.queryByRole('button', { name: /^Save /i })).not.toBeInTheDocument();
+
+                editControl.focus();
+                expect(editControl).toHaveFocus();
+                await user.keyboard('{Enter}');
+                expect(screen.queryByRole('button', { name: /^Save /i })).not.toBeInTheDocument();
+            });
+
+            // Review fix-round: Firefox's UA stylesheet sets `user-select: none`
+            // on <button> (Chromium's default is `auto`, which does not block
+            // selection) — a plain <div> defaults to `auto` in every engine, so
+            // this regressed statement-text selection/copy specifically in
+            // Firefox when this control became a <button>. `select-text`
+            // overrides the UA default explicitly.
+            //
+            // A computed-style or real drag-select assertion is NOT expressible
+            // here: happy-dom (this project's test environment, see
+            // vitest.config.ts) loads no stylesheet at all, UA or Tailwind —
+            // verified directly, `getComputedStyle(button).userSelect` reads
+            // `''` for a bare <button> AND for one with the `select-text`
+            // class, in this environment, always. An assertion against
+            // computed style here could never fail, which is worse than no
+            // assertion — it would look like coverage without being any. The
+            // only thing checkable in this environment is that the class
+            // making the override is actually present on the shipped element;
+            // the cross-engine behavior itself was verified live (headless
+            // Chromium here, Firefox by the reviewer) outside the test suite.
+            it('carries select-text, overriding the Firefox UA default that would block copying statement text', () => {
+                renderEditor();
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl).toHaveClass('select-text');
+            });
         });
 
         it('clears all statements with confirmation', async () => {

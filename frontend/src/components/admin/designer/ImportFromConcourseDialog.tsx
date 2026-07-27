@@ -247,19 +247,24 @@ export function ImportFromConcourseDialog({
                             </div>
                             <div className="divide-y divide-slate-50">
                                 {filteredItems.map((item) => (
-                                    <div
+                                    // A native <label> wrapping the Checkbox, not a
+                                    // role="button" div: this row already contains a
+                                    // real interactive control (Checkbox renders a real
+                                    // <button role="checkbox">), so wrapping the whole
+                                    // row in ANOTHER button would nest interactive
+                                    // controls (invalid content model) and, worse,
+                                    // double-toggle on every click (the outer button's
+                                    // onClick plus the checkbox's own onCheckedChange).
+                                    // <label> gives "click anywhere in the row toggles
+                                    // the checkbox" for free via native label/control
+                                    // association — no onClick/onKeyDown needed — and
+                                    // it also gives the checkbox a real accessible name
+                                    // from the row's own text (the div it replaces had
+                                    // none).
+                                    <label
                                         key={item.id}
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => toggleItem(item.id)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === ' ' || e.key === 'Enter') {
-                                                e.preventDefault();
-                                                toggleItem(item.id);
-                                            }
-                                        }}
                                         className={cn(
-                                            'flex items-start gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
+                                            'flex items-start gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors',
                                             selectedItemIds.has(item.id) && 'bg-indigo-50/30'
                                         )}
                                     >
@@ -291,7 +296,7 @@ export function ImportFromConcourseDialog({
                                                 {getItemText(item)}
                                             </p>
                                         </div>
-                                    </div>
+                                    </label>
                                 ))}
                             </div>
                         </div>

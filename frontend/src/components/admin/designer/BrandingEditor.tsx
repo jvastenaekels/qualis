@@ -352,7 +352,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                         ).filter((_, i) => i !== index);
                                                         updateBranding('partners', newPartners);
                                                     }}
-                                                    className="text-slate-300 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
+                                                    className="text-slate-500 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
                                                     aria-label={t(
                                                         'admin.design.theme.partners.remove',
                                                         'Remove {{name}}',
