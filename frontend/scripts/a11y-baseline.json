@@ -91,9 +91,6 @@
         }
     },
     "suppressedLabelErrors": {
-        "src/components/admin/designer/ImportFromConcourseDialog.tsx": {
-            "Label#2851b69212": 1
-        },
         "src/components/admin/designer/InterfaceEditor.tsx": {
             "Label#82b1d76fc7": 1,
             "Label#941606f737": 1,

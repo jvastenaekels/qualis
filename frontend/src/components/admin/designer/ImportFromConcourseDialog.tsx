@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Library, Loader2, Upload } from 'lucide-react';
@@ -174,10 +173,14 @@ export function ImportFromConcourseDialog({
                     {/* Options */}
                     <div className="flex flex-col sm:flex-row sm:items-end gap-3">
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
+                            <Label
+                                htmlFor="concourse-import-code-prefix"
+                                className="text-2xs font-black text-slate-500"
+                            >
                                 {t('admin.concourse_import.code_prefix', 'Code prefix')}
                             </Label>
                             <Input
+                                id="concourse-import-code-prefix"
                                 value={codePrefix}
                                 onChange={(e) => setCodePrefix(e.target.value)}
                                 placeholder={t(
