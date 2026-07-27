@@ -1,5 +1,37 @@
 {
-    "unnamedControls": {},
-    "lowContrastControls": {},
+    "unnamedControls": {
+        "src/components/admin/designer/ConditionOfInstructionEditor.tsx": {
+            "input#9c9b70dc01": 1
+        },
+        "src/components/admin/designer/ImageUploadInput.tsx": {
+            "input#407bf21f43": 1
+        },
+        "src/components/admin/designer/ProcessStepEditor.tsx": {
+            "div#9d3518e459": 1
+        },
+        "src/components/admin/designer/QSortEditor.tsx": {
+            "div#9d3518e459": 1
+        },
+        "src/components/admin/designer/QuestionBuilder.tsx": {
+            "div#9d3518e459": 1
+        },
+        "src/components/admin/memo/MemoEntry.tsx": {
+            "input#85a4b6a402": 1
+        },
+        "src/components/admin/memo/MemoSection.tsx": {
+            "input#323f9f9095": 1
+        },
+        "src/hooks/admin/useImportExportConfig.tsx": {
+            "input#407bf21f43": 1
+        },
+        "src/pages/admin/ConcourseDetailPage.tsx": {
+            "input#407bf21f43": 1
+        }
+    },
+    "lowContrastControls": {
+        "src/components/SortableCard.tsx": {
+            "div#7c0b7ced85": 1
+        }
+    },
     "suppressedLabelErrors": {}
 }
