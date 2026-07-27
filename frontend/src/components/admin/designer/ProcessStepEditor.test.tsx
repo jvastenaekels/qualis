@@ -203,3 +203,46 @@ describe('ProcessStepEditor — inconsistent feature flags banner', () => {
         expect(items).toHaveLength(2);
     });
 });
+
+describe('ProcessStepEditor — step field accessible names (Task 6.7b)', () => {
+    const expandTheOneStep = async (user: ReturnType<typeof userEvent.setup>) => {
+        const draft = buildDraft([otherStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+        await user.click(screen.getByRole('button', { name: /toggle/i }));
+    };
+
+    it('names the "Step title" field and lets its label focus it', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        const field = await screen.findByRole('textbox', { name: /^step title$/i });
+        await user.click(screen.getByText('Step title'));
+        expect(field).toHaveFocus();
+    });
+
+    it('names the "Short description" and "Color" fields', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        expect(
+            await screen.findByRole('textbox', { name: /^short description$/i })
+        ).toBeInTheDocument();
+        // The color swatch <input type="color"> has no ARIA role in jsdom, so
+        // getByLabelText (which also resolves via htmlFor/id) stands in for
+        // getByRole here — same as the datetime-local case elsewhere in 6.7b.
+        expect(screen.getByLabelText('Color')).toBeInTheDocument();
+    });
+
+    it('renders "Icon" as plain text heading a group of individually-named icon buttons', async () => {
+        const user = userEvent.setup();
+        await expandTheOneStep(user);
+
+        const heading = await screen.findByText('Icon');
+        expect(heading.tagName).not.toBe('LABEL');
+        // Each icon button in the picker already carries its own name (title=)
+        // — this fix didn't touch that, only stopped mislabelling the group.
+        expect(screen.getByRole('button', { name: 'User' })).toBeInTheDocument();
+    });
+});

@@ -1,4 +1,3 @@
-// biome-ignore-all lint/a11y/noLabelWithoutControl: pre-existing backlog measured 2026-07-27 by task 6.7a; remove this line when the file's labels get htmlFor (task 6.7b).
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import {
@@ -138,10 +137,14 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                 <div className="grid gap-6 sm:grid-cols-2">
                                     <div className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label className="text-2xs font-black text-slate-500">
+                                            <Label
+                                                htmlFor={`step-title-${id}`}
+                                                className="text-2xs font-black text-slate-500"
+                                            >
                                                 {t('admin.design.intro.process_steps.fields.title')}
                                             </Label>
                                             <Input
+                                                id={`step-title-${id}`}
                                                 value={step.title}
                                                 className="h-11 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
                                                 onChange={(e) =>
@@ -155,12 +158,16 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label className="text-2xs font-black text-slate-500">
+                                            <Label
+                                                htmlFor={`step-description-${id}`}
+                                                className="text-2xs font-black text-slate-500"
+                                            >
                                                 {t(
                                                     'admin.design.intro.process_steps.fields.description'
                                                 )}
                                             </Label>
                                             <Textarea
+                                                id={`step-description-${id}`}
                                                 value={step.description}
                                                 onChange={(e) =>
                                                     onUpdate({
@@ -179,9 +186,12 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
 
                                     <div className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label className="text-2xs font-black text-slate-500">
+                                            {/* Heads a grid of 16 individually-named icon buttons
+                                                (each has its own title), not one control — a real
+                                                heading element, not the form-field <Label>. */}
+                                            <p className="text-2xs font-black text-slate-500">
                                                 {t('admin.design.intro.process_steps.fields.icon')}
-                                            </Label>
+                                            </p>
                                             <IconPicker
                                                 selectedIcon={step.icon}
                                                 onChange={(icon) => onUpdate({ ...step, icon })}
@@ -190,7 +200,10 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label className="text-2xs font-black text-slate-500">
+                                            <Label
+                                                htmlFor={`step-color-${id}`}
+                                                className="text-2xs font-black text-slate-500"
+                                            >
                                                 {t(
                                                     'admin.design.intro.process_steps.fields.color',
                                                     'Color'
@@ -199,6 +212,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                             <div className="flex items-center gap-3">
                                                 <div className="relative group/color">
                                                     <Input
+                                                        id={`step-color-${id}`}
                                                         type="color"
                                                         value={step.color || '#3b82f6'}
                                                         onChange={(e) =>
