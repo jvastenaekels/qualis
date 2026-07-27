@@ -1914,7 +1914,9 @@
         "contract_cta": "Otwórz widok ogólny badania"
       },
       "pagination": {
-        "showing": "Pokazuję {{from}}–{{to}} z {{total}}"
+        "showing": "Pokazuję {{from}}–{{to}} z {{total}}",
+        "previous": "Poprzednia strona",
+        "next": "Następna strona"
       }
     },
     "team": {

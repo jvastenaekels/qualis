@@ -1914,7 +1914,9 @@
                 "contract_cta": "Onderzoeksoverzicht openen"
             },
             "pagination": {
-                "showing": "{{from}}–{{to}} van {{total}} weergegeven"
+                "showing": "{{from}}–{{to}} van {{total}} weergegeven",
+                "previous": "Vorige pagina",
+                "next": "Volgende pagina"
             }
         },
         "team": {

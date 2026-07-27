@@ -1914,7 +1914,9 @@
                 "contract_cta": "Studienübersicht öffnen"
             },
             "pagination": {
-                "showing": "{{from}}–{{to}} von {{total}} angezeigt"
+                "showing": "{{from}}–{{to}} von {{total}} angezeigt",
+                "previous": "Vorherige Seite",
+                "next": "Nächste Seite"
             }
         },
         "team": {

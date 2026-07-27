@@ -101,3 +101,38 @@ describe('InteractiveDataView — responses table header/body alignment', () => 
         expect(await screen.findByRole('columnheader', { name: /lang/i })).toBeInTheDocument();
     });
 });
+
+describe('InteractiveDataView — control names (Task 6.7c)', () => {
+    it('names the pagination and "more actions" controls', async () => {
+        // PAGE_SIZE is 25; 30 live (non-discarded) participants on a draft
+        // study exercises both the pagination buttons (page count > 1) and
+        // the kebab "more actions" menu (liveCount > 0 && state === 'draft').
+        const participants = Array.from({ length: 30 }, (_, i) =>
+            makeParticipant({ id: `p${i}`, db_id: i })
+        );
+        mockDumpQuery.mockReturnValue({
+            data: {
+                study: {
+                    slug: 'demo',
+                    statements: [],
+                    translations: [{ lang: 'en', title: 'Study' }],
+                    presort_config: {},
+                    postsort_config: {},
+                    state: 'draft',
+                    rough_sort_enabled: true,
+                },
+                participants,
+                statement_id_to_index: {},
+            } as unknown as DumpResponse,
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'More actions' })).toBeInTheDocument();
+    });
+});

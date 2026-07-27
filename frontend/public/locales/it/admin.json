@@ -1914,7 +1914,9 @@
                 "contract_cta": "Apri panoramica studio"
             },
             "pagination": {
-                "showing": "Visualizzazione {{from}}–{{to}} di {{total}}"
+                "showing": "Visualizzazione {{from}}–{{to}} di {{total}}",
+                "previous": "Pagina precedente",
+                "next": "Pagina successiva"
             }
         },
         "team": {

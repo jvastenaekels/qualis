@@ -1864,7 +1864,9 @@
                 "contract_cta": "Ouvrir la vue d'ensemble"
             },
             "pagination": {
-                "showing": "{{from}}–{{to}} sur {{total}}"
+                "showing": "{{from}}–{{to}} sur {{total}}",
+                "previous": "Page précédente",
+                "next": "Page suivante"
             }
         },
         "empty_states": {

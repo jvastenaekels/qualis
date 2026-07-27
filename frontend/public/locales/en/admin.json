@@ -1916,7 +1916,9 @@
                 "contract_cta": "Open study overview"
             },
             "pagination": {
-                "showing": "Showing {{from}}–{{to}} of {{total}}"
+                "showing": "Showing {{from}}–{{to}} of {{total}}",
+                "previous": "Previous page",
+                "next": "Next page"
             }
         },
         "team": {

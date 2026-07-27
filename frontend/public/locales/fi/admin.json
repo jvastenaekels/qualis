@@ -1826,7 +1826,9 @@
                 "contract_cta": "Avaa tutkimuksen yleisnäkymä"
             },
             "pagination": {
-                "showing": "Näytetään {{from}}–{{to}} / {{total}}"
+                "showing": "Näytetään {{from}}–{{to}} / {{total}}",
+                "previous": "Edellinen sivu",
+                "next": "Seuraava sivu"
             }
         },
         "team": {

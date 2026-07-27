@@ -1914,7 +1914,9 @@
                 "contract_cta": "Abrir resumen del estudio"
             },
             "pagination": {
-                "showing": "Mostrando {{from}}–{{to}} de {{total}}"
+                "showing": "Mostrando {{from}}–{{to}} de {{total}}",
+                "previous": "Página anterior",
+                "next": "Página siguiente"
             }
         },
         "team": {
