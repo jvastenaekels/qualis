@@ -133,16 +133,18 @@ function SortableStatementItem({
             )}
         >
             {!readOnly && !structureLocked && !isEditing && (
-                // useSortable's {...attributes} spread injects role="button" (and
-                // tabIndex={0}) at runtime — verified against @dnd-kit/core's source:
-                // defaultRole = 'button', and this call site passes no attributes
-                // override. Biome infers a role from JSX statically and cannot see one a
-                // spread injects, so it reads this as a roleless <div> and rejects
-                // aria-label below as unsupported on it.
-                // biome-ignore lint/a11y/useAriaPropsSupportedByRole: see comment above
                 <div
                     {...attributes}
                     {...listeners}
+                    // Literal, after the spread: useSortable's {...attributes} already
+                    // sets these (defaultRole = 'button', tabIndex default 0 — verified
+                    // against @dnd-kit/core's source) so this changes nothing at runtime.
+                    // It exists so Biome's useAriaPropsSupportedByRole can see the role
+                    // statically instead of inferring a roleless <div> from JSX and
+                    // rejecting aria-label below — matches the pattern SortableCard.tsx
+                    // already uses with no suppression needed.
+                    role="button"
+                    tabIndex={0}
                     aria-label={t('admin.design.qsort.set.reorder_item', 'Reorder {{code}}', {
                         code: item.code,
                     })}

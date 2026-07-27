@@ -144,11 +144,17 @@ describe('SortableCard', () => {
         // Task 6.7h: check-a11y-names.mjs widened CONTRAST_BEARING matching to a
         // control's effective role, catching this role="button" div for the first
         // time — the code watermark (the sighted user's only visible cue for a
-        // statement's code while dragging) was sitting at text-slate-300/80, below
-        // text-slate-300's own already-failing 1.45:1 (1.4.3/1.4.11 need 4.5:1/3:1).
+        // statement's code while dragging) was originally text-slate-300 (1.48:1).
+        // The first fix round moved it to text-slate-500/80 — still failing, at
+        // 3.24:1, because the /80 alpha modifier degrades an otherwise-passing
+        // colour and the gate's LOW_CONTRAST_CLASS check didn't know that. Now
+        // plain text-slate-500, no alpha: 4.76:1 against white, passing WCAG
+        // 1.4.3's 4.5:1 for this small (text-2xs) bold text.
         render(<SortableCard {...defaultProps} code="S1" />);
         const watermark = screen.getByText('S1');
-        expect(watermark).toHaveClass('text-slate-500/80');
+        expect(watermark).toHaveClass('text-slate-500');
+        expect(watermark).not.toHaveClass('text-slate-500/80');
+        expect(watermark).not.toHaveClass('text-slate-300');
         expect(watermark).not.toHaveClass('text-slate-300/80');
     });
 

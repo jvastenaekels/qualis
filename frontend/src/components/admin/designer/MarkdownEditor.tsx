@@ -137,6 +137,19 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                 {/* Content */}
                 <div className="relative min-h-[120px]">
                     {view === 'edit' ? (
+                        // a11y-baseline: this textarea's own `label` prop is empty/absent at
+                        // all three real call sites (IntroductionEditor.tsx's objective /
+                        // instructions / consent-description fields), so the internal
+                        // {label && <label htmlFor={id}>} block above never renders — but
+                        // each call site instead places a `<Label htmlFor="…">` matching this
+                        // `id` prop in ITS OWN file (IntroductionEditor.tsx), and HTML
+                        // label/id association is a pure DOM mechanism that doesn't care
+                        // which React component rendered which element. Verified live with a
+                        // getByRole probe rendering <Label htmlFor="objective"> next to
+                        // <MarkdownEditor id="objective">, exactly as the real call site does
+                        // (task 6.7h, 2026-07-28): resolves a name. The gate's
+                        // collectLabelTargets() only looks within the file it's scanning, so
+                        // this cross-file pairing is structurally invisible to it.
                         <textarea
                             id={id || 'md-editor'}
                             value={value}

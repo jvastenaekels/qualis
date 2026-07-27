@@ -9,12 +9,6 @@
         "src/components/admin/designer/MarkdownEditor.tsx": {
             "textarea#001b1a9107": 1
         },
-        "src/components/admin/memo/CommentThread.tsx": {
-            "textarea#a0fdb6d14f": 1
-        },
-        "src/components/admin/memo/MemoEntry.tsx": {
-            "textarea#a0fdb6d14f": 1
-        },
         "src/hooks/admin/useImportExportConfig.tsx": {
             "input#407bf21f43": 1
         },
@@ -22,10 +16,6 @@
             "input#407bf21f43": 1
         }
     },
-    "lowContrastControls": {
-        "src/components/SortableCard.tsx": {
-            "div#7c0b7ced85": 1
-        }
-    },
+    "lowContrastControls": {},
     "suppressedLabelErrors": {}
 }
