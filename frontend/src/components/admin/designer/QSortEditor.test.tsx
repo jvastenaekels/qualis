@@ -189,6 +189,21 @@ describe('QSortEditor', () => {
             expect(deleteButton).not.toHaveClass('text-slate-300');
         });
 
+        it('renders the drag-handle icon at a legible contrast (review fix-round, Task 6.7d)', () => {
+            renderEditor();
+
+            const statementItem = screen.getByText('Existing Statement').closest('.group');
+            expect(statementItem).toBeInTheDocument();
+            // dnd-kit's useSortable spreads {...attributes} onto this div,
+            // which injects role="button" — no accessible name, so it's found
+            // by class rather than by role+name.
+            // biome-ignore lint/style/noNonNullAssertion: test setup
+            const dragHandle = statementItem!.querySelector('.cursor-grab');
+            expect(dragHandle).not.toBeNull();
+            expect(dragHandle).toHaveClass('text-slate-500');
+            expect(dragHandle).not.toHaveClass('text-slate-300');
+        });
+
         it('names the save/cancel controls by the statement code being edited (Task 6.7c)', async () => {
             const user = userEvent.setup();
             renderEditor();
@@ -225,6 +240,32 @@ describe('QSortEditor', () => {
 
                 const editControl = screen.getByRole('button', { name: 'Existing Statement' });
                 expect(editControl).toBeDisabled();
+            });
+
+            // Review fix-round: Firefox's UA stylesheet sets `user-select: none`
+            // on <button> (Chromium's default is `auto`, which does not block
+            // selection) — a plain <div> defaults to `auto` in every engine, so
+            // this regressed statement-text selection/copy specifically in
+            // Firefox when this control became a <button>. `select-text`
+            // overrides the UA default explicitly.
+            //
+            // A computed-style or real drag-select assertion is NOT expressible
+            // here: happy-dom (this project's test environment, see
+            // vitest.config.ts) loads no stylesheet at all, UA or Tailwind —
+            // verified directly, `getComputedStyle(button).userSelect` reads
+            // `''` for a bare <button> AND for one with the `select-text`
+            // class, in this environment, always. An assertion against
+            // computed style here could never fail, which is worse than no
+            // assertion — it would look like coverage without being any. The
+            // only thing checkable in this environment is that the class
+            // making the override is actually present on the shipped element;
+            // the cross-engine behavior itself was verified live (headless
+            // Chromium here, Firefox by the reviewer) outside the test suite.
+            it('carries select-text, overriding the Firefox UA default that would block copying statement text', () => {
+                renderEditor();
+
+                const editControl = screen.getByRole('button', { name: 'Existing Statement' });
+                expect(editControl).toHaveClass('select-text');
             });
         });
 

@@ -136,7 +136,7 @@ function SortableStatementItem({
                 <div
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
+                    className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
                 >
                     <GripVertical className="h-4 w-4" />
                 </div>
@@ -208,7 +208,7 @@ function SortableStatementItem({
                         type="button"
                         disabled={readOnly}
                         className={cn(
-                            'flex-1 block w-full text-left px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
+                            'flex-1 block w-full text-left select-text px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-normal',
                             !readOnly ? 'cursor-text hover:bg-slate-50' : 'cursor-default'
                         )}
                         onClick={() => {
