@@ -70,9 +70,38 @@ const MOBILE_VIEWPORT = { width: 375, height: 800 };
  * still short of full opacity instead of hardcoding one selector per route.
  */
 async function waitForAnimationsToSettle(page: Page) {
+    type SettleState = { __a11yLastAnimateInCount?: number; __a11yStableTicks?: number };
+
+    // Reset the stability counters below before each call — this helper runs twice
+    // per test (once at desktop, once after the mobile resize) and each pass needs
+    // its own count, not one carried over from the previous viewport.
+    await page.evaluate(() => {
+        const state = window as unknown as SettleState;
+        state.__a11yLastAnimateInCount = -1;
+        state.__a11yStableTicks = 0;
+    });
+
     await page.waitForFunction(() => {
+        const state = window as unknown as SettleState;
         const animating = document.querySelectorAll('.animate-in');
-        return Array.from(animating).every((el) => getComputedStyle(el).opacity === '1');
+        const allSettled = Array.from(animating).every(
+            (el) => getComputedStyle(el).opacity === '1'
+        );
+
+        // `Array.every` on an empty NodeList returns `true` — a poll landing before
+        // any `.animate-in` element has mounted would otherwise resolve immediately
+        // and wait for nothing (the investigation named this hazard explicitly:
+        // `.animate-in` count was 0 at scan time on 4 of 7 routes it measured).
+        // Require the element count to be unchanged across two consecutive polls
+        // before trusting an empty-or-settled result: that rules out "polled before
+        // mount" while still resolving normally on routes that never render an
+        // `.animate-in` element at all (the count stabilises at 0 there too).
+        const count = animating.length;
+        state.__a11yStableTicks =
+            count === state.__a11yLastAnimateInCount ? (state.__a11yStableTicks ?? 0) + 1 : 0;
+        state.__a11yLastAnimateInCount = count;
+
+        return allSettled && state.__a11yStableTicks >= 2;
     });
 }
 
