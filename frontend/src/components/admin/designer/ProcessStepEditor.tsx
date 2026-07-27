@@ -77,7 +77,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                     <div
                         {...attributes}
                         {...listeners}
-                        className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 transition-colors"
+                        className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-500 hover:text-indigo-500 transition-colors"
                     >
                         <GripVertical className="h-4 w-4" />
                     </div>

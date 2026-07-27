@@ -292,4 +292,23 @@ describe('ProcessStepEditor — delete-step control name (Task 6.7c)', () => {
         await user.click(deleteButton);
         expect(screen.queryByRole('button', { name: "Delete Let's meet" })).not.toBeInTheDocument();
     });
+
+    it('renders the drag-handle icon at a legible contrast (review fix-round, Task 6.7d)', () => {
+        const draft = buildDraft([profileStep, roughStep]);
+        renderWithStore(<ProcessStepEditor />, {
+            initialState: { draft, activeLocale: 'en' },
+        });
+
+        const deleteButton = screen.getByRole('button', { name: "Delete Let's meet" });
+        const item = deleteButton.closest('.group');
+        expect(item).not.toBeNull();
+        // dnd-kit's useSortable spreads {...attributes} onto this div, which
+        // injects role="button" — no accessible name, so it's found by class
+        // rather than by role+name.
+        // biome-ignore lint/style/noNonNullAssertion: test setup
+        const dragHandle = item!.querySelector('.cursor-grab');
+        expect(dragHandle).not.toBeNull();
+        expect(dragHandle).toHaveClass('text-slate-500');
+        expect(dragHandle).not.toHaveClass('text-slate-300');
+    });
 });
