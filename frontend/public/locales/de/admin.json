@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Persönliche Informationen",
                 "email": "E-Mail-Adresse",
-                "email_locked": "E-Mail-Änderungen über diese Seite sind in Kürze verfügbar; die Backend-Unterstützung ist bereits aktiv.",
+                "email_locked": "Ihre E-Mail-Adresse kann hier noch nicht geändert werden. Wenden Sie sich an Ihren Administrator, um sie zu aktualisieren.",
                 "name": "Vollständiger Name",
                 "save": "Speichern",
                 "saving": "Wird gespeichert...",
@@ -631,7 +631,8 @@
                 "context_aria": "Über dieses Panel",
                 "audio_label": "Aufnahme: {{key}} von {{participant}}",
                 "url_unavailable": "Audio-URL nicht verfügbar.",
-                "comments_label": "Kartenkommentare"
+                "comments_label": "Kartenkommentare",
+                "question_default": "Gesprochener Kommentar"
             },
             "factor_note": {
                 "label": "Faktorinterpretation",
@@ -2166,6 +2167,8 @@
                 "presort": "Vorsortierungsfragen",
                 "postsort": "Nachsortierungsfragen",
                 "no_answers": "Keine Antworten für diesen Abschnitt aufgezeichnet.",
+                "question_default": "Gesprochene Antwort",
+                "answer_default": "Antwort",
                 "categories": {
                     "identity": "Identität & Kontakt",
                     "questions": "Fragebogenantworten",

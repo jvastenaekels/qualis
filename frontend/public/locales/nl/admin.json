@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Persoonlijke informatie",
                 "email": "E-mailadres",
-                "email_locked": "E-mailwijzigingen via de API komen binnenkort naar deze pagina; backendondersteuning is actief.",
+                "email_locked": "Uw e-mailadres kan hier nog niet worden gewijzigd. Neem contact op met uw beheerder om het bij te werken.",
                 "name": "Volledige naam",
                 "save": "Opslaan",
                 "saving": "Opslaan...",
@@ -631,7 +631,8 @@
                 "context_aria": "Over dit paneel",
                 "audio_label": "Opname: {{key}} door {{participant}}",
                 "url_unavailable": "Audio-URL niet beschikbaar.",
-                "comments_label": "Kaartcommentaren"
+                "comments_label": "Kaartcommentaren",
+                "question_default": "Gesproken commentaar"
             },
             "factor_note": {
                 "label": "Factornarratief",
@@ -2166,6 +2167,8 @@
                 "presort": "Voorsorteringsvragen",
                 "postsort": "Nasorteringsvragen",
                 "no_answers": "Geen antwoorden geregistreerd voor dit gedeelte.",
+                "question_default": "Gesproken antwoord",
+                "answer_default": "Antwoord",
                 "categories": {
                     "identity": "Identiteit & contact",
                     "questions": "Vragenlijstantwoorden",

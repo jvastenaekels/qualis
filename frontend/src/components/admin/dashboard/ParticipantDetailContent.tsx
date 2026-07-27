@@ -27,6 +27,7 @@ import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
 import { MultiLangFieldIcon } from '@/components/admin/designer/MultiLangFieldIcon';
 import type { InteractionUtils } from '@/types/grid';
+import { buildQuestionsMap, resolveAudioQuestionLabel } from './SurveyResponseTable.helpers';
 
 /** Shape of an audio recording entry in the participant answer blob. */
 type AudioEntry = {
@@ -206,6 +207,16 @@ export function ParticipantDetailContent({
 
     const language = participant.language || 'en';
     const studyForSurvey = studyData.study as unknown as StudyRead;
+
+    // Researcher-authored labels for custom post-sort questions (text_audio
+    // type included), keyed by the same id the study designer assigns in
+    // QuestionBuilder (e.g. "q_1737849283000"). Used below to resolve a real
+    // label for audio recordings instead of ever showing that raw,
+    // researcher-generated id.
+    const postsortQuestionsMap = useMemo(
+        () => buildQuestionsMap(studyData.study.postsort_config ?? {}),
+        [studyData.study.postsort_config]
+    );
 
     const detailStatement = detailStatementId ? statementsMap.get(detailStatementId) : null;
     const detailComment = detailStatementId
@@ -562,8 +573,12 @@ export function ParticipantDetailContent({
                                                     AudioEntry
                                                 >
                                             ).map(([key, audio]) => {
-                                                // Resolve label from question_key
-                                                let label = key;
+                                                // Resolve label from question_key.
+                                                // Deliberately left uninitialised: the chain
+                                                // below must assign on every branch, and the
+                                                // compiler now says so. Seeding it with `key`
+                                                // is what leaked the raw identifier before.
+                                                let label: string;
                                                 if (key.startsWith('card_')) {
                                                     const sId = Number(key.replace('card_', ''));
                                                     const stmt = statementsMap.get(sId);
@@ -587,6 +602,25 @@ export function ParticipantDetailContent({
                                                     label = t(
                                                         'post.extreme.general_comment',
                                                         'General Comment'
+                                                    );
+                                                } else {
+                                                    // Custom post-sort question (text_audio type),
+                                                    // uploaded with a "question_" prefix — see
+                                                    // Step2_Questionnaire.tsx. resolveAudioQuestionLabel
+                                                    // reads the researcher's own wording out of
+                                                    // postsort_config instead of ever showing the raw,
+                                                    // researcher-generated id (e.g. "q_1737849283000",
+                                                    // see QuestionBuilder.tsx:964); the analysis
+                                                    // Voices panel uses the same helper, so one
+                                                    // recording is named the same way on both screens.
+                                                    label = resolveAudioQuestionLabel(
+                                                        postsortQuestionsMap,
+                                                        key,
+                                                        language,
+                                                        t(
+                                                            'admin.participant.survey.question_default',
+                                                            'Spoken response'
+                                                        )
                                                     );
                                                 }
 

@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Personal information",
                 "email": "Email address",
-                "email_locked": "Email changes via the API are coming soon to this page; backend support is live.",
+                "email_locked": "Your email address can't be changed here yet. Contact your administrator to update it.",
                 "name": "Full name",
                 "save": "Save",
                 "saving": "Saving...",
@@ -633,7 +633,8 @@
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
-                "comments_label": "Card comments"
+                "comments_label": "Card comments",
+                "question_default": "Spoken comment"
             },
             "factor_note": {
                 "label": "Factor narrative",
@@ -2168,6 +2169,8 @@
                 "presort": "Pre-Sort Questions",
                 "postsort": "Post-Sort Questions",
                 "no_answers": "No answers recorded for this section.",
+                "question_default": "Spoken response",
+                "answer_default": "Response",
                 "categories": {
                     "identity": "Identity & Contact",
                     "questions": "Questionnaire Responses",

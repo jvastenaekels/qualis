@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Informações pessoais",
                 "email": "Endereço de email",
-                "email_locked": "As alterações de email via API chegam em breve a esta página; o suporte no servidor já está disponível.",
+                "email_locked": "O seu endereço de e-mail ainda não pode ser alterado aqui. Contacte o seu administrador para o atualizar.",
                 "name": "Nome completo",
                 "save": "Guardar",
                 "saving": "A guardar...",
@@ -631,7 +631,8 @@
                 "context_aria": "Sobre este painel",
                 "audio_label": "Gravação: {{key}} por {{participant}}",
                 "url_unavailable": "URL de áudio não disponível.",
-                "comments_label": "Comentários às afirmações"
+                "comments_label": "Comentários às afirmações",
+                "question_default": "Comentário oral"
             },
             "factor_note": {
                 "label": "Interpretação do fator",
@@ -2166,6 +2167,8 @@
                 "presort": "Perguntas de pré-classificação",
                 "postsort": "Perguntas de pós-classificação",
                 "no_answers": "Não foram registadas respostas para esta secção.",
+                "question_default": "Resposta oral",
+                "answer_default": "Resposta",
                 "categories": {
                     "identity": "Identidade e contacto",
                     "questions": "Respostas ao questionário",

@@ -261,7 +261,7 @@
             "personal": {
                 "title": "Informazioni personali",
                 "email": "Indirizzo e-mail",
-                "email_locked": "La modifica dell'e-mail tramite API sarà presto disponibile su questa pagina; il supporto backend è attivo.",
+                "email_locked": "Il suo indirizzo email non può ancora essere modificato qui. Contatti il suo amministratore per aggiornarlo.",
                 "name": "Nome completo",
                 "save": "Salva",
                 "saving": "Salvataggio in corso...",
@@ -631,7 +631,8 @@
                 "context_aria": "Informazioni su questo pannello",
                 "audio_label": "Registrazione: {{key}} di {{participant}}",
                 "url_unavailable": "URL audio non disponibile.",
-                "comments_label": "Commenti alle affermazioni"
+                "comments_label": "Commenti alle affermazioni",
+                "question_default": "Commento parlato"
             },
             "factor_note": {
                 "label": "Narrativa del fattore",
@@ -2166,6 +2167,8 @@
                 "presort": "Domande pre-classificazione",
                 "postsort": "Domande post-classificazione",
                 "no_answers": "Nessuna risposta registrata per questa sezione.",
+                "question_default": "Risposta parlata",
+                "answer_default": "Risposta",
                 "categories": {
                     "identity": "Identità e contatto",
                     "questions": "Risposte al questionario",

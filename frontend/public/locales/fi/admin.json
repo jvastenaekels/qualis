@@ -173,7 +173,7 @@
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
                 "email": "Sähköpostiosoite",
-                "email_locked": "Sähköpostin vaihto API:n kautta on tulossa pian tälle sivulle; taustatuki on jo käytössä.",
+                "email_locked": "Sähköpostiosoitettasi ei voi vielä muuttaa täällä. Ota yhteyttä järjestelmänvalvojaan sen päivittämiseksi.",
                 "name": "Koko nimi",
                 "save": "Tallenna",
                 "saving": "Tallennetaan...",
@@ -568,7 +568,8 @@
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
-                "comments_label": "Card comments"
+                "comments_label": "Card comments",
+                "question_default": "Puhuttu kommentti"
             },
             "factor_note": {
                 "label": "Factor narrative",
@@ -2106,6 +2107,8 @@
                 "postsort": "Jälkilajittelu",
                 "presort": "Esilajittelu",
                 "no_answers": "Tähän osioon ei ole kirjattu vastauksia.",
+                "question_default": "Puhuttu vastaus",
+                "answer_default": "Vastaus",
                 "categories": {
                     "identity": "Henkilö- ja yhteystiedot",
                     "questions": "Kyselyvastaukset",

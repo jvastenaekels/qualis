@@ -44,3 +44,9 @@ f0b3fdeb01383e097ee397522bc49c08f4fa9037:backend/app/routers/audio.py:generic-ap
 f24b53762abfb2f3952a5538aa8809f206ad3498:backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
 070c67d0cadf553d87abce8b43bf6b6b3c059ca2:.gitleaksignore:generic-api-key:34
 323f1cada0cc7cf0adc9621e3804b8b731ea65bc:.gitleaksignore:generic-api-key:34
+
+# Q-methodology question keys, minted by QuestionBuilder as `q_${Date.now()}`.
+# The timestamp reads as a high-entropy token to the generic-api-key rule. These
+# are test fixtures deliberately shaped like the keys real studies produce — the
+# whole point of the cases they appear in.
+77258e669aea9b6eb7cb0bdd15cfd9219388d9b3:frontend/src/components/admin/analysis/FactorVoicesPanel.test.tsx:generic-api-key:566

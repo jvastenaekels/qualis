@@ -66,6 +66,15 @@ vi.mock('@/api/generated', () => ({
         isError: false,
         error: null,
     }),
+    // FactorVoicesPanel also reads the study to resolve post-sort audio
+    // question labels; no recordings here, so an idle query is enough.
+    useGetStudyApiAdminStudiesSlugGet: () => ({
+        data: undefined,
+        isLoading: false,
+        isSuccess: false,
+        isError: false,
+        error: null,
+    }),
 }));
 
 // Mock useParams only — let useSearchParams work against MemoryRouter so

@@ -1,19 +1,22 @@
 import { renderWithProviders, screen, waitFor } from '@/test-utils/test-utils';
+import i18n from '@/test-utils/i18n-test';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { FactorVoicesPanel } from './FactorVoicesPanel';
 import type { ParticipantLoading } from '@/api/model/participantLoading';
 import type { ParticipantAudioRecording } from '@/api/model/participantAudioRecording';
 import type { ParticipantCardComment } from '@/api/model/participantCardComment';
 
-// Hoisted mocks for both API hooks
-const { mockAudiosHook, mockCommentsHook } = vi.hoisted(() => ({
+// Hoisted mocks for the three API hooks the panel calls
+const { mockAudiosHook, mockCommentsHook, mockStudyHook } = vi.hoisted(() => ({
     mockAudiosHook: vi.fn(),
     mockCommentsHook: vi.fn(),
+    mockStudyHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
     useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet: mockAudiosHook,
     useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet: mockCommentsHook,
+    useGetStudyApiAdminStudiesSlugGet: mockStudyHook,
 }));
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -85,11 +88,29 @@ function dataOk<T>(data: T[]): {
     return { data, isLoading: false, isSuccess: true, isError: false };
 }
 
+/** The study query resolved with a postsort_config carrying `questions`. */
+function studyWithPostsortQuestions(questions: Record<string, unknown>) {
+    return {
+        data: { slug: 'demo-study', postsort_config: { questions } },
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+    };
+}
+
+/** The study query still in flight / unavailable. */
+function noStudy() {
+    return { data: undefined, isLoading: false, isSuccess: false, isError: false };
+}
+
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
 describe('FactorVoicesPanel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Default: no study config available, so recordings fall back to the
+        // generic label. Tests that care override this.
+        mockStudyHook.mockReturnValue(noStudy());
     });
 
     // ── Test 1: empty state when neither audio nor comments are present ───────
@@ -141,8 +162,12 @@ describe('FactorVoicesPanel', () => {
         expect(screen.getByText('Carol')).toBeInTheDocument();
         expect(screen.getByText('Dave')).toBeInTheDocument();
 
-        expect(screen.getAllByText('post_sort_q1')).toHaveLength(2);
-        expect(screen.getByText('post_sort_q2')).toBeInTheDocument();
+        // 'post_sort_q1'/'post_sort_q2' are unmapped researcher-configured
+        // keys (Task 2.2): every recording shows the generic fallback label,
+        // never the raw key.
+        expect(screen.queryByText('post_sort_q1')).not.toBeInTheDocument();
+        expect(screen.queryByText('post_sort_q2')).not.toBeInTheDocument();
+        expect(screen.getAllByText('Spoken comment')).toHaveLength(3);
     });
 
     // ── Test 3: factor filtering — factor-1 participant NOT in factor-2 panel ─
@@ -374,6 +399,194 @@ describe('FactorVoicesPanel', () => {
             });
 
             expect(screen.queryByLabelText(/Δloading/i)).toBeNull();
+        });
+    });
+
+    // ── Question key → human label ─────────────────────────────────────────
+    describe('question label lookup', () => {
+        it("labels the recording with the researcher's own configured question label", async () => {
+            // Exactly the demo study's post-sort audio question
+            // (backend/data/example-study.json), uploaded under the
+            // "question_"-prefixed key (backend/seed_demo.py).
+            const configuredLabel = 'Optionally, record a short spoken comment about your sort.';
+            mockStudyHook.mockReturnValue(
+                studyWithPostsortQuestions({
+                    q_voice: { type: 'text_audio', label: { en: configuredLabel } },
+                })
+            );
+
+            const participants = [makeParticipant(91, 'Priya', [1])];
+            const recordings = [
+                makeRecording(901, 91, 'question_q_voice', 'https://cdn.example.com/rec901.webm'),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Priya')).toBeInTheDocument();
+            });
+
+            // Positive: the label the researcher wrote — the same one the
+            // participant saw, and the same one the Post-Sort tab shows for
+            // this very recording.
+            expect(screen.getByText(configuredLabel)).toBeInTheDocument();
+            // Negative: neither the raw key nor the generic stand-in.
+            expect(screen.queryByText('question_q_voice')).not.toBeInTheDocument();
+            expect(screen.queryByText('Spoken comment')).not.toBeInTheDocument();
+
+            // The audio element's accessible name is built from the same
+            // resolved label, so a screen-reader user hears it too.
+            const audioEl = screen.getByLabelText(new RegExp(`${configuredLabel} by Priya`));
+            expect(audioEl.tagName.toLowerCase()).toBe('audio');
+        });
+
+        it('gives two audio questions two different labels', async () => {
+            // A study with more than one audio question is the case the
+            // lookup has to get right: both players must be distinguishable.
+            mockStudyHook.mockReturnValue(
+                studyWithPostsortQuestions({
+                    q_1737849283000: {
+                        type: 'text_audio',
+                        label: { en: 'Why did you place the top card there?' },
+                    },
+                    q_1737849299000: {
+                        type: 'text_audio',
+                        label: { en: 'What would you change about this study?' },
+                    },
+                })
+            );
+
+            const participants = [makeParticipant(93, 'Rita', [1])];
+            const recordings = [
+                makeRecording(
+                    903,
+                    93,
+                    'question_q_1737849283000',
+                    'https://cdn.example.com/rec903.webm'
+                ),
+                makeRecording(
+                    904,
+                    93,
+                    'question_q_1737849299000',
+                    'https://cdn.example.com/rec904.webm'
+                ),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Rita')).toBeInTheDocument();
+            });
+
+            expect(screen.getByText('Why did you place the top card there?')).toBeInTheDocument();
+            expect(screen.getByText('What would you change about this study?')).toBeInTheDocument();
+            // Not two identical generic labels, and never the raw keys.
+            expect(screen.queryByText('Spoken comment')).not.toBeInTheDocument();
+            expect(screen.queryByText('question_q_1737849283000')).not.toBeInTheDocument();
+            expect(screen.queryByText('question_q_1737849299000')).not.toBeInTheDocument();
+        });
+
+        it("resolves the label in the admin's active language", async () => {
+            // The researcher browsing the analysis in French must read the
+            // French wording of the question, not the English one.
+            await i18n.changeLanguage('fr');
+            try {
+                mockStudyHook.mockReturnValue(
+                    studyWithPostsortQuestions({
+                        q_voice: {
+                            type: 'text_audio',
+                            label: {
+                                en: 'Optionally, record a short spoken comment about your sort.',
+                                fr: 'Optionnel : enregistrez un bref commentaire audio sur votre tri.',
+                            },
+                        },
+                    })
+                );
+
+                const participants = [makeParticipant(94, 'Sami', [1])];
+                const recordings = [
+                    makeRecording(
+                        905,
+                        94,
+                        'question_q_voice',
+                        'https://cdn.example.com/rec905.webm'
+                    ),
+                ];
+
+                mockAudiosHook.mockReturnValue(dataOk(recordings));
+                mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+                renderWithProviders(
+                    <FactorVoicesPanel
+                        slug="demo-study"
+                        factorIndex={0}
+                        participants={participants}
+                    />
+                );
+
+                await waitFor(() => {
+                    expect(screen.getByText('Sami')).toBeInTheDocument();
+                });
+
+                expect(
+                    screen.getByText(
+                        'Optionnel : enregistrez un bref commentaire audio sur votre tri.'
+                    )
+                ).toBeInTheDocument();
+                expect(
+                    screen.queryByText('Optionally, record a short spoken comment about your sort.')
+                ).not.toBeInTheDocument();
+            } finally {
+                await i18n.changeLanguage('en');
+            }
+        });
+
+        it('falls back to the generic label when the question is gone from the config, never the raw key', async () => {
+            // A different question exists in the config, but not the one this
+            // recording references (the researcher deleted it after the
+            // participant answered) — this proves a real lookup that missed,
+            // not an empty-config short-circuit that would pass vacuously.
+            mockStudyHook.mockReturnValue(
+                studyWithPostsortQuestions({
+                    q_other: { type: 'text_audio', label: { en: 'A different question' } },
+                })
+            );
+
+            const participants = [makeParticipant(92, 'Quinn', [1])];
+            // gitleaks:allow — a question key minted by QuestionBuilder as
+            // `q_${Date.now()}`, not a credential. Kept realistic on purpose: the
+            // whole point of this case is a key shaped like the ones real studies
+            // produce.
+            const unmappedKey = 'question_q_1737849283000';
+            const recordings = [
+                makeRecording(902, 92, unmappedKey, 'https://cdn.example.com/rec902.webm'),
+            ];
+
+            mockAudiosHook.mockReturnValue(dataOk(recordings));
+            mockCommentsHook.mockReturnValue(emptyOk<ParticipantCardComment>());
+
+            renderWithProviders(
+                <FactorVoicesPanel slug="demo-study" factorIndex={0} participants={participants} />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Quinn')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByText(unmappedKey)).not.toBeInTheDocument();
+            expect(screen.queryByText('q_1737849283000')).not.toBeInTheDocument();
+            expect(screen.queryByText('A different question')).not.toBeInTheDocument();
+            expect(screen.getByText('Spoken comment')).toBeInTheDocument();
         });
     });
 

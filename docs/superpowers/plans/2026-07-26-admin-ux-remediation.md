@@ -424,6 +424,8 @@ git commit -m "fix(i18n): replace the API-status note on Account settings with u
 
 **The defect:** `FactorVoicesPanel.tsx:104` renders `{rec.question_key}` — a database identifier (`question_q_voice`) — as the label above each audio player, three times per factor.
 
+> **Superseded by the Phase 2 fix wave.** The static key→label table prescribed in Step 3 shipped, then was removed: it had one entry, it existed only because of the demo seeder, and it disagreed with the label the same recording carries on the participant Post-Sort tab. `FactorVoicesPanel` now resolves the researcher's own `postsort_config.questions[<id>].label` through the shared `resolveAudioQuestionLabel` helper. No props signature change was needed — the panel already receives `slug`.
+
 **Files:**
 - Test: `frontend/src/components/admin/analysis/FactorVoicesPanel.test.tsx`
 - Modify: `frontend/src/components/admin/analysis/FactorVoicesPanel.tsx:104`
@@ -524,6 +526,41 @@ git add frontend/src/pages/admin/ProjectMembersPage.tsx \
         frontend/src/pages/admin/ProjectMembersPage.test.tsx \
         frontend/public/locales/en/admin.json
 git commit -m "fix(members): show the email instead of a 'No Name' placeholder"
+```
+
+---
+
+### Task 2.4: The same raw-key leak on the participant detail page
+
+**The defect:** found by Task 2.2's review. `ParticipantDetailContent.tsx:565-591` renders `question_key` directly for any key that is not one of `card_N`, `missing_statement`, or `general_comment` — the identical defect Task 2.2 fixed in `FactorVoicesPanel`. Since `question_key` is researcher-generated (`q_<Date.now()>`, `QuestionBuilder.tsx:964`), every custom post-sort question on this screen prints its raw identifier.
+
+**Files:**
+- Modify: `frontend/src/components/admin/dashboard/ParticipantDetailContent.tsx:565-591`
+- Test: `frontend/src/components/admin/dashboard/ParticipantDetailContent.test.tsx`
+
+- [ ] **Step 1: Write the failing test**
+
+```tsx
+it('never renders a raw question key', () => {
+    renderWithProviders(<ParticipantDetailContent {...propsWithAnswer('q_1737849283000')} />);
+    expect(screen.queryByText('q_1737849283000')).not.toBeInTheDocument();
+});
+```
+
+- [ ] **Step 2: Run it, confirm it fails with the raw key present**
+
+- [ ] **Step 3: Apply the same safe-default lookup Task 2.2 established**
+
+Reuse `admin.analysis.factor_voices.question_default` if the label fits, or add a sibling default in this screen's own namespace. The rule is the one from Task 2.2: an unmapped key falls back to a generic human label, never to the identifier.
+
+- [ ] **Step 4: Run the test, confirm it passes**
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add frontend/src/components/admin/dashboard/ParticipantDetailContent.tsx \
+        frontend/src/components/admin/dashboard/ParticipantDetailContent.test.tsx
+git commit -m "fix(participants): stop rendering raw question keys on the detail page"
 ```
 
 ---
@@ -1067,6 +1104,15 @@ cd frontend/src && grep -rnoE "t\('admin\.[a-z_.]*'\)" --include=*.tsx . | head 
 ```
 
 Add the canonical English label as the fallback for each.
+
+**Most important: resolve every `t()` key against the locale JSON.** Phase 2's whole-branch review found **twelve `t()` calls whose keys exist in neither `en/admin.json` nor `en/participant.json`** — i18next then renders the raw dotted key path as UI text, which is the purest instance of the defect class Phase 2 set out to remove. Confirmed sites include:
+
+- `components/auth/RequireAdmin.tsx:53-54` — the full-screen access-denied gate renders `common.errors.access_denied.title` and `…message`
+- `components/admin/dashboard/InteractiveDataView.tsx:809` — the destructive confirm button of "clear all participants" reads `common.confirm_delete`
+- `pages/admin/ProjectMembersPage.tsx:87,96` — changing a member's role toasts `admin.projects.settings.team.role_update_success` / `…role_update_error`
+- `hooks/admin/useStudyDesignPage.ts:484`, `pages/ErrorPage.helpers.ts:43,44,87,88`, `pages/RegistrationPage.tsx:151`, `hooks/participant/useFineSort.ts:464` (a participant-facing `window.confirm`)
+
+Note the `t('key') || 'Fallback'` guard used at ~17 sites (e.g. `PostSortConfigEditor.tsx:504-604`) is **inert**: `t()` returns the key itself on a miss, which is truthy, so `||` never fires. Write the check as a script that loads the locale JSON and asserts every key referenced in source resolves — then wire it into `npm run i18n-check` so this cannot regress.
 
 *(The `ConcourseDetailPage.tsx:484` `'Q-set'` / `'Curation'` divergence originally listed here was already retired by Phase 1 Task 1.3.)*
 

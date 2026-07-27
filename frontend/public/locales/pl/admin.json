@@ -261,7 +261,7 @@
       "personal": {
         "title": "Dane osobowe",
         "email": "Adres e-mail",
-        "email_locked": "Zmiana adresu e-mail przez API będzie wkrótce dostępna na tej stronie; obsługa serwerowa jest już aktywna.",
+        "email_locked": "Twój adres e-mail nie może być jeszcze zmieniony tutaj. Skontaktuj się z administratorem, aby go zaktualizować.",
         "name": "Imię i nazwisko",
         "save": "Zapisz",
         "saving": "Zapisywanie...",
@@ -631,7 +631,8 @@
         "context_aria": "O tym panelu",
         "audio_label": "Nagranie: {{key}} — {{participant}}",
         "url_unavailable": "URL audio niedostępny.",
-        "comments_label": "Komentarze do kart"
+        "comments_label": "Komentarze do kart",
+        "question_default": "Komentarz głosowy"
       },
       "factor_note": {
         "label": "Interpretacja czynnika",
@@ -2166,6 +2167,8 @@
         "presort": "Pytania wstępne",
         "postsort": "Pytania końcowe",
         "no_answers": "Brak zapisanych odpowiedzi dla tej sekcji.",
+        "question_default": "Odpowiedź głosowa",
+        "answer_default": "Odpowiedź",
         "categories": {
           "identity": "Tożsamość i kontakt",
           "questions": "Odpowiedzi na pytania",

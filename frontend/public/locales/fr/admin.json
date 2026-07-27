@@ -173,7 +173,7 @@
             "personal": {
                 "title": "Informations personnelles",
                 "email": "Adresse e-mail",
-                "email_locked": "La modification de l'e-mail via l'API arrivera bientôt sur cette page ; le support back-end est déjà en place.",
+                "email_locked": "Votre adresse e-mail ne peut pas encore être modifiée ici. Contactez votre administrateur pour la mettre à jour.",
                 "name": "Nom complet",
                 "save": "Enregistrer",
                 "saving": "Enregistrement...",
@@ -543,7 +543,8 @@
                 "context_aria": "À propos de ce panneau",
                 "audio_label": "Enregistrement : {{key}} par {{participant}}",
                 "url_unavailable": "URL audio non disponible.",
-                "comments_label": "Commentaires sur les cartes"
+                "comments_label": "Commentaires sur les cartes",
+                "question_default": "Commentaire oral"
             },
             "factor_note": {
                 "label": "Narration du facteur",
@@ -2166,6 +2167,8 @@
                 "presort": "Questions Pré-Sort",
                 "postsort": "Questions Post-Sort",
                 "no_answers": "Aucune réponse enregistrée pour cette section.",
+                "question_default": "Réponse orale",
+                "answer_default": "Réponse",
                 "categories": {
                     "identity": "Identité & Contact",
                     "questions": "Réponses au questionnaire",
