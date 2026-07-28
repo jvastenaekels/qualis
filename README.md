@@ -232,7 +232,7 @@ Use this path when you want hot reload, local tests, or direct backend/frontend 
 - Python 3.14 — the version CI and the backend image use. `pyproject.toml`
   declares 3.13 as the floor, but only 3.14 is exercised.
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
-- [Node.js](https://nodejs.org/) v24 (the active LTS line, pinned in `.nvmrc`)
+- [Node.js](https://nodejs.org/) v26 — pinned in `.nvmrc`, and the version CI installs
 - PostgreSQL 18 — the version CI and `docker-compose.yml` use. Earlier majors
   are untested.
 
@@ -281,6 +281,23 @@ cd backend && uv run python seed.py data/example-study.json && cd ..
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
 If you seeded the example study, you can also visit `http://localhost:5173/study/bioeconomy-futures` to walk the participant flow. (For the full demo — concourse plus filled Q-sorts — run `uv run python seed_demo.py` from `backend/` instead, with the backend running.)
+
+#### Local-setup troubleshooting
+
+Almost every failure here is step 2 or step 3, and the error usually surfaces two
+commands later. `make preflight` (which `make install` runs for you) checks the
+toolchain, every key `.env` is expected to hold, and whether `DATABASE_URL` actually
+connects — run it on its own any time.
+
+| What you see | What it means |
+| ------------ | ------------- |
+| `WARN .env has no ENVIRONMENT` | Step 3 was skipped or partial. Without `ENVIRONMENT=development` the `/api/test/*` routes are not mounted, so the E2E suite cannot run at all. |
+| `WARN .env has no SECRET_KEY` / `IP_HASH_SALT`, or `still holds a CHANGEME placeholder` | Generate each with `python3 -c 'import secrets; print(secrets.token_urlsafe(48))'`. |
+| `WARN DATABASE_URL does not connect` | Run `make db-check` for the real error — `preflight` hides it so no password reaches a build log. `role "…" does not exist` means step 2 was skipped; `password authentication failed` means the role exists with a different password; `could not connect` means PostgreSQL is not running. |
+| `make migrate` → `password authentication failed` | Same cause. `make db-check` confirms it in one line. |
+| `make test` → hundreds of `asyncpg … InvalidPasswordError` | `TEST_DATABASE_URL`, not `DATABASE_URL`. Step 2 creates `qualis_test` as a second database; the test suite resets it between runs. |
+| E2E fails on `The test router is not mounted` | `ENVIRONMENT` is missing or set to `production`. `TESTING=true` does **not** substitute — that variable only disables rate limiting. |
+| A spec fails locally but passes in CI | CI retries twice (`retries: process.env.CI ? 2 : 0`), so it absorbs flakes that a local run surfaces on the first attempt. Re-run the spec alone before assuming a regression. |
 
 ### Verifying your setup
 
