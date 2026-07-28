@@ -116,7 +116,7 @@ function ParticipantRow({
                     {participant.recruitment_token && (
                         <Badge
                             variant="outline"
-                            className="h-4 bg-white text-slate-500 border-slate-200 gap-0.5 pl-1 pr-1.5 truncate max-w-[100px]"
+                            className="min-h-4 bg-white text-slate-500 border-slate-200 gap-0.5 pl-1 pr-1.5 truncate max-w-[100px]"
                         >
                             <LinkIcon className="w-2.5 h-2.5 shrink-0" />
                             <span className="font-mono text-2xs leading-none truncate">
@@ -129,10 +129,15 @@ function ParticipantRow({
                 {/* Line 2: status-specific info */}
                 {isCompleted ? (
                     <div className="flex items-center gap-1.5">
-                        {/* `h-4` clamps the pill to 16px, and the badge base adds py-0.5 —
-                            a 12px content box. `text-2xs` line-heights to 16.6-18px, so
-                            without `leading-none` the label wraps out of the pill at 320px. */}
-                        <Badge className="h-4 text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
+                        {/* `min-h-4`, not `h-4`: at 320px this badge is a shrinking flex
+                            item that gets ~109px for a label needing ~126px, so the two
+                            words wrap. A hard `h-4` clamped the pill to 16px and the
+                            second line painted OUTSIDE it. A floor lets the pill grow
+                            instead. Not fixable by shortening the label — `Completed` in
+                            English is short, but es/pt/nl render "Completados
+                            recientemente" and are longer still. Measured at 320/360/375/
+                            414/768/1440. */}
+                        <Badge className="min-h-4 text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
