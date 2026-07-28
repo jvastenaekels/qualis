@@ -368,42 +368,30 @@ const RecruitmentPage = () => {
                         )}
                         {/* Password Protection */}
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
-                                <div className="space-y-0.5">
-                                    <Label
-                                        id="password-toggle-label"
-                                        htmlFor="password-toggle"
-                                        className="text-sm font-bold text-slate-700"
-                                    >
-                                        {t(
-                                            'admin.recruitment.access_rules.password_toggle',
-                                            'Require a password'
-                                        )}
-                                    </Label>
-                                    <p className="text-xs text-slate-500">
-                                        {t(
-                                            'admin.recruitment.access_rules.password_toggle_desc',
-                                            'Participants must enter a password before starting the study.'
-                                        )}
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="password-toggle"
-                                    aria-labelledby="password-toggle-label"
-                                    checked={passwordEnabled}
-                                    onCheckedChange={(checked) => {
-                                        accessForm.setValue('passwordEnabled', checked, {
+                            <AccessRuleRow
+                                labelId="password-toggle-label"
+                                switchId="password-toggle"
+                                label={t(
+                                    'admin.recruitment.access_rules.password_toggle',
+                                    'Require a password'
+                                )}
+                                description={t(
+                                    'admin.recruitment.access_rules.password_toggle_desc',
+                                    'Participants must enter a password before starting the study.'
+                                )}
+                                checked={passwordEnabled}
+                                onCheckedChange={(checked) => {
+                                    accessForm.setValue('passwordEnabled', checked, {
+                                        shouldDirty: true,
+                                    });
+                                    if (!checked) {
+                                        accessForm.setValue('accessPassword', '', {
                                             shouldDirty: true,
                                         });
-                                        if (!checked) {
-                                            accessForm.setValue('accessPassword', '', {
-                                                shouldDirty: true,
-                                            });
-                                        }
-                                    }}
-                                    disabled={isSlugLocked}
-                                />
-                            </div>
+                                    }
+                                }}
+                                disabled={isSlugLocked}
+                            />
 
                             {passwordEnabled && (
                                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -459,47 +447,35 @@ const RecruitmentPage = () => {
                             derives its initial state from the form values:
                             on if either date was previously set. */}
                         <div className="space-y-4">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="space-y-0.5">
-                                    <Label
-                                        id="window-toggle-label"
-                                        htmlFor="window-toggle"
-                                        className="text-sm font-black text-slate-700"
-                                    >
-                                        {t(
-                                            'admin.recruitment.access_rules.window_toggle',
-                                            'Limit collection window'
-                                        )}
-                                    </Label>
-                                    <p className="text-xs text-slate-600 font-medium">
-                                        {t(
-                                            'admin.recruitment.access_rules.window_toggle_help',
-                                            'Restrict participant access to a specific time range.'
-                                        )}
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="window-toggle"
-                                    aria-labelledby="window-toggle-label"
-                                    checked={showWindowPickers}
-                                    onCheckedChange={(checked) => {
-                                        setShowWindowPickers(checked);
-                                        if (!checked) {
-                                            if (accessForm.getValues('startDate')) {
-                                                accessForm.setValue('startDate', '', {
-                                                    shouldDirty: true,
-                                                });
-                                            }
-                                            if (accessForm.getValues('endDate')) {
-                                                accessForm.setValue('endDate', '', {
-                                                    shouldDirty: true,
-                                                });
-                                            }
+                            <AccessRuleRow
+                                labelId="window-toggle-label"
+                                switchId="window-toggle"
+                                label={t(
+                                    'admin.recruitment.access_rules.window_toggle',
+                                    'Limit collection window'
+                                )}
+                                description={t(
+                                    'admin.recruitment.access_rules.window_toggle_help',
+                                    'Restrict participant access to a specific time range.'
+                                )}
+                                checked={showWindowPickers}
+                                onCheckedChange={(checked) => {
+                                    setShowWindowPickers(checked);
+                                    if (!checked) {
+                                        if (accessForm.getValues('startDate')) {
+                                            accessForm.setValue('startDate', '', {
+                                                shouldDirty: true,
+                                            });
                                         }
-                                    }}
-                                    disabled={isArchived}
-                                />
-                            </div>
+                                        if (accessForm.getValues('endDate')) {
+                                            accessForm.setValue('endDate', '', {
+                                                shouldDirty: true,
+                                            });
+                                        }
+                                    }
+                                }}
+                                disabled={isArchived}
+                            />
                             {showWindowPickers && (
                                 <>
                                     {/* Heads the "Opens at"/"Closes at" pair below, both of
@@ -1149,3 +1125,54 @@ const RecruitmentPage = () => {
 };
 
 export default RecruitmentPage;
+
+// ─── sub-components ────────────────────────────────────────────────────────────
+
+interface AccessRuleRowProps {
+    labelId: string;
+    switchId: string;
+    label: string;
+    description: string;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    disabled?: boolean;
+}
+
+/**
+ * One row under "Access rules": a label/description pair with a switch.
+ * Password protection and the collection-window toggle used to be built
+ * independently and drifted apart — different padding/surface, different
+ * label weight (task 6.2) — so their switches ended up 17px apart
+ * horizontally. Extracted so the two rows share one shape and cannot drift
+ * again.
+ */
+function AccessRuleRow({
+    labelId,
+    switchId,
+    label,
+    description,
+    checked,
+    onCheckedChange,
+    disabled,
+}: AccessRuleRowProps) {
+    return (
+        <div
+            data-testid="access-rule-row"
+            className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100"
+        >
+            <div className="space-y-0.5">
+                <Label id={labelId} htmlFor={switchId} className="text-sm font-bold text-slate-700">
+                    {label}
+                </Label>
+                <p className="text-xs text-slate-500">{description}</p>
+            </div>
+            <Switch
+                id={switchId}
+                aria-labelledby={labelId}
+                checked={checked}
+                onCheckedChange={onCheckedChange}
+                disabled={disabled}
+            />
+        </div>
+    );
+}

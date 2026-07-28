@@ -125,6 +125,17 @@ describe('RecruitmentPage — access rule switches (a11y)', () => {
     });
 });
 
+describe('RecruitmentPage — access-rule rows share one shape (Task 6.2)', () => {
+    it('renders both access-rule rows with the same container treatment', () => {
+        mockUseRecruitmentPage.mockReturnValue(baseApi());
+        renderWithProviders(<RecruitmentPage />);
+
+        const rows = screen.getAllByTestId('access-rule-row');
+        expect(rows).toHaveLength(2);
+        expect(rows[0].className).toBe(rows[1].className);
+    });
+});
+
 describe('RecruitmentPage — group headings are real text, not dangling labels (Task 6.7b)', () => {
     // "Full URL" and "Collection window" head a read-only URL readout and a
     // pair of already-individually-labelled date fields, respectively —
