@@ -314,8 +314,15 @@ describe('DataPrivacyPage — stat tiles (Task 6.3)', () => {
         // Started/Completed/Discarded/Anonymised + Recordings/Total size —
         // all six tiles on this page render through the same Stat component.
         expect(values.length).toBeGreaterThanOrEqual(4);
-        const colours = new Set(values.map((v) => v.className.match(/text-\w+-\d+/)?.[0]));
-        expect(colours.size).toBe(1);
+        const colours = values.map((v) => v.className.match(/text-\w+-\d+/)?.[0]);
+        // Asserting the actual colour, not just Set-size uniqueness: a Set
+        // of extracted colours is satisfiable by *removing* the colour
+        // class from every tile too (every entry becomes `undefined`, still
+        // one distinct value) — that would pass without a single tile
+        // actually being coloured text-slate-900.
+        for (const colour of colours) {
+            expect(colour).toBe('text-slate-900');
+        }
     });
 
     it('gives the audio-storage tiles the same grid treatment as the participants snapshot', () => {
