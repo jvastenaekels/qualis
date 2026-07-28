@@ -1282,7 +1282,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                         </div>
 
                                         <div
-                                            className="mt-2 text-xs sm:text-[13px] font-black w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600"
+                                            className="mt-2 text-xs sm:text-sm font-black w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter transition-all group-hover/col:border-indigo-600 group-hover/col:text-indigo-600"
                                             data-testid={`grid-column-${idx}-score`}
                                         >
                                             {col.score > 0 ? `+${col.score}` : col.score}

@@ -131,7 +131,7 @@ export function ProjectSwitcher() {
                                                 {/* Show Role Badge */}
                                                 <span
                                                     className={cn(
-                                                        'px-1 rounded-sm text-[8px]',
+                                                        'px-1 rounded-sm text-2xs',
                                                         project.user_role === 'owner'
                                                             ? 'bg-amber-100 text-amber-700'
                                                             : project.user_role === 'member'

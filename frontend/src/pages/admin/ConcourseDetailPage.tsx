@@ -303,7 +303,7 @@ export default function ConcourseDetailPage() {
                         >
                             <NotebookPen className="size-4" />
                             {memoUnreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-[10px] leading-none px-1.5 py-0.5 font-medium border border-white">
+                                <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-2xs leading-none px-1.5 py-0.5 font-medium border border-white">
                                     {memoUnreadCount}
                                 </span>
                             )}
@@ -418,7 +418,7 @@ export default function ConcourseDetailPage() {
                                 >
                                     {lang.toUpperCase()}
                                     {missingCountByLang[lang] && (
-                                        <span className="absolute -top-1 -right-1 size-4 rounded-full bg-amber-400 text-[10px] font-bold text-white flex items-center justify-center">
+                                        <span className="absolute -top-1 -right-1 size-4 rounded-full bg-amber-400 text-2xs font-bold text-white flex items-center justify-center">
                                             {missingCountByLang[lang]}
                                         </span>
                                     )}
@@ -863,7 +863,7 @@ export default function ConcourseDetailPage() {
                                                             >
                                                                 <MessageSquare className="size-3.5" />
                                                                 {(item.comment_count ?? 0) > 0 && (
-                                                                    <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-[9px] font-bold">
+                                                                    <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-2xs font-bold">
                                                                         {item.comment_count}
                                                                     </span>
                                                                 )}
@@ -1167,7 +1167,7 @@ export default function ConcourseDetailPage() {
                                                         >
                                                             <MessageSquare className="size-3.5" />
                                                             {(item.comment_count ?? 0) > 0 && (
-                                                                <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-[9px] font-bold">
+                                                                <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-2xs font-bold">
                                                                     {item.comment_count}
                                                                 </span>
                                                             )}

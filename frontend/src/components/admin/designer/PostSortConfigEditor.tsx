@@ -670,7 +670,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                     {t('common.optional')}
                                 </Badge>
                             </Label>
-                            <p className="text-[13px] font-medium text-indigo-600/80 leading-relaxed max-w-lg">
+                            <p className="text-sm font-medium text-indigo-600/80 leading-relaxed max-w-lg">
                                 {t('admin.design.postsort.email.desc')}
                             </p>
                         </div>

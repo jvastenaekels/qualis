@@ -947,7 +947,7 @@ const RecruitmentPage = () => {
                                             {link.type === 'individual' && (
                                                 <div className="text-2xs">
                                                     {link.usage_count > 0 ? (
-                                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 px-2 py-0 shadow-none text-[9px] font-black">
+                                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 px-2 py-0 shadow-none text-2xs font-black">
                                                             <CheckCircle2 className="size-3 mr-1" />
                                                             {t(
                                                                 'admin.recruitment.usage.completed',
@@ -955,7 +955,7 @@ const RecruitmentPage = () => {
                                                             )}
                                                         </Badge>
                                                     ) : (link.start_count || 0) > 0 ? (
-                                                        <Badge className="bg-amber-50 text-amber-700 border-amber-100 px-2 py-0 shadow-none text-[9px] font-black">
+                                                        <Badge className="bg-amber-50 text-amber-700 border-amber-100 px-2 py-0 shadow-none text-2xs font-black">
                                                             <Globe className="size-3 mr-1" />
                                                             {t(
                                                                 'admin.recruitment.usage.in_progress',
@@ -965,7 +965,7 @@ const RecruitmentPage = () => {
                                                     ) : (
                                                         <Badge
                                                             variant="secondary"
-                                                            className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
+                                                            className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-2xs font-black"
                                                         >
                                                             {t(
                                                                 'admin.recruitment.usage.unused',
@@ -1030,13 +1030,13 @@ const RecruitmentPage = () => {
                                         </TableCell>
                                         <TableCell>
                                             {link.is_active ? (
-                                                <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100 px-2 py-0 shadow-none text-[9px] font-black">
+                                                <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100 px-2 py-0 shadow-none text-2xs font-black">
                                                     {t('admin.status.active')}
                                                 </Badge>
                                             ) : (
                                                 <Badge
                                                     variant="secondary"
-                                                    className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
+                                                    className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-2xs font-black"
                                                 >
                                                     {t('admin.recruitment.revoked', 'Revoked')}
                                                 </Badge>

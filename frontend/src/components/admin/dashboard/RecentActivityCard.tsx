@@ -119,7 +119,7 @@ function ParticipantRow({
                             className="h-4 bg-white text-slate-500 border-slate-200 gap-0.5 pl-1 pr-1.5 truncate max-w-[100px]"
                         >
                             <LinkIcon className="w-2.5 h-2.5 shrink-0" />
-                            <span className="font-mono text-[9px] truncate">
+                            <span className="font-mono text-2xs truncate">
                                 {participant.recruitment_token}
                             </span>
                         </Badge>
@@ -129,7 +129,7 @@ function ParticipantRow({
                 {/* Line 2: status-specific info */}
                 {isCompleted ? (
                     <div className="flex items-center gap-1.5">
-                        <Badge className="h-4 text-[9px] font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
+                        <Badge className="h-4 text-2xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
