@@ -162,8 +162,8 @@ make demo-up
 ```
 
 **Expected result:** after the images are built and the services become healthy,
-the command ends with `Qualis services are running` and tells you what to run
-next. The first build can take several minutes; later starts reuse the images.
+the command ends with `Your Qualis stack is up and healthy.` and tells you what to
+run next. The first build can take several minutes; later starts reuse the images.
 
 Load the guided example:
 
@@ -171,9 +171,9 @@ Load the guided example:
 make demo-seed
 ```
 
-**Expected result:** the final lines say that the Bioeconomy Futures demo data
-is ready and point you to the smoke test. This step reuses the Python environment
-already built into the backend image and does not install development tools.
+**Expected result:** the final lines read `The demo data is in place.` and point
+you to the smoke test. This step reuses the Python environment already built into
+the backend image and does not install development tools.
 
 Verify the complete path:
 
@@ -181,9 +181,11 @@ Verify the complete path:
 make demo-smoke
 ```
 
-**Expected result:** `Qualis demo is ready`, followed by the login URL and demo
-credentials. If any check fails, `curl` prints an error and Make stops without
-printing the success message.
+**Expected result:** each check is named as it passes, then
+`Everything checks out — your demo is ready.` followed by the login URL and demo
+credentials. If a check fails it says which one and what to do about it — a
+stopped backend reports `checking the backend health endpoint    failed` and
+points you at `docker compose logs backend`.
 
 Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
@@ -248,7 +250,11 @@ psql -U postgres
 # In psql:
 CREATE USER qualis_user WITH PASSWORD 'qualis_pass';
 CREATE DATABASE qualis_dev OWNER qualis_user;
--- The test suite needs its own database; `make test` resets it between runs.
+-- The test suite does not reuse one database: it creates a throwaway
+-- `<name>_<worker>_<pid>` per pytest process so parallel workers never share
+-- storage, and drops it afterwards. That needs CREATEDB, without which
+-- `make test` stops at "permission denied to create database".
+ALTER ROLE qualis_user CREATEDB;
 CREATE DATABASE qualis_test OWNER qualis_user;
 \q
 
@@ -295,7 +301,8 @@ connects — run it on its own any time.
 | `WARN .env has no SECRET_KEY` / `IP_HASH_SALT`, or `still holds a CHANGEME placeholder` | Generate each with `python3 -c 'import secrets; print(secrets.token_urlsafe(48))'`. |
 | `WARN DATABASE_URL does not connect` | Run `make db-check` for the real error — `preflight` hides it so no password reaches a build log. `role "…" does not exist` means step 2 was skipped; `password authentication failed` means the role exists with a different password; `could not connect` means PostgreSQL is not running. |
 | `make migrate` → `password authentication failed` | Same cause. `make db-check` confirms it in one line. |
-| `make test` → hundreds of `asyncpg … InvalidPasswordError` | `TEST_DATABASE_URL`, not `DATABASE_URL`. Step 2 creates `qualis_test` as a second database; the test suite resets it between runs. |
+| `make test` → hundreds of `asyncpg … InvalidPasswordError` | `TEST_DATABASE_URL`, not `DATABASE_URL`. Step 2 creates `qualis_test` as a second database; the test suite derives its own throwaway database from that name. |
+| `make test` → `InsufficientPrivilegeError: permission denied to create database` | The role is missing `CREATEDB`. Each pytest process creates and drops its own `<name>_<worker>_<pid>` database. Fix with `ALTER ROLE qualis_user CREATEDB;` as a superuser. |
 | E2E fails on `The test router is not mounted` | `ENVIRONMENT` is missing or set to `production`. `TESTING=true` does **not** substitute — that variable only disables rate limiting. |
 | A spec fails locally but passes in CI | CI retries twice (`retries: process.env.CI ? 2 : 0`), so it absorbs flakes that a local run surfaces on the first attempt. Re-run the spec alone before assuming a regression. |
 

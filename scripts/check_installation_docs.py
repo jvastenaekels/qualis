@@ -10,6 +10,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+# The exact lines the demo path prints on success. Changing one means changing
+# the README paragraph that quotes it; the check below enforces that pairing.
+DEMO_SUCCESS_MESSAGES = (
+    "Your Qualis stack is up and healthy.",
+    "The demo data is in place.",
+    "Everything checks out — your demo is ready.",
+)
+
+
 def _read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
@@ -116,13 +125,19 @@ def check_demo_make_targets() -> list[str]:
                 f"Makefile lets uv re-sync development dependencies for {script}"
             )
 
-    for message in (
-        "Qualis services are running.",
-        "Demo data is ready.",
-        "Qualis demo is ready:",
-    ):
+    # The README quotes these back to the reader as "Expected result", so the
+    # two must not drift. Pinning them in the Makefile alone let a reword make
+    # the README describe output the demo no longer prints — which is how this
+    # check first failed.
+    readme = _read("README.md")
+    for message in DEMO_SUCCESS_MESSAGES:
         if message not in makefile:
             errors.append(f"Makefile demo path is missing success feedback {message!r}")
+        if message not in readme:
+            errors.append(
+                f"README does not quote the demo success message {message!r} — "
+                "its 'Expected result' text and the Makefile have drifted"
+            )
     return errors
 
 

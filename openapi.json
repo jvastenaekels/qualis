@@ -10702,6 +10702,11 @@
               "unavailable"
             ],
             "title": "Audio Storage"
+          },
+          "demo_mode": {
+            "type": "boolean",
+            "title": "Demo Mode",
+            "default": false
           }
         },
         "type": "object",
@@ -10710,7 +10715,7 @@
           "audio_storage"
         ],
         "title": "PublicConfig",
-        "description": "Minimal client bootstrap payload.\n\n``email_delivery`` is \"smtp\" when SMTP credentials are configured and\n\"manual\" otherwise (see docs/guides/running-without-smtp.md).\n\n``audio_storage`` is \"available\" when S3/object-storage credentials are\nconfigured and \"unavailable\" otherwise. When \"unavailable\", the\nparticipant audio UI is suppressed and audio-enabled studies degrade to\ntext-only (see docs/guides/running-without-s3.md)."
+        "description": "Minimal client bootstrap payload.\n\n``email_delivery`` is \"smtp\" when SMTP credentials are configured and\n\"manual\" otherwise (see docs/guides/running-without-smtp.md).\n\n``audio_storage`` is \"available\" when S3/object-storage credentials are\nconfigured and \"unavailable\" otherwise. When \"unavailable\", the\nparticipant audio UI is suppressed and audio-enabled studies degrade to\ntext-only (see docs/guides/running-without-s3.md).\n\n``demo_mode`` is True only for the throwaway compose demo stack, and lets\nthe sign-in page offer to fill the published demo account. It is a boolean\nand nothing more: no credential crosses this endpoint, so an instance that\nreports it wrongly still discloses nothing. See ``Settings.is_demo_mode``\nfor the two gates that produce it."
       },
       "QSortEntryInput": {
         "properties": {

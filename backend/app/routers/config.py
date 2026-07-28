@@ -16,4 +16,5 @@ async def get_public_config() -> PublicConfig:
     return PublicConfig(
         email_delivery="smtp" if settings.is_smtp_configured else "manual",
         audio_storage=("available" if settings.is_s3_configured else "unavailable"),
+        demo_mode=settings.is_demo_mode,
     )

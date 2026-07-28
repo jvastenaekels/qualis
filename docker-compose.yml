@@ -79,6 +79,11 @@ services:
       IP_HASH_SALT: docker-dev-salt-change-in-production
       FRONTEND_URL: http://localhost:3000
       ENVIRONMENT: development
+      # Only ever here. This stack is disposable and its credentials are
+      # published in the README, so the sign-in page may offer to fill them.
+      # docker-compose.production.yml must never set this — and even if it
+      # somehow did, ENVIRONMENT=production overrides it (Settings.is_demo_mode).
+      DEMO_MODE: "true"
       ADMIN_EMAIL: admin@example.com
       ADMIN_PASSWORD: admin123
       # Audio storage (MinIO). Backend uploads via the internal endpoint;

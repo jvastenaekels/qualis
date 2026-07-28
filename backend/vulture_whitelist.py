@@ -409,6 +409,11 @@ email_delivery
 audio_storage
 require_audio_storage
 
+# --- Demo mode (docker-compose.yml quick start) ---
+# Same shape as the two above: a PublicConfig field vulture only ever sees
+# assigned, because it is read across the JSON wire by the sign-in page.
+demo_mode
+
 # --- app/schemas/recruitment.py (#24: public-link capacity validator) ---
 # Pydantic @model_validator invoked by the framework, not called directly.
 reject_capacity_on_public

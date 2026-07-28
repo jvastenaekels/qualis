@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Loader2, Lock, AtSign, ArrowRight, ShieldCheck, Info, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { DemoAccountCard } from '@/components/auth/DemoAccountCard';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { ApiError } from '@/api/client';
 
@@ -189,6 +190,12 @@ const LoginPage = () => {
                                     {t('auth.login.card_title')}
                                 </h1>
                             </CardHeader>
+                            <DemoAccountCard
+                                onFill={(demoEmail, demoPassword) => {
+                                    setEmail(demoEmail);
+                                    setPassword(demoPassword);
+                                }}
+                            />
                             {resetSuccess && (
                                 <div className="px-6 pb-2">
                                     <div
