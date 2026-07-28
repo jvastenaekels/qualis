@@ -1316,6 +1316,58 @@ git commit -m "fix(admin): remove duplicated actions, titles and notices"
 
 ---
 
+## Phase 5 — closed, and what it left behind
+
+All three tasks merged: 5.1 (#349), 5.2 (#348), 5.3 (#347).
+
+**Each found the plan's own failure shape one level deeper than the task described.**
+
+- **5.2** — `CLAUDE.md` forbids the `last.charAt(0).toUpperCase()` breadcrumb fallback and
+  requires a `mapping` entry per segment. The fallback was still there, and `/app/users` had
+  **no entry at all** — it only looked right because "users" title-cases to "Users". A defect
+  that renders a plausible string, so nothing flags it. The residual branch now returns the
+  segment verbatim, so a future miss is visibly wrong rather than plausibly right.
+- **5.3** — the `h2` → `h1` promotion broke `heading-order`, and **three local gates missed
+  it**: `lint:a11y` inspects controls only, vitest does not render the page, and the report's
+  true claim that the h1 count was unchanged at one was insufficient. *Count is not order.*
+  Only axe, in E2E, measures the sequence. Fixing it surfaced a **pre-existing** `h2 → h4`
+  skip on the q-sort step that reads the same way on `main` — the a11y spec audits the intro
+  step only, so the other six had never been looked at.
+- **5.1** — closing the 112 fallback/JSON divergences surfaced a live bug:
+  `ImageUploadInput.tsx:72` passed a template-literal fallback with no interpolation options,
+  rendering the literal `{{size}}kb` to users. The unused-key sweep found **396 of 2176 keys
+  (18%)** unused, not the 2 the brief predicted — including a dead `admin.team.*` block
+  inventing an `owner/editor/viewer` role taxonomy the enum does not have.
+
+### Two techniques established here, worth reusing
+
+- **Before adding an English-only key, check whether the other eight locales already
+  translated the canonical term.** 5.2 found they had, so copying their own existing values
+  made the i18n warning delta **zero** instead of several hundred — and fixed a `pl`
+  breadcrumb that had been showing the untranslated English "Settings". 5.1 reused it.
+- **A gate that cannot reach zero should not be wired in yet.** 5.1 was asked to add the
+  missing JSON→code half of 4.4's gate and **declined**, with the right reason: a correct
+  scanner starts at 345 failures, which means a 345-entry `DEFERRED` list — the exact
+  anti-pattern that file's own comment warns against. Proposed order: reporting-only in
+  `make check`, one deletion wave, then blocking.
+
+### Open debts carried out of Phase 5
+
+5. **The L2 header policy's premise fails below `md`.** `CLAUDE.md` justifies keeping the
+   entity name out of the L2 header because "it is in the breadcrumb already" — but the
+   breadcrumb's project and study segments are `hidden md:block`. Below 768px the study name
+   is visible **nowhere** on every study-scoped admin page (Design, Analysis, Access, …).
+   Pre-existing and general; 5.3 made Design consistent with it rather than causing it.
+6. **345 unused i18n keys remain** after 5.1 deleted 52. Needs one deletion wave, then the
+   reverse gate can go blocking.
+7. **Seven locales (de/es/fi/it/nl/pl/pt) retain pre-canon wording on 25 keys.** Listed in
+   task 5.1's report, deliberately not machine-translated.
+8. **Playwright cannot run locally**: `/api/test/*` 404s because the test router mounts on
+   `settings.ENVIRONMENT in ["test","development"]` while `playwright.config.ts:126` sets
+   `TESTING=true` — a different variable. Worth fixing; it is why 5.3's regression reached CI.
+
+---
+
 # PHASE 6 — Visual finish
 
 ### Task 6.1: A slug input that measures its own prefix
