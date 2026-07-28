@@ -17,7 +17,7 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **Time required:** ~30 minutes
 
-**Prerequisites:** A running Qualis instance and an account with Owner or Member access to a project (the roles that can create studies). For the quickest local start, use the [Docker quick start](../../README.md#quick-start-docker). For a development environment with hot reload, use the [Development Workflow guide](../contributing/development.md).
+**Prerequisites:** A running Qualis instance and an account with Owner or Member access to a project (the roles that can create studies). For the quickest local start, use the [Docker demo](../../README.md#try-the-demo-docker). For a development environment with hot reload, use the [Development Workflow guide](../contributing/development.md).
 
 > **Following the English labels.** The administration interface initially follows your browser language. If it is not in English, use the language selector near the bottom of the left sidebar and select **EN — English**. The participant-facing language is configured separately for each study.
 

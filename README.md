@@ -12,16 +12,34 @@ Design studies, collect Q-sorts, and run factor analysis in the browser. Partici
 [![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19985835.svg)](https://doi.org/10.5281/zenodo.19985835)
 
-> **First time here?** [Start Qualis locally with Docker](#quick-start-docker).
-> The guided demo takes three commands and opens at `http://localhost:3000`.
+---
+
+## Where to start
+
+| What you want | Where to go |
+| :--- | :--- |
+| **See what Qualis does** | [Try the demo](#try-the-demo-docker) — three commands, a worked example study, nothing to configure. |
+| **Run studies with real participants** | [Deployment guide](docs/guides/deployment.md) — Scalingo or `docker-compose.production.yml`. Start here for anything that collects real data. |
+| **Work on Qualis itself** | [Local development setup](#local-development-setup) — hot reload, tests, contributing. |
 
 ---
 
-## Quick start (Docker)
+## Try the demo (Docker)
 
-**This is how you run Qualis.** Three commands bring up PostgreSQL, the backend, and the built frontend, with a worked example study already loaded — no configuration file to write first. Use it to evaluate Qualis, to run a pilot, or as the basis of a self-hosted deployment (see [Deployment](docs/guides/deployment.md) for production settings).
+Three commands bring up PostgreSQL, the backend and the built frontend, with the
+Bioeconomy Futures example study and 18 Q-sorts already loaded — no configuration
+file to write first.
 
-The [local development setup](#local-development-setup) below is for contributing to Qualis itself.
+> [!WARNING]
+> **The demo stack is for evaluation only. Never point real participants at it.**
+> It signs its sessions with a key published in this repository, ships a known
+> administrator account (`admin@example.com` / `admin123`) that its own sign-in
+> page advertises, runs PostgreSQL with `fsync=off` because the data is meant to
+> be thrown away, and — because it runs with `ENVIRONMENT=development` — exposes
+> an unauthenticated `/api/test/cleanup-all` endpoint that erases everything.
+>
+> For real studies, follow the [deployment guide](docs/guides/deployment.md).
+> It uses `docker-compose.production.yml`, which shares none of the above.
 
 > The first `make demo-up` **builds the backend and frontend images from source** (no pre-built image is pulled), so the initial run compiles the stack and may take a few minutes; subsequent runs reuse the cached layers. Qualis is self-hosted by design — there is no third-party-hosted instance, which is the point: participant data stays on infrastructure you control.
 
@@ -305,7 +323,7 @@ to regenerate the reference from R.
 
 ### Deploy
 
-Qualis deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for Scalingo, Render, Heroku, and Docker instructions.
+Qualis deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for the two documented paths: Scalingo, and Docker via `docker-compose.production.yml`.
 
 ---
 

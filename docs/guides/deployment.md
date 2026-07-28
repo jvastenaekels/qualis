@@ -8,14 +8,19 @@ For the canonical list of environment variables (with types and defaults), see [
 
 ## Supported platforms
 
-| Platform | Difficulty | Status |
-| -------- | ---------- | ------ |
-| **Scalingo** | Easy | Documented below; primary supported target. |
-| **Docker (self-host)** | Medium | `docker-compose.production.yml` in repo root; see [Docker](#docker). |
-| **Render** | Easy | Generic Python + Postgres app; same env vars as Scalingo. |
-| **Heroku** | Medium | Generic Python buildpack; same env vars and `Procfile` apply. |
+Two paths are documented, and both are exercised:
 
-The Scalingo path is the one used in production by the maintainer; the others are known to work with the standard Python buildpack but are not documented step-by-step.
+| Platform | Status |
+| -------- | ------ |
+| **Scalingo** | Documented [below](#scalingo). The instance the maintainer runs in production. |
+| **Docker (self-host)** | Documented [below](#docker). `docker-compose.production.yml` in the repo root, and the stack CI builds and health-checks on every pull request. |
+
+Qualis is an ordinary Python app with a `Procfile`, so any platform that speaks
+the standard Python buildpack — Heroku, Render, Clever Cloud — should run it with
+the same environment variables. Those are **not** tested and not documented
+step-by-step here, so treat them as plausible rather than supported: earlier
+versions of this page rated their difficulty, which implied a verification that
+had never happened.
 
 ---
 
@@ -38,6 +43,16 @@ graph LR
 
 - A Scalingo account and the [Scalingo CLI](https://doc.scalingo.com/cli).
 - The repository pushed to GitHub or GitLab.
+
+`scalingo.json` in the repo root declares the addon and every variable the app
+needs, generating `SECRET_KEY`, `IP_HASH_SALT` and `ADMIN_PASSWORD` rather than
+letting them fall back to defaults. A one-click deploy from that manifest asks
+only for `ADMIN_EMAIL`, `FRONTEND_URL` and `ALLOWED_ORIGINS`; the generated
+password is readable from the app's environment variables in the dashboard, and
+should be changed after the first login.
+
+The steps below do the same thing from the CLI, which is what you want when
+deploying into an existing app or an organisation account.
 
 ### Steps
 
@@ -187,7 +202,9 @@ when needed; audio also requires S3-compatible object storage.
 
 ## Required environment variables
 
-The minimum set for any production deployment:
+The minimum set for any production deployment. The two `QUALIS_*` rows apply to
+the Docker path only, where `docker-compose.production.yml` declares them with
+`${VAR:?}` — Compose refuses to start if either is unset.
 
 | Variable | Required | Notes |
 | -------- | :------: | ----- |
@@ -200,6 +217,8 @@ The minimum set for any production deployment:
 | `ADMIN_EMAIL` | first deploy | Email of the initial owner created when the database is empty. |
 | `ADMIN_PASSWORD` | first deploy | Unique initial password. Demo/template values are rejected in production. |
 | `TRUSTED_PROXIES` | behind a proxy | Set to `*` on Scalingo; use explicit proxy IPs on infrastructure you control. |
+| `QUALIS_DB_PASSWORD` | Docker only | Password for the bundled Postgres service. `docker-compose.production.yml` refuses to start without it. |
+| `QUALIS_ALLOWED_HOST_PATTERN` | Docker only | Regex of hosts the backend will answer for. Also mandatory — use `[.]` for literal dots. |
 
 For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
 
