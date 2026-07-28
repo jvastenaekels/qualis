@@ -162,8 +162,8 @@ make demo-up
 ```
 
 **Expected result:** after the images are built and the services become healthy,
-the command ends with `Qualis services are running` and tells you what to run
-next. The first build can take several minutes; later starts reuse the images.
+the command ends with `Your Qualis stack is up and healthy.` and tells you what to
+run next. The first build can take several minutes; later starts reuse the images.
 
 Load the guided example:
 
@@ -171,9 +171,9 @@ Load the guided example:
 make demo-seed
 ```
 
-**Expected result:** the final lines say that the Bioeconomy Futures demo data
-is ready and point you to the smoke test. This step reuses the Python environment
-already built into the backend image and does not install development tools.
+**Expected result:** the final lines read `The demo data is in place.` and point
+you to the smoke test. This step reuses the Python environment already built into
+the backend image and does not install development tools.
 
 Verify the complete path:
 
@@ -181,9 +181,11 @@ Verify the complete path:
 make demo-smoke
 ```
 
-**Expected result:** `Qualis demo is ready`, followed by the login URL and demo
-credentials. If any check fails, `curl` prints an error and Make stops without
-printing the success message.
+**Expected result:** each check is named as it passes, then
+`Everything checks out — your demo is ready.` followed by the login URL and demo
+credentials. If a check fails it says which one and what to do about it — a
+stopped backend reports `checking the backend health endpoint    failed` and
+points you at `docker compose logs backend`.
 
 Open [http://localhost:3000/login](http://localhost:3000/login) and log in with:
 
