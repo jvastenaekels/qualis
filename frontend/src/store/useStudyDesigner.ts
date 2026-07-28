@@ -19,6 +19,14 @@ import { produce } from 'immer';
  */
 export type DraftTranslation = StudyTranslationCreate & { _is_copy?: boolean };
 
+/**
+ * The designer's save state. Named and exported rather than inlined so the
+ * guards that enumerate it can be checked against the type — three separate
+ * enumerations of this union had each silently handled only three of its four
+ * values. See `hasUnsavedWork` in useStudyPersistence.helpers.ts.
+ */
+export type SyncStatus = 'synced' | 'saving' | 'error' | 'modified';
+
 export interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
@@ -32,7 +40,7 @@ export interface StudyDesignerState {
         | 'branding';
     activeSubStep?: string;
     activeLocale: string;
-    syncStatus: 'synced' | 'saving' | 'error' | 'modified';
+    syncStatus: SyncStatus;
     lastSavedAt: Date | null;
 
     // Actions

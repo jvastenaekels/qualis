@@ -1,7 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStudyDesigner, projectStudyToUpdate } from '@/store/useStudyDesigner';
-import { isDraftInSync, resolveServerConflict } from './useStudyPersistence.helpers';
+import {
+    hasUnsavedWork,
+    isDraftInSync,
+    resolveServerConflict,
+} from './useStudyPersistence.helpers';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 import type { StudyUpdate, StudyRead } from '@/api/model';
 import { useBlocker, useParams } from 'react-router-dom';
@@ -37,7 +41,7 @@ export function useStudyPersistence() {
     // 2. BeforeUnload Guard
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (syncStatus === 'modified' || syncStatus === 'saving') {
+            if (hasUnsavedWork(syncStatus)) {
                 e.preventDefault();
                 e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
             }
@@ -49,8 +53,7 @@ export function useStudyPersistence() {
     // 3. React Router Navigation Guard (Internal Link Blocking)
     const blocker = useBlocker(
         ({ currentLocation, nextLocation }) =>
-            (syncStatus === 'modified' || syncStatus === 'saving') &&
-            currentLocation.pathname !== nextLocation.pathname
+            hasUnsavedWork(syncStatus) && currentLocation.pathname !== nextLocation.pathname
     );
 
     // Exposed blocker for UI handling
@@ -80,7 +83,7 @@ export function useStudyPersistence() {
         // as a safety net against crashes/refreshes. Debounced 1s so we don't
         // hammer storage on every keystroke.
         const backupTimer = setTimeout(() => {
-            if (syncStatus === 'modified' || syncStatus === 'saving') {
+            if (hasUnsavedWork(syncStatus)) {
                 const backupData = {
                     ...draft,
                     _study_id: original?.id,
@@ -159,6 +162,18 @@ export function useStudyPersistence() {
                 } catch (mergeError) {
                     console.error('Merge failed', mergeError);
                     setSyncStatus('error');
+                    // Both sibling failure paths (the hard-conflict branch in
+                    // applyConflict and the generic branch below) raise a toast;
+                    // this one did not. The Save button's accessible name is
+                    // "Save" in both 'modified' and 'error', so without this a
+                    // screen-reader user got no signal at all that the save had
+                    // failed — only a colour change they could not perceive.
+                    toast.error(
+                        t(
+                            'admin.study.save.conflict',
+                            'Conflict detected. Some changes could not be merged.'
+                        )
+                    );
                 }
             } else {
                 console.error('Save failed:', error);
