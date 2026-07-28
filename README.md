@@ -323,7 +323,7 @@ to regenerate the reference from R.
 
 ### Deploy
 
-Qualis deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for Scalingo, Render, Heroku, and Docker instructions.
+Qualis deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for the two documented paths: Scalingo, and Docker via `docker-compose.production.yml`.
 
 ---
 
