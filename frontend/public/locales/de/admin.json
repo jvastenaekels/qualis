@@ -937,15 +937,16 @@
             "participants": "Teilnehmer",
             "team": "Team",
             "recruitment": "Zugang",
-            "exports": "Daten",
             "data": "Daten",
             "privacy": "Datenschutz",
             "account": "Kontoeinstellungen",
             "participant_n": "Teilnehmer {{code}}",
             "analysis": "Analyse",
-            "settings": "Einstellungen",
+            "project_settings": "Projekteinstellungen",
+            "study_settings": "Studieneinstellungen",
             "concourse": "Aussagenpool",
             "members": "Teammitglieder",
+            "users": "Benutzer",
             "nav_label": "Brotkrümelnavigation"
         },
         "command_menu": {
@@ -971,7 +972,7 @@
             "switched_project": "Zu {{name}} gewechselt"
         },
         "dashboard": {
-            "title": "Projekt-Dashboard",
+            "title": "Dashboard",
             "welcome": "Willkommen zurück,",
             "snapshot": "Hier ist ein Überblick über Ihre Forschungsaktivitäten.",
             "create_study": "Studie erstellen",
@@ -1249,7 +1250,7 @@
             }
         },
         "design": {
-            "title": "Studiendesign",
+            "title": "Design",
             "translation_needed": "Überprüfung erforderlich (Kopie)",
             "reset_defaults": "Auf Standard zurücksetzen",
             "editing_language_banner": "Sie bearbeiten die {{language}}-Version. Verwenden Sie die Sprachauswahl in der Werkzeugleiste, um zu wechseln.",
@@ -2005,7 +2006,7 @@
             "draft": "Entwurf"
         },
         "settings": {
-            "title": "Einstellungen",
+            "title": "Studieneinstellungen",
             "description": "Datenspeicherung, Archivierung und Studienlöschung.",
             "lifecycle": {
                 "title": "Archivierung",

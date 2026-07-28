@@ -937,15 +937,16 @@
             "participants": "Participantes",
             "team": "Equipa",
             "recruitment": "Acesso",
-            "exports": "Dados",
             "data": "Dados",
             "privacy": "Privacidade de dados",
             "account": "Definições da conta",
             "participant_n": "Participante {{code}}",
             "analysis": "Análise",
-            "settings": "Definições",
+            "project_settings": "Definições do projeto",
+            "study_settings": "Definições do estudo",
             "concourse": "Concurso",
             "members": "Membros da equipa",
+            "users": "Utilizadores",
             "nav_label": "rasto de navegação"
         },
         "command_menu": {
@@ -971,7 +972,7 @@
             "switched_project": "Mudou para {{name}}"
         },
         "dashboard": {
-            "title": "Painel do projeto",
+            "title": "Painel",
             "welcome": "Bem-vindo/a de volta,",
             "snapshot": "Aqui está um resumo da sua atividade de investigação.",
             "create_study": "Criar estudo",
@@ -1249,7 +1250,7 @@
             }
         },
         "design": {
-            "title": "Desenho do estudo",
+            "title": "Desenho",
             "translation_needed": "Revisão necessária (cópia)",
             "reset_defaults": "Repor valores predefinidos",
             "editing_language_banner": "A editar a versão em {{language}}. Use o seletor de idioma na barra de ferramentas para mudar.",
@@ -2005,7 +2006,7 @@
             "draft": "Rascunho"
         },
         "settings": {
-            "title": "Definições",
+            "title": "Definições do estudo",
             "description": "Retenção de dados, arquivamento e eliminação de estudos.",
             "lifecycle": {
                 "title": "Arquivamento",

@@ -258,19 +258,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: true,
                   },
                   {
-                      title: t('admin.sidebar.design'),
+                      title: t('admin.sidebar.design', 'Design'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/design`,
                       icon: PencilRuler,
                       show: can('study:edit_design'),
                   },
                   {
-                      title: t('admin.sidebar.recruit'),
+                      title: t('admin.sidebar.recruit', 'Access'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/recruitment`,
                       icon: Link2,
                       show: can('study:launch_recruitment'),
                   },
                   {
-                      title: t('admin.sidebar.data'),
+                      title: t('admin.sidebar.data', 'Data'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}/data`,
                       icon: Download,
                       show: can('study:view_data'),
@@ -332,7 +332,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 >
                                     <Search className="size-3.5 mr-2" />
                                     <span className="text-xs">
-                                        {t('admin.sidebar.search', 'Search')}
+                                        {t('admin.sidebar.search', 'Search...')}
                                     </span>
                                     <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-2xs font-medium text-muted-foreground opacity-100">
                                         <span className="text-xs">⌘</span>K
@@ -372,7 +372,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     }}
                                 >
                                     <Search className="size-3.5 mr-2" />
-                                    <span className="text-xs">{t('admin.sidebar.search')}</span>
+                                    <span className="text-xs">
+                                        {t('admin.sidebar.search', 'Search...')}
+                                    </span>
                                     <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-2xs font-medium text-muted-foreground opacity-100">
                                         <span className="text-xs">⌘</span>K
                                     </kbd>

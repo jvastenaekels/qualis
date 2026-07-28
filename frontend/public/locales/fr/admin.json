@@ -846,15 +846,16 @@
             "participants": "Participants",
             "team": "Équipe",
             "recruitment": "Accès",
-            "exports": "Données",
             "data": "Données",
             "privacy": "Confidentialité",
             "account": "Paramètres du compte",
             "participant_n": "Participant {{code}}",
             "analysis": "Analyse",
-            "settings": "Réglages",
+            "project_settings": "Réglages du projet",
+            "study_settings": "Réglages",
             "concourse": "Concours",
             "members": "Membres de l'équipe",
+            "users": "Utilisateurs",
             "nav_label": "fil d'Ariane"
         },
         "command_menu": {
@@ -880,7 +881,7 @@
             "switched_project": "Basculé vers {{name}}"
         },
         "dashboard": {
-            "title": "Tableau de bord du projet",
+            "title": "Tableau de bord",
             "welcome": "Bon retour,",
             "snapshot": "Voici un aperçu de votre activité de recherche.",
             "create_study": "Créer une étude",
@@ -1691,7 +1692,7 @@
                     "remove_default": "Retirer l'image"
                 }
             },
-            "title": "Conception de l'étude",
+            "title": "Conception",
             "activate_dialog": {
                 "title": "Activer cette étude ?",
                 "description": "L’activation ouvre le recrutement et déverrouille les liens publics. De vrais participants peuvent commencer à répondre.",

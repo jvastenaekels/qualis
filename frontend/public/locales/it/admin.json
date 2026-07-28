@@ -937,15 +937,16 @@
             "participants": "Partecipanti",
             "team": "Team",
             "recruitment": "Accesso",
-            "exports": "Dati",
             "data": "Dati",
             "privacy": "Privacy dei dati",
             "account": "Impostazioni account",
             "participant_n": "Partecipante {{code}}",
             "analysis": "Analisi",
-            "settings": "Impostazioni",
+            "project_settings": "Impostazioni progetto",
+            "study_settings": "Impostazioni studio",
             "concourse": "Concorso",
             "members": "Membri del team",
+            "users": "Utenti",
             "nav_label": "percorso di navigazione"
         },
         "command_menu": {
@@ -971,7 +972,7 @@
             "switched_project": "Passato a {{name}}"
         },
         "dashboard": {
-            "title": "Dashboard del progetto",
+            "title": "Dashboard",
             "welcome": "Bentornato,",
             "snapshot": "Ecco un riepilogo della sua attività di ricerca.",
             "create_study": "Crea studio",
@@ -1249,7 +1250,7 @@
             }
         },
         "design": {
-            "title": "Progettazione studio",
+            "title": "Progettazione",
             "translation_needed": "Revisione richiesta (testo)",
             "reset_defaults": "Ripristina valori predefiniti",
             "editing_language_banner": "Modifica della versione {{language}}. Utilizzi il selettore lingua nella barra degli strumenti per cambiare.",
@@ -2005,7 +2006,7 @@
             "draft": "Bozza"
         },
         "settings": {
-            "title": "Impostazioni",
+            "title": "Impostazioni studio",
             "description": "Conservazione dei dati, archiviazione ed eliminazione dello studio.",
             "lifecycle": {
                 "title": "Archiviazione",

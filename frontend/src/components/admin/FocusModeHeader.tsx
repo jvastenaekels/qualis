@@ -33,7 +33,7 @@ export function FocusModeHeader({
                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
                 <ArrowLeft className="h-4 w-4" />
-                <span>{projectTitle || t('admin.sidebar.project')}</span>
+                <span>{projectTitle || t('admin.sidebar.project', 'Project')}</span>
             </button>
             <div className="px-2">
                 <Badge variant="outline" className="font-semibold" title={title}>

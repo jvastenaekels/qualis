@@ -937,15 +937,16 @@
             "participants": "Participantes",
             "team": "Equipo",
             "recruitment": "Acceso",
-            "exports": "Datos",
             "data": "Datos",
             "privacy": "Privacidad de datos",
             "account": "Configuración de cuenta",
             "participant_n": "Participante {{code}}",
             "analysis": "Análisis",
-            "settings": "Configuración",
+            "project_settings": "Configuración del proyecto",
+            "study_settings": "Configuración del estudio",
             "concourse": "Concurso",
             "members": "Miembros del equipo",
+            "users": "Usuarios",
             "nav_label": "ruta de navegación"
         },
         "command_menu": {
@@ -971,7 +972,7 @@
             "switched_project": "Cambiado a {{name}}"
         },
         "dashboard": {
-            "title": "Panel del proyecto",
+            "title": "Panel",
             "welcome": "Bienvenido de nuevo,",
             "snapshot": "Aquí tiene un resumen de su actividad de investigación.",
             "create_study": "Crear estudio",
@@ -1249,7 +1250,7 @@
             }
         },
         "design": {
-            "title": "Diseño del estudio",
+            "title": "Diseño",
             "translation_needed": "Revisión requerida (texto)",
             "reset_defaults": "Restablecer valores predeterminados",
             "editing_language_banner": "Editando la versión en {{language}}. Use el selector de idioma en la barra de herramientas para cambiar.",
@@ -2005,7 +2006,7 @@
             "draft": "Borrador"
         },
         "settings": {
-            "title": "Configuración",
+            "title": "Configuración del estudio",
             "description": "Retención de datos, archivado y eliminación del estudio.",
             "lifecycle": {
                 "title": "Archivado",
