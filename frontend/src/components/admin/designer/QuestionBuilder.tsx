@@ -201,8 +201,25 @@ const QuestionItem = (props: QuestionItemProps) => {
             data-testid="question-item"
             className={cn(
                 'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
-                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20',
-                readOnly && 'opacity-80'
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
+                // No `readOnly && 'opacity-80'` (task 6.5 review, F3). `readOnly` is
+                // `api.isFullyReadOnly` = `draft.state !== 'draft'`, i.e. every active,
+                // paused or closed study — the normal steady state of any launched
+                // study, not an edge case, and nothing here is a disabled *component*
+                // that WCAG would exempt. Opacity multiplies into the computed
+                // contrast, so at 80% the promoted text inside landed at slate-500 @
+                // 80% over white = #8390a2 → 3.25:1 (the "Untitled" placeholder and the
+                // field labels) and 3.17:1 for the question-type chip on its slate-50
+                // pill — the latter being, to two decimals, the 3.24:1 case this repo's
+                // own a11y gate documents as the failure it exists to catch
+                // (scripts/check-a11y-names.mjs). Removing it puts them at 4.76:1.
+                //
+                // Nothing is lost: read-only-ness was never carried by a 20% dim. The
+                // drag handle, the copy-from-language menu and the delete button are
+                // not rendered at all, every Input is `readOnly` with
+                // `cursor-not-allowed opacity-70`, and every Switch is `disabled` —
+                // three stronger, still-present signals, each on a control where the
+                // inactive-component exemption genuinely does apply.
             )}
         >
             <div className="flex items-start p-4 gap-4">
@@ -393,7 +410,14 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                     <div
                                         data-testid="question-type-label"
-                                        className="text-2xs text-slate-500 font-black bg-slate-50 px-2 py-1 rounded-lg"
+                                        // slate-600, not slate-500 (task 6.5 review, F3):
+                                        // this chip is the one promoted node here that
+                                        // does not sit on white. slate-500 on bg-slate-50
+                                        // is 4.55:1 — a 1% margin over the 4.5:1 floor for
+                                        // 11-12px text, the same zero-margin fragility the
+                                        // review flagged elsewhere. slate-600 on slate-50
+                                        // is 7.24:1.
+                                        className="text-2xs text-slate-600 font-black bg-slate-50 px-2 py-1 rounded-lg"
                                     >
                                         {question.type}
                                     </div>

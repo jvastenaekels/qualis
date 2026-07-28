@@ -1,3 +1,4 @@
+import { act } from '@testing-library/react';
 import { renderWithProviders, screen, waitFor, within, fireEvent } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -458,5 +459,76 @@ describe('StudyDesignPage Feature Tests', () => {
         } finally {
             await i18n.changeLanguage('en');
         }
+    });
+
+    /*
+     * Task 6.5 review, F1. `syncStatus` is a FOUR-value union
+     * (store/useStudyDesigner.ts) and 'error' is set on three real paths in
+     * hooks/useStudyPersistence.ts — save conflict, merge failure, save failure —
+     * where it is also sticky. On a draft study none of the button's three
+     * `disabled` conditions holds in that state, so the Save button stays enabled
+     * and focusable: it is the user's retry control. It used to fall through to the
+     * muted "saved" arm and paint at `text-slate-400` = 2.56:1 on white, failing
+     * both 1.4.3 (4.5:1) and 1.4.11 (3:1), with no `disabled:opacity-50` to claim
+     * WCAG's inactive-component exemption — the component is not inactive. Worse,
+     * it rendered a green tick and the word "Saved" over a save that had failed.
+     */
+    describe('the Save button in the error state', () => {
+        async function renderInErrorState() {
+            renderPage();
+            await screen.findByTestId('readiness-checklist');
+
+            // The 'error' arm is only reachable on a dirty draft: the persistence
+            // effect downgrades any status to 'synced' while the draft matches the
+            // server, and refuses to downgrade 'error' once the draft differs.
+            await act(async () => {
+                useStudyDesigner.getState().updateDraft((d) => {
+                    d.randomize_statement_order = !d.randomize_statement_order;
+                });
+            });
+            await act(async () => {
+                useStudyDesigner.setState({ syncStatus: 'error' });
+            });
+
+            return screen.getByTitle('Save error');
+        }
+
+        it('leaves the retry control enabled, which is why no exemption applies to it', async () => {
+            const button = await renderInErrorState();
+
+            expect(button).toBeEnabled();
+            expect(button).not.toHaveAttribute('aria-disabled', 'true');
+        });
+
+        it('paints it at a token that clears the floor, and carries no resting opacity', async () => {
+            const button = await renderInErrorState();
+
+            // red-700 on red-50 = 5.91:1 (text 4.5:1, non-text 3:1 — both cleared).
+            // The token alone would not be enough: any resting opacity would
+            // multiply straight back into the computed ratio, which is the whole
+            // defect class this task exists to remove.
+            expect(button).toHaveClass('text-red-700');
+            expect(button).toHaveClass('bg-red-50');
+            expect(button).not.toHaveClass('text-slate-400');
+            expect(button.className).not.toMatch(/(?:^|\s)opacity-\d/);
+        });
+
+        it('reads as a failed save rather than borrowing the green "Saved" tick', async () => {
+            const button = await renderInErrorState();
+
+            expect(button).toHaveTextContent('Save');
+            expect(button).not.toHaveTextContent('Saved');
+            expect(button.querySelector('svg.lucide-circle-alert')).not.toBeNull();
+            expect(button.querySelector('svg.lucide-circle-check-big')).toBeNull();
+        });
+
+        it('still mutes the synced state, where the button really is disabled', async () => {
+            renderPage();
+            await screen.findByTestId('readiness-checklist');
+
+            const button = screen.getByTitle('Save');
+            expect(button).toBeDisabled();
+            expect(button).toHaveClass('text-slate-400');
+        });
     });
 });

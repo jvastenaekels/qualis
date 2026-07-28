@@ -447,9 +447,23 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         return (
                             <div
                                 key={step.id}
-                                className={`space-y-6 transition-opacity ${
-                                    stepEnabled ? '' : 'opacity-50'
-                                }`}
+                                // No `opacity-50` on a disabled step (task 6.5 review,
+                                // F4). The exemption that covers the <Label>/<Input>
+                                // pair below — the input really is `disabled`, so it is
+                                // an inactive component — does not reach the two nodes
+                                // that explain the state and are attached to no control
+                                // at all: the "Step N: <name>" badge (indigo-900 on
+                                // bg-indigo-50/50 fell from 10.81:1 to 2.76:1) and the
+                                // "(step disabled)" marker beside it (slate-500, 4.76:1
+                                // → 1.96:1). Dimming the sentence that says *why* the
+                                // block is dimmed until it cannot be read is
+                                // self-defeating, so the opacity is gone and the
+                                // disabled affordance is carried where WCAG does exempt
+                                // it: the Inputs are `disabled` and ui/input ships
+                                // `disabled:opacity-50 disabled:cursor-not-allowed`, the
+                                // reset Button is disabled too, and the state is stated
+                                // in words by the marker. `aria-disabled` is unchanged.
+                                className="space-y-6"
                                 aria-disabled={!stepEnabled || undefined}
                             >
                                 <div className="flex items-center justify-between">

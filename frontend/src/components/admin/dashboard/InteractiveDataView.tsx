@@ -854,8 +854,30 @@ export default function InteractiveDataView({
                                         key={row.id}
                                         className={cn(
                                             'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                            // No `opacity-60` on a discarded row (task 6.5
+                                            // review, F2). `is_discarded` is a persisted
+                                            // flag, so this is a RESTING state, and the row
+                                            // keeps `cursor-pointer` and an unconditional
+                                            // onClick that navigates — it is an operable
+                                            // component, so WCAG's inactive-component
+                                            // exemption does not apply to it. At 60% the
+                                            // seven promoted cells inside (the four `—`
+                                            // empty-value markers plus the OS, browser and
+                                            // language glyphs) composited to slate-500 @ 60%
+                                            // over white = #a2acb9 → 2.30:1, under even the
+                                            // 3:1 non-text floor.
+                                            //
+                                            // The de-emphasis itself is worth keeping, so it
+                                            // is carried by two signals that do not touch
+                                            // contrast: a slate-50 surface (slate-500 on
+                                            // #f8fafc = 4.55:1, still clears 4.5:1) and the
+                                            // existing desaturation, which drains the colour
+                                            // out of the ID badge and the status chips. The
+                                            // row also names itself in words — see the
+                                            // "Discarded" badge in
+                                            // InteractiveDataView.columns.tsx.
                                             !!row.original.is_discarded &&
-                                                'opacity-60 grayscale-[0.5]'
+                                                'bg-slate-50 grayscale-[0.5]'
                                         )}
                                         onClick={(e) => {
                                             // Belt-and-braces (Task 6.7i
