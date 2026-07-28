@@ -1850,3 +1850,38 @@ form false-positives on any `<Button>`, because `\b` matches inside `disabled:op
 **Verify by computation against the actual background**, not against white — several admin
 surfaces are tinted, and a promoted shade that passes on white can still fail on its own
 background (6.5 found `slate-500` at 4.34:1 on `bg-slate-100` and 4.26:1 on `bg-indigo-50`).
+
+---
+
+### Task 6.12: A failed save can be navigated away from silently
+
+**Found by the verification pass on Task 6.5's F1 fix. Pre-existing, and the most
+consequential thing this plan has turned up — this one loses user work.**
+
+`useStudyPersistence.ts:40` (the `beforeunload` guard) and `:52` (the router blocker) both
+enumerate only `'modified' | 'saving'`. But `syncStatus` is a **four**-value union, and
+`'error'` is *sticky* (`:75` refuses to downgrade it while the draft is dirty).
+
+So: a researcher edits a study, the save fails, the status parks on `'error'` with the
+draft still dirty — and **both guards are blind to it**. They close the tab or navigate
+away and lose the edits with no warning. The one state where a warning matters most is the
+one state neither guard covers.
+
+This is exactly the F1 shape, one file over: an enumeration written over a four-value union
+that silently handles three. F1 existed because `'error'` was dropped from that union in
+prose; this exists because it was dropped from the same union in code.
+
+**Second finding, same file.** `:159-162` — the merge-throw path sets `'error'` with a
+`console.error` and **no `toast.error`**, unlike the sibling paths at `:139` and `:166`.
+The Save button's accessible name is "Save" in both `'modified'` and `'error'` at ≥md, so
+a screen-reader user on that path receives **no signal at all** that the save failed.
+
+**Fix:** add `'error'` to both guard enumerations; add the missing `toast.error`. Small —
+roughly one token each — but it changes navigation-guard behaviour, so it needs its own
+tests rather than riding along in a styling PR. That is why 6.5 logged it instead of
+grabbing it.
+
+**Verify:** drive the real `'error'` state (not `setState`) through each of the three paths
+that set it — `:145` unmergeable 409, `:161` merge threw, `:165` other failure — and assert
+the guard fires and the toast appears. Task 6.5's own tests drove state via `setState`, so
+nothing currently guards `'error'`'s reachability or stickiness; do not repeat that.
