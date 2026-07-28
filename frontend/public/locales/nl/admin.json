@@ -937,15 +937,16 @@
             "participants": "Deelnemers",
             "team": "Team",
             "recruitment": "Toegang",
-            "exports": "Data",
             "data": "Data",
             "privacy": "Gegevensprivacy",
             "account": "Accountinstellingen",
             "participant_n": "Deelnemer {{code}}",
             "analysis": "Analyse",
-            "settings": "Instellingen",
+            "project_settings": "Projectinstellingen",
+            "study_settings": "Onderzoeksinstellingen",
             "concourse": "Concours",
             "members": "Teamleden",
+            "users": "Gebruikers",
             "nav_label": "kruimelpad"
         },
         "command_menu": {
@@ -971,7 +972,7 @@
             "switched_project": "Overgeschakeld naar {{name}}"
         },
         "dashboard": {
-            "title": "Projectdashboard",
+            "title": "Dashboard",
             "welcome": "Welkom terug,",
             "snapshot": "Een overzicht van uw onderzoeksactiviteit.",
             "create_study": "Onderzoek aanmaken",
@@ -1249,7 +1250,7 @@
             }
         },
         "design": {
-            "title": "Onderzoeksopzet",
+            "title": "Opzet",
             "translation_needed": "Controle vereist (kopie)",
             "reset_defaults": "Standaardinstellingen herstellen",
             "editing_language_banner": "U bewerkt de {{language}}-versie. Gebruik de taalkiezer in de werkbalk om te wisselen.",
@@ -2005,7 +2006,7 @@
             "draft": "Concept"
         },
         "settings": {
-            "title": "Instellingen",
+            "title": "Onderzoeksinstellingen",
             "description": "Gegevensbewaring, archivering en verwijdering van onderzoeken.",
             "lifecycle": {
                 "title": "Archivering",

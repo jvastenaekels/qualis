@@ -29,24 +29,22 @@ const t = ((key: string, fallbackOrOpts?: unknown, opts?: Record<string, unknown
 
 describe('resolveBreadcrumbLabel', () => {
     it('returns dashboard for empty pathname', () => {
-        expect(resolveBreadcrumbLabel('/', null, undefined, t)).toBe('admin.breadcrumbs.dashboard');
+        expect(resolveBreadcrumbLabel('/', null, undefined, t)).toBe('Dashboard');
     });
 
     it('returns dashboard for /admin tail', () => {
-        expect(resolveBreadcrumbLabel('/admin', null, undefined, t)).toBe(
-            'admin.breadcrumbs.dashboard'
-        );
+        expect(resolveBreadcrumbLabel('/admin', null, undefined, t)).toBe('Dashboard');
     });
 
     it('returns study_dashboard when last segment matches activeStudyId', () => {
         expect(
             resolveBreadcrumbLabel('/app/proj1/studies/study-abc', 'study-abc', undefined, t)
-        ).toBe('admin.breadcrumbs.study_dashboard');
+        ).toBe('Overview');
     });
 
     it('returns project.create.title for /new tail', () => {
         expect(resolveBreadcrumbLabel('/app/proj1/projects/new', null, undefined, t)).toBe(
-            'admin.project.create.title'
+            'Create project'
         );
     });
 
@@ -73,7 +71,10 @@ describe('resolveBreadcrumbLabel', () => {
         ).toBe('Participant 7');
     });
 
-    it('maps known segments via the mapping table (with fallback)', () => {
+    it('maps known segments via the mapping table', () => {
+        expect(resolveBreadcrumbLabel('/app/proj1/dashboard', null, undefined, t)).toBe(
+            'Dashboard'
+        );
         expect(resolveBreadcrumbLabel('/app/proj1/data', null, undefined, t)).toBe('Data');
         expect(resolveBreadcrumbLabel('/app/proj1/privacy', null, undefined, t)).toBe(
             'Data privacy'
@@ -84,21 +85,74 @@ describe('resolveBreadcrumbLabel', () => {
         expect(resolveBreadcrumbLabel('/app/proj1/concourses', null, undefined, t)).toBe(
             'Concourse'
         );
+        expect(resolveBreadcrumbLabel('/app/proj1/members', null, undefined, t)).toBe(
+            'Team members'
+        );
+        expect(resolveBreadcrumbLabel('/app/proj1/studies/s/design', 's', undefined, t)).toBe(
+            'Design'
+        );
+        expect(resolveBreadcrumbLabel('/app/proj1/studies/s/recruitment', 's', undefined, t)).toBe(
+            'Access'
+        );
+        expect(resolveBreadcrumbLabel('/app/proj1/studies/s/analysis', 's', undefined, t)).toBe(
+            'Analysis'
+        );
     });
 
-    it('maps known segments via the mapping table (no fallback)', () => {
-        expect(resolveBreadcrumbLabel('/app/proj1/dashboard', null, undefined, t)).toBe(
-            'admin.breadcrumbs.dashboard'
-        );
-        expect(resolveBreadcrumbLabel('/app/proj1/exports', null, undefined, t)).toBe(
-            'admin.breadcrumbs.exports'
-        );
+    // --- Naming canon (CLAUDE.md) -------------------------------------------
+    // One label per section, propagated to admin.sidebar.<s>,
+    // admin.breadcrumbs.<s> and admin.<s>.title. The `settings` URL segment is
+    // used by two different pages, so it must resolve by context: a bare
+    // "Settings" leaf makes the breadcrumb — the single source of truth for
+    // hierarchy — unable to say which page you are on.
+
+    it('labels the project settings breadcrumb "Project settings", matching admin.sidebar.project_settings', () => {
         expect(resolveBreadcrumbLabel('/app/proj1/settings', null, undefined, t)).toBe(
-            'admin.breadcrumbs.settings'
+            'Project settings'
         );
     });
 
-    it('Title-cases unknown segments as fallback', () => {
-        expect(resolveBreadcrumbLabel('/app/proj1/banana', null, undefined, t)).toBe('Banana');
+    it('labels the study settings breadcrumb "Study settings", matching admin.sidebar.settings', () => {
+        expect(
+            resolveBreadcrumbLabel(
+                '/app/proj1/studies/study-abc/settings',
+                'study-abc',
+                undefined,
+                t
+            )
+        ).toBe('Study settings');
+    });
+
+    it('distinguishes study settings from project settings in the breadcrumb', () => {
+        const project = resolveBreadcrumbLabel('/app/proj1/settings', null, undefined, t);
+        const study = resolveBreadcrumbLabel(
+            '/app/proj1/studies/study-abc/settings',
+            'study-abc',
+            undefined,
+            t
+        );
+        expect(project).not.toBe(study);
+    });
+
+    it('resolves the study settings breadcrumb from the URL, not from the active-study store', () => {
+        // activeStudyId is store state and can lag a route change by a render.
+        // The URL is authoritative for hierarchy.
+        expect(
+            resolveBreadcrumbLabel('/app/proj1/studies/study-abc/settings', null, undefined, t)
+        ).toBe('Study settings');
+    });
+
+    it('has a mapping entry for the superuser /app/users segment', () => {
+        // Previously this fell through to the Title-case fallback and only
+        // *looked* right because "users" title-cases to "Users".
+        expect(resolveBreadcrumbLabel('/app/users', null, undefined, t)).toBe('Users');
+    });
+
+    it('never fabricates a Title-cased label for an unmapped segment', () => {
+        // CLAUDE.md: every static URL segment must have a `mapping` entry, with
+        // no fallback to `last.charAt(0).toUpperCase()`. AdminLayout.breadcrumb-coverage
+        // .test.ts proves the mapping is exhaustive over the real route table;
+        // this pins that the fabricating fallback is gone.
+        expect(resolveBreadcrumbLabel('/app/proj1/banana', null, undefined, t)).toBe('banana');
     });
 });

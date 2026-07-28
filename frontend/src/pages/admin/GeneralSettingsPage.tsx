@@ -256,7 +256,7 @@ export default function GeneralSettingsPage() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.settings.title')}
+                title={t('admin.settings.title', 'Study settings')}
                 description={t('admin.settings.description')}
                 icon={Settings}
             />

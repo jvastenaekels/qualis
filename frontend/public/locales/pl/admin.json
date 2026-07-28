@@ -937,15 +937,16 @@
       "participants": "Participants",
       "team": "Team",
       "recruitment": "Access",
-      "exports": "Data",
       "data": "Data",
       "privacy": "Data privacy",
       "account": "Account settings",
       "participant_n": "Participant {{code}}",
       "analysis": "Analysis",
-      "settings": "Settings",
+      "project_settings": "Ustawienia projektu",
+      "study_settings": "Ustawienia badania",
       "concourse": "Concourse",
       "members": "Team members",
+      "users": "Użytkownicy",
       "nav_label": "ścieżka nawigacji"
     },
     "command_menu": {
@@ -971,7 +972,7 @@
       "switched_project": "Przełączono na {{name}}"
     },
     "dashboard": {
-      "title": "Panel projektu",
+      "title": "Panel",
       "welcome": "Witamy z powrotem,",
       "snapshot": "Oto migawka aktywności badawczej.",
       "create_study": "Utwórz badanie",
@@ -1249,7 +1250,7 @@
       }
     },
     "design": {
-      "title": "Projekt badania",
+      "title": "Projekt",
       "translation_needed": "Wymaga weryfikacji (kopia)",
       "reset_defaults": "Przywróć wartości domyślne",
       "editing_language_banner": "Edytowanie wersji {{language}}. Aby przełączyć, użyj selektora języka na pasku narzędzi.",
@@ -2005,7 +2006,7 @@
       "draft": "Draft"
     },
     "settings": {
-      "title": "Ustawienia",
+      "title": "Ustawienia badania",
       "description": "Przechowywanie danych, archiwizacja i usuwanie badania.",
       "lifecycle": {
         "title": "Archiwizacja",

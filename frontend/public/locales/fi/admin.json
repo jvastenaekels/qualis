@@ -846,15 +846,16 @@
             "participants": "Osallistujat",
             "team": "Tiimi",
             "recruitment": "Pääsy",
-            "exports": "Tiedot",
             "data": "Tiedot",
             "privacy": "Tietosuoja",
             "account": "Tilin asetukset",
             "participant_n": "Osallistuja {{code}}",
             "analysis": "Analyysi",
-            "settings": "Asetukset",
+            "project_settings": "Projektin asetukset",
+            "study_settings": "Asetukset",
             "concourse": "Concourse",
             "members": "Tiimin jäsenet",
+            "users": "Käyttäjät",
             "nav_label": "murupolku"
         },
         "command_menu": {
@@ -880,7 +881,7 @@
             "switched_project": "Vaihdettu projektiin {{name}}"
         },
         "dashboard": {
-            "title": "Projektin yhteenveto",
+            "title": "Hallintapaneeli",
             "welcome": "Tervetuloa takaisin,",
             "snapshot": "Tässä on yhteenveto tutkimustoiminnastasi.",
             "create_study": "Luo tutkimus",
@@ -1653,7 +1654,7 @@
                     "remove_default": "Poista kuva"
                 }
             },
-            "title": "Tutkimuksen suunnittelu",
+            "title": "Suunnittelu",
             "activate_dialog": {
                 "title": "Aktivoidaanko tämä tutkimus?",
                 "description": "Aktivointi avaa rekrytoinnin ja vapauttaa julkiset linkit. Todelliset osallistujat voivat alkaa vastata.",

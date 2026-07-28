@@ -217,7 +217,7 @@ export const CommandMenu = () => {
                                     missed in that pass and still showed the project-scope
                                     "Tableau de bord" / "Dashboard" / "Hallintapaneeli" label
                                     for the same target. */}
-                                <span>{t('admin.sidebar.overview')}</span>
+                                <span>{t('admin.sidebar.overview', 'Overview')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="design study"
@@ -233,7 +233,7 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-emerald-100 dark:bg-emerald-900/40">
                                     <PencilRuler className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                                 </div>
-                                <span>{t('admin.sidebar.design')}</span>
+                                <span>{t('admin.sidebar.design', 'Design')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="access recruit recruitment"
@@ -249,7 +249,7 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-pink-100 dark:bg-pink-900/40">
                                     <UserPlus className="h-3.5 w-3.5 text-pink-600 dark:text-pink-400" />
                                 </div>
-                                <span>{t('admin.sidebar.recruit')}</span>
+                                <span>{t('admin.sidebar.recruit', 'Access')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="data exports stats analytics"
@@ -265,7 +265,7 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-amber-100 dark:bg-amber-900/40">
                                     <BarChart3 className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
                                 </div>
-                                <span>{t('admin.sidebar.data')}</span>
+                                <span>{t('admin.sidebar.data', 'Data')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="settings configuration"
@@ -281,7 +281,7 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 dark:bg-slate-800 border">
                                     <Settings className="h-3.5 w-3.5 text-slate-500" />
                                 </div>
-                                <span>{t('admin.sidebar.settings')}</span>
+                                <span>{t('admin.sidebar.settings', 'Study settings')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="copy share link"

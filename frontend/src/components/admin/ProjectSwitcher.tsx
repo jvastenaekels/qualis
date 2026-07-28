@@ -80,7 +80,7 @@ export function ProjectSwitcher() {
                                 <span className="truncate font-bold tracking-tight text-slate-900">
                                     {currentProject
                                         ? currentProject.title
-                                        : t('admin.sidebar.select_project')}
+                                        : t('admin.sidebar.select_project', 'Select project')}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4 text-slate-500" />

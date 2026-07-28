@@ -947,15 +947,16 @@
             "participants": "Participants",
             "team": "Team",
             "recruitment": "Access",
-            "exports": "Data",
             "data": "Data",
             "privacy": "Data privacy",
             "account": "Account settings",
             "participant_n": "Participant {{code}}",
             "analysis": "Analysis",
-            "settings": "Settings",
+            "project_settings": "Project settings",
+            "study_settings": "Study settings",
             "concourse": "Concourse",
             "members": "Team members",
+            "users": "Users",
             "nav_label": "breadcrumb"
         },
         "command_menu": {
@@ -981,7 +982,7 @@
             "switched_project": "Switched to {{name}}"
         },
         "dashboard": {
-            "title": "Project dashboard",
+            "title": "Dashboard",
             "welcome": "Welcome back,",
             "snapshot": "Here's a snapshot of your research activity.",
             "create_study": "Create study",
@@ -1262,7 +1263,7 @@
             }
         },
         "design": {
-            "title": "Study design",
+            "title": "Design",
             "translation_needed": "Review required (copy)",
             "reset_defaults": "Reset to defaults",
             "editing_language_banner": "Editing the {{language}} version. Use the language selector in the toolbar to switch.",
@@ -2020,7 +2021,7 @@
             "draft": "Draft"
         },
         "settings": {
-            "title": "Settings",
+            "title": "Study settings",
             "description": "Data retention, archiving, and study deletion.",
             "lifecycle": {
                 "title": "Archiving",
