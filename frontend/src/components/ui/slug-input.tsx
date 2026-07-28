@@ -8,17 +8,29 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-/** Breathing room, in px, kept between the measured prefix and the value text. */
+/** Breathing room, in px, kept between the measured prefix's right edge and the value text. */
 const PREFIX_GUTTER_PX = 12;
 
 /**
- * Padding used before the prefix has been measured at least once (first
- * paint, or an environment — like jsdom — that never fires ResizeObserver).
- * It only ever shows up as a brief flash in real browsers; the two prior
- * hard-coded paddings this component replaces (`pl-32`, `pl-14`) are proof
- * a guessed constant is not a substitute for the real measurement below.
+ * Padding used before the prefix has been measured at least once. In a real
+ * browser this is only ever visible for the single frame between mount and
+ * the layout-effect's synchronous measurement below; it exists mainly for
+ * jsdom, which never fires ResizeObserver at all. The two prior hard-coded
+ * paddings this component replaces (`pl-32`, `pl-14`) are proof a guessed
+ * constant is not a substitute for the real measurement.
  */
 const FALLBACK_PADDING_PX = 48;
+
+/**
+ * Default look for the prefix text: matches ProjectSettingsPage/CreateProjectPage's
+ * original `/app/` styling, including the vertical divider (`border-r`) that
+ * separated it from the value — dropped by an earlier version of this
+ * component without being called out, which this restores. Pass
+ * `prefixClassName` to replace it wholesale for a differently-styled value
+ * (see RecruitmentPage.tsx's call site for the monospace, divider-less case).
+ */
+const DEFAULT_PREFIX_CLASSES =
+    'pointer-events-none absolute left-3 top-1/2 flex h-4 -translate-y-1/2 select-none items-center whitespace-nowrap border-r border-slate-300 pr-3 text-xs font-bold text-slate-400';
 
 export interface SlugInputProps
     extends Omit<React.ComponentPropsWithoutRef<'input'>, 'value' | 'onChange' | 'prefix'> {
@@ -26,15 +38,30 @@ export interface SlugInputProps
     prefix: string;
     value: string;
     onChange: (value: string) => void;
+    /**
+     * Replaces `DEFAULT_PREFIX_CLASSES` wholesale (not merged — pass the
+     * full class list) when a call site needs a differently-styled prefix,
+     * e.g. to match a monospace value instead of the default sans-serif one.
+     */
+    prefixClassName?: string;
 }
 
 /**
  * A text input prefixed with a fixed string, whose left padding is derived
- * from the prefix's own measured width (ref + ResizeObserver) instead of a
- * guessed Tailwind class. The same `pl-*` guess shipped twice and was wrong
- * in both directions: `pl-32` (128px) for a ~60px "/app/" prefix left a 68px
- * gap, and `pl-14` (56px) for an exactly-56px "/study/" prefix made the
- * value collide with it. Measuring removes the guess entirely.
+ * from the prefix's own measured position and width (ref + ResizeObserver)
+ * instead of a guessed Tailwind class. The same `pl-*` guess shipped twice
+ * and was wrong in both directions: `pl-32` (128px) for a ~60px "/app/"
+ * prefix left a 68px gap, and `pl-14` (56px) for an exactly-56px "/study/"
+ * prefix made the value collide with it. Measuring removes the guess
+ * entirely.
+ *
+ * The prefix span is positioned `left-3` (12px in from the input's own left
+ * edge) — the padding formula below measures `offsetLeft` (that 12px) *and*
+ * `offsetWidth` (the prefix's rendered size), not just the latter. Adding
+ * only `prefixWidth + PREFIX_GUTTER_PX` (an earlier version of this file)
+ * places the value's first glyph at the prefix's *right edge*, which is the
+ * same defect this component exists to remove, just shrunk from 68px too
+ * much to 1px too little.
  *
  * Forwards ref, id, and any other native input props to the underlying
  * `<input>` (not the decorative wrapper) so it composes correctly inside
@@ -45,35 +72,34 @@ export interface SlugInputProps
  * at a non-labelable element).
  */
 const SlugInput = React.forwardRef<HTMLInputElement, SlugInputProps>(
-    ({ prefix, value, onChange, className, style, ...rest }, forwardedRef) => {
+    ({ prefix, value, onChange, className, style, prefixClassName, ...rest }, forwardedRef) => {
         const prefixRef = React.useRef<HTMLSpanElement>(null);
-        const [prefixWidth, setPrefixWidth] = React.useState<number | null>(null);
+        const [paddingLeft, setPaddingLeft] = React.useState<number | null>(null);
 
-        React.useEffect(() => {
+        // useLayoutEffect (not useEffect) + a synchronous measure() call
+        // before the ResizeObserver is even attached: without both, the
+        // first frame paints with FALLBACK_PADDING_PX and only corrects
+        // itself once the observer's first (async) callback fires — a
+        // visible flash from 48px to the real value.
+        React.useLayoutEffect(() => {
             const node = prefixRef.current;
             if (!node) {
                 return undefined;
             }
 
-            const observer = new ResizeObserver((entries) => {
-                const measured = entries[0]?.contentRect.width;
-                if (typeof measured === 'number') {
-                    setPrefixWidth(measured);
-                }
-            });
+            const measure = () => {
+                setPaddingLeft(node.offsetLeft + node.offsetWidth + PREFIX_GUTTER_PX);
+            };
+            measure();
+
+            const observer = new ResizeObserver(measure);
             observer.observe(node);
             return () => observer.disconnect();
         }, []);
 
-        const paddingLeft =
-            prefixWidth === null ? FALLBACK_PADDING_PX : prefixWidth + PREFIX_GUTTER_PX;
-
         return (
             <div className="relative">
-                <span
-                    ref={prefixRef}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-xs font-bold text-slate-400"
-                >
+                <span ref={prefixRef} className={prefixClassName ?? DEFAULT_PREFIX_CLASSES}>
                     {prefix}
                 </span>
                 <input
@@ -81,7 +107,7 @@ const SlugInput = React.forwardRef<HTMLInputElement, SlugInputProps>(
                     ref={forwardedRef}
                     value={value}
                     onChange={(event) => onChange(event.target.value)}
-                    style={{ paddingLeft, ...style }}
+                    style={{ paddingLeft: paddingLeft ?? FALLBACK_PADDING_PX, ...style }}
                     className={cn(
                         'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                         className

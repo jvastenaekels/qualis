@@ -273,9 +273,16 @@ const RecruitmentPage = () => {
                                          * ProjectSettingsPage/CreateProjectPage too).
                                          */}
                                         <FormControl>
+                                            {/* prefixClassName: deliberate, not the SlugInput
+                                                default — matches this field's monospace,
+                                                slate-600 value instead of the default sans
+                                                slate-400, and skips the divider (review note
+                                                on task 6.1: the typeface change was silent in
+                                                an earlier version of this file). */}
                                             <SlugInput
                                                 {...field}
                                                 prefix="/study/"
+                                                prefixClassName="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none whitespace-nowrap font-mono text-xs text-slate-600"
                                                 disabled={isSlugLocked}
                                                 className="h-11 rounded-xl bg-slate-50 border-slate-100 font-mono text-xs focus-visible:ring-indigo-500"
                                             />
