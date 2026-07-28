@@ -1,9 +1,42 @@
 {
   "name": "Qualis",
+  "description": "Open-source platform for Q-methodology research.",
+  "repository": "https://github.com/jvastenaekels/qualis",
+  "addons": [
+    "postgresql"
+  ],
   "env": {
     "ENVIRONMENT": {
       "description": "Application environment. Must be 'production' for any deployment with real users; 'development' enables test/seed routes used by E2E tests only.",
       "value": "production"
+    },
+    "SECRET_KEY": {
+      "description": "Signs the JWTs used for every authenticated request. Generated for you — never reuse a value from another deployment, and never leave the placeholder that ships in the repository.",
+      "generator": "secret"
+    },
+    "IP_HASH_SALT": {
+      "description": "Salt for the SHA-256 hashing of participant IP addresses. Unique per deployment, so hashes cannot be correlated across instances.",
+      "generator": "secret"
+    },
+    "ADMIN_PASSWORD": {
+      "description": "Password of the first owner account, created on the first deploy against an empty database. Generated for you — read it from the app's environment variables in the dashboard, then change it after your first login.",
+      "generator": "secret"
+    },
+    "ADMIN_EMAIL": {
+      "description": "Email address of the first owner account. Use your own; this is the login for the initial administrator.",
+      "value": ""
+    },
+    "FRONTEND_URL": {
+      "description": "Public HTTPS origin of this deployment, used to build account and invitation links. For example https://qualis.osc-fr1.scalingo.io",
+      "value": ""
+    },
+    "ALLOWED_ORIGINS": {
+      "description": "Comma-separated CORS allow-list. Normally the same value as FRONTEND_URL. No wildcards.",
+      "value": ""
+    },
+    "TRUSTED_PROXIES": {
+      "description": "Scalingo terminates TLS in front of the app, so rate limiting must read the client IP from the forwarded header.",
+      "value": "*"
     }
   }
 }
