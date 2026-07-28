@@ -50,7 +50,7 @@ export default function EmailVerificationSentPage() {
                 type="button"
                 onClick={onResend}
                 disabled={cooldown > 0 || !email}
-                className="rounded bg-slate-900 text-white px-4 py-2 disabled:opacity-50"
+                className="rounded bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 disabled:opacity-50"
             >
                 {cooldown > 0
                     ? t(

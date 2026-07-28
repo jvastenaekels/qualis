@@ -1334,7 +1334,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                     <Button
                                         size="sm"
                                         onClick={autoShapeGrid}
-                                        className="h-11 px-6 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all font-bold gap-2"
+                                        className="h-11 px-6 rounded-2xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all font-bold gap-2"
                                     >
                                         <Wand2 className="h-4 w-4" />
                                         {t('admin.design.qsort.grid.auto_balance')}

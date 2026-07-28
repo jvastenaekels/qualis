@@ -661,7 +661,7 @@ export default function InteractiveDataView({
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    className="h-10 w-10 sm:w-auto sm:h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
+                                    className="h-10 w-10 sm:w-auto sm:h-9 font-bold shadow-sm gap-2 text-xs"
                                     disabled={isExportLoading}
                                     aria-label={t('admin.export.label', 'Export')}
                                 >

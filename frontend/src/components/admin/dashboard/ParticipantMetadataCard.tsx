@@ -361,9 +361,10 @@ export function ParticipantMetadataCard({
                             }
                             className={cn(
                                 'rounded-2xl font-bold h-12',
-                                isDiscarded
-                                    ? 'bg-emerald-600 hover:bg-emerald-700'
-                                    : 'bg-rose-600 hover:bg-rose-700'
+                                // Restore inherits the single primary fill. Discard keeps a
+                                // destructive fill: white on rose-600 is 4.70:1 (AA), where the
+                                // emerald-600 it replaced sat at 3.77:1 and failed.
+                                !isDiscarded && 'bg-rose-600 text-white hover:bg-rose-700'
                             )}
                         >
                             {isDiscarded

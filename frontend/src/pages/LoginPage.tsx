@@ -286,7 +286,7 @@ const LoginPage = () => {
                             <CardFooter className="pt-2 flex flex-col gap-4">
                                 <Button
                                     type="submit"
-                                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-900 disabled:opacity-100 transition-all font-semibold"
+                                    className="w-full disabled:opacity-100 transition-all font-semibold"
                                     disabled={isCredentialsPending}
                                 >
                                     {isCredentialsPending ? (
@@ -342,7 +342,7 @@ const LoginPage = () => {
                             <CardFooter className="pt-2 flex flex-col gap-3">
                                 <Button
                                     type="submit"
-                                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-900 disabled:opacity-100 transition-all font-semibold"
+                                    className="w-full disabled:opacity-100 transition-all font-semibold"
                                     disabled={otp.length !== 6 || isOtpPending}
                                 >
                                     {isOtpPending ? (

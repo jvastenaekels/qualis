@@ -287,7 +287,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                             <Button
                                 type="submit"
                                 disabled={createStudyMutation.isPending}
-                                className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+                                className="h-11 rounded-xl px-8 font-black shadow-sm"
                             >
                                 {createStudyMutation.isPending && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
