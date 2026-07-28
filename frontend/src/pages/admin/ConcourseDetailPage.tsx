@@ -976,10 +976,28 @@ export default function ConcourseDetailPage() {
                                                                             overflowed: measured 1px
                                                                             out of a 20px pill at
                                                                             320px. `min-h-5` gives
-                                                                            it 28.16px instead. */}
+                                                                            it 28.16px instead.
+
+                                                                            The pathological case
+                                                                            reaches here too, and
+                                                                            the earlier fix did not:
+                                                                            a 49-character token
+                                                                            left this badge at 293px
+                                                                            inside a 232px container,
+                                                                            unchanged from main,
+                                                                            because `min-w-0` on a
+                                                                            Badge whose parent is a
+                                                                            <Label> is inert.
+                                                                            `[overflow-wrap:anywhere]`
+                                                                            brings it to 210 × 28.16
+                                                                            with nothing outside —
+                                                                            and does so without any
+                                                                            `min-w-0` on the Label,
+                                                                            which measures identical
+                                                                            with and without. */}
                                                                         <Badge
                                                                             variant="outline"
-                                                                            className="text-2xs min-h-5 min-w-0 break-words cursor-pointer"
+                                                                            className="text-2xs min-h-5 [overflow-wrap:anywhere] cursor-pointer"
                                                                             style={
                                                                                 tag.color
                                                                                     ? {
@@ -1030,30 +1048,77 @@ export default function ConcourseDetailPage() {
                                                     {/* Task 6.10. Tag names are user-supplied,
                                                         multi-word and unbounded, so this pill has
                                                         to be sized by its content, not by a hard
-                                                        `h-5`. Measured at 320px with a three-word
-                                                        fixture: the container is 232px, the three
-                                                        badges were squeezed to 104/90/122px, each
-                                                        needed 34/34/26px of text height, and 14px
-                                                        of it painted OUTSIDE a 20px pill. Three
-                                                        changes, all necessary:
+                                                        `h-5`. Re-measured at 320px with a
+                                                        three-word German fixture
+                                                        ("Umweltbewusstsein hoch" / "Soziale
+                                                        Gerechtigkeit" / "Wirtschaftliches
+                                                        Wachstum"): the container is 232px, the
+                                                        three badges were squeezed to 122/92/102px,
+                                                        each needed 30.61px of text height (two
+                                                        15.3px lines), and 14.61px of it painted
+                                                        OUTSIDE a 20px pill — 7px of that below the
+                                                        pill's padding edge. (The figures this
+                                                        comment carried before — widths 104/90/122,
+                                                        text 34/34/26px, escapes 14/14/6px — came
+                                                        from a fixture that was not recorded and do
+                                                        not reproduce; 26px and 34px are not whole
+                                                        numbers of line boxes at this font size,
+                                                        which is the tell. Same conclusion, real
+                                                        numbers.) Three changes, all necessary:
                                                         `flex-wrap` (without it the badges compete
                                                         for one line and each shrinks to its
                                                         longest word — the 6.4 failure shape),
                                                         `min-h-5` (a floor, not a clamp, so the
                                                         pill grows with the label), and
-                                                        `min-w-0 break-words` (a single tag name
-                                                        longer than the container is one unbreakable
-                                                        flex item otherwise: a 49-character German
-                                                        compound measured 329px inside 232px).
-                                                        After: 220/210/202px wide, 22.61px tall,
-                                                        overflow -1.61px. */}
+                                                        `[overflow-wrap:anywhere]`.
+
+                                                        That last one was `min-w-0 break-words`,
+                                                        which does not work and looks like it does.
+                                                        `overflow-wrap: break-word` does NOT reduce
+                                                        a flex item's automatic minimum size, so a
+                                                        49-character tag name stays one unbreakable
+                                                        box; `min-w-0` then shrinks the *pill* to
+                                                        232px around it and the label paints up to
+                                                        132px outside — measured escapes in 32 of
+                                                        360 cells (4 locales × 3 fixtures × 6
+                                                        viewports × 5 sites). That is this defect
+                                                        rotated 90°.
+
+                                                        `overflow-wrap: anywhere` both reduces the
+                                                        minimum size and breaks only a word that
+                                                        cannot fit a line of its own: 0 escapes in
+                                                        all 360 cells, at all three sites. Not
+                                                        `break-all`, which breaks mid-word even
+                                                        where a space break exists. The ordinary
+                                                        multi-word control is untouched by the
+                                                        change — 149/129/156px × 22.61px, one line
+                                                        each, identical to `break-words`; the
+                                                        single-token pill grows to 232 × 39.22
+                                                        (two lines) with `scrollWidth ==
+                                                        clientWidth` and nothing outside it.
+
+                                                        `min-w-0` is deliberately NOT kept here:
+                                                        with `anywhere` it is measurably inert
+                                                        (every cell identical with and without it),
+                                                        and so is the `min-w-0` that was proposed
+                                                        for the two <Label> wrappers below — the
+                                                        Label's own min-content shrinks with the
+                                                        badge's, so it has nothing left to release.
+
+                                                        Still out of scope and still real: with a
+                                                        single-token tag the page's own
+                                                        `scrollWidth` stays at 383 for a 320px
+                                                        viewport, driven by the tag-breakdown chip
+                                                        at :580 (name span at :586) — a plain div,
+                                                        not a Badge, not one of these three sites.
+                                                        Unchanged by any of this. */}
                                                     {item.tags && item.tags.length > 0 && (
                                                         <div className="flex flex-wrap gap-1 mt-2">
                                                             {item.tags.map((tag) => (
                                                                 <Badge
                                                                     key={tag.id}
                                                                     variant="outline"
-                                                                    className="text-2xs min-h-5 min-w-0 break-words"
+                                                                    className="text-2xs min-h-5 [overflow-wrap:anywhere]"
                                                                     style={
                                                                         tag.color
                                                                             ? {
@@ -1873,10 +1938,13 @@ function TagCheckboxGroup({
                         />
                         <Label htmlFor={`tag-checkbox-group-${tag.id}`} className="cursor-pointer">
                             {/* Task 6.10, third instance of the same clamp — see the item-list
-                                badge for the measurements. */}
+                                badge for the measurements. Same correction as the edit picker: a
+                                49-character token left this badge at 293px inside its container
+                                until `[overflow-wrap:anywhere]` replaced `min-w-0 break-words`;
+                                it now measures 216 × 28.16 with nothing painted outside. */}
                             <Badge
                                 variant="outline"
-                                className="text-2xs min-h-5 min-w-0 break-words cursor-pointer"
+                                className="text-2xs min-h-5 [overflow-wrap:anywhere] cursor-pointer"
                                 style={
                                     tag.color
                                         ? { borderColor: tag.color, color: tag.color }
