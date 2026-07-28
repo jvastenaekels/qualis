@@ -153,11 +153,11 @@ export default function ProjectMembersPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        {/* No card title (task 5.3): it repeated the page's H1 —
+                            same words, same icon, ~120px apart. The table below
+                            keeps its own sr-only <caption> as an accessible name;
+                            the description line stays as the card's only lead-in. */}
                         <CardHeader className="border-b border-slate-50 pb-4">
-                            <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
-                                <Users className="size-5 text-indigo-500" />
-                                {t('admin.projects.settings.team.title')}
-                            </CardTitle>
                             <CardDescription className="text-sm font-medium text-slate-500">
                                 {t('admin.projects.settings.team.desc')}
                             </CardDescription>

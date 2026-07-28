@@ -362,7 +362,6 @@ export function AdminDashboard() {
                     title={getStudyTitle(studies[0])}
                     projectSlug={projectSlug}
                     t={t}
-                    onCreateStudy={canCreateStudy ? () => setShowCreateDialog(true) : undefined}
                 />
             ) : (
                 <StudyGroups
@@ -505,13 +504,11 @@ function SingleStudyCard({
     title,
     projectSlug,
     t,
-    onCreateStudy,
 }: {
     study: StudyRead;
     title: string;
     projectSlug: string;
     t: TranslateFn;
-    onCreateStudy?: () => void; // omitted for viewers — Add-study CTA hides
 }) {
     const navigate = useNavigate();
     const { formatDate, formatRelative } = useDateFormat();
@@ -522,25 +519,15 @@ function SingleStudyCard({
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <FlaskConical className="h-5 w-5 text-indigo-500" />
-                    <h2 className="text-lg font-black text-slate-900">
-                        {t('admin.dashboard.studies', 'Studies')}
-                    </h2>
-                </div>
-                {onCreateStudy && (
-                    // text-slate-600, not text-muted-foreground — see ConcourseCard above.
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-slate-600"
-                        onClick={onCreateStudy}
-                    >
-                        <Plus className="h-3 w-3 mr-1" />
-                        {t('admin.dashboard.add_study', 'Add study')}
-                    </Button>
-                )}
+            {/* No section-level "Add study" CTA (task 5.3): it opened the same
+                dialog as the page header's "Create study" ~160px above, in a
+                different button style. The page header is the one home for the
+                page's primary actions. */}
+            <div className="flex items-center gap-2">
+                <FlaskConical className="h-5 w-5 text-indigo-500" />
+                <h2 className="text-lg font-black text-slate-900">
+                    {t('admin.dashboard.studies', 'Studies')}
+                </h2>
             </div>
 
             <div className={CARD_SHELL}>

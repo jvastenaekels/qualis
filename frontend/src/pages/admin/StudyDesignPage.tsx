@@ -152,19 +152,6 @@ const StudyDesignPage = () => {
             className="flex flex-col h-full animate-in fade-in duration-500 overflow-hidden max-w-full"
             style={{ animationFillMode: 'forwards' }}
         >
-            {/*
-             * Sole page heading. The visible toolbar title below is an <h2> showing the
-             * *study's* title — correct for orientation inside the page, but it leaves
-             * the page with zero <h1>s (axe: page-has-heading-one), and every sibling
-             * study-scope page (Access, Data, Analysis, Settings) already has one via
-             * StudyPageHeader, whose h1 is the page's *functional* name rather than the
-             * study title (see CLAUDE.md's admin header policy). This page predates
-             * StudyPageHeader and has too much bespoke toolbar layout to convert here
-             * safely, so it gets the same sr-only h1 LandingPage uses for the same
-             * reason — visible layout unchanged, screen readers get one landmark
-             * heading that names the page instead of none.
-             */}
-            <h1 className="sr-only">{t('admin.sidebar.design', 'Design')}</h1>
             {/* Toolbar */}
             <div className="border-b bg-background px-3 sm:px-6 py-2 sm:py-3 shrink-0">
                 <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 min-w-0">
@@ -177,9 +164,17 @@ const StudyDesignPage = () => {
                             <Wand2 className="h-4.5 w-4.5 text-indigo-600" />
                         </div>
                         <div className="h-6 w-px bg-border hidden lg:block" />
-                        <h2 className="text-sm font-bold text-slate-800 truncate flex-1">
-                            {api.currentTranslation?.title || api.effectiveSlug}
-                        </h2>
+                        {/*
+                         * The page's sole <h1>, and it names the page's *function*, not
+                         * the study (task 5.3 + CLAUDE.md's admin header policy). It used
+                         * to render `currentTranslation.title`, which the breadcrumb
+                         * directly above already carries — the study title appeared twice,
+                         * stacked. The h1 also satisfies axe's page-has-heading-one, which
+                         * an sr-only h1 previously covered here.
+                         */}
+                        <h1 className="text-sm font-bold text-slate-800 truncate flex-1">
+                            {t('admin.sidebar.design', 'Design')}
+                        </h1>
                         {/* Status Badge */}
                         <div
                             role="status"
