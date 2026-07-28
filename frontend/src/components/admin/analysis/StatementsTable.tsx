@@ -18,7 +18,7 @@ interface StatementsTableProps {
 type SortKey = 'code' | 'type' | `z${number}` | `a${number}`;
 
 function zScoreColor(z: number | null): string {
-    if (z === null) return 'text-slate-400';
+    if (z === null) return 'text-slate-500';
     if (z >= 1.5) return 'text-blue-700 bg-blue-50';
     if (z >= 0.5) return 'text-blue-600 bg-blue-50/50';
     if (z <= -1.5) return 'text-red-700 bg-red-50';
@@ -129,7 +129,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
                         <UiTooltip>
                             <TooltipTrigger asChild>
                                 <Info
-                                    className="size-3.5 text-slate-400 cursor-help"
+                                    className="size-3.5 text-slate-500 cursor-help"
                                     aria-hidden="true"
                                 />
                             </TooltipTrigger>
@@ -252,7 +252,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                                     ? '-'
                                                     : `${z > 0 ? '+' : ''}${z.toFixed(2)}`}
                                                 {stab && (
-                                                    <span className="text-slate-400 font-normal">
+                                                    <span className="text-slate-500 font-normal">
                                                         {' '}
                                                         ±{stab.z_se.toFixed(2)}
                                                     </span>

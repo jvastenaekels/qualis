@@ -214,7 +214,7 @@ export function ImportFromConcourseDialog({
                     {/* Item list */}
                     {isLoadingConcourse && (
                         <div className="py-8 flex justify-center">
-                            <Loader2 className="size-5 animate-spin text-slate-400" />
+                            <Loader2 className="size-5 animate-spin text-slate-500" />
                         </div>
                     )}
 
@@ -303,7 +303,7 @@ export function ImportFromConcourseDialog({
                     )}
 
                     {!isLoadingConcourse && filteredItems.length === 0 && concourseId && (
-                        <div className="py-8 text-center text-slate-400 text-sm">
+                        <div className="py-8 text-center text-slate-500 text-sm">
                             {showOnlyAccepted
                                 ? t(
                                       'admin.concourse_import.no_accepted',
@@ -317,7 +317,7 @@ export function ImportFromConcourseDialog({
                     )}
 
                     {!concourseId && !isLoadingConcourse && (
-                        <div className="py-8 text-center text-slate-400 text-sm">
+                        <div className="py-8 text-center text-slate-500 text-sm">
                             {t(
                                 'admin.concourse_import.no_concourses',
                                 'No concourses in this project. Create one first.'

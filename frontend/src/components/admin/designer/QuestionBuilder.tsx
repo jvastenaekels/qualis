@@ -273,7 +273,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         </div>
                                         <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
                                             {label || (
-                                                <span className="text-slate-400 italic font-medium">
+                                                <span className="text-slate-500 italic font-medium">
                                                     {t('admin.design.questions.defaults.untitled')}
                                                 </span>
                                             )}
@@ -300,7 +300,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
-                                                    <div className="px-2 py-1.5 text-2xs font-black text-slate-400">
+                                                    <div className="px-2 py-1.5 text-2xs font-black text-slate-500">
                                                         {t(
                                                             'admin.design.questions.actions.copy_from'
                                                         )}
@@ -393,7 +393,7 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                     <div
                                         data-testid="question-type-label"
-                                        className="text-2xs text-slate-400 font-black bg-slate-50 px-2 py-1 rounded-lg"
+                                        className="text-2xs text-slate-500 font-black bg-slate-50 px-2 py-1 rounded-lg"
                                     >
                                         {question.type}
                                     </div>
@@ -1191,7 +1191,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.basic_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1211,7 +1211,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             onClick={() => addQuestion(field.type as QuestionType)}
                                             className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                         >
-                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                             {t(`admin.design.questions.types.${field.label}`)}
                                         </Button>
                                     ))}
@@ -1221,7 +1221,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.choice_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1242,7 +1242,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             onClick={() => addQuestion(field.type as QuestionType)}
                                             className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                         >
-                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                             {t(`admin.design.questions.types.${field.label}`)}
                                         </Button>
                                     ))}
@@ -1252,7 +1252,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.scale_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1263,7 +1263,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                         onClick={() => addQuestion('rating')}
                                         className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                     >
-                                        <BarChart3 className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                        <BarChart3 className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                         {t('admin.design.questions.types.rating')}
                                     </Button>
                                 </div>

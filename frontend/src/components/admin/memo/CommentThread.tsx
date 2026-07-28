@@ -102,7 +102,7 @@ export function CommentThread({
                         </div>
                         <div className="whitespace-pre-wrap">
                             {c.deleted ? (
-                                <em className="text-slate-400">
+                                <em className="text-slate-500">
                                     {t('admin.memo.deleted_body', '[deleted comment]')}
                                 </em>
                             ) : (

@@ -76,9 +76,14 @@ function StatusStepButton({ step, currentState, renderActionDialog }: StatusStep
                 'relative flex flex-col items-center justify-center p-2.5 rounded-lg transition-all border',
                 isActive
                     ? cn('bg-white shadow-sm z-10', step.activeClass, step.border)
-                    : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400 opacity-60 hover:opacity-100',
-                isClickable &&
-                    'cursor-pointer hover:border-slate-200 hover:shadow-sm hover:opacity-100'
+                    : // No `opacity-60` here (task 6.5). Opacity multiplies into the
+                      // computed contrast: text-slate-500 at 60% over white resolves to
+                      // #a2acb9 → 2.30:1, and the inactive step's icon (slate-500 on
+                      // bg-slate-100) drops to ~2.2:1, under even the 3:1 non-text floor.
+                      // The active step is already distinguished by bg-white + shadow +
+                      // its own accent colour, so the dimming was redundant signalling.
+                      'bg-transparent border-transparent hover:bg-slate-50 text-slate-500',
+                isClickable && 'cursor-pointer hover:border-slate-200 hover:shadow-sm'
             )}
         >
             <div
@@ -87,7 +92,7 @@ function StatusStepButton({ step, currentState, renderActionDialog }: StatusStep
                     isActive ? step.bg : 'bg-slate-100'
                 )}
             >
-                <step.icon className={cn('h-4 w-4', isActive ? step.color : 'text-slate-400')} />
+                <step.icon className={cn('h-4 w-4', isActive ? step.color : 'text-slate-500')} />
             </div>
             <div className="text-sm font-bold tracking-tight mb-0.5">{step.label}</div>
             <div className="text-2xs text-muted-foreground font-medium text-center">

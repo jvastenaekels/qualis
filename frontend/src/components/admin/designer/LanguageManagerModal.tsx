@@ -127,7 +127,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                                         </div>
                                     ) : (
                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Plus className="h-5 w-5 text-slate-400" />
+                                            <Plus className="h-5 w-5 text-slate-500" />
                                         </div>
                                     )}
                                 </button>

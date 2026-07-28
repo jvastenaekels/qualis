@@ -67,7 +67,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 'About accent color'
                                             )}
                                         >
-                                            <Info className="h-3.5 w-3.5 text-slate-400 hover:text-indigo-500 transition-colors" />
+                                            <Info className="h-3.5 w-3.5 text-slate-500 hover:text-indigo-500 transition-colors" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right" className="max-w-xs">
                                             <p className="text-xs">
@@ -181,7 +181,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 'About the study logo'
                                             )}
                                         >
-                                            <Info className="h-3.5 w-3.5 text-slate-400" />
+                                            <Info className="h-3.5 w-3.5 text-slate-500" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right">
                                             <p className="text-xs">
@@ -247,7 +247,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 'About institutional partners'
                                             )}
                                         >
-                                            <Info className="h-3.5 w-3.5 text-slate-400" />
+                                            <Info className="h-3.5 w-3.5 text-slate-500" />
                                         </TooltipTrigger>
                                         <TooltipContent side="right">
                                             <p className="text-xs">
@@ -285,14 +285,14 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                             className="max-w-full max-h-full object-contain"
                                                         />
                                                     ) : (
-                                                        <ImageIcon className="text-slate-300 w-6 h-6" />
+                                                        <ImageIcon className="text-slate-500 w-6 h-6" />
                                                     )}
                                                 </div>
                                                 <div className="flex-1 space-y-3">
                                                     <div className="grid gap-1.5">
                                                         <Label
                                                             htmlFor={`partner-name-${partner.id ?? index}`}
-                                                            className="text-2xs font-black text-slate-400"
+                                                            className="text-2xs font-black text-slate-500"
                                                         >
                                                             {t(
                                                                 'admin.design.theme.partners.name_placeholder',

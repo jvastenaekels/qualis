@@ -101,7 +101,7 @@ export function ActivateStudyDialog({
                                         />
                                     ) : (
                                         <Circle
-                                            className="h-4 w-4 text-slate-300 mt-0.5 flex-shrink-0"
+                                            className="h-4 w-4 text-slate-500 mt-0.5 flex-shrink-0"
                                             aria-hidden="true"
                                         />
                                     )}

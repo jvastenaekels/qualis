@@ -74,6 +74,23 @@ describe('StudyStatusControl — the reachable step tile is a real, keyboard-ope
         expect(await screen.findByText(/launch study\?/i)).toBeInTheDocument();
     });
 
+    it('carries no resting opacity on a reachable step — the class alone would not have fixed it', () => {
+        // Task 6.5. The reachable-but-inactive tile used to read
+        // `text-slate-400 opacity-60`. Opacity multiplies into the computed
+        // contrast, so promoting the colour on its own would have left it
+        // failing: slate-500 at 60% over white resolves to #a2acb9 → 2.30:1,
+        // and the tile's icon (slate-500 on bg-slate-100) to ~2.2:1, under
+        // even the 3:1 non-text floor. A future "just bump the shade" edit
+        // that reinstates the opacity has to trip this.
+        setup();
+
+        const tile = screen.getByRole('button', { name: /active/i });
+        const content = tile.firstElementChild;
+        expect(content).not.toBeNull();
+        expect(content).toHaveClass('text-slate-500');
+        expect(content?.className).not.toMatch(/\bopacity-\d/);
+    });
+
     it('leaves an unreachable step as plain, non-interactive content', () => {
         setup();
 

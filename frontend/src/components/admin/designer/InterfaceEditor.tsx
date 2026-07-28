@@ -188,7 +188,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                             }
                                                         )}
                                                     >
-                                                        <Info className="size-3 text-slate-400" />
+                                                        <Info className="size-3 text-slate-500" />
                                                     </TooltipTrigger>
                                                     <TooltipContent className="text-2xs">
                                                         {t(
@@ -204,7 +204,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 disabled={readOnly}
                                                 onClick={() => resetLabel(inputKey)}
                                                 className="flex items-center gap-1.5 px-2 py-1 rounded-md text-2xs
-                                                         font-black text-slate-400
+                                                         font-black text-slate-500
                                                          hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                                 title={t('common.reset_to_default')}
                                             >
@@ -300,7 +300,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 <div key={inputKey} className="space-y-2.5">
                                                     <Label
                                                         htmlFor={`interface-term-${inputKey}`}
-                                                        className="text-2xs font-black text-slate-400"
+                                                        className="text-2xs font-black text-slate-500"
                                                     >
                                                         {t(
                                                             `admin.design.interface.terms.${termKey}`
@@ -485,7 +485,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         <div key={field} className="space-y-2.5">
                                             <Label
                                                 htmlFor={`step-help-${step.id}-${field}`}
-                                                className="text-2xs font-black text-slate-400"
+                                                className="text-2xs font-black text-slate-500"
                                             >
                                                 {t(`study.help.${field}`)}
                                             </Label>

@@ -222,7 +222,7 @@ const AccountSettingsPage = () => {
                                                     className="h-11 rounded-xl bg-slate-50 border-slate-200"
                                                 />
                                             </FormControl>
-                                            <p className="text-2xs text-slate-400 italic">
+                                            <p className="text-2xs text-slate-500 italic">
                                                 {t(
                                                     'admin.account.personal.email_locked',
                                                     "Your email address can't be changed here yet. Contact your administrator to update it."

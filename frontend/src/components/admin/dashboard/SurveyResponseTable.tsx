@@ -44,12 +44,12 @@ function renderValue(
         );
     if (value === false)
         return (
-            <Badge variant="outline" className="text-slate-400 border-slate-200">
+            <Badge variant="outline" className="text-slate-500 border-slate-200">
                 {t('common.no', 'No')}
             </Badge>
         );
     if (value === null || value === undefined || value === '')
-        return <span className="text-slate-300">—</span>;
+        return <span className="text-slate-500">—</span>;
 
     const q = questionsMap[key];
     if (q?.options && Array.isArray(q.options)) {
@@ -103,7 +103,7 @@ export function SurveyResponseTable({
                     className
                 )}
             >
-                <FeedbackIcon className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <FeedbackIcon className="h-8 w-8 text-slate-500 mx-auto mb-2" />
                 <p className="text-sm font-medium text-slate-500">
                     {t(
                         'admin.participant.survey.no_answers',
@@ -269,9 +269,13 @@ export function SurveyResponseTable({
                                 <span className="text-xs font-black text-slate-500 group-data-[state=open]:text-slate-900 transition-colors">
                                     {group.title}
                                 </span>
+                                {/* slate-600/indigo-600, not -400 (task 6.5): this count sits
+                                    on bg-slate-100 closed and bg-indigo-50 open, so the usual
+                                    slate-500 promotion only reaches 4.34:1 here. The open
+                                    state's indigo-400 measured 2.67:1 on indigo-50. */}
                                 <Badge
                                     variant="secondary"
-                                    className="ml-2 bg-slate-100 text-slate-400 group-data-[state=open]:bg-indigo-50 group-data-[state=open]:text-indigo-400"
+                                    className="ml-2 bg-slate-100 text-slate-600 group-data-[state=open]:bg-indigo-50 group-data-[state=open]:text-indigo-600"
                                 >
                                     {group.items.length}
                                 </Badge>
@@ -297,7 +301,11 @@ export function SurveyResponseTable({
                                                     />
                                                 )}
                                             </div>
-                                            <p className="text-2xs font-mono text-slate-400 mt-1 tracking-tighter opacity-70">
+                                            {/* No `opacity-70` (task 6.5): opacity multiplies
+                                                into the computed contrast — slate-500 at 70%
+                                                over white resolves to #929eae → 2.72:1, so the
+                                                colour promotion alone would not have landed. */}
+                                            <p className="text-2xs font-mono text-slate-500 mt-1 tracking-tighter">
                                                 {t('admin.participant.metadata.id', 'ID')}:{' '}
                                                 {item.id || item.key}
                                             </p>

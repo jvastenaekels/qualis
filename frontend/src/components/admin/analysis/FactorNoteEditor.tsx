@@ -130,7 +130,7 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                     <div className="flex items-center justify-between gap-2">
                         <span
                             className={`text-2xs ${
-                                isOverLimit ? 'text-rose-600 font-semibold' : 'text-slate-400'
+                                isOverLimit ? 'text-rose-600 font-semibold' : 'text-slate-500'
                             }`}
                         >
                             {t('admin.analysis.factor_note.char_count', '{{n}}/{{max}}', {
@@ -154,7 +154,7 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="text-slate-400 hover:text-slate-600 p-1"
+                                className="text-slate-500 hover:text-slate-600 p-1"
                                 aria-label={t(
                                     'admin.analysis.factor_note.cancel_aria',
                                     'Cancel editing'
@@ -182,14 +182,14 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                         )}
                     >
                         <NotebookText
-                            className="size-3 text-slate-400 mt-0.5 shrink-0"
+                            className="size-3 text-slate-500 mt-0.5 shrink-0"
                             aria-hidden="true"
                         />
                         <p className="flex-1 min-w-0 text-xs text-slate-600 leading-snug">
                             {currentNote}
                         </p>
                         <Pencil
-                            className="size-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                            className="size-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                             aria-hidden="true"
                         />
                     </button>
@@ -197,7 +197,7 @@ export const FactorNoteEditor = forwardRef<FactorNoteEditorHandle, FactorNoteEdi
                     <button
                         type="button"
                         onClick={handleStart}
-                        className="text-2xs text-slate-400 hover:text-slate-600 italic flex items-center gap-1.5 transition-colors"
+                        className="text-2xs text-slate-500 hover:text-slate-600 italic flex items-center gap-1.5 transition-colors"
                     >
                         <NotebookText className="size-3" aria-hidden="true" />
                         {t(

@@ -140,7 +140,7 @@ export function FactorLoadingsTable({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Info
-                                    className="size-3.5 text-slate-400 cursor-help"
+                                    className="size-3.5 text-slate-500 cursor-help"
                                     aria-hidden="true"
                                 />
                             </TooltipTrigger>
@@ -245,7 +245,7 @@ export function FactorLoadingsTable({
                                                 ))}
                                             </span>
                                         ) : (
-                                            <span className="text-slate-300">&mdash;</span>
+                                            <span className="text-slate-500">&mdash;</span>
                                         )}
                                     </td>
                                 </tr>

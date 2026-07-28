@@ -200,14 +200,14 @@ function VersionList({
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="size-5 animate-spin text-slate-400" />
+                <Loader2 className="size-5 animate-spin text-slate-500" />
             </div>
         );
     }
 
     if (versions.length === 0) {
         return (
-            <p className="text-center text-sm text-slate-400 py-12">
+            <p className="text-center text-sm text-slate-500 py-12">
                 {t('admin.concourse.no_history', 'No edit history yet.')}
             </p>
         );
@@ -255,7 +255,7 @@ function VersionList({
                                     </span>
                                 )}
                             </div>
-                            <span className="text-2xs text-slate-400">
+                            <span className="text-2xs text-slate-500">
                                 {formatDate(v.changed_at)}
                             </span>
                         </div>
@@ -270,7 +270,7 @@ function VersionList({
                                             key={tr.language_code}
                                             className="text-sm text-slate-700"
                                         >
-                                            <span className="text-2xs font-bold text-slate-400 mr-1.5">
+                                            <span className="text-2xs font-bold text-slate-500 mr-1.5">
                                                 {tr.language_code?.toUpperCase()}
                                             </span>
                                             {tr.text}
@@ -309,14 +309,14 @@ function CommentList({
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="size-5 animate-spin text-slate-400" />
+                <Loader2 className="size-5 animate-spin text-slate-500" />
             </div>
         );
     }
 
     if (comments.length === 0) {
         return (
-            <p className="text-center text-sm text-slate-400 py-12">
+            <p className="text-center text-sm text-slate-500 py-12">
                 {t('admin.concourse.no_comments', 'No comments yet.')}
             </p>
         );
@@ -335,7 +335,7 @@ function CommentList({
                                 ? (memberNames[c.user_id] ?? `#${c.user_id}`)
                                 : t('common.unknown', 'Unknown')}
                         </span>
-                        <span className="text-2xs text-slate-400">{formatDate(c.created_at)}</span>
+                        <span className="text-2xs text-slate-500">{formatDate(c.created_at)}</span>
                     </div>
                     <p className="text-sm text-slate-800 whitespace-pre-wrap">{c.body}</p>
                 </div>

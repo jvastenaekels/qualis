@@ -93,13 +93,13 @@ function getStateIcon(state: string | undefined) {
                 </span>
             );
         case 'draft':
-            return <Circle className="h-3 w-3 text-slate-400" />;
+            return <Circle className="h-3 w-3 text-slate-500" />;
         case 'paused':
             return <Clock className="h-3 w-3 text-amber-500" />;
         case 'closed':
             return <CheckCircle2 className="h-3 w-3 text-blue-500" />;
         default:
-            return <Circle className="h-3 w-3 text-slate-400" />;
+            return <Circle className="h-3 w-3 text-slate-500" />;
     }
 }
 

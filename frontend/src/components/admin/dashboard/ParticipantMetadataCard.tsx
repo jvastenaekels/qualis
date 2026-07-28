@@ -147,7 +147,7 @@ export function ParticipantMetadataCard({
             <CardContent className="p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Tech Info */}
                 <div className="space-y-4">
-                    <h4 className="text-2xs font-black text-slate-400">
+                    <h4 className="text-2xs font-black text-slate-500">
                         {t('admin.participant.metadata.technology', 'Technology')}
                     </h4>
                     <div className="space-y-3">
@@ -189,7 +189,7 @@ export function ParticipantMetadataCard({
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <h4 className="text-2xs font-black text-slate-400">
+                    <h4 className="text-2xs font-black text-slate-500">
                         {t('admin.participant.metadata.session', 'Session Details')}
                     </h4>
                     <div className="space-y-3">

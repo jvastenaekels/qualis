@@ -218,7 +218,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                                         <FormLabel className="text-2xs font-black text-slate-500">
                                             {t('admin.dialogs.create_study.languages', 'Languages')}
                                         </FormLabel>
-                                        <p className="text-xs font-medium text-slate-400 mt-1">
+                                        <p className="text-xs font-medium text-slate-500 mt-1">
                                             {t(
                                                 'admin.dialogs.create_study.languages_desc',
                                                 'Select languages to enable for this study. Content will be initialized with localized defaults.'
