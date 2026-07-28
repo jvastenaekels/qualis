@@ -185,33 +185,38 @@ export function ParticipantCell({
                 // ("Duplicate IP #1") — role="img" would turn that readable
                 // text into a graphic node (NVDA: "graphic, Duplicate IP
                 // #1") and force the same wording into a hand-maintained
-                // aria-label. `title` keeps the hint/IP-hash-prefix for a
-                // mouse user hovering; the sr-only span repeats it as real
-                // content so a screen-reader user gets it reliably too (a
-                // `title` is announced as a description inconsistently
-                // across screen readers). Residual gap, accepted rather than
-                // solved here: a sighted keyboard-only or touch user with no
-                // screen reader still can't reach this detail, since there is
-                // no longer a focusable trigger to reveal it on demand.
+                // aria-label.
+                //
+                // One channel, not two (re-review, 2026-07-28): an earlier
+                // version of this fix kept BOTH a `title` and an sr-only
+                // span carrying the same hint text. That double-announces on
+                // any AT/browser pairing that surfaces the accessible
+                // description alongside the name (VoiceOver commonly; NVDA/
+                // JAWS in some modes) — once the name comes from content
+                // rather than `title` (HTML-AAM), `title` is exposed
+                // separately as the description, so the identical string
+                // reaches the tree twice. Kept the sr-only span only: it is
+                // ordinary text content, read exactly like the visible label
+                // next to it on every screen reader, with no separate
+                // "hover for description" step `title` requires — and no
+                // risk of NVDA/JAWS/VoiceOver each deciding differently
+                // whether to surface it. Traded away: the native
+                // browser-tooltip-on-hover a sighted mouse user got before.
+                // Accepted rather than solved here — see the submitted_at
+                // cell below for the same trade and the same reasoning.
                 // text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1.
                 <Badge
                     variant="outline"
-                    title={`${t(
-                        'admin.data.table.duplicate_ip_hint',
-                        'Shares IP hash with other participants'
-                    )} (${p.ip_address.substring(0, 8)}...)`}
                     className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
                 >
                     {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
                     {duplicateIpGroups.get(p.ip_address)}
                     <span className="sr-only">
                         {' '}
-                        (
-                        {t(
+                        {`${t(
                             'admin.data.table.duplicate_ip_hint',
                             'Shares IP hash with other participants'
-                        )}
-                        , {p.ip_address.substring(0, 8)}...)
+                        )} (${p.ip_address.substring(0, 8)}...)`}
                     </span>
                 </Badge>
             )}
@@ -777,22 +782,25 @@ export function buildColumns({
                 // short date is already the accessible name via its own
                 // visible text, sitting in a sorted temporal column —
                 // role="img" would make a screen reader announce it as
-                // "graphic, Jan 1, 01:10" instead of a date. `title` keeps
-                // the full timestamp for a mouse user hovering; the sr-only
-                // span repeats it as real content so a screen-reader user
-                // gets the full timestamp reliably too (a `title` is
-                // announced as a description inconsistently across screen
-                // readers). Residual gap, accepted rather than solved here:
-                // a sighted keyboard-only or touch user with no screen
-                // reader still can't reach the full timestamp, since there
-                // is no longer a focusable trigger to reveal it on demand.
+                // "graphic, Jan 1, 01:10" instead of a date.
+                //
+                // One channel, not two (re-review, 2026-07-28): no `title`
+                // here alongside the sr-only span — keeping both would
+                // double-announce the full timestamp on any AT/browser
+                // pairing that surfaces the accessible description
+                // alongside the name (see the duplicate-IP badge above for
+                // the full HTML-AAM reasoning; identical trade here). The
+                // sr-only span is the one reliable channel to a screen
+                // reader; the trade-off accepted, not solved, is that a
+                // sighted mouse user no longer gets a hover tooltip for the
+                // full timestamp, and neither they nor a sighted
+                // keyboard-only/touch user without AT can reach it at all
+                // now — there is no longer any focusable trigger to reveal
+                // it on demand.
                 return (
-                    <span
-                        title={fullLabel}
-                        className="flex flex-col text-xs text-slate-500 font-medium"
-                    >
+                    <span className="flex flex-col text-xs text-slate-500 font-medium">
                         {shortLabel}
-                        <span className="sr-only"> ({fullLabel})</span>
+                        <span className="sr-only"> {fullLabel}</span>
                     </span>
                 );
             },

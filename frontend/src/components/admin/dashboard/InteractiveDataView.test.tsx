@@ -285,10 +285,17 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // tab stop (Task 6.7i). It carries no role at all now (review
         // finding 2): it already has an accessible name from its own
         // visible text, so role="img" would have turned it into a graphic
-        // node instead. Find it by its `title` (the full timestamp) and
-        // confirm the short label is still its visible text.
-        const dateCell = within(row).getByTitle(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'));
-        expect(dateCell).toHaveTextContent(expectedSubmittedLabel('2026-01-01T00:10:19Z'));
+        // node instead. The visible short label and the sr-only full
+        // timestamp are two separate text-node-owning elements (RTL's
+        // getByText matches an element's own direct text nodes, not its
+        // descendants' — no `title` any more, single channel, see
+        // columns.tsx), so both are queried independently.
+        expect(
+            within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+        expect(
+            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
     });
 
     it('counts focusable controls in a duplicate-IP row: the badge and the date are no longer tab stops, leaving exactly one real, named action (Task 6.7i)', async () => {
@@ -316,18 +323,27 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // The duplicate-IP badge is a fact, not a control: plain visible
         // text, no role at all (Task 6.7i review finding 2 — it already had
         // an accessible name from its own text, so role="img" would have
-        // wrongly turned it into a graphic node). Find it by its `title`
-        // (the hint/IP-hash-prefix) and confirm the visible label is there.
-        const badge = within(row).getByTitle(/Shares IP hash with other participants/);
-        expect(badge).toHaveTextContent('Duplicate IP #1');
+        // wrongly turned it into a graphic node). "Duplicate IP #1" is the
+        // badge's own direct text (RTL's getByText matches an element's own
+        // text nodes, not its descendants' — so this specifically excludes
+        // the nested sr-only span's text); the hint/IP-hash-prefix lives
+        // only in that sr-only span now (no `title` any more, single
+        // channel — see columns.tsx), queried separately below.
+        expect(within(row).getByText('Duplicate IP #1')).toBeInTheDocument();
+        expect(within(row).getByText(/Shares IP hash with other participants/)).toBeInTheDocument();
         expect(within(row).queryByRole('img', { name: /Duplicate IP/ })).not.toBeInTheDocument();
         expect(within(row).queryByRole('button', { name: /Duplicate IP/ })).not.toBeInTheDocument();
 
         // Same for the submitted_at date: was a TooltipTrigger button
-        // revealing the full timestamp on hover, now plain text with a
-        // `title` — not a role="img" either, for the same reason.
-        const dateCell = within(row).getByTitle(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'));
-        expect(dateCell).toHaveTextContent(expectedSubmittedLabel('2026-01-01T00:10:19Z'));
+        // revealing the full timestamp on hover, now plain text, split
+        // across a visible short label and an sr-only full timestamp — not
+        // a role="img" either, for the same reason.
+        expect(
+            within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+        expect(
+            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
         expect(
             within(row).queryByRole('img', { name: expectedSubmittedLabel('2026-01-01T00:10:19Z') })
         ).not.toBeInTheDocument();
