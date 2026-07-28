@@ -41,6 +41,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { SlugInput } from '@/components/ui/slug-input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
@@ -258,27 +259,34 @@ const RecruitmentPage = () => {
                                             )}
                                         </FormLabel>
                                         {/*
-                                         * FormControl now wraps the <Input> directly, not the
+                                         * FormControl must wrap SlugInput directly, not a
                                          * decorative wrapper div (task 6.7e). shadcn's
                                          * FormControl uses Radix Slot to attach id/
                                          * aria-describedby/aria-invalid to its *only* child —
-                                         * with the div as that child, those landed on the div
-                                         * instead of the input, so FormLabel's htmlFor pointed
-                                         * at a non-labelable element and the real <input> had
-                                         * no accessible name at all (axe: label).
+                                         * SlugInput forwards those (and its ref) to the real
+                                         * <input> it renders internally, not its wrapper div.
+                                         * Wrapping anything else here regresses to the div
+                                         * receiving them instead: FormLabel's htmlFor would
+                                         * then point at a non-labelable element and the real
+                                         * <input> would have no accessible name at all
+                                         * (axe: label — task 6.1 reuses this component at
+                                         * ProjectSettingsPage/CreateProjectPage too).
                                          */}
-                                        <div className="relative">
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 font-mono text-xs select-none">
-                                                /study/
-                                            </div>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    disabled={isSlugLocked}
-                                                    className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
-                                                />
-                                            </FormControl>
-                                        </div>
+                                        <FormControl>
+                                            {/* prefixClassName: deliberate, not the SlugInput
+                                                default — matches this field's monospace,
+                                                slate-600 value instead of the default sans
+                                                slate-400, and skips the divider (review note
+                                                on task 6.1: the typeface change was silent in
+                                                an earlier version of this file). */}
+                                            <SlugInput
+                                                {...field}
+                                                prefix="/study/"
+                                                prefixClassName="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none whitespace-nowrap font-mono text-xs text-slate-600"
+                                                disabled={isSlugLocked}
+                                                className="h-11 rounded-xl bg-slate-50 border-slate-100 font-mono text-xs focus-visible:ring-indigo-500"
+                                            />
+                                        </FormControl>
                                         {isSlugLocked ? (
                                             <p className="text-xs text-amber-800 flex items-center gap-1.5 mt-1.5">
                                                 <Info className="size-3 shrink-0" />
@@ -367,42 +375,30 @@ const RecruitmentPage = () => {
                         )}
                         {/* Password Protection */}
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
-                                <div className="space-y-0.5">
-                                    <Label
-                                        id="password-toggle-label"
-                                        htmlFor="password-toggle"
-                                        className="text-sm font-bold text-slate-700"
-                                    >
-                                        {t(
-                                            'admin.recruitment.access_rules.password_toggle',
-                                            'Require a password'
-                                        )}
-                                    </Label>
-                                    <p className="text-xs text-slate-500">
-                                        {t(
-                                            'admin.recruitment.access_rules.password_toggle_desc',
-                                            'Participants must enter a password before starting the study.'
-                                        )}
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="password-toggle"
-                                    aria-labelledby="password-toggle-label"
-                                    checked={passwordEnabled}
-                                    onCheckedChange={(checked) => {
-                                        accessForm.setValue('passwordEnabled', checked, {
+                            <AccessRuleRow
+                                labelId="password-toggle-label"
+                                switchId="password-toggle"
+                                label={t(
+                                    'admin.recruitment.access_rules.password_toggle',
+                                    'Require a password'
+                                )}
+                                description={t(
+                                    'admin.recruitment.access_rules.password_toggle_desc',
+                                    'Participants must enter a password before starting the study.'
+                                )}
+                                checked={passwordEnabled}
+                                onCheckedChange={(checked) => {
+                                    accessForm.setValue('passwordEnabled', checked, {
+                                        shouldDirty: true,
+                                    });
+                                    if (!checked) {
+                                        accessForm.setValue('accessPassword', '', {
                                             shouldDirty: true,
                                         });
-                                        if (!checked) {
-                                            accessForm.setValue('accessPassword', '', {
-                                                shouldDirty: true,
-                                            });
-                                        }
-                                    }}
-                                    disabled={isSlugLocked}
-                                />
-                            </div>
+                                    }
+                                }}
+                                disabled={isSlugLocked}
+                            />
 
                             {passwordEnabled && (
                                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -458,47 +454,35 @@ const RecruitmentPage = () => {
                             derives its initial state from the form values:
                             on if either date was previously set. */}
                         <div className="space-y-4">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="space-y-0.5">
-                                    <Label
-                                        id="window-toggle-label"
-                                        htmlFor="window-toggle"
-                                        className="text-sm font-black text-slate-700"
-                                    >
-                                        {t(
-                                            'admin.recruitment.access_rules.window_toggle',
-                                            'Limit collection window'
-                                        )}
-                                    </Label>
-                                    <p className="text-xs text-slate-600 font-medium">
-                                        {t(
-                                            'admin.recruitment.access_rules.window_toggle_help',
-                                            'Restrict participant access to a specific time range.'
-                                        )}
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="window-toggle"
-                                    aria-labelledby="window-toggle-label"
-                                    checked={showWindowPickers}
-                                    onCheckedChange={(checked) => {
-                                        setShowWindowPickers(checked);
-                                        if (!checked) {
-                                            if (accessForm.getValues('startDate')) {
-                                                accessForm.setValue('startDate', '', {
-                                                    shouldDirty: true,
-                                                });
-                                            }
-                                            if (accessForm.getValues('endDate')) {
-                                                accessForm.setValue('endDate', '', {
-                                                    shouldDirty: true,
-                                                });
-                                            }
+                            <AccessRuleRow
+                                labelId="window-toggle-label"
+                                switchId="window-toggle"
+                                label={t(
+                                    'admin.recruitment.access_rules.window_toggle',
+                                    'Limit collection window'
+                                )}
+                                description={t(
+                                    'admin.recruitment.access_rules.window_toggle_help',
+                                    'Restrict participant access to a specific time range.'
+                                )}
+                                checked={showWindowPickers}
+                                onCheckedChange={(checked) => {
+                                    setShowWindowPickers(checked);
+                                    if (!checked) {
+                                        if (accessForm.getValues('startDate')) {
+                                            accessForm.setValue('startDate', '', {
+                                                shouldDirty: true,
+                                            });
                                         }
-                                    }}
-                                    disabled={isArchived}
-                                />
-                            </div>
+                                        if (accessForm.getValues('endDate')) {
+                                            accessForm.setValue('endDate', '', {
+                                                shouldDirty: true,
+                                            });
+                                        }
+                                    }
+                                }}
+                                disabled={isArchived}
+                            />
                             {showWindowPickers && (
                                 <>
                                     {/* Heads the "Opens at"/"Closes at" pair below, both of
@@ -1148,3 +1132,54 @@ const RecruitmentPage = () => {
 };
 
 export default RecruitmentPage;
+
+// ─── sub-components ────────────────────────────────────────────────────────────
+
+interface AccessRuleRowProps {
+    labelId: string;
+    switchId: string;
+    label: string;
+    description: string;
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+    disabled?: boolean;
+}
+
+/**
+ * One row under "Access rules": a label/description pair with a switch.
+ * Password protection and the collection-window toggle used to be built
+ * independently and drifted apart — different padding/surface, different
+ * label weight (task 6.2) — so their switches ended up 17px apart
+ * horizontally. Extracted so the two rows share one shape and cannot drift
+ * again.
+ */
+function AccessRuleRow({
+    labelId,
+    switchId,
+    label,
+    description,
+    checked,
+    onCheckedChange,
+    disabled,
+}: AccessRuleRowProps) {
+    return (
+        <div
+            data-testid="access-rule-row"
+            className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100"
+        >
+            <div className="space-y-0.5">
+                <Label id={labelId} htmlFor={switchId} className="text-sm font-bold text-slate-700">
+                    {label}
+                </Label>
+                <p className="text-xs text-slate-500">{description}</p>
+            </div>
+            <Switch
+                id={switchId}
+                aria-labelledby={labelId}
+                checked={checked}
+                onCheckedChange={onCheckedChange}
+                disabled={disabled}
+            />
+        </div>
+    );
+}

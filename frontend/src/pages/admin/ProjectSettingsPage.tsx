@@ -11,6 +11,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { SlugInput } from '@/components/ui/slug-input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -168,19 +169,15 @@ export default function ProjectSettingsPage() {
                                                 {t('admin.projects.settings.general.label_slug')}
                                             </FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <Input
-                                                        {...field}
-                                                        placeholder={t(
-                                                            'admin.projects.settings.general.placeholder_slug'
-                                                        )}
-                                                        className="h-11 rounded-xl pl-32 bg-white/50"
-                                                        disabled={!isOwner}
-                                                    />
-                                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none border-r pr-3 mr-3 h-4 flex items-center">
-                                                        /app/
-                                                    </div>
-                                                </div>
+                                                <SlugInput
+                                                    {...field}
+                                                    prefix="/app/"
+                                                    placeholder={t(
+                                                        'admin.projects.settings.general.placeholder_slug'
+                                                    )}
+                                                    className="h-11 rounded-xl bg-white/50"
+                                                    disabled={!isOwner}
+                                                />
                                             </FormControl>
                                             <FormDescription className="text-2xs italic">
                                                 {t('admin.projects.settings.general.slug_hint')}
