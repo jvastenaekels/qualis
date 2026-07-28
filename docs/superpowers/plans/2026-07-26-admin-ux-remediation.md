@@ -1095,6 +1095,52 @@ orphan key exits **1**, removing it exits **0**.
 
 ---
 
+## Phase 4 — closed, and what it left behind
+
+All four tasks merged: 4.1 (#345), 4.2 (#340), 4.3 (#343), 4.4 (#342).
+
+**Both of the last two found something larger than their own brief, in the same shape:
+a defect that produces *valid* strings, which is precisely why no gate could see it.**
+
+- **4.3** was scoped to four date formats and found a **second engine**. Beyond the 7 raw
+  `toLocale*` sites, date-fns formatted dates across 5 components and 2 hooks with a locale
+  map covering only `{en, fr, fi, de}` — **5 of 9 supported languages silently fell back to
+  English**, and the map read `i18n.language` unstripped so `en-US`/`pt-BR` missed it too.
+  A Spanish researcher's dashboard read "2 hours ago". Real English, wrong language.
+- **4.4** was scoped to orphan keys and found **11 sites rendering the raw dotted key** to
+  users, via the inert `t('key') || 'Fallback'` idiom.
+- **4.1**'s counts were right and its *mechanism* was wrong: the near-black buttons contain
+  no `bg-slate-900` — bare `<Button>`s fall through to `bg-primary`, which was the slate
+  token. Applying the plan literally would have turned 26 indigo buttons black. Two fills
+  the plan wanted kept were already failing AA (white on amber-500 = **2.15:1**).
+
+### Open debts — carried out of this plan, each needing its own task
+
+1. **`study.access.*` — the entire participant password gate, 4 keys, untranslated in every
+   locale.** Participant-facing, so outside this plan's admin scope, and the participant
+   namespace is strict-parity: closing it needs nine real translations, not a machine pass.
+   Currently declared in `check_orphan_keys.py`'s `DEFERRED` list (20 keys total).
+2. **`SubmissionsTimelineChart` passes no locale at all** — its axis and tooltip are
+   hardcoded English in all nine languages. Left alone deliberately by 4.3; unifying its
+   axis tick would wreck the axis.
+3. **`--primary` and the button primary now diverge.** The token still drives `IconPicker`
+   and the `link` variant, so the CSS variable and the component disagree about what
+   "primary" means.
+4. **Unverified visually:** 4.3's Data-table cell grows ~6 characters; no browser check was
+   run at 320–375px. 4.1's white-on-indigo is a real drop from 17.85:1 to 6.29:1 — passing,
+   but a reduction.
+
+### Two process facts this phase established
+
+- **A green gate in a fresh git worktree may mean nothing ran.** Task 4.1's worktree had no
+  `node_modules`, so `npx biome` and `npx vitest` no-opped and **exited 0**. All its gates
+  were re-run from a tree with real dependencies.
+- **Verify a new gate adversarially, reading the exit code directly.** A pipe through `tail`
+  masks the real status: `check_orphan_keys.py` printed `FAIL` while the shell reported 0.
+  Both new gates on this phase were injection-tested in both directions.
+
+---
+
 # PHASE 5 — Vocabulary and naming canon
 
 ### Task 5.1: One word per concept
