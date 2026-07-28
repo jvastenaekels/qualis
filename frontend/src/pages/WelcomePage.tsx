@@ -145,7 +145,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         ></div>
                         <h2 className="text-xs font-bold text-slate-500 mb-4 flex items-center gap-2">
                             <Target size={16} style={{ color: 'var(--brand-accent)' }} />
-                            {t('welcome.objective_label', 'Objective of the study')}
+                            {t('welcome.objective_label', 'Study objective')}
                         </h2>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                             <SafeMarkdown>{config.objective}</SafeMarkdown>
@@ -196,7 +196,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                         }}
                     >
                         <div className="text-xs font-bold mb-4 w-fit px-3 py-1.5 rounded-md border text-slate-700 bg-slate-50 border-slate-200">
-                            {t('welcome.how_it_works', 'How it works')}
+                            {t('welcome.how_it_works', 'Process')}
                         </div>
 
                         {config.instructions && (
@@ -264,7 +264,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     {/* Visual Column */}
                     <div className="md:col-span-12 lg:col-span-5 p-4 sm:p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[250px] sm:min-h-[350px] md:min-h-[500px] relative overflow-hidden">
                         <div className="text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm mb-4">
-                            {t('welcome.preview_title', "It's child's play!")}
+                            {t('welcome.preview_title', 'Preview')}
                         </div>
 
                         <div

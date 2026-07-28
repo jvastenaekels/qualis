@@ -814,7 +814,7 @@ const StudyDesignPage = () => {
                                         <h3 className="font-black text-sm text-rose-500">
                                             {t(
                                                 'admin.design.translation_needed',
-                                                'Translation Required'
+                                                'Review required (copy)'
                                             )}
                                         </h3>
                                     </div>
@@ -914,7 +914,7 @@ const StudyDesignPage = () => {
                                         )}
                                         description={t(
                                             'admin.design.guidance.qsort_desc',
-                                            'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
+                                            'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually follows a quasi-normal (bell curve) distribution.'
                                         )}
                                     />
                                 )}

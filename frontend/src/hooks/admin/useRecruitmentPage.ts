@@ -227,7 +227,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
         mutation: {
             onSuccess: () => {
                 toast.success(
-                    t('admin.recruitment.toasts.created', 'Recruitment links created successfully')
+                    t('admin.recruitment.toasts.created', 'Access links created successfully')
                 );
                 setIsCreateModalOpen(false);
                 revalidator.revalidate();
@@ -238,7 +238,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 toast.error(
                     t(
                         'admin.recruitment.toasts.failed',
-                        'Could not create recruitment links. Check the inputs and try again.'
+                        'Could not create access links. Check the inputs and try again.'
                     )
                 );
             },

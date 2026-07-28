@@ -311,7 +311,7 @@ export default function RecentActivityCard({
                         {t('admin.study_overview.latest_participants', {
                             count: recentParticipants.length,
                             total: totalParticipantCount,
-                            defaultValue: `Latest participants (${recentParticipants.length} of ${totalParticipantCount})`,
+                            defaultValue: 'Latest participants (last {{count}} of {{total}})',
                         })}
                     </CardDescription>
                 </div>

@@ -199,7 +199,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
             id: 'active',
             label: t('admin.study_status.steps.active.label', 'Active'),
             icon: Rocket,
-            description: t('admin.study_status.steps.active.description', 'Collecting responses'),
+            description: t('admin.study_status.steps.active.description', 'Data collection'),
             color: 'text-emerald-600',
             bg: 'bg-emerald-100',
             border: 'border-emerald-200',

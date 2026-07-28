@@ -69,10 +69,10 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
         if (file.size > maxFileSize) {
             const maxSizeKB = Math.round(maxFileSize / 1024);
             setError(
-                t(
-                    'admin.design.theme.upload.file_too_large',
-                    `File too large. Maximum size: ${maxSizeKB}KB.`
-                )
+                t('admin.design.theme.upload.file_too_large', {
+                    size: maxSizeKB,
+                    defaultValue: 'File too large. Maximum size: {{size}}kb.',
+                })
             );
             return;
         }

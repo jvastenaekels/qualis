@@ -185,7 +185,7 @@
             "logout": "Kirjaudu ulos",
             "account": "Tilin asetukset",
             "admin_user": "Ylläpitäjä",
-            "platform_settings": "Alustan asetukset"
+            "platform_settings": "Käyttäjät"
         },
         "account": {
             "title": "Tilin asetukset",
@@ -745,7 +745,6 @@
             "link_count": "Erän koko",
             "capacity_label": "Maksimilähetykset",
             "generate_links": "Luo linkit",
-            "no_links": "Ei vielä luotuja rekrytointilinkkejä.",
             "unnamed": "Nimetön kanava",
             "revoked": "Pääsy peruutettu",
             "qr_title": "Jaa QR-koodina",
@@ -782,16 +781,6 @@
                 "public": "Paras suurten määrien rekrytointiin. Yksi URL kaikille osallistujille.",
                 "individual": "Maksimaalinen turvallisuus. Luo yksilöllisiä linkkejä, jotka vanhenevat yhden onnistuneen suorituksen jälkeen.",
                 "limited": "Hallittu pääsy. Yksi linkki, joka lakkaa toimimasta tietyn lähetysmäärän jälkeen."
-            },
-            "stats": {
-                "total_links": "Kanavat",
-                "active_channels": "Aktiiviset erät",
-                "started": "Istunnot",
-                "engagements": "Osallistujat",
-                "submitted": "Tiedot",
-                "completions": "Valmiit",
-                "conversion": "Konversio",
-                "efficiency": "Tehokkuus"
             },
             "table": {
                 "name": "Kampanja",
@@ -839,12 +828,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Ylläpito",
             "dashboard": "Hallintapaneeli",
             "study_dashboard": "Yleisnäkymä",
             "design": "Suunnittelu",
             "participants": "Osallistujat",
-            "team": "Tiimi",
             "recruitment": "Pääsy",
             "data": "Tiedot",
             "privacy": "Tietosuoja",
@@ -869,7 +856,6 @@
             "no_studies": "Ei tutkimuksia tässä projektissa.",
             "open_dashboard": "Avaa kojelauta",
             "design_study": "Tutkimuksen suunnittelu",
-            "collaborators": "Yhteistyökumppanit",
             "copy_link": "Kopioi julkinen linkki",
             "toggle_theme": "Vaihda teemaa",
             "logout": "Kirjaudu ulos",
@@ -939,7 +925,6 @@
             "alert_deadline": "{{study}}: sulkeutuu {{days}} päivän kuluttua, {{count}} osallistujaa",
             "view": "Näytä",
             "open_study": "Avaa tutkimus",
-            "add_study": "Lisää tutkimus",
             "closes": "Sulkeutuu",
             "timeline": {
                 "title": "Vastausten aikajana",
@@ -959,13 +944,7 @@
             },
             "n_studies_help": "Tämän projektin tutkimusten kokonaismäärä, mukaan lukien luonnokset ja suljetut.",
             "n_active_help": "Tutkimukset, jotka ottavat parhaillaan vastaan osallistujien vastauksia (tila = active).",
-            "n_participants_total_help": "Loppuun saaneiden osallistujien summa kaikissa projektin tutkimuksissa.",
-            "tool_help": {
-                "design": "Tutkimuksen asetukset: jakaumaruudukko, ohjeet, lauseet, suostumus.",
-                "recruit": "Rekrytointilinkit, käyttöoikeussäännöt ja URL-asetukset.",
-                "data": "Osallistujien vastaukset ja viennit (CSV, Q-sort-tuonnit).",
-                "analysis": "Faktorianalyysin asetukset ja aiempien ajojen historia."
-            }
+            "n_participants_total_help": "Loppuun saaneiden osallistujien summa kaikissa projektin tutkimuksissa."
         },
         "export": {
             "config": "Vie asetukset",
@@ -1851,44 +1830,6 @@
                 "next": "Seuraava sivu"
             }
         },
-        "team": {
-            "title": "Tutkimustiimi",
-            "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
-            "invite_title": "Kutsu yhteistyökumppani",
-            "invite_description": "Luo turvallinen linkki uuden jäsenen kutsumiseksi tähän tutkimukseen.",
-            "email_label": "Sähköpostiosoite",
-            "role_label": "Rooli",
-            "select_role": "Valitse rooli",
-            "generate_link": "Luo linkki",
-            "invite_success": "Kutsulinkki luotu!",
-            "invite_error": "Kutsun luominen epäonnistui",
-            "copy_success": "Linkki kopioitu leikepöydälle",
-            "share_label": "Jaa tämä linkki kutsuttavan kanssa:",
-            "collab_overview": "Yhteistyön yleiskatsaus",
-            "active_members": "Aktiiviset jäsenet",
-            "permissions_info": "Lupatiedot",
-            "list_title": "Tutkimustiimi",
-            "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
-            "added_on": "Lisätty",
-            "headers": {
-                "collaborator": "Yhteistyökumppani",
-                "role": "Rooli",
-                "actions": "Toiminnot"
-            },
-            "roles": {
-                "owner": "Omistaja (Täydet oikeudet)",
-                "editor": "Muokkaja (Suunnittelu ja analyysi)",
-                "viewer": "Katsoja (Vain luku)",
-                "owner_badge": "OMISTAJA",
-                "editor_badge": "MUOKKAAJA",
-                "viewer_badge": "KATSOJA"
-            },
-            "permissions": {
-                "owner": "Voi poistaa tutkimuksen ja hallinnoida tiimiä.",
-                "editor": "Voi muokata suunnitelmaa ja tarkastella tuloksia.",
-                "viewer": "Vain luku -pääsy kaikkiin moduuleihin."
-            }
-        },
         "empty_states": {
             "participants": {
                 "title": "Valmiina julkaisuun?",
@@ -1896,11 +1837,6 @@
                 "action": "Kopioi tutkimuslinkki",
                 "hint": "Tai skannaa QR-koodi",
                 "copy_success": "Tutkimuslinkki kopioitu leikepöydälle!"
-            },
-            "team": {
-                "title": "Työskentelet yksin",
-                "desc": "Kutsu yhteistyökumppaneita auttamaan tämän tutkimuksen hallinnassa. He voivat tarkastella tietoja, muokata suunnitelmaa tai vain seurata.",
-                "action": "Kutsu ensimmäinen yhteistyökumppanisi"
             },
             "designer": {
                 "title": "Tabula Rasa",
@@ -1987,9 +1923,7 @@
                     "save_error": "Projektin päivitys epäonnistui"
                 },
                 "team_growth_title": "Tiimin hallinta",
-                "team_growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita projektiisi. He voivat hallinnoida kaikkia projektin tutkimuksia.",
                 "team": {
-                    "title": "Tiimin jäsenet",
                     "desc": "Luettelo käyttäjistä, joilla on pääsy tähän projektiin.",
                     "col_user": "Käyttäjä",
                     "col_role": "Rooli",
@@ -2212,10 +2146,10 @@
             "audio_title": "Audio storage",
             "audio_count": "Recordings",
             "audio_mb": "Total size",
-            "locale_title": "Locale breakdown",
+            "locale_title": "Language breakdown",
             "locale_col": "Language",
             "locale_count_col": "Participants",
-            "locale_empty": "No locale data yet.",
+            "locale_empty": "No language data yet.",
             "timeline_title": "Timeline",
             "tl_first": "First submission",
             "tl_last": "Last submission",

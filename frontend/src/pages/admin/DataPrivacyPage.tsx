@@ -128,14 +128,14 @@ function ConsentSummaryCard({ designHref }: { designHref: string }) {
                     >
                         <Link to={`${designHref}#consent`}>
                             <PencilLine className="size-4 mr-2" />
-                            {t('admin.privacy.consent.edit_in_design', 'Edit in Study design')}
+                            {t('admin.privacy.consent.edit_in_design', 'Edit in Design')}
                         </Link>
                     </Button>
                 </div>
                 <CardDescription className="text-sm font-medium text-slate-500">
                     {t(
                         'admin.privacy.consent.description',
-                        'What participants see before they enter the study. Edited in Study design.'
+                        'What participants see before they enter the study. Edited in Design.'
                     )}
                 </CardDescription>
             </CardHeader>
@@ -486,7 +486,7 @@ export default function DataPrivacyPage() {
                         <div className="flex items-center gap-2 mb-1">
                             <Globe className="h-5 w-5 text-emerald-500" />
                             <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.privacy.locale_title', 'Locale breakdown')}
+                                {t('admin.privacy.locale_title', 'Language breakdown')}
                             </CardTitle>
                         </div>
                     </CardHeader>
@@ -521,7 +521,7 @@ export default function DataPrivacyPage() {
                             </table>
                         ) : (
                             <EmptyState
-                                title={t('admin.privacy.locale_empty', 'No locale data yet.')}
+                                title={t('admin.privacy.locale_empty', 'No language data yet.')}
                                 variant="compact"
                             />
                         )}

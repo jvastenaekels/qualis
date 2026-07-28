@@ -694,7 +694,7 @@
         },
         "recruitment": {
             "title": "Accès",
-            "description": "Configurez l'URL de l'étude, gérez l'accès des participants et suivez l'efficacité du recrutement.",
+            "description": "Configurez l'URL de l'étude, gérez l'accès des participants et suivez les performances de chaque lien d'accès.",
             "study_url": {
                 "title": "URL de l'étude",
                 "description": "L'adresse publique par laquelle les participants accèdent à votre étude.",
@@ -705,8 +705,8 @@
             },
             "state_draft": "Mode brouillon. Les liens fonctionneront une fois l'étude activée.",
             "state_closed": "Cette étude est fermée. Les liens existants restent visibles mais les nouveaux participants ne peuvent pas commencer.",
-            "state_archived": "Cette étude est archivée. Toutes les données de recrutement sont en lecture seule.",
-            "empty_title": "Aucun lien de recrutement",
+            "state_archived": "Cette étude est archivée. Les liens d'accès sont en lecture seule.",
+            "empty_title": "Aucun lien d'accès",
             "empty_description": "Créez votre premier lien pour commencer à inviter des participants.",
             "empty_cta": "Créer un lien d'accès",
             "stats_summary": {
@@ -739,18 +739,17 @@
             "new_link": "Nouveau lien d'accès",
             "create_title": "Créer des liens d'accès",
             "link_type": "Stratégie d'accès",
-            "select_type": "Choisir le type de recrutement...",
+            "select_type": "Choisir une stratégie d'accès...",
             "campaign_name": "Nom du canal / de la campagne",
             "name_placeholder": "ex: LinkedIn, Email Lot A, Liste étudiants...",
             "link_count": "Taille du lot",
             "capacity_label": "Soumissions max",
             "generate_links": "Provisionner les liens",
-            "no_links": "Aucun lien de recrutement généré pour le moment.",
             "unnamed": "Canal sans nom",
             "revoked": "Accès révoqué",
             "qr_title": "Partager via QR",
             "copy_link": "Copier l'URL",
-            "table_title": "Liens de recrutement",
+            "table_title": "Liens d'accès",
             "share_title": "Partager l'étude",
             "share_desc": "Distribuez l'URL de votre étude pour inviter des participants.",
             "public_url_label": "URL publique de participation",
@@ -758,7 +757,7 @@
             "show_qr": "Afficher le code QR",
             "delete_link": "Supprimer le lien",
             "qr_alt": "Code QR pour {{url}}",
-            "table_caption": "Liens de recrutement",
+            "table_caption": "Liens d'accès",
             "progress_label": "{{count}} sur {{max}} réponses",
             "usage": {
                 "started": "démarrés",
@@ -783,20 +782,10 @@
                 "individual": "Sécurité maximale. Génère des liens uniques qui expirent après une participation validée.",
                 "limited": "Accès contrôlé. Un seul lien qui cesse de fonctionner après un nombre fixe de participations."
             },
-            "stats": {
-                "total_links": "Canaux",
-                "active_channels": "Lots de recrutement actifs",
-                "started": "Sessions",
-                "engagements": "Participants ayant commencé",
-                "submitted": "Données",
-                "completions": "Soumissions terminées",
-                "conversion": "Taux de conversion",
-                "efficiency": "Efficacité"
-            },
             "table": {
                 "name": "Campagne / Lot",
                 "type": "Type d'entrée",
-                "token": "Jeton",
+                "token": "Jeton du lien",
                 "usage": "Capacité",
                 "status": "État",
                 "actions": "Gérer",
@@ -808,8 +797,8 @@
                 "limited": "Limité"
             },
             "toasts": {
-                "created": "Liens de recrutement créés avec succès",
-                "failed": "Impossible de créer les liens de recrutement. Vérifiez les paramètres et réessayez.",
+                "created": "Liens d'accès créés avec succès",
+                "failed": "Impossible de créer les liens d'accès. Vérifiez les paramètres et réessayez.",
                 "revoked": "Lien révoqué",
                 "revoke_failed": "Impossible de révoquer ce lien. Il est peut-être déjà utilisé.",
                 "copied": "Copié dans le presse-papiers"
@@ -839,12 +828,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Admin",
             "dashboard": "Tableau de bord",
             "study_dashboard": "Vue d'ensemble",
             "design": "Conception",
             "participants": "Participants",
-            "team": "Équipe",
             "recruitment": "Accès",
             "data": "Données",
             "privacy": "Confidentialité",
@@ -869,7 +856,6 @@
             "no_studies": "Aucune étude dans cet espace.",
             "open_dashboard": "Ouvrir le tableau de bord",
             "design_study": "Conception",
-            "collaborators": "Collaborateurs",
             "copy_link": "Copier le lien public",
             "toggle_theme": "Changer de thème",
             "logout": "Déconnexion",
@@ -939,7 +925,6 @@
             "alert_deadline": "{{study}} : fermeture dans {{days}} jours avec {{count}} participants",
             "view": "Voir",
             "open_study": "Ouvrir l'étude",
-            "add_study": "Ajouter une étude",
             "closes": "Fermeture le",
             "timeline": {
                 "title": "Chronologie des participations",
@@ -959,13 +944,7 @@
             },
             "n_studies_help": "Nombre total d’études dans ce projet, brouillons et fermées comprises.",
             "n_active_help": "Études actuellement ouvertes aux participants (état = actif).",
-            "n_participants_total_help": "Somme des participants ayant terminé, toutes études confondues dans ce projet.",
-            "tool_help": {
-                "design": "Configurer l’étude : grille de distribution, consignes, énoncés, consentement.",
-                "recruit": "Liens de recrutement, règles d’accès et configuration de l’URL.",
-                "data": "Réponses des participants et exports (CSV, dumps Q-sort).",
-                "analysis": "Configuration de l’analyse factorielle et runs historiques."
-            }
+            "n_participants_total_help": "Somme des participants ayant terminé, toutes études confondues dans ce projet."
         },
         "export": {
             "config": "Exporter la configuration",
@@ -1131,7 +1110,7 @@
                 },
                 "active": {
                     "label": "Active",
-                    "description": "Collecte de réponses"
+                    "description": "Collecte de données"
                 },
                 "paused": {
                     "label": "En pause",
@@ -1156,44 +1135,6 @@
                 "activate": "Activer l'étude",
                 "switch_to_draft": "Mode brouillon",
                 "manage": "Gérer le statut"
-            }
-        },
-        "team": {
-            "title": "Équipe de l'étude",
-            "description": "Gérez les collaborateurs et le contrôle d'accès au niveau de l'étude.",
-            "invite_title": "Inviter un collaborateur",
-            "invite_description": "Générez un lien sécurisé pour inviter un nouveau membre à cette étude.",
-            "email_label": "Adresse E-mail",
-            "role_label": "Rôle",
-            "select_role": "Sélectionner un rôle",
-            "generate_link": "Générer le lien",
-            "invite_success": "Lien d'invitation généré !",
-            "invite_error": "Échec de la génération de l'invitation",
-            "copy_success": "Lien copié dans le presse-papiers",
-            "share_label": "Partagez ce lien avec l'invité :",
-            "collab_overview": "Aperçu de la collaboration",
-            "active_members": "Membres actifs",
-            "permissions_info": "Infos sur les permissions",
-            "list_title": "Équipe de recherche",
-            "list_description": "Gérez l'accès des collaborateurs existants.",
-            "added_on": "Ajouté le",
-            "headers": {
-                "collaborator": "Collaborateur",
-                "role": "Rôle",
-                "actions": "Actions"
-            },
-            "roles": {
-                "owner": "Propriétaire (Contrôle total)",
-                "editor": "Éditeur (Conception & Analyse)",
-                "viewer": "Lecteur (Lecture seule)",
-                "owner_badge": "PROPRIÉTAIRE",
-                "editor_badge": "ÉDITEUR",
-                "viewer_badge": "LECTEUR"
-            },
-            "permissions": {
-                "owner": "Peut supprimer l'étude et gérer l'équipe.",
-                "editor": "Peut modifier la conception et voir les résultats.",
-                "viewer": "Accès en lecture seule à tous les modules."
             }
         },
         "design": {
@@ -1806,7 +1747,7 @@
                 "email_provided": "Email fourni",
                 "newsletter_consent": "Souhaite les résultats",
                 "interview_consent": "Accepte suivi",
-                "recruitment_link": "Lien de recrutement",
+                "recruitment_link": "Lien d'accès",
                 "device_info": "Appareil : {{os}}, {{browser}}"
             },
             "toast": {
@@ -1856,7 +1797,7 @@
                 "all_steps": "Toutes les étapes",
                 "has_comments": "Avec commentaires",
                 "has_audio": "Avec audio",
-                "has_recruitment": "Avec lien de recrutement"
+                "has_recruitment": "Avec lien d'accès"
             },
             "charts": {
                 "section_title": "Répartition des réponses",
@@ -1868,7 +1809,7 @@
                 "count": "Nombre"
             },
             "search": {
-                "placeholder": "Chercher par ID, email...",
+                "placeholder": "Chercher par ID ou jeton du lien...",
                 "records_found": "enregistrements détectés",
                 "no_results": "Aucun enregistrement ne correspond à votre requête"
             },
@@ -1896,11 +1837,6 @@
                 "action": "Copier le lien de l'étude",
                 "hint": "Ou scannez le code QR",
                 "copy_success": "Lien de l'étude copié dans le presse-papiers !"
-            },
-            "team": {
-                "title": "Aucun collaborateur identifié",
-                "desc": "Invitez des collaborateurs pour aider à gérer cette étude. Ils peuvent consulter les données, modifier la conception ou simplement observer.",
-                "action": "Ajouter un collaborateur"
             },
             "designer": {
                 "title": "Configuration initiale (Vierge)",
@@ -2041,24 +1977,22 @@
                     "save_error": "Échec de la mise à jour du projet"
                 },
                 "team_growth_title": "Gérer l'équipe",
-                "team_growth_desc": "Besoin de plus de chercheurs ? Vous pouvez inviter des collaborateurs à votre projet. Ils pourront gérer toutes les études au sein de ce projet.",
                 "team": {
-                    "title": "Membres de l'équipe",
-                    "desc": "Liste des utilisateurs ayant accès à ce projet.",
-                    "col_user": "Utilisateur",
+                    "desc": "Liste des membres ayant accès à ce projet.",
+                    "col_user": "Membre",
                     "col_role": "Rôle",
                     "col_joined": "Rejoint le",
                     "col_actions": "Actions",
                     "remove_confirm": "Êtes-vous sûr de vouloir supprimer ce membre ?",
-                    "remove_dialog_title": "Retirer ce membre de l'équipe ?",
+                    "remove_dialog_title": "Retirer ce membre ?",
                     "remove_dialog_body": "{{name}} perdra l'accès à ce projet. Vous pourrez l'inviter à nouveau plus tard.",
                     "remove_dialog_action": "Retirer",
                     "remove_member_aria": "Retirer {{name}}",
                     "remove_success": "Membre supprimé avec succès",
                     "remove_error": "Échec de la suppression du membre",
                     "growth_title": "Gestion des accès",
-                    "growth_desc": "Gérez les accès institutionnels en ajoutant des chercheurs à ce projet. Ils pourront gérer toutes les études au sein de ce projet.",
-                    "invite_button": "Inviter un collaborateur",
+                    "growth_desc": "Besoin de plus de membres ? Invitez-les à rejoindre ce projet. Ils pourront gérer toutes les études au sein de ce projet.",
+                    "invite_button": "Inviter un membre",
                     "permissions_matrix": {
                         "title": "Matrice des permissions",
                         "admin": {
@@ -2080,8 +2014,8 @@
                     },
                     "coming_soon": "Bientôt disponible",
                     "invite_modal": {
-                        "title": "Inviter un collaborateur",
-                        "email_label": "E-mail du collaborateur",
+                        "title": "Inviter un membre",
+                        "email_label": "E-mail du membre",
                         "role_label": "Rôle assigné",
                         "success": "Lien d'invitation généré !",
                         "error": "Échec de la création de l'invitation.",
@@ -2109,7 +2043,7 @@
             "n_studies_other": "{{count}} études",
             "n_active_one": "{{count}} active",
             "n_active_other": "{{count}} actives",
-            "collecting": "Collecte en cours",
+            "collecting": "Études actives",
             "no_studies": "Aucune étude",
             "no_projects": "Aucun projet. Créez votre premier projet pour commencer.",
             "no_projects_title": "Lancer votre premier projet de recherche",
@@ -2225,12 +2159,13 @@
                 "submitted": "Soumis",
                 "id": "ID interne",
                 "ip_hash": "Hash IP",
-                "recruitment_token": "Jeton de recrutement",
+                "recruitment_token": "Jeton du lien",
                 "device": {
                     "mobile": "Mobile",
                     "tablet": "Tablette",
                     "desktop": "Ordinateur"
-                }
+                },
+                "recruitment_link": "Lien d'accès"
             },
             "status": {
                 "started": "Commencé",

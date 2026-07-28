@@ -276,7 +276,7 @@
             "logout": "Abmelden",
             "account": "Kontoeinstellungen",
             "admin_user": "Admin-Benutzer",
-            "platform_settings": "Plattformeinstellungen"
+            "platform_settings": "Benutzer"
         },
         "account": {
             "title": "Kontoeinstellungen",
@@ -836,7 +836,6 @@
             "link_count": "Chargengröße",
             "capacity_label": "Max. Einreichungen",
             "generate_links": "Links bereitstellen",
-            "no_links": "Noch keine Rekrutierungslinks erstellt.",
             "unnamed": "Unbenannter Kanal",
             "revoked": "Zugang widerrufen",
             "qr_title": "Per QR teilen",
@@ -873,16 +872,6 @@
                 "public": "Am besten für hohe Teilnehmerzahlen. Eine einzige URL für alle Teilnehmer.",
                 "individual": "Maximale Sicherheit. Erzeugt eindeutige Links, die nach einer erfolgreichen Teilnahme verfallen.",
                 "limited": "Kontrollierter Zugang. Ein Link, der nach einer festgelegten Anzahl von Einreichungen nicht mehr funktioniert."
-            },
-            "stats": {
-                "total_links": "Kanäle gesamt",
-                "active_channels": "Aktive Rekrutierungschargen",
-                "started": "Sitzungen gesamt",
-                "engagements": "Teilnehmer, die gestartet haben",
-                "submitted": "Gültige Daten",
-                "completions": "Abgeschlossene Einreichungen",
-                "conversion": "Erfassungsrate",
-                "efficiency": "Endgültige Datenausbeute"
             },
             "table": {
                 "name": "Kampagne / Charge",
@@ -930,12 +919,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Admin",
             "dashboard": "Dashboard",
             "study_dashboard": "Übersicht",
             "design": "Design",
             "participants": "Teilnehmer",
-            "team": "Team",
             "recruitment": "Zugang",
             "data": "Daten",
             "privacy": "Datenschutz",
@@ -960,7 +947,6 @@
             "no_studies": "Keine Studien in diesem Projekt.",
             "open_dashboard": "Dashboard öffnen",
             "design_study": "Studiendesign",
-            "collaborators": "Mitarbeiter",
             "copy_link": "Öffentlichen Link kopieren",
             "toggle_theme": "Design umschalten",
             "logout": "Abmelden",
@@ -1030,7 +1016,6 @@
             "alert_deadline": "{{study}}: Schließt in {{days}} Tagen mit {{count}} Teilnehmern",
             "view": "Anzeigen",
             "open_study": "Studie öffnen",
-            "add_study": "Studie hinzufügen",
             "closes": "Schließt",
             "timeline": {
                 "title": "Einreichungszeitlinie",
@@ -1050,13 +1035,7 @@
             },
             "n_studies_help": "Gesamtzahl der Studien in diesem Projekt, einschließlich Entwürfe und abgeschlossene.",
             "n_active_help": "Studien, die derzeit Teilnehmereinreichungen akzeptieren (Status = aktiv).",
-            "n_participants_total_help": "Summe der abgeschlossenen Teilnehmer über alle Studien in diesem Projekt.",
-            "tool_help": {
-                "design": "Studie konfigurieren: Verteilungsraster, Anweisungen, Aussagen, Einwilligung.",
-                "recruit": "Rekrutierungslinks, Zugriffsregeln und Studien-URL-Einstellungen.",
-                "data": "Teilnehmerantworten und Exporte (CSV, Q-Sortierungen).",
-                "analysis": "Faktoranalyse-Konfiguration und Verlaufsläufe."
-            }
+            "n_participants_total_help": "Summe der abgeschlossenen Teilnehmer über alle Studien in diesem Projekt."
         },
         "export": {
             "config": "Konfiguration exportieren",
@@ -1942,44 +1921,6 @@
                 "next": "Nächste Seite"
             }
         },
-        "team": {
-            "title": "Studienteam",
-            "description": "Mitarbeiter und Zugriffsberechtigungen auf Studienebene verwalten.",
-            "invite_title": "Mitarbeiter einladen",
-            "invite_description": "Einen sicheren Link erstellen, um ein neues Mitglied zu dieser Studie einzuladen.",
-            "email_label": "E-Mail-Adresse",
-            "role_label": "Rolle",
-            "select_role": "Rolle auswählen",
-            "generate_link": "Link erstellen",
-            "invite_success": "Einladungslink erstellt!",
-            "invite_error": "Einladung konnte nicht erstellt werden",
-            "copy_success": "Link in die Zwischenablage kopiert",
-            "share_label": "Diesen Link mit dem Eingeladenen teilen:",
-            "collab_overview": "Zusammenarbeitsübersicht",
-            "active_members": "Aktive Mitglieder",
-            "permissions_info": "Berechtigungsinfo",
-            "list_title": "Forschungsteam",
-            "list_description": "Zugriff für bestehende Mitarbeiter verwalten.",
-            "added_on": "Hinzugefügt am",
-            "headers": {
-                "collaborator": "Mitarbeiter",
-                "role": "Rolle",
-                "actions": "Aktionen"
-            },
-            "roles": {
-                "owner": "Eigentümer (volle Kontrolle)",
-                "editor": "Bearbeiter (Design & Analyse)",
-                "viewer": "Betrachter (nur lesen)",
-                "owner_badge": "EIGENTÜMER",
-                "editor_badge": "BEARBEITER",
-                "viewer_badge": "BETRACHTER"
-            },
-            "permissions": {
-                "owner": "Kann die Studie löschen und das Team verwalten.",
-                "editor": "Kann das Design ändern und Ergebnisse einsehen.",
-                "viewer": "Nur-Lese-Zugriff auf alle Module."
-            }
-        },
         "empty_states": {
             "participants": {
                 "title": "Bereit zum Start?",
@@ -1987,11 +1928,6 @@
                 "action": "Studienlink kopieren",
                 "hint": "Oder QR-Code scannen",
                 "copy_success": "Studienlink in die Zwischenablage kopiert!"
-            },
-            "team": {
-                "title": "Sie arbeiten alleine",
-                "desc": "Laden Sie Mitarbeiter ein, um diese Studie gemeinsam zu verwalten. Sie können Daten einsehen, das Design bearbeiten oder nur beobachten.",
-                "action": "Ersten Mitarbeiter einladen"
             },
             "designer": {
                 "title": "Tabula rasa",
@@ -2132,9 +2068,7 @@
                     "save_error": "Projekt konnte nicht aktualisiert werden."
                 },
                 "team_growth_title": "Teamverwaltung",
-                "team_growth_desc": "Weitere Forscher benötigt? Sie können Mitarbeiter zu Ihrem Projekt einladen. Diese können alle Studien innerhalb dieses Projekts verwalten.",
                 "team": {
-                    "title": "Teammitglieder",
                     "desc": "Liste der Benutzer mit Zugriff auf dieses Projekt.",
                     "col_user": "Benutzer",
                     "col_role": "Rolle",

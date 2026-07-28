@@ -23,7 +23,7 @@ export default function DataExportsPage() {
                     title={t('admin.data.title', 'Data')}
                     description={t(
                         'admin.data.description',
-                        'Browse responses, export raw data, and inspect submission metadata'
+                        'Monitor real-time participation, analyze data quality, and manage research sessions.'
                     )}
                     icon={Database}
                 />

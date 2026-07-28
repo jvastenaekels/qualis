@@ -31,11 +31,19 @@ export function resolveAnswerLabel(
         // both are valid inputs for getLocalizedText.
         return getLocalizedText(q.label || q.text, language, genericFallback);
     }
-    if (key === 'email') return t('post.contact.email_label', 'Email Address');
-    if (key === 'interview_consent') return t('post.contact.interview_consent', 'Follow-up');
-    if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Results');
+    if (key === 'email') return t('post.contact.email_label', 'Your email address (optional)');
+    if (key === 'interview_consent')
+        return t(
+            'post.contact.interview_consent',
+            'I agree to be contacted by the researcher for follow-up.'
+        );
+    if (key === 'newsletter_consent')
+        return t(
+            'post.contact.newsletter_consent',
+            'I wish to be informed about the study results.'
+        );
     if (key === '_recruitment_token')
-        return t('admin.participant.metadata.recruitment_token', 'Recruitment token');
+        return t('admin.participant.metadata.recruitment_token', 'Link token');
     if (key === 'missing_statement')
         return t('post.extreme.missing_statement', 'Missing Statement');
     if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');

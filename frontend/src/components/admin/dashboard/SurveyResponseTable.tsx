@@ -210,7 +210,7 @@ export function SurveyResponseTable({
                         ? statement.translations?.find((t) => t.language_code === language)?.text ||
                           statement.translations?.[0]?.text ||
                           statement.code
-                        : `${t('admin.participant.metadata.id', 'ID')}: ${sId}`;
+                        : `${t('admin.participant.metadata.id', 'Internal ID')}: ${sId}`;
 
                     // Build translations array for MultiLangFieldIcon
                     const stmtTranslations = statement?.translations?.map((tr) => ({
@@ -306,7 +306,7 @@ export function SurveyResponseTable({
                                                 over white resolves to #929eae → 2.72:1, so the
                                                 colour promotion alone would not have landed. */}
                                             <p className="text-2xs font-mono text-slate-500 mt-1 tracking-tighter">
-                                                {t('admin.participant.metadata.id', 'ID')}:{' '}
+                                                {t('admin.participant.metadata.id', 'Internal ID')}:{' '}
                                                 {item.id || item.key}
                                             </p>
                                         </div>

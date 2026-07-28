@@ -113,7 +113,7 @@
             "n_studies_other": "{{count}} studies",
             "n_active_one": "{{count}} active",
             "n_active_other": "{{count}} active",
-            "collecting": "Collecting data",
+            "collecting": "Active studies",
             "no_studies": "No studies yet",
             "no_projects": "No projects yet. Create your first project to get started.",
             "no_projects_title": "Start your first research project",
@@ -276,7 +276,7 @@
             "beta": "Research beta",
             "logout": "Log out",
             "account": "Account settings",
-            "platform_settings": "Platform settings",
+            "platform_settings": "Users",
             "admin_user": "Admin user"
         },
         "account": {
@@ -792,7 +792,7 @@
         },
         "recruitment": {
             "title": "Access",
-            "description": "Configure the study URL, manage participant access, and track recruitment efficiency.",
+            "description": "Configure the study URL, manage participant access, and track how each access link performs.",
             "study_url": {
                 "title": "Study URL",
                 "description": "The public address where participants access your study.",
@@ -803,8 +803,8 @@
             },
             "state_draft": "Draft mode. Links will work once you activate the study.",
             "state_closed": "This study is closed. Existing links remain visible but new participants cannot start.",
-            "state_archived": "This study is archived. All recruitment data is read-only.",
-            "empty_title": "No recruitment links yet",
+            "state_archived": "This study is archived. Access links are read-only.",
+            "empty_title": "No access links yet",
             "empty_description": "Create your first link to start inviting participants.",
             "empty_cta": "Create access link",
             "stats_summary": {
@@ -837,18 +837,17 @@
             "new_link": "New access link",
             "create_title": "Create access links",
             "link_type": "Access strategy",
-            "select_type": "Choose a recruitment type...",
+            "select_type": "Choose an access strategy...",
             "campaign_name": "Channel / campaign name",
             "name_placeholder": "E.g. LinkedIn, email batch a, student list...",
             "link_count": "Batch size",
             "capacity_label": "Max submissions",
             "generate_links": "Provision links",
-            "no_links": "No recruitment links generated yet.",
             "unnamed": "Unnamed channel",
             "revoked": "Access revoked",
             "qr_title": "Share via QR",
             "copy_link": "Copy URL",
-            "table_title": "Recruitment links",
+            "table_title": "Access links",
             "share_title": "Share study",
             "share_desc": "Distribute your study URL to invite participants.",
             "public_url_label": "Public participation URL",
@@ -856,7 +855,7 @@
             "show_qr": "Show QR code",
             "delete_link": "Delete link",
             "qr_alt": "QR code for {{url}}",
-            "table_caption": "Recruitment links",
+            "table_caption": "Access links",
             "progress_label": "{{count}} of {{max}} responses",
             "usage": {
                 "started": "started",
@@ -881,20 +880,10 @@
                 "individual": "Maximum security. Generates unique links that expire after one successful completion.",
                 "limited": "Controlled access. One link that stops working after a fixed number of submissions."
             },
-            "stats": {
-                "total_links": "Total channels",
-                "active_channels": "Active recruitment lots",
-                "started": "Total sessions",
-                "engagements": "Participants who started",
-                "submitted": "Valid data",
-                "completions": "Finished submissions",
-                "conversion": "Capture rate",
-                "efficiency": "Final data yield"
-            },
             "table": {
                 "name": "Campaign / lot",
                 "type": "Entry type",
-                "token": "Security token",
+                "token": "Link token",
                 "usage": "Capacity",
                 "status": "State",
                 "actions": "Manage",
@@ -906,8 +895,8 @@
                 "limited": "Limited"
             },
             "toasts": {
-                "created": "Recruitment links created successfully",
-                "failed": "Could not create recruitment links. Check the inputs and try again.",
+                "created": "Access links created successfully",
+                "failed": "Could not create access links. Check the inputs and try again.",
                 "revoked": "Link revoked",
                 "revoke_failed": "Could not revoke this link. It may already be in use.",
                 "copied": "Copied to clipboard"
@@ -940,12 +929,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Admin",
             "dashboard": "Dashboard",
             "study_dashboard": "Overview",
             "design": "Design",
             "participants": "Participants",
-            "team": "Team",
             "recruitment": "Access",
             "data": "Data",
             "privacy": "Data privacy",
@@ -970,7 +957,6 @@
             "no_studies": "No studies in this project.",
             "open_dashboard": "Open dashboard",
             "design_study": "Study design",
-            "collaborators": "Collaborators",
             "copy_link": "Copy public link",
             "toggle_theme": "Toggle theme",
             "logout": "Log out",
@@ -1040,7 +1026,6 @@
             "alert_deadline": "{{study}}: closing in {{days}} days with {{count}} participants",
             "view": "View",
             "open_study": "Open study",
-            "add_study": "Add study",
             "closes": "Closes",
             "timeline": {
                 "title": "Submissions timeline",
@@ -1060,13 +1045,7 @@
             },
             "n_studies_help": "Total number of studies in this project, including drafts and closed.",
             "n_active_help": "Studies currently accepting participant submissions (state = active).",
-            "n_participants_total_help": "Sum of completed participants across all studies in this project.",
-            "tool_help": {
-                "design": "Configure the study: distribution grid, conditions of instruction, statements, consent.",
-                "recruit": "Recruitment links, access rules, and study URL settings.",
-                "data": "Participant responses and exports (CSV, Q-sort dumps).",
-                "analysis": "Factor analysis configuration and historical runs."
-            }
+            "n_participants_total_help": "Sum of completed participants across all studies in this project."
         },
         "export": {
             "config": "Export configuration",
@@ -1235,7 +1214,7 @@
                 },
                 "active": {
                     "label": "Active",
-                    "description": "Collecting responses"
+                    "description": "Data collection"
                 },
                 "paused": {
                     "label": "Paused",
@@ -1874,7 +1853,7 @@
                 "email_provided": "Email provided",
                 "newsletter_consent": "Wants results",
                 "interview_consent": "Accepts follow-up",
-                "recruitment_link": "Recruitment link",
+                "recruitment_link": "Access link",
                 "device_info": "Device: {{os}}, {{browser}}"
             },
             "toast": {
@@ -1924,7 +1903,7 @@
                 "all_steps": "All steps",
                 "has_comments": "Has comments",
                 "has_audio": "Has audio",
-                "has_recruitment": "Has recruitment link"
+                "has_recruitment": "Has access link"
             },
             "charts": {
                 "section_title": "Response distributions",
@@ -1936,7 +1915,7 @@
                 "count": "Count"
             },
             "search": {
-                "placeholder": "Search by ID or recruitment token...",
+                "placeholder": "Search by ID or link token...",
                 "records_found": "Records detected",
                 "no_results": "No records match your query"
             },
@@ -1957,44 +1936,6 @@
                 "next": "Next page"
             }
         },
-        "team": {
-            "title": "Study team",
-            "description": "Manage collaborators and study-level access control.",
-            "invite_title": "Invite collaborator",
-            "invite_description": "Generate a secure link to invite a new member to this study.",
-            "email_label": "Email address",
-            "role_label": "Role",
-            "select_role": "Select a role",
-            "generate_link": "Generate link",
-            "invite_success": "Invitation link generated!",
-            "invite_error": "Failed to generate invitation",
-            "copy_success": "Link copied to clipboard",
-            "share_label": "Share this link with the invitee:",
-            "collab_overview": "Collaboration overview",
-            "active_members": "Active members",
-            "permissions_info": "Permissions info",
-            "list_title": "Research team",
-            "list_description": "Manage access for existing collaborators.",
-            "added_on": "Added on",
-            "headers": {
-                "collaborator": "Collaborator",
-                "role": "Role",
-                "actions": "Actions"
-            },
-            "roles": {
-                "owner": "Owner (full control)",
-                "editor": "Editor (design & analysis)",
-                "viewer": "Viewer (read-only)",
-                "owner_badge": "OWNER",
-                "editor_badge": "EDITOR",
-                "viewer_badge": "VIEWER"
-            },
-            "permissions": {
-                "owner": "Can delete the study and manage team.",
-                "editor": "Can modify design and view results.",
-                "viewer": "Read-only access to all modules."
-            }
-        },
         "empty_states": {
             "participants": {
                 "title": "Ready to launch?",
@@ -2002,11 +1943,6 @@
                 "action": "Copy study link",
                 "hint": "Or scan the QR code",
                 "copy_success": "Study link copied to clipboard!"
-            },
-            "team": {
-                "title": "You're flying solo",
-                "desc": "Invite collaborators to help manage this study. They can view data, edit the design, or just observe.",
-                "action": "Invite your first collaborator"
             },
             "designer": {
                 "title": "Tabula rasa",
@@ -2089,10 +2025,10 @@
             "audio_title": "Audio storage",
             "audio_count": "Recordings",
             "audio_mb": "Total size",
-            "locale_title": "Locale breakdown",
+            "locale_title": "Language breakdown",
             "locale_col": "Language",
             "locale_count_col": "Participants",
-            "locale_empty": "No locale data yet.",
+            "locale_empty": "No language data yet.",
             "timeline_title": "Timeline",
             "tl_first": "First submission",
             "tl_last": "Last submission",
@@ -2121,11 +2057,11 @@
             },
             "consent": {
                 "title": "Consent form",
-                "description": "What participants see before they enter the study. Edited in Study design.",
+                "description": "What participants see before they enter the study. Edited in Design.",
                 "no_text": "No consent text set yet.",
                 "no_title": "(no title)",
                 "no_body": "(empty)",
-                "edit_in_design": "Edit in Study design",
+                "edit_in_design": "Edit in Design",
                 "view": "View"
             }
         },
@@ -2147,24 +2083,22 @@
                     "save_error": "Failed to update project."
                 },
                 "team_growth_title": "Team management",
-                "team_growth_desc": "Need more researchers? You can invite collaborators to your project. They will be able to manage all studies within this project.",
                 "team": {
-                    "title": "Team members",
-                    "desc": "List of users with access to this project.",
-                    "col_user": "User",
+                    "desc": "List of members with access to this project.",
+                    "col_user": "Member",
                     "col_role": "Role",
                     "col_joined": "Joined",
                     "col_actions": "Actions",
                     "remove_confirm": "Are you sure you want to remove this member?",
-                    "remove_dialog_title": "Remove team member?",
+                    "remove_dialog_title": "Remove member?",
                     "remove_dialog_body": "{{name}} will lose access to this project. They can be re-invited later.",
                     "remove_dialog_action": "Remove",
                     "remove_member_aria": "Remove {{name}}",
                     "remove_success": "Member removed successfully",
                     "remove_error": "Failed to remove member",
                     "growth_title": "Team growth",
-                    "growth_desc": "Need more researchers? You can invite collaborators to your project. They will be able to manage all studies within this project.",
-                    "invite_button": "Invite collaborator",
+                    "growth_desc": "Need more members? Invite them to your project. They will be able to manage all studies within this project.",
+                    "invite_button": "Invite member",
                     "permissions_matrix": {
                         "title": "Permissions matrix",
                         "admin": {
@@ -2186,8 +2120,8 @@
                     },
                     "coming_soon": "Coming soon",
                     "invite_modal": {
-                        "title": "Invite collaborator",
-                        "email_label": "Collaborator email",
+                        "title": "Invite member",
+                        "email_label": "Member email",
                         "role_label": "Assigned role",
                         "success": "Invitation link generated!",
                         "error": "Failed to create invitation.",
@@ -2243,13 +2177,13 @@
                 "submitted": "Submitted",
                 "id": "Internal ID",
                 "ip_hash": "IP hash",
-                "recruitment_token": "Recruitment token",
+                "recruitment_token": "Link token",
                 "device": {
                     "mobile": "Mobile",
                     "tablet": "Tablet",
                     "desktop": "Desktop"
                 },
-                "recruitment_link": "Recruitment link"
+                "recruitment_link": "Access link"
             },
             "status": {
                 "started": "Started",

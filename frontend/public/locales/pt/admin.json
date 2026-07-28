@@ -276,7 +276,7 @@
             "logout": "Terminar sessão",
             "account": "Definições da conta",
             "admin_user": "Utilizador administrador",
-            "platform_settings": "Definições da plataforma"
+            "platform_settings": "Utilizadores"
         },
         "account": {
             "title": "Definições da conta",
@@ -836,7 +836,6 @@
             "link_count": "Tamanho do lote",
             "capacity_label": "Máximo de submissões",
             "generate_links": "Criar links",
-            "no_links": "Ainda não foram gerados links de recrutamento.",
             "unnamed": "Canal sem nome",
             "revoked": "Acesso revogado",
             "qr_title": "Partilhar via QR",
@@ -873,16 +872,6 @@
                 "public": "Ideal para recrutamento de grande volume. Um único URL para todos os participantes.",
                 "individual": "Segurança máxima. Gera links únicos que expiram após uma conclusão bem-sucedida.",
                 "limited": "Acesso controlado. Um link que deixa de funcionar após um número fixo de submissões."
-            },
-            "stats": {
-                "total_links": "Total de canais",
-                "active_channels": "Lotes de recrutamento ativos",
-                "started": "Total de sessões",
-                "engagements": "Participantes que iniciaram",
-                "submitted": "Dados válidos",
-                "completions": "Submissões concluídas",
-                "conversion": "Taxa de captação",
-                "efficiency": "Rendimento final de dados"
             },
             "table": {
                 "name": "Campanha / lote",
@@ -930,12 +919,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Administração",
             "dashboard": "Painel",
             "study_dashboard": "Visão geral",
             "design": "Desenho",
             "participants": "Participantes",
-            "team": "Equipa",
             "recruitment": "Acesso",
             "data": "Dados",
             "privacy": "Privacidade de dados",
@@ -960,7 +947,6 @@
             "no_studies": "Nenhum estudo neste projeto.",
             "open_dashboard": "Abrir painel",
             "design_study": "Desenho do estudo",
-            "collaborators": "Colaboradores",
             "copy_link": "Copiar link público",
             "toggle_theme": "Alternar tema",
             "logout": "Terminar sessão",
@@ -1030,7 +1016,6 @@
             "alert_deadline": "{{study}}: fecha em {{days}} dias com {{count}} participantes",
             "view": "Ver",
             "open_study": "Abrir estudo",
-            "add_study": "Adicionar estudo",
             "closes": "Fecha",
             "timeline": {
                 "title": "Cronograma de submissões",
@@ -1050,13 +1035,7 @@
             },
             "n_studies_help": "Número total de estudos neste projeto, incluindo rascunhos e fechados.",
             "n_active_help": "Estudos atualmente a aceitar submissões de participantes (estado = ativo).",
-            "n_participants_total_help": "Soma de participantes que concluíram em todos os estudos deste projeto.",
-            "tool_help": {
-                "design": "Configure o estudo: grelha de distribuição, condições de instrução, afirmações, consentimento.",
-                "recruit": "Links de recrutamento, regras de acesso e definições do URL do estudo.",
-                "data": "Respostas dos participantes e exportações (CSV, dumps de classificação Q).",
-                "analysis": "Configuração da análise fatorial e execuções anteriores."
-            }
+            "n_participants_total_help": "Soma de participantes que concluíram em todos os estudos deste projeto."
         },
         "export": {
             "config": "Exportar configuração",
@@ -1942,44 +1921,6 @@
                 "next": "Página seguinte"
             }
         },
-        "team": {
-            "title": "Equipa do estudo",
-            "description": "Gira colaboradores e o controlo de acesso ao nível do estudo.",
-            "invite_title": "Convidar colaborador",
-            "invite_description": "Gere um link seguro para convidar um novo membro para este estudo.",
-            "email_label": "Endereço de email",
-            "role_label": "Função",
-            "select_role": "Selecione uma função",
-            "generate_link": "Gerar link",
-            "invite_success": "Link de convite gerado!",
-            "invite_error": "Falha ao gerar o convite",
-            "copy_success": "Link copiado para a área de transferência",
-            "share_label": "Partilhe este link com o convidado:",
-            "collab_overview": "Visão geral da colaboração",
-            "active_members": "Membros ativos",
-            "permissions_info": "Informações sobre permissões",
-            "list_title": "Equipa de investigação",
-            "list_description": "Gira o acesso dos colaboradores existentes.",
-            "added_on": "Adicionado em",
-            "headers": {
-                "collaborator": "Colaborador",
-                "role": "Função",
-                "actions": "Ações"
-            },
-            "roles": {
-                "owner": "Proprietário (controlo total)",
-                "editor": "Editor (desenho e análise)",
-                "viewer": "Visualizador (apenas leitura)",
-                "owner_badge": "PROPRIETÁRIO",
-                "editor_badge": "EDITOR",
-                "viewer_badge": "VISUALIZADOR"
-            },
-            "permissions": {
-                "owner": "Pode eliminar o estudo e gerir a equipa.",
-                "editor": "Pode modificar o desenho e ver os resultados.",
-                "viewer": "Acesso de leitura a todos os módulos."
-            }
-        },
         "empty_states": {
             "participants": {
                 "title": "Pronto para lançar?",
@@ -1987,11 +1928,6 @@
                 "action": "Copiar link do estudo",
                 "hint": "Ou digitalize o código QR",
                 "copy_success": "Link do estudo copiado para a área de transferência!"
-            },
-            "team": {
-                "title": "Está a trabalhar sozinho",
-                "desc": "Convide colaboradores para ajudar a gerir este estudo. Podem ver dados, editar o desenho ou apenas observar.",
-                "action": "Convidar o primeiro colaborador"
             },
             "designer": {
                 "title": "Tabula rasa",
@@ -2132,9 +2068,7 @@
                     "save_error": "Falha ao atualizar o projeto."
                 },
                 "team_growth_title": "Gestão da equipa",
-                "team_growth_desc": "Precisa de mais investigadores? Pode convidar colaboradores para o seu projeto. Eles poderão gerir todos os estudos dentro deste projeto.",
                 "team": {
-                    "title": "Membros da equipa",
                     "desc": "Lista de utilizadores com acesso a este projeto.",
                     "col_user": "Utilizador",
                     "col_role": "Função",

@@ -110,7 +110,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                         <span className="min-w-0 break-words">
                             {showQR
                                 ? t('admin.recruitment.hide_qr', 'Hide QR')
-                                : t('admin.recruitment.show_qr', 'Show QR')}
+                                : t('admin.recruitment.show_qr', 'Show QR code')}
                         </span>
                     </Button>
                     <Button

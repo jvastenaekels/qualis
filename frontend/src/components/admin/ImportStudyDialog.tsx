@@ -126,7 +126,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
             await handleConfigLoaded(json);
         } catch (error: unknown) {
             const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-            toast.error(t('admin.import.invalid_json', 'Invalid JSON'), {
+            toast.error(t('admin.import.invalid_json', 'Invalid JSON file'), {
                 description: errorMsg,
             });
         }

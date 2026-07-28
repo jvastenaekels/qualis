@@ -243,7 +243,7 @@ export default function ParticipantDetailsPage() {
                     }
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t('common.back', 'Back to Study')}
+                    {t('common.back', 'Back')}
                 </Button>
             </div>
         );
@@ -280,7 +280,7 @@ export default function ParticipantDetailsPage() {
                                 size="icon"
                                 disabled={nextId === null}
                                 onClick={() => navigate(`${baseUrl}/participants/${nextId}`)}
-                                aria-label={t('common.next', 'Next')}
+                                aria-label={t('common.next', 'Next step')}
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </Button>

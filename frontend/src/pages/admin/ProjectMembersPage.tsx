@@ -394,7 +394,7 @@ export default function ProjectMembersPage() {
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.projects.settings.team.permissions_matrix.member.desc',
-                                            'Can manage studies, concourses, and participants.'
+                                            'Can create and manage all studies. Restricted from project settings.'
                                         )}
                                     </p>
                                 </div>
@@ -425,7 +425,7 @@ export default function ProjectMembersPage() {
                         <AlertDialogTitle>
                             {t(
                                 'admin.projects.settings.team.remove_dialog_title',
-                                'Remove team member?'
+                                'Remove member?'
                             )}
                         </AlertDialogTitle>
                         <AlertDialogDescription>

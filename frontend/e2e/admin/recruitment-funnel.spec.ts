@@ -54,7 +54,7 @@ test.describe('Recruitment funnel', () => {
         await expect(page).toHaveURL(/recruitment/, { timeout: 15_000 });
 
         // Verify the empty state is shown initially
-        await expect(page.getByText(/no recruitment links yet/i)).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/no access links yet/i)).toBeVisible({ timeout: 10_000 });
 
         // ------------------------------------------------------------------ //
         // 3. Create a public recruitment link via the UI                       //
@@ -102,15 +102,15 @@ test.describe('Recruitment funnel', () => {
         // en.json key admin.status.active = "Active" (or similar)
         await expect(linkRow.getByText(/active/i)).toBeVisible({ timeout: 5_000 });
 
-        // Verify the link has a security token displayed (non-empty <code> element)
+        // Verify the link has a link token displayed (non-empty <code> element)
         const tokenCell = linkRow.locator('code');
         await expect(tokenCell).toBeVisible({ timeout: 5_000 });
         const tokenText = await tokenCell.textContent();
         expect(tokenText).toBeTruthy();
         expect(tokenText?.length).toBeGreaterThan(4);
 
-        // The "no recruitment links yet" empty state should be gone
-        await expect(page.getByText(/no recruitment links yet/i)).not.toBeVisible();
+        // The "no access links yet" empty state should be gone
+        await expect(page.getByText(/no access links yet/i)).not.toBeVisible();
 
         // ------------------------------------------------------------------ //
         // 5. Verify the public study URL is live for this link                 //

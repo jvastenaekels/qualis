@@ -175,7 +175,7 @@ test.describe('owner can manage team', () => {
         await expect(page.getByRole('heading', { name: /team members/i })).toBeVisible();
 
         // Open invite modal
-        await page.getByRole('button', { name: /invite collaborator/i }).click();
+        await page.getByRole('button', { name: /invite member/i }).click();
 
         // Fill email (label isn't bound via htmlFor; target the textbox by placeholder).
         const dialog = page.getByRole('dialog');
@@ -269,7 +269,7 @@ test.describe('member cannot manage team', () => {
         await expect(ownRow).toBeVisible();
 
         // Invite button must be disabled for non-owners.
-        const inviteBtn = page.getByRole('button', { name: /invite collaborator/i });
+        const inviteBtn = page.getByRole('button', { name: /invite member/i });
         await expect(inviteBtn).toBeDisabled();
 
         // Role selects in every data row should be disabled — the page gates
@@ -403,7 +403,7 @@ test.describe('owner role is never offered in dropdowns', () => {
         const projectSlug = testDb.getWorkspaceSlug();
 
         await page.goto(`/app/${projectSlug}/members`);
-        await page.getByRole('button', { name: /invite collaborator/i }).click();
+        await page.getByRole('button', { name: /invite member/i }).click();
 
         // Open the role select inside the dialog. Two combobox elements exist
         // (the Radix portal duplicates them) — the visible trigger is first.

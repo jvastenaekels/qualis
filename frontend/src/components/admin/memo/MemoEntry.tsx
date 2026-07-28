@@ -102,7 +102,7 @@ export function MemoEntry({
                                                 window.confirm(
                                                     t(
                                                         'admin.memo.delete_entry_confirm',
-                                                        'Delete this entry?'
+                                                        'Delete this entry and all its comments?'
                                                     )
                                                 )
                                             ) {

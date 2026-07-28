@@ -177,7 +177,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = (props) => {
                         {uploadStatus === 'success' && (
                             <Check
                                 className="w-3.5 h-3.5 text-emerald-500 shrink-0"
-                                aria-label={t('audio.upload_success', 'Uploaded')}
+                                aria-label={t(
+                                    'audio.upload_success',
+                                    'Audio uploaded successfully'
+                                )}
                             />
                         )}
                         {uploadStatus === 'failed' && (

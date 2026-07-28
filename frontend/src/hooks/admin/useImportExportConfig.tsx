@@ -56,7 +56,7 @@ export function useImportConfig() {
                 }
 
                 importConfig(config);
-                toast.success(t('admin.import.success', 'Configuration imported successfully'));
+                toast.success(t('admin.import.success', 'Study imported successfully'));
             } catch (error: unknown) {
                 console.error('Import failed:', error);
                 const errorMsg = error instanceof Error ? error.message : 'Unknown error';

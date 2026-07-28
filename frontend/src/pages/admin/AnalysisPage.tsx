@@ -371,7 +371,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                 <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_extraction',
-                                        'PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.'
+                                        'PCA maximises explained variance. Centroid is less mathematically constrained.'
                                     )}
                                 </p>
                             </div>
@@ -402,7 +402,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                 <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_n_factors',
-                                        'Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.'
+                                        'Each factor represents a distinct viewpoint.'
                                     )}
                                 </p>
                             </div>
@@ -517,7 +517,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                                 <p className="text-xs text-muted-foreground leading-snug">
                                                     {t(
                                                         'admin.analysis.help_rotation',
-                                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
+                                                        'Varimax separates factors for simpler structure.'
                                                     )}
                                                 </p>
                                             </div>
@@ -554,7 +554,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                                 <p className="text-xs text-muted-foreground leading-snug">
                                                     {t(
                                                         'admin.analysis.help_flagging',
-                                                        'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
+                                                        'Auto: flag participants loading on exactly one factor. Manual: override per participant.'
                                                     )}
                                                 </p>
                                             </div>
@@ -573,7 +573,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                                     <p className="text-xs text-muted-foreground leading-snug mt-1">
                                                         {t(
                                                             'admin.analysis.manual_rotations.helper',
-                                                            "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+                                                            "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order."
                                                         )}
                                                     </p>
                                                 </div>
@@ -751,7 +751,7 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                                     <p className="text-xs text-muted-foreground leading-snug">
                                                         {t(
                                                             'admin.analysis.bootstrap.helper',
-                                                            'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
+                                                            'Optional. Resamples Q-sorts B times to estimate percentile confidence intervals on factor scores.'
                                                         )}
                                                     </p>
                                                 </div>
@@ -1098,14 +1098,14 @@ function InterpretShell({
                                     aria-hidden="true"
                                 />
                             )}
-                            {t('admin.analysis.export_xlsx', 'XLSX: Complete Analysis')}
+                            {t('admin.analysis.export_xlsx', 'Complete analysis (XLSX)')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => void handleExport('loadings')}>
-                            {t('admin.analysis.export_loadings', 'CSV: Factor Loadings')}
+                            {t('admin.analysis.export_loadings', 'Factor loadings (CSV)')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => void handleExport('scores')}>
-                            {t('admin.analysis.export_scores', 'CSV: Statement Scores')}
+                            {t('admin.analysis.export_scores', 'Statement scores (CSV)')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

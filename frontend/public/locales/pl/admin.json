@@ -276,7 +276,7 @@
       "logout": "Wyloguj",
       "account": "Ustawienia konta",
       "admin_user": "Użytkownik administracyjny",
-      "platform_settings": "Ustawienia platformy"
+      "platform_settings": "Użytkownicy"
     },
     "account": {
       "title": "Ustawienia konta",
@@ -836,7 +836,6 @@
       "link_count": "Rozmiar partii",
       "capacity_label": "Maks. zgłoszeń",
       "generate_links": "Generuj linki",
-      "no_links": "Nie wygenerowano jeszcze żadnych linków rekrutacyjnych.",
       "unnamed": "Kanał bez nazwy",
       "revoked": "Dostęp odwołany",
       "qr_title": "Udostępnij przez QR",
@@ -873,16 +872,6 @@
         "public": "Najlepszy do rekrutacji na dużą skalę. Jeden URL dla wszystkich uczestników.",
         "individual": "Maksymalne bezpieczeństwo. Generuje unikalne linki wygasające po jednym pomyślnym ukończeniu.",
         "limited": "Kontrolowany dostęp. Jeden link, który przestaje działać po określonej liczbie zgłoszeń."
-      },
-      "stats": {
-        "total_links": "Łącznie kanałów",
-        "active_channels": "Aktywne partie rekrutacyjne",
-        "started": "Łącznie sesji",
-        "engagements": "Uczestnicy, którzy rozpoczęli",
-        "submitted": "Prawidłowe dane",
-        "completions": "Ukończone zgłoszenia",
-        "conversion": "Wskaźnik przechwycenia",
-        "efficiency": "Ostateczny wynik danych"
       },
       "table": {
         "name": "Kampania / partia",
@@ -930,12 +919,10 @@
       }
     },
     "breadcrumbs": {
-      "admin": "Admin",
       "dashboard": "Dashboard",
       "study_dashboard": "Overview",
       "design": "Design",
       "participants": "Participants",
-      "team": "Team",
       "recruitment": "Access",
       "data": "Data",
       "privacy": "Data privacy",
@@ -960,7 +947,6 @@
       "no_studies": "Brak badań w tym projekcie.",
       "open_dashboard": "Otwórz panel",
       "design_study": "Projekt badania",
-      "collaborators": "Współpracownicy",
       "copy_link": "Kopiuj publiczny link",
       "toggle_theme": "Przełącz motyw",
       "logout": "Wyloguj",
@@ -1030,7 +1016,6 @@
       "alert_deadline": "{{study}}: zamknięcie za {{days}} dni, {{count}} uczestników",
       "view": "Pokaż",
       "open_study": "Otwórz badanie",
-      "add_study": "Dodaj badanie",
       "closes": "Zamknięcie",
       "timeline": {
         "title": "Oś czasu zgłoszeń",
@@ -1050,13 +1035,7 @@
       },
       "n_studies_help": "Łączna liczba badań w tym projekcie, w tym szkice i zamknięte.",
       "n_active_help": "Badania aktualnie przyjmujące zgłoszenia uczestników (stan = aktywne).",
-      "n_participants_total_help": "Suma ukończonych uczestników we wszystkich badaniach tego projektu.",
-      "tool_help": {
-        "design": "Konfiguruj badanie: siatka rozkładu, warunki instrukcji, stwierdzenia, zgoda.",
-        "recruit": "Linki rekrutacyjne, reguły dostępu i ustawienia URL badania.",
-        "data": "Odpowiedzi uczestników i eksporty (CSV, zrzuty sortowania Q).",
-        "analysis": "Konfiguracja analizy czynnikowej i historia przebiegów."
-      }
+      "n_participants_total_help": "Suma ukończonych uczestników we wszystkich badaniach tego projektu."
     },
     "export": {
       "config": "Eksportuj konfigurację",
@@ -1942,44 +1921,6 @@
         "next": "Następna strona"
       }
     },
-    "team": {
-      "title": "Zespół badania",
-      "description": "Zarządzaj współpracownikami i kontrolą dostępu na poziomie badania.",
-      "invite_title": "Zaproś współpracownika",
-      "invite_description": "Wygeneruj bezpieczny link, aby zaprosić nowego członka do tego badania.",
-      "email_label": "Adres e-mail",
-      "role_label": "Rola",
-      "select_role": "Wybierz rolę",
-      "generate_link": "Generuj link",
-      "invite_success": "Link zaproszenia wygenerowany!",
-      "invite_error": "Nie udało się wygenerować zaproszenia",
-      "copy_success": "Link skopiowany do schowka",
-      "share_label": "Udostępnij ten link zaproszonej osobie:",
-      "collab_overview": "Przegląd współpracy",
-      "active_members": "Aktywni członkowie",
-      "permissions_info": "Informacje o uprawnieniach",
-      "list_title": "Zespół badawczy",
-      "list_description": "Zarządzaj dostępem dla istniejących współpracowników.",
-      "added_on": "Dodano",
-      "headers": {
-        "collaborator": "Współpracownik",
-        "role": "Rola",
-        "actions": "Akcje"
-      },
-      "roles": {
-        "owner": "Właściciel (pełna kontrola)",
-        "editor": "Redaktor (projekt i analiza)",
-        "viewer": "Obserwator (tylko odczyt)",
-        "owner_badge": "WŁAŚCICIEL",
-        "editor_badge": "REDAKTOR",
-        "viewer_badge": "OBSERWATOR"
-      },
-      "permissions": {
-        "owner": "Może usunąć badanie i zarządzać zespołem.",
-        "editor": "Może modyfikować projekt i przeglądać wyniki.",
-        "viewer": "Dostęp tylko do odczytu do wszystkich modułów."
-      }
-    },
     "empty_states": {
       "participants": {
         "title": "Gotowe do uruchomienia?",
@@ -1987,11 +1928,6 @@
         "action": "Kopiuj link do badania",
         "hint": "Lub zeskanuj kod QR",
         "copy_success": "Link do badania skopiowany do schowka!"
-      },
-      "team": {
-        "title": "Działasz samodzielnie",
-        "desc": "Zaproś współpracowników, aby pomogli zarządzać tym badaniem. Mogą przeglądać dane, edytować projekt lub jedynie obserwować.",
-        "action": "Zaproś pierwszego współpracownika"
       },
       "designer": {
         "title": "Tabula rasa",
@@ -2132,9 +2068,7 @@
           "save_error": "Nie udało się zaktualizować projektu."
         },
         "team_growth_title": "Zarządzanie zespołem",
-        "team_growth_desc": "Potrzeba więcej badaczy? Możesz zaprosić współpracowników do projektu. Będą mogli zarządzać wszystkimi badaniami w tym projekcie.",
         "team": {
-          "title": "Członkowie zespołu",
           "desc": "Lista użytkowników mających dostęp do tego projektu.",
           "col_user": "Użytkownik",
           "col_role": "Rola",
