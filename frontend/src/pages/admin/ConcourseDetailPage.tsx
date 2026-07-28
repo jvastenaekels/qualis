@@ -967,9 +967,19 @@ export default function ConcourseDetailPage() {
                                                                         htmlFor={`edit-item-tag-${tag.id}`}
                                                                         className="cursor-pointer"
                                                                     >
+                                                                        {/* Task 6.10, same clamp.
+                                                                            This one sits in a
+                                                                            `flex flex-wrap gap-2`
+                                                                            so items wrap instead of
+                                                                            competing, but a single
+                                                                            long name still
+                                                                            overflowed: measured 1px
+                                                                            out of a 20px pill at
+                                                                            320px. `min-h-5` gives
+                                                                            it 28.16px instead. */}
                                                                         <Badge
                                                                             variant="outline"
-                                                                            className="text-2xs h-5 cursor-pointer"
+                                                                            className="text-2xs min-h-5 min-w-0 break-words cursor-pointer"
                                                                             style={
                                                                                 tag.color
                                                                                     ? {
@@ -1017,13 +1027,33 @@ export default function ConcourseDetailPage() {
                                                             {item.source}
                                                         </p>
                                                     )}
+                                                    {/* Task 6.10. Tag names are user-supplied,
+                                                        multi-word and unbounded, so this pill has
+                                                        to be sized by its content, not by a hard
+                                                        `h-5`. Measured at 320px with a three-word
+                                                        fixture: the container is 232px, the three
+                                                        badges were squeezed to 104/90/122px, each
+                                                        needed 34/34/26px of text height, and 14px
+                                                        of it painted OUTSIDE a 20px pill. Three
+                                                        changes, all necessary:
+                                                        `flex-wrap` (without it the badges compete
+                                                        for one line and each shrinks to its
+                                                        longest word — the 6.4 failure shape),
+                                                        `min-h-5` (a floor, not a clamp, so the
+                                                        pill grows with the label), and
+                                                        `min-w-0 break-words` (a single tag name
+                                                        longer than the container is one unbreakable
+                                                        flex item otherwise: a 49-character German
+                                                        compound measured 329px inside 232px).
+                                                        After: 220/210/202px wide, 22.61px tall,
+                                                        overflow -1.61px. */}
                                                     {item.tags && item.tags.length > 0 && (
-                                                        <div className="flex gap-1 mt-2">
+                                                        <div className="flex flex-wrap gap-1 mt-2">
                                                             {item.tags.map((tag) => (
                                                                 <Badge
                                                                     key={tag.id}
                                                                     variant="outline"
-                                                                    className="text-2xs h-5"
+                                                                    className="text-2xs min-h-5 min-w-0 break-words"
                                                                     style={
                                                                         tag.color
                                                                             ? {
@@ -1842,9 +1872,11 @@ function TagCheckboxGroup({
                             }}
                         />
                         <Label htmlFor={`tag-checkbox-group-${tag.id}`} className="cursor-pointer">
+                            {/* Task 6.10, third instance of the same clamp — see the item-list
+                                badge for the measurements. */}
                             <Badge
                                 variant="outline"
-                                className="text-2xs h-5 cursor-pointer"
+                                className="text-2xs min-h-5 min-w-0 break-words cursor-pointer"
                                 style={
                                     tag.color
                                         ? { borderColor: tag.color, color: tag.color }

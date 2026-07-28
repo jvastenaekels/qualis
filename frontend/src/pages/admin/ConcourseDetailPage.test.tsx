@@ -509,3 +509,123 @@ describe('ConcourseDetailPage — control accessible names (Task 6.7c)', () => {
         expect(screen.queryByRole('button', { name: 'Delete Vision' })).not.toBeInTheDocument();
     });
 });
+
+/**
+ * Task 6.10 — the three tag badges clamped user-supplied labels.
+ *
+ * Tag names come from the researcher: multi-word, unbounded, and never
+ * shortened by the UI. All three badges shipped with a hard `h-5` (20px),
+ * which is ~3.4px of headroom over a 16.6px line box. Measured in a headless
+ * Chromium at a 320px viewport with a deliberately long three-word fixture:
+ *
+ *   site           container   badge w   text h   escaped
+ *   item list      232px       104px     34px     14px
+ *   item list      232px        90px     34px     14px
+ *   item list      232px       122px     26px      6px
+ *   edit picker    232px       210px     21px      1px
+ *   tag picker     238px       216px     21px      1px
+ *
+ * The item-list container also lacked `flex-wrap`, so its three badges
+ * competed for one line and each shrank to its longest word — the same
+ * mechanism task 6.4 fixed on the "Recently completed" pill.
+ *
+ * After `flex-wrap` + `min-h-5` + `min-w-0 break-words`: 220/210/202px wide,
+ * 22.61px tall, overflow -1.61px, and a 49-character single-token tag name
+ * that measured 329px inside a 232px container now measures 232px.
+ *
+ * jsdom does no layout, so these assert the contract that produced those
+ * numbers. `h-5` is asserted absent explicitly: a future edit that re-adds it
+ * alongside `min-h-5` would win under tailwind-merge and silently restore the
+ * clamp.
+ */
+describe('ConcourseDetailPage — tag badges are sized by their label, not clamped (Task 6.10)', () => {
+    const longTag = {
+        id: 1,
+        name: 'Environmental justice and land use',
+        color: '#7c3aed',
+        project_id: 1,
+    };
+
+    function badgeFor(name: string) {
+        // The Badge is a styled <div>; the tag name is its only text.
+        const nodes = screen.getAllByText(name);
+        const badge = nodes.find((n) => n.className.includes('rounded-full'));
+        if (!badge) throw new Error(`no badge rendered for "${name}"`);
+        return badge;
+    }
+
+    function expectNotClamped(badge: HTMLElement) {
+        expect(badge).toHaveClass('min-h-5');
+        expect(badge).not.toHaveClass('h-5');
+        // A tag name with no spaces is a single unbreakable flex item
+        // otherwise, and pushes the whole page into horizontal scroll.
+        expect(badge).toHaveClass('min-w-0');
+        expect(badge).toHaveClass('break-words');
+    }
+
+    it('lets an item-list tag badge grow instead of painting its label outside itself', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+        item.tags = [longTag];
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+
+    it('wraps the item-list tag row instead of making the badges compete for one line', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+        item.tags = [
+            longTag,
+            { id: 2, name: 'Perceived institutional legitimacy', color: '#0891b2', project_id: 1 },
+            { id: 3, name: 'Intergenerational responsibility', color: '#b45309', project_id: 1 },
+        ];
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        const row = badgeFor(longTag.name).parentElement;
+        expect(row).toHaveClass('flex');
+        expect(row).toHaveClass('flex-wrap');
+    });
+
+    it('lets the inline item-edit tag badge grow', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            filteredItems: concourse.items ?? [],
+            editingItem: item.id,
+            tags: [longTag],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+
+    it('lets the "Add Item" dialog tag badge (TagCheckboxGroup) grow', () => {
+        const concourse = concourseWith(1, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+            tags: [longTag],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+});
