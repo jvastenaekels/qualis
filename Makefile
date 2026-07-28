@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: install preflight run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
+.PHONY: install preflight db-check run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
 
 # Toolchain versions CI exercises. Keep in sync with .python-version, .nvmrc,
 # backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
@@ -28,8 +28,39 @@ preflight:
 		pg=$$(psql --version | sed 's/[^0-9]*\([0-9]*\).*/\1/'); \
 		[ "$$pg" = "$(POSTGRES_MAJOR)" ] || echo "WARN     psql client $$pg, expected $(POSTGRES_MAJOR) — the server major is what matters"; \
 	fi; \
-	[ -f .env ] || echo "WARN     no .env — copy .env.example and fill SECRET_KEY, IP_HASH_SALT, DATABASE_URL"; \
+	if [ ! -f .env ]; then \
+		echo "WARN     no .env — copy .env.example and fill SECRET_KEY, IP_HASH_SALT, DATABASE_URL"; \
+	else \
+		for k in ENVIRONMENT DATABASE_URL SECRET_KEY IP_HASH_SALT TEST_DATABASE_URL; do \
+			grep -qE "^$$k=." .env || echo "WARN     .env has no $$k — see .env.example for what it does"; \
+		done; \
+		grep -qE "^(SECRET_KEY|IP_HASH_SALT)=CHANGEME-insecure-dev-only" .env \
+			&& echo "WARN     .env still holds a CHANGEME placeholder — generate one: python3 -c 'import secrets; print(secrets.token_urlsafe(48))'"; \
+		url=$$(grep -E "^DATABASE_URL=." .env | head -1 | cut -d= -f2- | sed 's/+asyncpg//'); \
+		if [ -z "$$url" ]; then :; \
+		elif ! command -v psql >/dev/null 2>&1; then \
+			echo "SKIPPED  DATABASE_URL not tested (no psql client on PATH)"; \
+		elif psql "$$url" -c 'select 1' >/dev/null 2>&1; then :; \
+		else \
+			echo "WARN     DATABASE_URL does not connect. Is PostgreSQL running, and did you"; \
+			echo "         run README.md step 2 (CREATE USER qualis_user / CREATE DATABASE"; \
+			echo "         qualis_dev + qualis_test)? Diagnose with: make db-check"; \
+		fi; \
+	fi; \
 	[ "$$fail" = "0" ] || { echo; echo "Prerequisites missing. See README.md > Local development setup."; exit 1; }
+
+# Print the database error instead of swallowing it. `preflight` only reports
+# that DATABASE_URL does not connect — deliberately, so it never leaks the
+# password into a build log. Run this by hand when you need to know why:
+# "password authentication failed" means the role exists with a different
+# password, "role ... does not exist" means README step 2 was skipped, and
+# "could not connect" means the server is not running.
+db-check:
+	@if [ ! -f .env ]; then echo "No .env — copy .env.example first."; exit 1; fi; \
+	url=$$(grep -E "^DATABASE_URL=." .env | head -1 | cut -d= -f2- | sed 's/+asyncpg//'); \
+	if [ -z "$$url" ]; then echo ".env has no DATABASE_URL."; exit 1; fi; \
+	command -v psql >/dev/null 2>&1 || { echo "No psql client on PATH — install postgresql-client."; exit 1; }; \
+	psql "$$url" -c 'select current_user, current_database()' || exit 1
 
 install: preflight
 	cd backend && uv sync
