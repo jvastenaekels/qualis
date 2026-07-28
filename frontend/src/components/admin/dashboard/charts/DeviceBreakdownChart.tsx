@@ -57,7 +57,18 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
             <CardContent>
                 <div className="flex flex-col items-center">
                     <div className="h-[200px] w-full mt-2">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                        {/* See the matching comment in SubmissionsTimelineChart.tsx:
+                            width/height are both percentages, so Recharts'
+                            first render falls back to initialDimension
+                            (default {width:-1, height:-1}) and logs the
+                            "should be greater than 0" warning on every
+                            mount; minWidth alone doesn't prevent it. */}
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                            minWidth={0}
+                            initialDimension={{ width: 200, height: 200 }}
+                        >
                             <PieChart>
                                 <Pie
                                     data={data}

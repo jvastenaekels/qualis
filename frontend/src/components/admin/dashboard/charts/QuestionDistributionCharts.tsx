@@ -240,7 +240,23 @@ export function QuestionDistributionCharts({
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ResponsiveContainer width="100%" height={chartHeight} minWidth={0}>
+                            {/* height is already a fixed pixel value (not a
+                                percentage), so this container doesn't hit
+                                Recharts' "-1,-1 initial size" warning path —
+                                only its width is percentage-based, and a
+                                positive height alone is enough to satisfy
+                                Recharts' size guard on first render.
+                                initialDimension is set anyway as a floor,
+                                matching the fix applied to the two chart
+                                components in this same section
+                                (SubmissionsTimelineChart, DeviceBreakdownChart)
+                                that do use percentage heights and did warn. */}
+                            <ResponsiveContainer
+                                width="100%"
+                                height={chartHeight}
+                                minWidth={0}
+                                initialDimension={{ width: 480, height: chartHeight }}
+                            >
                                 <BarChart
                                     data={item.bars}
                                     layout="vertical"

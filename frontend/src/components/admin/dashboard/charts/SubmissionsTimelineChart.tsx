@@ -146,7 +146,22 @@ export const SubmissionsTimelineChart = ({
             </CardHeader>
             <CardContent>
                 <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                    {/* width/height are both percentages, so Recharts' first
+                        render (before its ResizeObserver has fired) falls
+                        back to initialDimension, which defaults to
+                        {width:-1, height:-1} — logging "should be greater
+                        than 0" on every mount. minWidth/minHeight don't
+                        prevent this (they're applied as CSS, not fed into
+                        the size calculation); giving initialDimension a
+                        real floor does. The exact numbers only need to be
+                        positive — the ResizeObserver corrects them to the
+                        true size within a frame. */}
+                    <ResponsiveContainer
+                        width="100%"
+                        height="100%"
+                        minWidth={0}
+                        initialDimension={{ width: 520, height: 300 }}
+                    >
                         <LineChart
                             data={chartData}
                             margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
