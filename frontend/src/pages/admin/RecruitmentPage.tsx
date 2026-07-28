@@ -808,7 +808,7 @@ const RecruitmentPage = () => {
                                             className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
                                         >
                                             {isCreatingLink
-                                                ? t('common.generating', 'Generating...')
+                                                ? t('admin.recruitment.generating', 'Generating...')
                                                 : t(
                                                       'admin.recruitment.generate_links',
                                                       'Generate Links'

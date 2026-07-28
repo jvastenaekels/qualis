@@ -99,7 +99,7 @@ export default function ConcourseListPage() {
                     ) : (
                         <RefreshCw className="size-4 mr-2" />
                     )}
-                    {t('common.retry', 'Retry')}
+                    {t('admin.concourse.retry', 'Retry')}
                 </Button>
             </div>
         );

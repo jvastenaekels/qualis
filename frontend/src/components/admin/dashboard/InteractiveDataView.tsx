@@ -816,7 +816,7 @@ export default function InteractiveDataView({
                                 onClick={handleClearAllParticipants}
                                 className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
                             >
-                                {t('common.confirm_delete')}
+                                {t('admin.data.actions.confirm_delete')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

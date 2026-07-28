@@ -140,6 +140,7 @@ check:
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
 	cd frontend && npm run check-interpolations
+	cd frontend && npm run check-orphan-keys
 	cd frontend && npm run lint:a11y
 
 test:
