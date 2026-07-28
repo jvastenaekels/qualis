@@ -218,7 +218,7 @@ jobs:
       ADMIN_EMAIL: admin@ci.example.com
       COMPOSE_FILE: docker-compose.production.yml
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Generate throwaway secrets
         # init_db refuses to bootstrap in ENVIRONMENT=production if ADMIN_PASSWORD
