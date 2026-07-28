@@ -30,24 +30,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Routes, Route } from 'react-router-dom';
 import type { ReactElement } from 'react';
-import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { formatDateTime } from '@/lib/datetime';
 import type { DumpParticipant, DumpResponse } from './types';
 import InteractiveDataView from './InteractiveDataView';
 
-// The submitted_at cell renders `format(date, 'MMM d, HH:mm', { locale })`
+// The submitted_at cell renders `formatDateTime(date, language)`
 // (InteractiveDataView.columns.tsx) in the *local* timezone of whatever
 // machine runs the test — computing the expected label the same way the
-// component does (rather than hardcoding a string like "Jan 1, 00:10")
+// component does (rather than hardcoding a string like "01 Jan 2026, 00:10")
 // keeps these assertions correct regardless of the runner's TZ.
+//
+// Task 4.3 collapsed this cell's two labels into one: it used to render a
+// year-less visible label plus an sr-only long form, which under a single
+// format would have announced the same string twice.
 function expectedSubmittedLabel(iso: string): string {
-    return format(new Date(iso), 'MMM d, HH:mm', { locale: enUS });
-}
-
-// The submitted_at cell's `title` carries the full timestamp (Task 6.7i) —
-// same local-timezone-independence reasoning as expectedSubmittedLabel above.
-function expectedFullSubmittedLabel(iso: string): string {
-    return format(new Date(iso), 'PPpp', { locale: enUS });
+    return formatDateTime(iso, 'en');
 }
 
 const { mockDumpQuery } = vi.hoisted(() => ({ mockDumpQuery: vi.fn() }));
@@ -285,16 +282,11 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // tab stop (Task 6.7i). It carries no role at all now (review
         // finding 2): it already has an accessible name from its own
         // visible text, so role="img" would have turned it into a graphic
-        // node instead. The visible short label and the sr-only full
-        // timestamp are two separate text-node-owning elements (RTL's
-        // getByText matches an element's own direct text nodes, not its
-        // descendants' — no `title` any more, single channel, see
-        // columns.tsx), so both are queried independently.
+        // node instead. Since Task 4.3 there is one label, not a short
+        // visible one plus an sr-only long one — under a single format the
+        // two were the same string, announced twice.
         expect(
             within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
-        ).toBeInTheDocument();
-        expect(
-            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
         ).toBeInTheDocument();
     });
 
@@ -335,14 +327,11 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         expect(within(row).queryByRole('button', { name: /Duplicate IP/ })).not.toBeInTheDocument();
 
         // Same for the submitted_at date: was a TooltipTrigger button
-        // revealing the full timestamp on hover, now plain text, split
-        // across a visible short label and an sr-only full timestamp — not
-        // a role="img" either, for the same reason.
+        // revealing the full timestamp on hover, now a single plain-text
+        // label carrying the whole timestamp — not a role="img" either, for
+        // the same reason.
         expect(
             within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
-        ).toBeInTheDocument();
-        expect(
-            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
         ).toBeInTheDocument();
         expect(
             within(row).queryByRole('img', { name: expectedSubmittedLabel('2026-01-01T00:10:19Z') })

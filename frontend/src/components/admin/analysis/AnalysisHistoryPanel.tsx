@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { toast } from 'sonner';
 import { ClipboardList, Pencil, Trash2, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import {
@@ -45,20 +46,6 @@ interface AnalysisHistoryPanelProps {
     onLoadRun: (result: AnalysisResult, run: AnalysisRunSummary) => void;
 }
 
-function formatDateTime(iso: string): string {
-    try {
-        return new Date(iso).toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    } catch {
-        return iso;
-    }
-}
-
 function truncate(str: string, maxLen: number): string {
     if (str.length <= maxLen) return str;
     return `${str.slice(0, maxLen)}…`;
@@ -71,6 +58,7 @@ export function AnalysisHistoryPanel({
     onLoadRun,
 }: AnalysisHistoryPanelProps) {
     const { t } = useTranslation();
+    const { formatDateTime } = useDateFormat();
     const queryClient = useQueryClient();
 
     const [collapsed, setCollapsed] = useState(false);

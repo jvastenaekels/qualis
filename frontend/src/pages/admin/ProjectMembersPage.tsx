@@ -53,10 +53,12 @@ import {
     useCreateInvitationApiAdminProjectsSlugInvitationsPost,
 } from '@/api/generated';
 import { parseApiErrorSync, resolveApiErrorKey } from '@/lib/error-utils';
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 export default function ProjectMembersPage() {
     const { slug } = useLoaderData() as { slug: string };
     const { t } = useTranslation();
+    const { formatDate } = useDateFormat();
     const { user: currentUser } = useAuthStore();
 
     const { data: project, isLoading: isProjectLoading } =
@@ -296,7 +298,7 @@ export default function ProjectMembersPage() {
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-xs font-medium text-slate-500">
-                                                {new Date(member.joined_at).toLocaleDateString()}
+                                                {formatDate(member.joined_at)}
                                             </TableCell>
                                             <TableCell className="text-right px-6">
                                                 <Button

@@ -14,7 +14,6 @@ import {
     Library,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useTranslation } from 'react-i18next';
 import { useAdminDashboard } from '@/hooks/admin/useAdminDashboard';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import type { StudyRead } from '@/api/model/studyRead';
 import type { ConcourseRead } from '@/api/model/concourseRead';
 
@@ -122,7 +122,6 @@ export function AdminDashboard() {
         concourse,
         isConcourseLoading,
         alerts,
-        currentLocale,
         showCreateDialog,
         showImportDialog,
         setShowCreateDialog,
@@ -362,7 +361,6 @@ export function AdminDashboard() {
                     study={studies[0]}
                     title={getStudyTitle(studies[0])}
                     projectSlug={projectSlug}
-                    locale={currentLocale}
                     t={t}
                     onCreateStudy={canCreateStudy ? () => setShowCreateDialog(true) : undefined}
                 />
@@ -374,7 +372,6 @@ export function AdminDashboard() {
                     closedStudies={closedStudies}
                     getTitle={getStudyTitle}
                     onOpen={handleOpenStudy}
-                    locale={currentLocale}
                     t={t}
                 />
             )}
@@ -507,19 +504,17 @@ function SingleStudyCard({
     study,
     title,
     projectSlug,
-    locale,
     t,
     onCreateStudy,
 }: {
     study: StudyRead;
     title: string;
     projectSlug: string;
-    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
-    locale: any;
     t: TranslateFn;
     onCreateStudy?: () => void; // omitted for viewers — Add-study CTA hides
 }) {
     const navigate = useNavigate();
+    const { formatDate, formatRelative } = useDateFormat();
     const participants = study.participant_count ?? 0;
     const languageCodes =
         study.translations?.map((tr) => tr.language_code.toUpperCase()).join(', ') ?? '';
@@ -593,18 +588,13 @@ function SingleStudyCard({
                                 </span>
                                 <span className="inline-flex items-center gap-1">
                                     <Calendar className="h-3 w-3" />
-                                    {formatDistanceToNow(new Date(study.created_at), {
-                                        addSuffix: true,
-                                        locale,
-                                    })}
+                                    {formatRelative(study.created_at)}
                                 </span>
                                 {study.end_date && (
                                     <span className="inline-flex items-center gap-1">
                                         <Clock className="h-3 w-3" />
                                         {t('admin.dashboard.closes', 'Closes')}{' '}
-                                        {format(new Date(study.end_date as string), 'PP', {
-                                            locale,
-                                        })}
+                                        {formatDate(study.end_date)}
                                     </span>
                                 )}
                             </div>
@@ -630,7 +620,6 @@ function StudyGroups({
     closedStudies,
     getTitle,
     onOpen,
-    locale,
     t,
 }: {
     activeStudies: StudyRead[];
@@ -639,8 +628,6 @@ function StudyGroups({
     closedStudies: StudyRead[];
     getTitle: (s: StudyRead) => string;
     onOpen: (slug: string) => void;
-    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
-    locale: any;
     t: TranslateFn;
 }) {
     return (
@@ -651,7 +638,6 @@ function StudyGroups({
                     studies={activeStudies}
                     getTitle={getTitle}
                     onOpen={onOpen}
-                    locale={locale}
                     t={t}
                 />
             )}
@@ -661,7 +647,6 @@ function StudyGroups({
                     studies={pausedStudies}
                     getTitle={getTitle}
                     onOpen={onOpen}
-                    locale={locale}
                     t={t}
                 />
             )}
@@ -671,7 +656,6 @@ function StudyGroups({
                     studies={draftStudies}
                     getTitle={getTitle}
                     onOpen={onOpen}
-                    locale={locale}
                     t={t}
                 />
             )}
@@ -681,7 +665,6 @@ function StudyGroups({
                     studies={closedStudies}
                     getTitle={getTitle}
                     onOpen={onOpen}
-                    locale={locale}
                     t={t}
                     collapsed
                 />
@@ -695,7 +678,6 @@ function StudyGroup({
     studies,
     getTitle,
     onOpen,
-    locale,
     t,
     collapsed = false,
 }: {
@@ -703,8 +685,6 @@ function StudyGroup({
     studies: StudyRead[];
     getTitle: (s: StudyRead) => string;
     onOpen: (slug: string) => void;
-    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
-    locale: any;
     t: TranslateFn;
     collapsed?: boolean;
 }) {
@@ -734,7 +714,6 @@ function StudyGroup({
                             study={study}
                             title={getTitle(study)}
                             onOpen={() => onOpen(study.slug)}
-                            locale={locale}
                             t={t}
                         />
                     ))}
@@ -748,16 +727,14 @@ function StudyRow({
     study,
     title,
     onOpen,
-    locale,
     t,
 }: {
     study: StudyRead;
     title: string;
     onOpen: () => void;
-    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
-    locale: any;
     t: TranslateFn;
 }) {
+    const { formatDate, formatRelative } = useDateFormat();
     const languageCodes =
         study.translations?.map((tr) => tr.language_code.toUpperCase()).join(', ') ?? '';
     const participants = study.participant_count ?? 0;
@@ -805,16 +782,13 @@ function StudyRow({
                             </span>
                             <span className="inline-flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                {formatDistanceToNow(new Date(study.created_at), {
-                                    addSuffix: true,
-                                    locale,
-                                })}
+                                {formatRelative(study.created_at)}
                             </span>
                             {study.end_date && (
                                 <span className="inline-flex items-center gap-1">
                                     <Clock className="h-3 w-3" />
                                     {t('admin.dashboard.closes', 'Closes')}{' '}
-                                    {format(new Date(study.end_date as string), 'PP', { locale })}
+                                    {formatDate(study.end_date)}
                                 </span>
                             )}
                         </div>

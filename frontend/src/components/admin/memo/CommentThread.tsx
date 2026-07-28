@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { Button } from '@/components/ui/button';
 import type { MemoCommentRead } from '@/api/model';
 import { MentionAutocomplete } from './MentionAutocomplete';
@@ -39,6 +40,7 @@ export function CommentThread({
     onToggleResolve,
 }: Props) {
     const { t } = useTranslation();
+    const { formatDate } = useDateFormat();
     const [draft, setDraft] = useState('');
     const [mentions, setMentions] = useState<number[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -92,8 +94,7 @@ export function CommentThread({
                 return (
                     <div key={c.id} className="border rounded-xl p-3 bg-white text-sm">
                         <div className="text-xs text-slate-500 mb-1">
-                            {displayNameFor(c.user_id, members)} ·{' '}
-                            {new Date(c.created_at).toLocaleDateString()}
+                            {displayNameFor(c.user_id, members)} · {formatDate(c.created_at)}
                             {c.resolved && (
                                 <span className="ml-2 text-emerald-600">
                                     {t('admin.memo.resolved_label', '[resolved]')}

@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Locale } from 'date-fns';
-import { formatDistanceToNow, format } from 'date-fns';
-import { de, enUS, fr, fi } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 import type { ParticipantRead } from '@/api/model';
@@ -14,13 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { TrendingUp, Eye, Link as LinkIcon, Table as TableIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getStepInfo } from '@/utils/studySteps';
-
-const dateLocales: Record<string, Locale> = {
-    en: enUS,
-    fr: fr,
-    fi: fi,
-    de: de,
-};
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 function getParticipantColor(id: string) {
     const hue = (id.charCodeAt(0) + id.charCodeAt(1)) % 360;
@@ -48,7 +39,6 @@ function computeDurationSeconds(p: ParticipantRead): number | null {
 
 interface ParticipantRowProps {
     participant: ParticipantRead;
-    locale: Locale;
     showLanguage: boolean;
     roughSortEnabled: boolean;
     onView: () => void;
@@ -56,12 +46,12 @@ interface ParticipantRowProps {
 
 function ParticipantRow({
     participant,
-    locale,
     showLanguage,
     roughSortEnabled,
     onView,
 }: ParticipantRowProps) {
     const { t } = useTranslation();
+    const { formatRelative, formatDateTime } = useDateFormat();
     const colors = getParticipantColor(participant.code);
     const isCompleted = participant.status === 'completed';
     const activityTime = getActivityTime(participant);
@@ -172,14 +162,11 @@ function ParticipantRow({
                                             : 'admin.study_overview.started',
                                         isCompleted ? 'Submitted' : 'Started'
                                     )}{' '}
-                                    {formatDistanceToNow(new Date(activityTime), {
-                                        addSuffix: true,
-                                        locale,
-                                    })}
+                                    {formatRelative(activityTime)}
                                 </span>
                             </TooltipTrigger>
                             <TooltipContent className="text-xs">
-                                {format(new Date(activityTime), 'PPpp', { locale })}
+                                {formatDateTime(activityTime)}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -226,9 +213,8 @@ export default function RecentActivityCard({
     studySlug,
     roughSortEnabled = true,
 }: RecentActivityCardProps) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    const currentLocale = dateLocales[i18n.language] || enUS;
 
     const recentParticipants = useMemo(() => {
         const active = participants.filter(
@@ -273,7 +259,6 @@ export default function RecentActivityCard({
                             <ParticipantRow
                                 key={p.id}
                                 participant={p}
-                                locale={currentLocale}
                                 showLanguage={isMultiLang}
                                 roughSortEnabled={roughSortEnabled}
                                 onView={() =>

@@ -63,10 +63,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/lib/datetime';
 import { parseUA } from '@/utils/uaParser';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
-import type { Locale } from 'date-fns/locale';
 import type { DumpParticipant } from './types';
 import type {
     ConsentType,
@@ -235,7 +234,8 @@ export function ParticipantCell({
 
 export interface BuildColumnsParams {
     t: TFunction;
-    currentLocale: Locale;
+    /** Active i18n language; see `lib/datetime`. */
+    language: string;
     duplicateIpGroups: Map<string, number>;
     showLanguageColumn: boolean;
     statusFilter: StatusFilter;
@@ -263,7 +263,7 @@ export interface BuildColumnsParams {
 
 export function buildColumns({
     t,
-    currentLocale,
+    language,
     duplicateIpGroups,
     showLanguageColumn,
     statusFilter,
@@ -779,31 +779,29 @@ export function buildColumns({
                 const val = info.getValue();
                 if (!val) return <span className="text-slate-500">—</span>;
                 const date = new Date(val);
-                const shortLabel = format(date, 'MMM d, HH:mm', { locale: currentLocale });
-                const fullLabel = format(date, 'PPpp', { locale: currentLocale });
+                const label = formatDateTime(date, language);
                 // Plain span, no role (Task 6.7i review finding 2): the
-                // short date is already the accessible name via its own
-                // visible text, sitting in a sorted temporal column —
-                // role="img" would make a screen reader announce it as
-                // "graphic, Jan 1, 01:10" instead of a date.
+                // date is already the accessible name via its own visible
+                // text, sitting in a sorted temporal column — role="img"
+                // would make a screen reader announce it as "graphic, Jan 1,
+                // 01:10" instead of a date.
                 //
-                // One channel, not two (re-review, 2026-07-28): no `title`
-                // here alongside the sr-only span — keeping both would
-                // double-announce the full timestamp on any AT/browser
-                // pairing that surfaces the accessible description
-                // alongside the name (see the duplicate-IP badge above for
-                // the full HTML-AAM reasoning; identical trade here). The
-                // sr-only span is the one reliable channel to a screen
-                // reader; the trade-off accepted, not solved, is that a
-                // sighted mouse user no longer gets a hover tooltip for the
-                // full timestamp, and neither they nor a sighted
-                // keyboard-only/touch user without AT can reach it at all
-                // now — there is no longer any focusable trigger to reveal
-                // it on demand.
+                // One channel, not two (re-review, 2026-07-28): no `title`,
+                // which would double-announce on any AT/browser pairing that
+                // surfaces the accessible description alongside the name (see
+                // the duplicate-IP badge above for the full HTML-AAM
+                // reasoning; identical trade here).
+                //
+                // Task 4.3 removed the sr-only companion span that used to
+                // carry a *longer* form of the same timestamp. It existed
+                // because the visible label was the year-less `MMM d, HH:mm`
+                // while screen readers got the full `PPpp`. Now that
+                // `formatDateTime` is the single format, the visible text
+                // already carries day, month, year and 24-hour time, so the
+                // second span was announcing the identical string twice.
                 return (
                     <span className="flex flex-col text-xs text-slate-500 font-medium">
-                        {shortLabel}
-                        <span className="sr-only"> {fullLabel}</span>
+                        {label}
                     </span>
                 );
             },

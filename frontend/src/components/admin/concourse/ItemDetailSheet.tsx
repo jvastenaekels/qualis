@@ -22,6 +22,7 @@ import {
 import type { ConcourseItemVersionRead, ConcourseItemCommentRead } from '@/api/model';
 import { useQueryClient } from '@tanstack/react-query';
 import { parseApiErrorSync } from '@/lib/error-utils';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { diffVersionFields } from './ItemDetailSheet.helpers';
 
 interface ItemDetailSheetProps {
@@ -97,16 +98,7 @@ export function ItemDetailSheet({
         }
     };
 
-    const formatDate = (dateStr: string) => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
+    const { formatDateTime: formatDate } = useDateFormat();
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
