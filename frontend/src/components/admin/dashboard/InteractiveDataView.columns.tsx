@@ -180,18 +180,22 @@ export function ParticipantCell({
                 )}
             </div>
             {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
-                // role="img", not a TooltipTrigger button (Task 6.7i, same
-                // defect shape as the seven chips 6.7g converted): this badge
-                // did nothing on activation, it only ever announced a fact.
-                // aria-label keeps the exact wording the badge's own text
-                // already computed as its accessible name; title carries the
-                // extra hint that used to live in TooltipContent, for mouse
-                // users hovering.
+                // Plain badge, no role (Task 6.7i review finding 2): this
+                // already has an accessible name from its own visible text
+                // ("Duplicate IP #1") — role="img" would turn that readable
+                // text into a graphic node (NVDA: "graphic, Duplicate IP
+                // #1") and force the same wording into a hand-maintained
+                // aria-label. `title` keeps the hint/IP-hash-prefix for a
+                // mouse user hovering; the sr-only span repeats it as real
+                // content so a screen-reader user gets it reliably too (a
+                // `title` is announced as a description inconsistently
+                // across screen readers). Residual gap, accepted rather than
+                // solved here: a sighted keyboard-only or touch user with no
+                // screen reader still can't reach this detail, since there is
+                // no longer a focusable trigger to reveal it on demand.
                 // text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1.
                 <Badge
                     variant="outline"
-                    role="img"
-                    aria-label={`${t('admin.data.table.duplicate_ip', 'Duplicate IP')} #${duplicateIpGroups.get(p.ip_address)}`}
                     title={`${t(
                         'admin.data.table.duplicate_ip_hint',
                         'Shares IP hash with other participants'
@@ -200,6 +204,15 @@ export function ParticipantCell({
                 >
                     {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
                     {duplicateIpGroups.get(p.ip_address)}
+                    <span className="sr-only">
+                        {' '}
+                        (
+                        {t(
+                            'admin.data.table.duplicate_ip_hint',
+                            'Shares IP hash with other participants'
+                        )}
+                        , {p.ip_address.substring(0, 8)}...)
+                    </span>
                 </Badge>
             )}
         </div>
@@ -760,19 +773,26 @@ export function buildColumns({
                 const date = new Date(val);
                 const shortLabel = format(date, 'MMM d, HH:mm', { locale: currentLocale });
                 const fullLabel = format(date, 'PPpp', { locale: currentLocale });
-                // role="img", not a TooltipTrigger button (Task 6.7i, same
-                // defect shape 6.7g fixed elsewhere in this file): the short
-                // date was already the accessible name via visible text; the
-                // full timestamp that used to live in TooltipContent is now
-                // the native `title` a mouse user hovers to see.
+                // Plain span, no role (Task 6.7i review finding 2): the
+                // short date is already the accessible name via its own
+                // visible text, sitting in a sorted temporal column —
+                // role="img" would make a screen reader announce it as
+                // "graphic, Jan 1, 01:10" instead of a date. `title` keeps
+                // the full timestamp for a mouse user hovering; the sr-only
+                // span repeats it as real content so a screen-reader user
+                // gets the full timestamp reliably too (a `title` is
+                // announced as a description inconsistently across screen
+                // readers). Residual gap, accepted rather than solved here:
+                // a sighted keyboard-only or touch user with no screen
+                // reader still can't reach the full timestamp, since there
+                // is no longer a focusable trigger to reveal it on demand.
                 return (
                     <span
-                        role="img"
-                        aria-label={shortLabel}
                         title={fullLabel}
                         className="flex flex-col text-xs text-slate-500 font-medium"
                     >
                         {shortLabel}
+                        <span className="sr-only"> ({fullLabel})</span>
                     </span>
                 );
             },
@@ -788,7 +808,12 @@ export function buildColumns({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
+                        // text-slate-500, not -400: -400 is 2.56:1 on white,
+                        // below WCAG 1.4.11's 3:1 non-text-contrast floor, and
+                        // this icon is the control's *only* visible
+                        // affordance (Task 6.7i review finding 1). -500 is
+                        // 4.76:1.
+                        className="h-7 w-7 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50"
                         aria-label={t(
                             'admin.data.table.view_participant',
                             'View participant {{id}}',

@@ -44,6 +44,12 @@ function expectedSubmittedLabel(iso: string): string {
     return format(new Date(iso), 'MMM d, HH:mm', { locale: enUS });
 }
 
+// The submitted_at cell's `title` carries the full timestamp (Task 6.7i) —
+// same local-timezone-independence reasoning as expectedSubmittedLabel above.
+function expectedFullSubmittedLabel(iso: string): string {
+    return format(new Date(iso), 'PPpp', { locale: enUS });
+}
+
 const { mockDumpQuery } = vi.hoisted(() => ({ mockDumpQuery: vi.fn() }));
 
 vi.mock('@/api/generated', () => ({
@@ -276,12 +282,13 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         ).toBeInTheDocument();
 
         // The submitted_at date is also still announced, just no longer a
-        // tab stop (Task 6.7i).
-        expect(
-            within(row).getByRole('img', {
-                name: expectedSubmittedLabel('2026-01-01T00:10:19Z'),
-            })
-        ).toBeInTheDocument();
+        // tab stop (Task 6.7i). It carries no role at all now (review
+        // finding 2): it already has an accessible name from its own
+        // visible text, so role="img" would have turned it into a graphic
+        // node instead. Find it by its `title` (the full timestamp) and
+        // confirm the short label is still its visible text.
+        const dateCell = within(row).getByTitle(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'));
+        expect(dateCell).toHaveTextContent(expectedSubmittedLabel('2026-01-01T00:10:19Z'));
     });
 
     it('counts focusable controls in a duplicate-IP row: the badge and the date are no longer tab stops, leaving exactly one real, named action (Task 6.7i)', async () => {
@@ -306,19 +313,24 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         const row = screen.getByText('p1').closest('tr');
         if (!row) throw new Error('participant row not found');
 
-        // The duplicate-IP badge is a fact, not a control: named via
-        // role="img", absent from the button role.
-        expect(within(row).getByRole('img', { name: 'Duplicate IP #1' })).toBeInTheDocument();
+        // The duplicate-IP badge is a fact, not a control: plain visible
+        // text, no role at all (Task 6.7i review finding 2 — it already had
+        // an accessible name from its own text, so role="img" would have
+        // wrongly turned it into a graphic node). Find it by its `title`
+        // (the hint/IP-hash-prefix) and confirm the visible label is there.
+        const badge = within(row).getByTitle(/Shares IP hash with other participants/);
+        expect(badge).toHaveTextContent('Duplicate IP #1');
+        expect(within(row).queryByRole('img', { name: /Duplicate IP/ })).not.toBeInTheDocument();
         expect(within(row).queryByRole('button', { name: /Duplicate IP/ })).not.toBeInTheDocument();
 
         // Same for the submitted_at date: was a TooltipTrigger button
-        // revealing the full timestamp on hover, now a named,
-        // non-focusable fact.
+        // revealing the full timestamp on hover, now plain text with a
+        // `title` — not a role="img" either, for the same reason.
+        const dateCell = within(row).getByTitle(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'));
+        expect(dateCell).toHaveTextContent(expectedSubmittedLabel('2026-01-01T00:10:19Z'));
         expect(
-            within(row).getByRole('img', {
-                name: expectedSubmittedLabel('2026-01-01T00:10:19Z'),
-            })
-        ).toBeInTheDocument();
+            within(row).queryByRole('img', { name: expectedSubmittedLabel('2026-01-01T00:10:19Z') })
+        ).not.toBeInTheDocument();
 
         // Before this task, a duplicate-IP row carried two inert tab stops
         // (this badge's own TooltipTrigger, plus the untouched submitted_at
