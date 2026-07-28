@@ -123,14 +123,34 @@ export default defineConfig({
     /* Run both frontend and backend servers before starting tests */
     webServer: [
         {
-            command: 'cd ../backend && TESTING=true uv run uvicorn app.main:app --port 8000',
+            command: 'cd ../backend && uv run uvicorn app.main:app --port 8000',
             url: 'http://127.0.0.1:8000/health',
             reuseExistingServer: true,
             timeout: 120 * 1000,
             stdout: 'pipe',
             stderr: 'pipe',
+            /*
+             * Two variables, two different jobs — setting only one is why this
+             * suite could not run outside CI.
+             *
+             * `ENVIRONMENT=test` is what mounts the test router: `main.py`
+             * gates `include_router(test_router)` on
+             * `settings.ENVIRONMENT in ["test", "development"]`, and
+             * `ENVIRONMENT` defaults to `"production"`. Without it every
+             * `/api/test/*` call 404s and the suite dies in global setup,
+             * before a single assertion runs.
+             *
+             * `TESTING=true` is read only by `limiter.py`, to disable rate
+             * limiting. It does not gate the router, so it cannot substitute
+             * for the above — which is precisely the mistake this config made.
+             *
+             * CI passed regardless because `ci.yml` sets `ENVIRONMENT: test` at
+             * the job level. That made this config non-self-contained: green in
+             * CI, broken everywhere else, and no gate could see the difference.
+             */
             env: {
                 TESTING: 'true',
+                ENVIRONMENT: 'test',
             },
         },
         {
