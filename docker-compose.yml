@@ -21,7 +21,19 @@ services:
       # would vanish on `docker compose down` — silently, with no error.
       - pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U qualis"]
+      # `psql`, not `pg_isready`, and the difference is the whole point:
+      # `pg_isready` only asks whether the server accepts connections. It
+      # returns 0 for a role that does not exist — measured against this very
+      # volume, with a deliberately bogus role. So the old probe could not see
+      # the one misconfiguration it most needed to: POSTGRES_USER is silently
+      # ignored against an already-populated pgdata volume (the image runs
+      # initdb only on an empty data directory), leaving Compose reporting
+      # "Healthy" while the backend failed on `role does not exist`.
+      #
+      # A real connection as the app's own role distinguishes them: exit 0
+      # when it works, exit 2 when the role is absent. $$ escapes Compose
+      # interpolation so the container shell expands it.
+      test: ["CMD-SHELL", "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'select 1' >/dev/null"]
       interval: 5s
       timeout: 3s
       retries: 5

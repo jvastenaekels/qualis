@@ -224,6 +224,25 @@ Stop the stack with:
 make demo-down
 ```
 
+This keeps your data. `make demo-down` removes the containers and the network but
+leaves the `qualis_pgdata` and `qualis_miniodata` volumes in place, so the next
+`make demo-up` comes back to the same database — which is why re-running
+`make demo-seed` reports that the study and its 18 Q-sorts already exist and skips
+them.
+
+To start over from an empty database instead — **this deletes the demo data and
+any study you built on top of it**:
+
+```bash
+docker compose down -v
+```
+
+One thing worth knowing if you edit `docker-compose.yml`: the postgres image runs
+`initdb` only on an empty data directory, so changing `POSTGRES_USER` or
+`POSTGRES_PASSWORD` against an existing volume is **silently ignored** — the old
+role stays, and the app then fails to connect. `docker compose down -v` first if
+you change either.
+
 ### Local development setup
 
 Use this path when you want hot reload, local tests, or direct backend/frontend development.
