@@ -366,7 +366,7 @@ export function buildColumns({
                                     setStepFilter('all');
                                 }}
                             >
-                                {t('admin.data.filters.all_statuses', 'All')}
+                                {t('admin.data.filters.all_statuses', 'All statuses')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel className="text-2xs text-slate-500">
@@ -524,7 +524,7 @@ export function buildColumns({
                                 )}
                             >
                                 <MessagesSquare className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.filters.interview', 'Follow-up')}
+                                {t('admin.data.filters.interview', 'Accepts follow-up')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -620,7 +620,7 @@ export function buildColumns({
                                 )}
                             >
                                 <AlertTriangle className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.filters.flagged', 'Flagged')}
+                                {t('admin.data.filters.flagged', 'Flagged only')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => setQualityFilter('has_comments')}
@@ -648,7 +648,7 @@ export function buildColumns({
                                 )}
                             >
                                 <Tag className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.filters.has_recruitment', 'Has recruitment link')}
+                                {t('admin.data.filters.has_recruitment', 'Has access link')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -664,7 +664,7 @@ export function buildColumns({
 
                 const recruitmentLinkLabel = `${t(
                     'admin.data.tooltips.recruitment_link',
-                    'Recruitment link'
+                    'Access link'
                 )}: ${p.recruitment_token}`;
                 const suspectLabel = t('admin.data.tooltips.suspect');
                 const hasCommentsLabel = t('admin.data.tooltips.has_comments');

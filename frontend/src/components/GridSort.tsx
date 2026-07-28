@@ -895,7 +895,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                     <div
                                         className="flex flex-row gap-2 items-end flex-nowrap outline-none"
                                         role="grid"
-                                        aria-label={t('fine.grid.label', 'Sorting grid')}
+                                        aria-label={t('fine.grid.label', 'Q-Sort grid')}
                                         tabIndex={-1}
                                         onKeyDown={handleGridKeyDown}
                                     >

@@ -98,7 +98,10 @@ const StudyOverviewPage = () => {
                                     <Users className="w-5 h-5" aria-hidden="true" />
                                 </div>
                                 <span className="min-w-0 text-xs font-bold text-slate-500 leading-tight break-words">
-                                    {t('admin.study_overview.sample_size', 'Sample size (N)')}
+                                    {t(
+                                        'admin.study_overview.sample_size',
+                                        'Number of participants (P-Set)'
+                                    )}
                                 </span>
                             </div>
                             <div className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">

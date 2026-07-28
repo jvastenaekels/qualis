@@ -219,7 +219,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         <p className="text-blue-800/80 text-xs leading-relaxed font-medium">
                                             {t(
                                                 'admin.design.theme.logo.help_desc',
-                                                'The logo is displayed at the top of every study page and on the welcome page.'
+                                                "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity."
                                             )}
                                         </p>
                                     </div>
@@ -253,7 +253,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             <p className="text-xs">
                                                 {t(
                                                     'admin.design.theme.partners.desc',
-                                                    'Add logos of universities, labs, or funders supporting this study.'
+                                                    'Add logos of supporting institutions or partners.'
                                                 )}
                                             </p>
                                         </TooltipContent>
@@ -296,7 +296,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                         >
                                                             {t(
                                                                 'admin.design.theme.partners.name_placeholder',
-                                                                'Name'
+                                                                'Institution name'
                                                             )}
                                                         </Label>
                                                         <Input
@@ -397,13 +397,13 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         <p className="font-bold mb-1 text-indigo-900">
                                             {t(
                                                 'admin.design.theme.partners.help_title',
-                                                'Credibility & Trust'
+                                                'Display of logos'
                                             )}
                                         </p>
                                         <p className="text-indigo-800/80 text-xs leading-relaxed font-medium">
                                             {t(
                                                 'admin.design.theme.partners.help_desc',
-                                                'Partner logos are prominently displayed on the study home page.'
+                                                'Partner logos are displayed on the landing page as well as in the study header, next to the main logo.'
                                             )}
                                         </p>
                                     </div>

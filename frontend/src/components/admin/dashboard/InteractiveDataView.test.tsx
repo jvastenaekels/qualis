@@ -186,7 +186,7 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         expect(screen.getByRole('img', { name: 'Email provided' })).toBeInTheDocument();
         expect(screen.getByRole('img', { name: 'Wants results' })).toBeInTheDocument();
         expect(screen.getByRole('img', { name: 'Accepts follow-up' })).toBeInTheDocument();
-        expect(screen.getByRole('img', { name: 'Recruitment link: REF123' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Access link: REF123' })).toBeInTheDocument();
         expect(
             screen.getByRole('img', {
                 name: 'Potentially suspect: session duration < 2 minutes',
@@ -214,7 +214,7 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
             'Email provided',
             'Wants results',
             'Accepts follow-up',
-            'Recruitment link: REF123',
+            'Access link: REF123',
             'Potentially suspect: session duration < 2 minutes',
             'Contains participant comments on cards',
             'Has audio responses',

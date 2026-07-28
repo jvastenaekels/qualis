@@ -309,7 +309,7 @@ export const CommandMenu = () => {
                             <div className="flex h-6 w-6 items-center justify-center rounded bg-red-100 dark:bg-red-900/40">
                                 <LogOut className="h-3.5 w-3.5 text-red-600" />
                             </div>
-                            <span>{t('admin.command_menu.logout', 'Logout')}</span>
+                            <span>{t('admin.command_menu.logout', 'Log out')}</span>
                         </Command.Item>
                     </Command.Group>
                 </Command.List>

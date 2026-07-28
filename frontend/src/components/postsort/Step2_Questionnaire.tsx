@@ -265,7 +265,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     if (!hasText && !hasAudio) {
                         newTextAudioErrors[key] = t(
                             'post.text_audio_required',
-                            'Please provide either a text or audio response.'
+                            'A few words or an audio recording will help us understand your viewpoint.'
                         );
                     }
                 }
@@ -364,7 +364,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 <Card className="border-blue-100 bg-blue-50/50 shadow-sm">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-black text-blue-900 flex items-center gap-2">
-                            ✉️ {t('post.contact.title', 'Contact')}
+                            ✉️ {t('post.contact.title', 'Results & contact')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -471,7 +471,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                         </>
                     ) : (
                         <>
-                            <span>{t('post.submit', 'Submit Study')}</span>
+                            <span>{t('post.submit', 'Share my perspective')}</span>
                             <Check size={20} className="ml-2" strokeWidth={3} />
                         </>
                     )}

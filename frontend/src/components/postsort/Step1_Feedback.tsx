@@ -472,7 +472,10 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             defaultValue=""
                         >
                             <option value="" disabled>
-                                {t('post.optional.select_placeholder', 'Select a statement...')}
+                                {t(
+                                    'post.optional.select_placeholder',
+                                    'Select a statement to comment...'
+                                )}
                             </option>
                             {qsort
                                 .filter((s) => {

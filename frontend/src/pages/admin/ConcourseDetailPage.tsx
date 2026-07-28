@@ -240,7 +240,7 @@ export default function ConcourseDetailPage() {
     if (!concourse) {
         return (
             <div className="p-8 text-center text-slate-500">
-                {t('common.errors.not_found', 'Not found')}
+                {t('common.errors.not_found', 'Study not found.')}
             </div>
         );
     }
@@ -918,7 +918,7 @@ export default function ConcourseDetailPage() {
                                                         }
                                                         placeholder={t(
                                                             'admin.concourse.source_placeholder',
-                                                            'Source (optional)'
+                                                            'e.g. Interview #3, Literature review'
                                                         )}
                                                         className="h-8 text-xs rounded-lg"
                                                     />
@@ -1346,7 +1346,7 @@ export default function ConcourseDetailPage() {
                                         <SelectValue
                                             placeholder={t(
                                                 'admin.concourse.select_language',
-                                                'Select language'
+                                                'Language'
                                             )}
                                         />
                                     </SelectTrigger>
@@ -1851,10 +1851,7 @@ export default function ConcourseDetailPage() {
                     <Select value={newLangCode} onValueChange={(val) => setNewLangCode(val)}>
                         <SelectTrigger className="h-10 rounded-xl">
                             <SelectValue
-                                placeholder={t(
-                                    'admin.concourse.select_language',
-                                    'Select language'
-                                )}
+                                placeholder={t('admin.concourse.select_language', 'Language')}
                             />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl max-h-60">

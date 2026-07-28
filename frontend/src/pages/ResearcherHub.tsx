@@ -156,7 +156,7 @@ export default function ResearcherHub() {
                                     {activeStudies.length > 0 && (
                                         <div className="border-t mx-5 pt-3 pb-4 space-y-2">
                                             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                {t('admin.hub.collecting', 'Collecting data')}
+                                                {t('admin.hub.collecting', 'Active studies')}
                                             </p>
                                             {activeStudies.map((study) => {
                                                 const title = getStudyTitle(study);

@@ -870,7 +870,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                   ? t('admin.design.qsort.bulk.process_append')
                                                   : t(
                                                         'admin.design.qsort.bulk.process_sync',
-                                                        'Sync statements'
+                                                        'Process & sync translations'
                                                     )}
                                         </Button>
                                     </div>
@@ -1381,7 +1381,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                         <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                                             {t(
                                                 'admin.study_design.distribution_mode.helper',
-                                                'Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice; Brown 1980; Watts & Stenner 2012). Free: any number of cards per column, total = Q-set size (Brown et al. 2015 argue distribution shape barely affects results). Flexible: total enforced, columns are soft hints.'
+                                                'Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice). Free: any number of cards per column, total = Q-set size. Flexible: total enforced, columns are soft hints.'
                                             )}
                                         </p>
                                     </div>

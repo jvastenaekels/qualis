@@ -221,7 +221,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                                         <p className="text-xs font-medium text-slate-500 mt-1">
                                             {t(
                                                 'admin.dialogs.create_study.languages_desc',
-                                                'Select languages to enable for this study. Content will be initialized with localized defaults.'
+                                                'Select the languages to enable. Content will be initialized with localized defaults.'
                                             )}
                                         </p>
                                     </div>

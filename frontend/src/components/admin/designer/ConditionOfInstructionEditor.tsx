@@ -226,7 +226,7 @@ const ConditionOfInstructionEditor = ({
                                 )}
                                 placeholder={t(
                                     'admin.design.condition.pre_placeholder',
-                                    'e.g. Based on your personal point of view...'
+                                    'E.g. Based on your personal point of view; divide the cards into three piles...'
                                 )}
                                 value={translation?.pre_instruction || ''}
                                 translations={preInstructionTranslations}
@@ -248,7 +248,7 @@ const ConditionOfInstructionEditor = ({
                             )}
                             placeholder={t(
                                 'admin.design.condition.placeholder',
-                                'e.g. Please rank the following statements...'
+                                'E.g. Please rank the following statements from those you most agree with to those you most disagree with'
                             )}
                             value={translation?.condition_of_instruction || ''}
                             translations={conditionTranslations}

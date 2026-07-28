@@ -306,7 +306,7 @@ export default function InteractiveDataView({
                         </div>
 
                         <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
                     </button>
@@ -355,7 +355,7 @@ export default function InteractiveDataView({
                         </div>
 
                         <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
                     </button>
@@ -403,7 +403,7 @@ export default function InteractiveDataView({
                         </div>
 
                         <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-xs font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
                     </button>
@@ -523,14 +523,14 @@ export default function InteractiveDataView({
                             >
                                 <AlertTriangle className="w-3 h-3" />
                                 {qualityFilter === 'flagged'
-                                    ? t('admin.data.filters.flagged', 'Flagged')
+                                    ? t('admin.data.filters.flagged', 'Flagged only')
                                     : qualityFilter === 'has_comments'
                                       ? t('admin.data.filters.has_comments', 'Has comments')
                                       : qualityFilter === 'has_audio'
                                         ? t('admin.data.filters.has_audio', 'Has audio')
                                         : t(
                                               'admin.data.filters.has_recruitment',
-                                              'Has recruitment link'
+                                              'Has access link'
                                           )}
                                 <button
                                     type="button"
@@ -630,7 +630,7 @@ export default function InteractiveDataView({
                             className="h-7 text-xs font-semibold text-slate-600 gap-1.5"
                         >
                             <FilterX className="w-3.5 h-3.5" />
-                            {t('admin.data.filters.clear_all', 'Clear all')}
+                            {t('admin.data.filters.clear_all', 'Clear filters')}
                         </Button>
                     </div>
                 )}
@@ -643,11 +643,11 @@ export default function InteractiveDataView({
                             <Input
                                 placeholder={t(
                                     'admin.data.search.placeholder',
-                                    'Search by ID, email...'
+                                    'Search by ID or link token...'
                                 )}
                                 aria-label={t(
                                     'admin.data.search.placeholder',
-                                    'Search by ID, email...'
+                                    'Search by ID or link token...'
                                 )}
                                 value={globalFilter ?? ''}
                                 onChange={(e) => setGlobalFilter(e.target.value)}
@@ -663,7 +663,7 @@ export default function InteractiveDataView({
                                 <Button
                                     className="h-10 w-10 sm:w-auto sm:h-9 font-bold shadow-sm gap-2 text-xs"
                                     disabled={isExportLoading}
-                                    aria-label={t('admin.export.label', 'Export')}
+                                    aria-label={t('admin.export.label', 'Export data')}
                                 >
                                     {isExportLoading ? (
                                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -671,7 +671,7 @@ export default function InteractiveDataView({
                                         <Download className="h-3.5 w-3.5" />
                                     )}
                                     <span className="hidden sm:inline">
-                                        {t('admin.export.label', 'Export')}
+                                        {t('admin.export.label', 'Export data')}
                                     </span>
                                 </Button>
                             </DropdownMenuTrigger>

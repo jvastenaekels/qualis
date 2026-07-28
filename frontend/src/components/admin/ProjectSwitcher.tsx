@@ -93,7 +93,7 @@ export function ProjectSwitcher() {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-500">
-                            {t('admin.command_menu.switch_project', 'Projects')}
+                            {t('admin.command_menu.switch_project', 'Switch project')}
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
                             {projects?.map((project) => {

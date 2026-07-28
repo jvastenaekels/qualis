@@ -27,19 +27,23 @@ describe('resolveAnswerLabel', () => {
     });
 
     it('returns t() fallback for special key "email"', () => {
-        expect(resolveAnswerLabel({}, 'email', 'en', t)).toBe('Email Address');
+        expect(resolveAnswerLabel({}, 'email', 'en', t)).toBe('Your email address (optional)');
     });
 
     it('returns t() fallback for "interview_consent"', () => {
-        expect(resolveAnswerLabel({}, 'interview_consent', 'en', t)).toBe('Follow-up');
+        expect(resolveAnswerLabel({}, 'interview_consent', 'en', t)).toBe(
+            'I agree to be contacted by the researcher for follow-up.'
+        );
     });
 
     it('returns t() fallback for "newsletter_consent"', () => {
-        expect(resolveAnswerLabel({}, 'newsletter_consent', 'en', t)).toBe('Results');
+        expect(resolveAnswerLabel({}, 'newsletter_consent', 'en', t)).toBe(
+            'I wish to be informed about the study results.'
+        );
     });
 
     it('returns t() fallback for "_recruitment_token"', () => {
-        expect(resolveAnswerLabel({}, '_recruitment_token', 'en', t)).toBe('Recruitment token');
+        expect(resolveAnswerLabel({}, '_recruitment_token', 'en', t)).toBe('Link token');
     });
 
     it('returns t() fallback for "missing_statement"', () => {

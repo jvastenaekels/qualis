@@ -265,7 +265,7 @@ export function ParticipantMetadataCard({
                                     <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t(
                                             'admin.participant.metadata.recruitment_link',
-                                            'Recruitment link'
+                                            'Access link'
                                         )}
                                     </p>
                                 </div>

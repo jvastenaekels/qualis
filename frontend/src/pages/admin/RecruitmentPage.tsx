@@ -123,7 +123,7 @@ const RecruitmentPage = () => {
                 title={t('admin.recruitment.title', 'Access')}
                 description={t(
                     'admin.recruitment.description',
-                    'Configure the study URL, manage participant access, and track recruitment efficiency.'
+                    'Configure the study URL, manage participant access, and track how each access link performs.'
                 )}
                 icon={Link2}
             />
@@ -165,7 +165,7 @@ const RecruitmentPage = () => {
                     <Archive className="size-4 shrink-0" />
                     {t(
                         'admin.recruitment.state_archived',
-                        'This study is archived. All recruitment data is read-only.'
+                        'This study is archived. Access links are read-only.'
                     )}
                 </div>
             )}
@@ -339,7 +339,7 @@ const RecruitmentPage = () => {
                                     ) : (
                                         <Save className="w-4 h-4 mr-2" />
                                     )}
-                                    {t('admin.settings.save_button', 'Save changes')}
+                                    {t('admin.settings.save_button', 'Save')}
                                 </Button>
                             </div>
                         </form>
@@ -629,7 +629,7 @@ const RecruitmentPage = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <CardTitle className="text-sm font-black text-slate-500">
-                                {t('admin.recruitment.table_title', 'Recruitment links')}
+                                {t('admin.recruitment.table_title', 'Access links')}
                             </CardTitle>
                         </div>
                         <div className="flex items-center gap-3">
@@ -661,7 +661,10 @@ const RecruitmentPage = () => {
                                                 htmlFor="type"
                                                 className="text-2xs font-black text-slate-500"
                                             >
-                                                {t('admin.recruitment.link_type', 'Link Type')}
+                                                {t(
+                                                    'admin.recruitment.link_type',
+                                                    'Access strategy'
+                                                )}
                                             </Label>
                                             <Select
                                                 value={newLinkType}
@@ -676,7 +679,7 @@ const RecruitmentPage = () => {
                                                     <SelectValue
                                                         placeholder={t(
                                                             'admin.recruitment.select_type',
-                                                            'Select type'
+                                                            'Choose an access strategy...'
                                                         )}
                                                     />
                                                 </SelectTrigger>
@@ -686,7 +689,7 @@ const RecruitmentPage = () => {
                                                             <Globe className="h-4 w-4 text-blue-500 flex-shrink-0" />
                                                             {t(
                                                                 'admin.recruitment.types.public',
-                                                                'Public (Multiple usage)'
+                                                                'Open access (public)'
                                                             )}
                                                         </span>
                                                     </SelectItem>
@@ -695,7 +698,7 @@ const RecruitmentPage = () => {
                                                             <Users className="h-4 w-4 text-indigo-500 flex-shrink-0" />
                                                             {t(
                                                                 'admin.recruitment.types.individual',
-                                                                'Individual (Single usage)'
+                                                                'Single-use passcode'
                                                             )}
                                                         </span>
                                                     </SelectItem>
@@ -704,7 +707,7 @@ const RecruitmentPage = () => {
                                                             <Lock className="h-4 w-4 text-orange-500 flex-shrink-0" />
                                                             {t(
                                                                 'admin.recruitment.types.limited',
-                                                                'Limited (Set capacity)'
+                                                                'Capped participation'
                                                             )}
                                                         </span>
                                                     </SelectItem>
@@ -714,17 +717,17 @@ const RecruitmentPage = () => {
                                                 {newLinkType === 'public' &&
                                                     t(
                                                         'admin.recruitment.guidance.public',
-                                                        'Ideal for social media or generic newsletters. Anyone with this link can participate multiple times.'
+                                                        'Best for high-volume recruitment. A single URL for all participants.'
                                                     )}
                                                 {newLinkType === 'individual' &&
                                                     t(
                                                         'admin.recruitment.guidance.individual',
-                                                        'Each link is unique and expires after one submission. Best for controlled samples.'
+                                                        'Maximum security. Generates unique links that expire after one successful completion.'
                                                     )}
                                                 {newLinkType === 'limited' &&
                                                     t(
                                                         'admin.recruitment.guidance.limited',
-                                                        'Set a maximum number of submissions for a single link. Good for small target groups.'
+                                                        'Controlled access. One link that stops working after a fixed number of submissions.'
                                                     )}
                                             </div>
                                         </div>
@@ -735,7 +738,7 @@ const RecruitmentPage = () => {
                                             >
                                                 {t(
                                                     'admin.recruitment.campaign_name',
-                                                    'Campaign Name (Optional)'
+                                                    'Channel / campaign name'
                                                 )}
                                             </Label>
                                             <div className="relative">
@@ -744,7 +747,7 @@ const RecruitmentPage = () => {
                                                     id="name"
                                                     placeholder={t(
                                                         'admin.recruitment.name_placeholder',
-                                                        'e.g. Social Media, Batch A'
+                                                        'E.g. LinkedIn, email batch a, student list...'
                                                     )}
                                                     value={newLinkName}
                                                     onChange={(e) => setNewLinkName(e.target.value)}
@@ -761,11 +764,11 @@ const RecruitmentPage = () => {
                                                     {newLinkType === 'individual'
                                                         ? t(
                                                               'admin.recruitment.link_count',
-                                                              'Number of links to generate'
+                                                              'Batch size'
                                                           )
                                                         : t(
                                                               'admin.recruitment.capacity_label',
-                                                              'Participant Capacity'
+                                                              'Max submissions'
                                                           )}
                                                 </Label>
                                                 <div className="relative">
@@ -808,7 +811,7 @@ const RecruitmentPage = () => {
                                                 ? t('admin.recruitment.generating', 'Generating...')
                                                 : t(
                                                       'admin.recruitment.generate_links',
-                                                      'Generate Links'
+                                                      'Provision links'
                                                   )}
                                         </Button>
                                     </DialogFooter>
@@ -820,7 +823,7 @@ const RecruitmentPage = () => {
                 <CardContent className="p-0">
                     <Table>
                         <caption className="sr-only">
-                            {t('admin.recruitment.table_caption', 'Recruitment links')}
+                            {t('admin.recruitment.table_caption', 'Access links')}
                         </caption>
                         <TableHeader>
                             <TableRow className="hover:bg-transparent border-slate-100">
@@ -828,41 +831,41 @@ const RecruitmentPage = () => {
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600 pl-6"
                                 >
-                                    {t('admin.recruitment.table.name', 'Name / Cohort')}
+                                    {t('admin.recruitment.table.name', 'Campaign / lot')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600 cursor-help"
                                     title={t(
                                         'admin.recruitment.table.type_help',
-                                        'Public, Single-use, or Capacity-limited. See strategy descriptions in the “New access link” dialog.'
+                                        'Public, Single-use, or Capacity-limited. See strategy descriptions in the "New access link" dialog.'
                                     )}
                                 >
-                                    {t('admin.recruitment.table.type', 'Type')}
+                                    {t('admin.recruitment.table.type', 'Entry type')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600"
                                 >
-                                    {t('admin.recruitment.table.token', 'Token')}
+                                    {t('admin.recruitment.table.token', 'Link token')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600"
                                 >
-                                    {t('admin.recruitment.table.usage', 'Usage')}
+                                    {t('admin.recruitment.table.usage', 'Capacity')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600"
                                 >
-                                    {t('admin.recruitment.table.status', 'Status')}
+                                    {t('admin.recruitment.table.status', 'State')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
                                     className="py-4 text-2xs font-black text-slate-600 text-right pr-6"
                                 >
-                                    {t('admin.recruitment.table.actions', 'Actions')}
+                                    {t('admin.recruitment.table.actions', 'Manage')}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -876,7 +879,7 @@ const RecruitmentPage = () => {
                                                 icon={Link2}
                                                 title={t(
                                                     'admin.recruitment.empty_title',
-                                                    'No recruitment links yet'
+                                                    'No access links yet'
                                                 )}
                                                 body={t(
                                                     'admin.recruitment.empty_description',
@@ -907,7 +910,10 @@ const RecruitmentPage = () => {
                                         <TableCell className="font-bold text-slate-900 pl-6">
                                             {link.name || (
                                                 <span className="text-slate-500 italic font-normal">
-                                                    {t('admin.recruitment.unnamed', 'Unnamed')}
+                                                    {t(
+                                                        'admin.recruitment.unnamed',
+                                                        'Unnamed channel'
+                                                    )}
                                                 </span>
                                             )}
                                         </TableCell>
@@ -1052,7 +1058,10 @@ const RecruitmentPage = () => {
                                                     variant="secondary"
                                                     className="bg-slate-50 text-slate-600 border-slate-200 px-2 py-0 shadow-none text-2xs font-black"
                                                 >
-                                                    {t('admin.recruitment.revoked', 'Revoked')}
+                                                    {t(
+                                                        'admin.recruitment.revoked',
+                                                        'Access revoked'
+                                                    )}
                                                 </Badge>
                                             )}
                                         </TableCell>
@@ -1112,7 +1121,7 @@ const RecruitmentPage = () => {
                                                                 <Copy className="h-3.5 w-3.5" />
                                                                 {t(
                                                                     'admin.recruitment.copy_link',
-                                                                    'Copy Link'
+                                                                    'Copy URL'
                                                                 )}
                                                             </Button>
                                                         </div>

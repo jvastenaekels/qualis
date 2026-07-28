@@ -101,14 +101,11 @@ export default function CreateProjectPage() {
             } else {
                 const message = parseApiErrorSync(
                     error,
-                    t('admin.project.create.error', 'Could not create project. Try again.')
+                    t('admin.project.create.error', 'Failed to create project')
                 );
-                toast.error(
-                    t('admin.project.create.error', 'Could not create project. Try again.'),
-                    {
-                        description: message,
-                    }
-                );
+                toast.error(t('admin.project.create.error', 'Failed to create project'), {
+                    description: message,
+                });
             }
         } finally {
             setIsSubmitting(false);

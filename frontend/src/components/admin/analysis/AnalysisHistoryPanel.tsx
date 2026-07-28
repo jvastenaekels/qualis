@@ -226,7 +226,7 @@ export function AnalysisHistoryPanel({
                             )}
                             body={t(
                                 'admin.analysis.history.empty_explainer',
-                                'Documenting analytical choices supports reproducibility, a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.'
+                                'Each run is logged here so you can document and revisit every decision.'
                             )}
                             variant="inline"
                             headingLevel={3}

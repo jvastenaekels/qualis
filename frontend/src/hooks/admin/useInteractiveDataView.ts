@@ -211,9 +211,7 @@ export function useInteractiveDataView({
                 url: `/api/admin/studies/${slug}/participants`,
                 method: 'DELETE',
             });
-            toast.success(
-                t('admin.data.actions.clear_all_success', 'All participants successfully cleared!')
-            );
+            toast.success(t('admin.data.actions.clear_all_success', 'All data cleared'));
             queryClient.invalidateQueries({
                 queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
             });
@@ -316,7 +314,7 @@ export function useInteractiveDataView({
                 await exportFn();
                 toast.success(t('admin.export.success', 'Export successful'));
             } catch (_e) {
-                toast.error(t('admin.export.error', 'Export failed'));
+                toast.error(t('admin.export.error', 'Export failed. Try again.'));
             } finally {
                 setIsExportLoading(false);
             }

@@ -123,7 +123,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
             }
             return (
                 <select id={id} {...register(id)} className={commonClasses}>
-                    <option value="">{t('presort.select_placeholder', 'Select an option')}</option>
+                    <option value="">{t('presort.select_placeholder', 'Select...')}</option>
                     {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
                         const optLabel =

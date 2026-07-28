@@ -166,7 +166,7 @@ function NavUser({
                             {isSuperuser && (
                                 <DropdownMenuItem onSelect={() => navigate('/app/users')}>
                                     <ShieldCheck className="mr-2 h-4 w-4" />
-                                    {t('admin.layout.platform_settings', 'Platform settings')}
+                                    {t('admin.layout.platform_settings', 'Users')}
                                 </DropdownMenuItem>
                             )}
                         </DropdownMenuGroup>

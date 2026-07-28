@@ -920,7 +920,7 @@ describe('AudioRecorder', () => {
         await simulateRecordingComplete();
 
         await waitFor(() => {
-            expect(screen.getByLabelText('Uploaded')).toBeInTheDocument();
+            expect(screen.getByLabelText('Audio uploaded successfully')).toBeInTheDocument();
         });
     });
 

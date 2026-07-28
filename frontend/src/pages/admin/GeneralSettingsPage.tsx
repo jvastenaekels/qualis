@@ -100,20 +100,11 @@ export default function GeneralSettingsPage() {
         } catch (error) {
             const message = parseApiErrorSync(
                 error,
-                t(
-                    'admin.settings.archive_error',
-                    'Could not archive study. Make sure the study is closed first.'
-                )
+                t('admin.settings.archive_error', 'Error archiving study')
             );
-            toast.error(
-                t(
-                    'admin.settings.archive_error',
-                    'Could not archive study. Make sure the study is closed first.'
-                ),
-                {
-                    description: message,
-                }
-            );
+            toast.error(t('admin.settings.archive_error', 'Error archiving study'), {
+                description: message,
+            });
         }
     };
     const handleDelete = async () => {
@@ -285,7 +276,7 @@ export default function GeneralSettingsPage() {
                                     <AlertDescription className="text-red-800">
                                         {t(
                                             'admin.settings.storage.error',
-                                            'Failed to load storage usage'
+                                            'Failed to load storage usage.'
                                         )}
                                     </AlertDescription>
                                 </Alert>

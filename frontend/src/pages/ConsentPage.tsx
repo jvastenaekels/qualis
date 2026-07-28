@@ -105,7 +105,7 @@ const ConsentPage: React.FC = () => {
                     toast.error(
                         t(
                             'consent.record_error',
-                            'Could not save consent record. Please try again.'
+                            'Could not save consent record. You may continue.'
                         )
                     );
                     return; // Block navigation — consent must be recorded
@@ -133,10 +133,10 @@ const ConsentPage: React.FC = () => {
         <div className="w-full max-w-2xl min-w-0 mx-auto py-6 sm:py-12 px-4 animate-in fade-in duration-500">
             <div className="mb-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                    {t('consent.title', 'Consent to Participate')}
+                    {t('consent.title', 'Informed consent and data processing agreement')}
                 </h1>
                 <p className="text-gray-600">
-                    {t('consent.subtitle', 'Please review the following information carefully.')}
+                    {t('consent.subtitle', 'Please read the following information carefully.')}
                 </p>
             </div>
 
@@ -184,7 +184,10 @@ const ConsentPage: React.FC = () => {
                             </label>
                             {errors.consent && (
                                 <p className="text-red-600 mt-2 text-sm">
-                                    {t('welcome.consent.error', 'Consent is required to proceed.')}
+                                    {t(
+                                        'welcome.consent.error',
+                                        'Please accept the terms to continue.'
+                                    )}
                                 </p>
                             )}
                         </div>

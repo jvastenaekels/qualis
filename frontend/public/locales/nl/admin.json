@@ -276,7 +276,7 @@
             "logout": "Uitloggen",
             "account": "Accountinstellingen",
             "admin_user": "Beheerder",
-            "platform_settings": "Platforminstellingen"
+            "platform_settings": "Gebruikers"
         },
         "account": {
             "title": "Accountinstellingen",
@@ -836,7 +836,6 @@
             "link_count": "Batchgrootte",
             "capacity_label": "Max. inzendingen",
             "generate_links": "Links aanmaken",
-            "no_links": "Nog geen wervingslinks aangemaakt.",
             "unnamed": "Naamloos kanaal",
             "revoked": "Toegang ingetrokken",
             "qr_title": "Delen via QR",
@@ -873,16 +872,6 @@
                 "public": "Ideaal voor grootschalige werving. Één URL voor alle deelnemers.",
                 "individual": "Maximale beveiliging. Genereert unieke links die verlopen na één succesvolle voltooiing.",
                 "limited": "Gecontroleerde toegang. Één link die stopt na een vast aantal inzendingen."
-            },
-            "stats": {
-                "total_links": "Totaal kanalen",
-                "active_channels": "Actieve wervingslots",
-                "started": "Totaal sessies",
-                "engagements": "Gestarte deelnemers",
-                "submitted": "Geldige data",
-                "completions": "Voltooide inzendingen",
-                "conversion": "Vastleggingspercentage",
-                "efficiency": "Uiteindelijke dataopbrengst"
             },
             "table": {
                 "name": "Campagne / lot",
@@ -930,12 +919,10 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Beheer",
             "dashboard": "Dashboard",
             "study_dashboard": "Overzicht",
             "design": "Opzet",
             "participants": "Deelnemers",
-            "team": "Team",
             "recruitment": "Toegang",
             "data": "Data",
             "privacy": "Gegevensprivacy",
@@ -960,7 +947,6 @@
             "no_studies": "Geen onderzoeken in dit project.",
             "open_dashboard": "Dashboard openen",
             "design_study": "Onderzoeksopzet",
-            "collaborators": "Medewerkers",
             "copy_link": "Openbare link kopiëren",
             "toggle_theme": "Thema wisselen",
             "logout": "Uitloggen",
@@ -1030,7 +1016,6 @@
             "alert_deadline": "{{study}}: sluit over {{days}} dagen met {{count}} deelnemers",
             "view": "Bekijken",
             "open_study": "Onderzoek openen",
-            "add_study": "Onderzoek toevoegen",
             "closes": "Sluit",
             "timeline": {
                 "title": "Inzendingtijdlijn",
@@ -1050,13 +1035,7 @@
             },
             "n_studies_help": "Totaal aantal onderzoeken in dit project, inclusief concepten en gesloten.",
             "n_active_help": "Onderzoeken die momenteel deelnemersinzendingen accepteren (status = actief).",
-            "n_participants_total_help": "Som van voltooide deelnemers over alle onderzoeken in dit project.",
-            "tool_help": {
-                "design": "Configureer het onderzoek: verdeelgrid, instructieomstandigheden, stellingen, toestemming.",
-                "recruit": "Wervingslinks, toegangsregels en URL-instellingen.",
-                "data": "Deelnemersantwoorden en exports (CSV, Q-sorteringsdumps).",
-                "analysis": "Factoranalyseconfiguratie en historische runs."
-            }
+            "n_participants_total_help": "Som van voltooide deelnemers over alle onderzoeken in dit project."
         },
         "export": {
             "config": "Configuratie exporteren",
@@ -1942,44 +1921,6 @@
                 "next": "Volgende pagina"
             }
         },
-        "team": {
-            "title": "Onderzoeksteam",
-            "description": "Beheer medewerkers en toegangsrechten op onderzoeksniveau.",
-            "invite_title": "Medewerker uitnodigen",
-            "invite_description": "Genereer een beveiligde link om een nieuw lid uit te nodigen voor dit onderzoek.",
-            "email_label": "E-mailadres",
-            "role_label": "Rol",
-            "select_role": "Selecteer een rol",
-            "generate_link": "Link genereren",
-            "invite_success": "Uitnodigingslink gegenereerd!",
-            "invite_error": "Uitnodiging genereren mislukt",
-            "copy_success": "Link gekopieerd naar klembord",
-            "share_label": "Deel deze link met de genodigde:",
-            "collab_overview": "Samenwerkingsoverzicht",
-            "active_members": "Actieve leden",
-            "permissions_info": "Rechtenoverzicht",
-            "list_title": "Onderzoeksteam",
-            "list_description": "Beheer toegang voor bestaande medewerkers.",
-            "added_on": "Toegevoegd op",
-            "headers": {
-                "collaborator": "Medewerker",
-                "role": "Rol",
-                "actions": "Acties"
-            },
-            "roles": {
-                "owner": "Eigenaar (volledige controle)",
-                "editor": "Redacteur (opzet & analyse)",
-                "viewer": "Kijker (alleen-lezen)",
-                "owner_badge": "EIGENAAR",
-                "editor_badge": "REDACTEUR",
-                "viewer_badge": "KIJKER"
-            },
-            "permissions": {
-                "owner": "Kan het onderzoek verwijderen en het team beheren.",
-                "editor": "Kan de opzet aanpassen en resultaten bekijken.",
-                "viewer": "Alleen-lezentoegang tot alle modules."
-            }
-        },
         "empty_states": {
             "participants": {
                 "title": "Klaar om te starten?",
@@ -1987,11 +1928,6 @@
                 "action": "Onderzoekslink kopiëren",
                 "hint": "Of scan de QR-code",
                 "copy_success": "Onderzoekslink gekopieerd naar klembord!"
-            },
-            "team": {
-                "title": "U werkt alleen",
-                "desc": "Nodig medewerkers uit om dit onderzoek te helpen beheren. Zij kunnen data bekijken, de opzet bewerken of gewoon meekijken.",
-                "action": "Uw eerste medewerker uitnodigen"
             },
             "designer": {
                 "title": "Tabula rasa",
@@ -2132,9 +2068,7 @@
                     "save_error": "Project bijwerken mislukt."
                 },
                 "team_growth_title": "Teambeheer",
-                "team_growth_desc": "Meer onderzoekers nodig? U kunt medewerkers uitnodigen voor uw project. Zij kunnen alle onderzoeken in dit project beheren.",
                 "team": {
-                    "title": "Teamleden",
                     "desc": "Lijst van gebruikers met toegang tot dit project.",
                     "col_user": "Gebruiker",
                     "col_role": "Rol",

@@ -184,7 +184,7 @@ export function AdminDashboard() {
                                 size="sm"
                             >
                                 <Upload className="mr-2 h-3.5 w-3.5" />
-                                {t('admin.dashboard.import_study', 'Import')}
+                                {t('admin.dashboard.import_study', 'Import study')}
                             </Button>
                         </div>
                     )}
@@ -305,7 +305,7 @@ export function AdminDashboard() {
                         </Button>
                         <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
                             <Upload className="mr-2 h-3.5 w-3.5" />
-                            {t('admin.dashboard.import_study', 'Import')}
+                            {t('admin.dashboard.import_study', 'Import study')}
                         </Button>
                     </div>
                 )}

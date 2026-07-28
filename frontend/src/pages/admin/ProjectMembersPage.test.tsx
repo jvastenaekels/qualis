@@ -155,10 +155,10 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
         const user = userEvent.setup();
         renderWithProviders(<ProjectMembersPage />);
 
-        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
+        await user.click(await screen.findByRole('button', { name: /invite member/i }));
 
-        const emailField = screen.getByRole('textbox', { name: /collaborator email/i });
-        await user.click(screen.getByText('Collaborator email'));
+        const emailField = screen.getByRole('textbox', { name: /member email/i });
+        await user.click(screen.getByText('Member email'));
         expect(emailField).toHaveFocus();
     });
 
@@ -166,7 +166,7 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
         const user = userEvent.setup();
         renderWithProviders(<ProjectMembersPage />);
 
-        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
+        await user.click(await screen.findByRole('button', { name: /invite member/i }));
 
         // The trigger's own content is the selected role's value ("Member");
         // pairing the Label overrides that with the field's purpose, per
@@ -182,7 +182,8 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
     it('does not repeat the page title as a card title (task 5.3)', () => {
         // `admin.members.title` and `admin.projects.settings.team.title` were both
         // "Team members", rendered ~120px apart with the same icon. The H1 stays;
-        // the card keeps only its descriptive sub-line.
+        // the card keeps only its descriptive sub-line. Task 5.1 then deleted the
+        // orphaned `…team.title` key outright, so only one now exists.
         renderWithProviders(<ProjectMembersPage />);
 
         expect(screen.getAllByText('Team members')).toHaveLength(1);
@@ -198,8 +199,8 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
         });
         renderWithProviders(<ProjectMembersPage />);
 
-        await user.click(await screen.findByRole('button', { name: /invite collaborator/i }));
-        await user.type(screen.getByRole('textbox', { name: /collaborator email/i }), 'x@y.io');
+        await user.click(await screen.findByRole('button', { name: /invite member/i }));
+        await user.type(screen.getByRole('textbox', { name: /member email/i }), 'x@y.io');
         await user.click(screen.getByRole('button', { name: /create & send invitation/i }));
 
         const copyButton = await screen.findByRole('button', { name: 'Copy link' });

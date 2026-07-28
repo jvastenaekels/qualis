@@ -262,7 +262,7 @@ const AccountSettingsPage = () => {
                                 >
                                     {isUpdating
                                         ? t('admin.account.personal.saving', 'Saving...')
-                                        : t('admin.account.personal.save', 'Save changes')}
+                                        : t('admin.account.personal.save', 'Save')}
                                 </Button>
                             </CardFooter>
                         </form>
@@ -382,7 +382,7 @@ const AccountSettingsPage = () => {
                                         >
                                             {t(
                                                 'admin.account.security.enter_code',
-                                                '2. Enter the 6-digit code'
+                                                'Enter 6-digit code'
                                             )}
                                         </Label>
                                         <div className="flex gap-3">
