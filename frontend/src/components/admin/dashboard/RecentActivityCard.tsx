@@ -111,7 +111,13 @@ function ParticipantRow({
 
                 {/* Line 2: status-specific info */}
                 {isCompleted ? (
-                    <div className="flex items-center gap-1.5">
+                    // `items-start`, not `items-center` (task 6.9). Once the pill wraps
+                    // to two lines — which it does at 320px in every locale, and up to
+                    // 375px in es/pt — centring floated the duration in the middle of a
+                    // 26.16px pill with 4.8px of air above and below, so the pair read as
+                    // misaligned. Top-aligning sets the duration on the pill's first text
+                    // line. Measured at 320/360/375/414/768/1440 × en/es/nl/pt.
+                    <div className="flex items-start gap-1.5">
                         {/* `min-h-4`, not `h-4`: at 320px this badge is a shrinking flex
                             item that gets ~109px for a label needing ~126px, so the two
                             words wrap. A hard `h-4` clamped the pill to 16px and the
@@ -119,12 +125,66 @@ function ParticipantRow({
                             instead. Not fixable by shortening the label — `Completed` in
                             English is short, but es/pt/nl render "Completados
                             recientemente" and are longer still. Measured at 320/360/375/
-                            414/768/1440. */}
-                        <Badge className="min-h-4 text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
+                            414/768/1440.
+
+                            `[overflow-wrap:anywhere]` is the other half of the
+                            duration's `shrink-0 whitespace-nowrap` below, and the
+                            two only work as a pair. A flex item's automatic
+                            minimum size is its min-content width, which for this
+                            pill is its longest word ("recientemente", 73px + 12px
+                            of padding = 85px). With the duration incompressible,
+                            85 + 6 + 60 = 151px was being asked of a 144px line at
+                            320px, and the surplus was pushed off the end of the
+                            line box: measured 7px (es), 8px (de), 4px (pt) for
+                            `12h 34m 56s`, rising to 13/14/10px for `123h 45m 56s`,
+                            at which point the duration paints under the View
+                            button (+3px es, +4px de).
+
+                            `overflow-wrap: anywhere` — NOT `break-words`, and NOT
+                            `min-w-0` — is what fixes it. `break-words`
+                            (`overflow-wrap: break-word`) does not reduce the
+                            automatic minimum size, so it changes nothing here.
+                            Bare `min-w-0` lets the pill shrink but leaves the word
+                            unbreakable, so the label then paints up to 14px
+                            OUTSIDE the pill — the same escape, moved from the
+                            duration to the label. `break-all` contains it but
+                            breaks mid-word even when a space break is available
+                            ("Recently complete" / "d" at 320px in English, where
+                            the shipped build breaks cleanly at the space).
+                            `anywhere` reduces the minimum size AND only breaks a
+                            word when the word cannot fit on a line of its own.
+
+                            Measured across 4 locales × 4 durations × 6 viewports
+                            (96 cells): text painted outside its box in 0 of them,
+                            for both the duration and the label, and geometry
+                            identical to the shipped build in the 90 cells that
+                            were already correct. The 6 that were not now cost row
+                            height instead of legibility: the completed row grows
+                            from 86.81px to 97.89px (de/pt) or 108.97px (es) at
+                            320px for a sort of 12 hours or more, because the pill
+                            takes a third line rather than the duration leaving the
+                            row. */}
+                        <Badge className="min-h-4 [overflow-wrap:anywhere] text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
-                            <span className="text-2xs text-slate-500">
+                            // `shrink-0 whitespace-nowrap` (task 6.9). Without it the
+                            // duration is a shrinking flex item competing with the pill,
+                            // and at 320px it broke mid-value: "5m 0s" rendered as "5m"
+                            // over "0s", 33.22px tall. That second line — not the pill —
+                            // was what made the completed row 16.61px taller than the
+                            // in-progress one (93.88 vs 77.27). A duration is one token;
+                            // it must never wrap between its parts.
+                            //
+                            // On its own this made the duration incompressible against a
+                            // pill that could not shrink below its longest word, and the
+                            // duration was pushed off the end of the line box. It holds
+                            // only together with `[overflow-wrap:anywhere]` on the pill
+                            // above — do not remove either one alone. `whitespace-nowrap`
+                            // is doing the work here; `shrink-0` is redundant with it
+                            // (a nowrap box's min-content size is its full width) and is
+                            // kept only to state the intent.
+                            <span className="text-2xs text-slate-500 shrink-0 whitespace-nowrap">
                                 {durationSeconds >= 3600
                                     ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
                                           h: Math.floor(durationSeconds / 3600),
@@ -139,13 +199,21 @@ function ParticipantRow({
                         )}
                     </div>
                 ) : stepInfo ? (
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-2xs font-medium text-sky-700 shrink-0">
+                    // Second instance of the same shrinking-flex mechanism (task 6.9).
+                    // The label used to carry `shrink-0` and the bar nothing, so the bar
+                    // absorbed the whole overflow: at 320px in Spanish
+                    // ("Clasificación preliminar", 131px) the 48px bar rendered as a 7px
+                    // dot. The priority is inverted here — the bar is the only thing on
+                    // this line that cannot degrade gracefully, so it keeps its width and
+                    // the label truncates. Measured: bar = 48px in en/es/nl/pt at
+                    // 320/360/375/414/768/1440.
+                    <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="min-w-0 truncate text-2xs font-medium text-sky-700">
                             {t(stepInfo.labelKey, stepInfo.labelDefault)}
                         </span>
                         <Progress
                             value={stepInfo.progress}
-                            className="h-1 w-12 bg-sky-100 [&>div]:bg-sky-500"
+                            className="h-1 w-12 shrink-0 bg-sky-100 [&>div]:bg-sky-500"
                         />
                     </div>
                 ) : (

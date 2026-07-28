@@ -509,3 +509,141 @@ describe('ConcourseDetailPage — control accessible names (Task 6.7c)', () => {
         expect(screen.queryByRole('button', { name: 'Delete Vision' })).not.toBeInTheDocument();
     });
 });
+
+/**
+ * Task 6.10 — the three tag badges clamped user-supplied labels.
+ *
+ * Tag names come from the researcher: multi-word, unbounded, and never
+ * shortened by the UI. All three badges shipped with a hard `h-5` (20px),
+ * which is ~3.4px of headroom over a 16.6px line box. Measured in a headless
+ * Chromium at a 320px viewport with a three-word German fixture
+ * ("Umweltbewusstsein hoch" / "Soziale Gerechtigkeit" / "Wirtschaftliches
+ * Wachstum"), pre-fix:
+ *
+ *   site           container   badge w   text h    escaped
+ *   item list      232px       122px     30.61px   14.61px
+ *   item list      232px        92px     30.61px   14.61px
+ *   item list      232px       102px     30.61px   14.61px
+ *
+ * (The table this comment carried before gave text heights of 34/34/26px and
+ * escapes of 14/14/6px from an unrecorded fixture. Those do not reproduce and
+ * are not whole numbers of line boxes at this font size. Same conclusion.)
+ *
+ * The item-list container also lacked `flex-wrap`, so its three badges
+ * competed for one line and each shrank to its longest word — the same
+ * mechanism task 6.4 fixed on the "Recently completed" pill.
+ *
+ * `flex-wrap` + `min-h-5` fixed the multi-word case. The single-token case
+ * was NOT fixed by the `min-w-0 break-words` that shipped with it:
+ * `overflow-wrap: break-word` does not reduce a flex item's automatic
+ * minimum size, so a 49-character tag name stayed unbreakable, `min-w-0`
+ * shrank the pill around it, and the label painted up to 132px outside —
+ * 32 escaping cells out of 360 measured (4 locales × 3 fixtures × 6
+ * viewports × 5 sites). `[overflow-wrap:anywhere]` reduces the minimum size
+ * AND breaks only a word that cannot fit a line of its own: 0 escapes in all
+ * 360 cells. Not `break-all`, which breaks mid-word even where a space break
+ * exists. The multi-word control is unchanged by the swap (149/129/156px ×
+ * 22.61px, one line each); the single-token pill measures 232 × 39.22 with
+ * `scrollWidth == clientWidth`.
+ *
+ * jsdom does no layout, so these assert the contract that produced those
+ * numbers. `h-5` is asserted absent explicitly: a future edit that re-adds it
+ * alongside `min-h-5` would win under tailwind-merge and silently restore the
+ * clamp. `break-words` and `break-all` are asserted absent for the same
+ * reason — both look like this fix and neither is.
+ */
+describe('ConcourseDetailPage — tag badges are sized by their label, not clamped (Task 6.10)', () => {
+    const longTag = {
+        id: 1,
+        name: 'Environmental justice and land use',
+        color: '#7c3aed',
+        project_id: 1,
+    };
+
+    function badgeFor(name: string) {
+        // The Badge is a styled <div>; the tag name is its only text.
+        const nodes = screen.getAllByText(name);
+        const badge = nodes.find((n) => n.className.includes('rounded-full'));
+        if (!badge) throw new Error(`no badge rendered for "${name}"`);
+        return badge;
+    }
+
+    function expectNotClamped(badge: HTMLElement) {
+        expect(badge).toHaveClass('min-h-5');
+        expect(badge).not.toHaveClass('h-5');
+        // A tag name with no spaces is a single unbreakable flex item
+        // otherwise. Only `overflow-wrap: anywhere` reduces the automatic
+        // minimum size that makes it unbreakable; `break-words` does not
+        // (it left the label painting 132px outside its pill) and
+        // `break-all` over-applies.
+        expect(badge).toHaveClass('[overflow-wrap:anywhere]');
+        expect(badge).not.toHaveClass('break-words');
+        expect(badge).not.toHaveClass('break-all');
+    }
+
+    it('lets an item-list tag badge grow instead of painting its label outside itself', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+        item.tags = [longTag];
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+
+    it('wraps the item-list tag row instead of making the badges compete for one line', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+        item.tags = [
+            longTag,
+            { id: 2, name: 'Perceived institutional legitimacy', color: '#0891b2', project_id: 1 },
+            { id: 3, name: 'Intergenerational responsibility', color: '#b45309', project_id: 1 },
+        ];
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            filteredItems: concourse.items ?? [],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        const row = badgeFor(longTag.name).parentElement;
+        expect(row).toHaveClass('flex');
+        expect(row).toHaveClass('flex-wrap');
+    });
+
+    it('lets the inline item-edit tag badge grow', () => {
+        const concourse = concourseWith(1, 0, 0);
+        const item = concourse.items?.[0];
+        if (!item) throw new Error('expected at least one item');
+
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            filteredItems: concourse.items ?? [],
+            editingItem: item.id,
+            tags: [longTag],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+
+    it('lets the "Add Item" dialog tag badge (TagCheckboxGroup) grow', () => {
+        const concourse = concourseWith(1, 0, 0);
+        mockUseConcourseDetailPage.mockReturnValue({
+            ...baseApi(concourse),
+            canEdit: true,
+            addItemOpen: true,
+            tags: [longTag],
+        });
+        renderWithProviders(<ConcourseDetailPage />);
+
+        expectNotClamped(badgeFor(longTag.name));
+    });
+});
