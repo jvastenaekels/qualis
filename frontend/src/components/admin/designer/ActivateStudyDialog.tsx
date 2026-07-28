@@ -186,11 +186,7 @@ export function ActivateStudyDialog({
                     >
                         {t('common.cancel', 'Cancel')}
                     </Button>
-                    <Button
-                        onClick={handleConfirm}
-                        disabled={!canConfirm}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                    >
+                    <Button onClick={handleConfirm} disabled={!canConfirm}>
                         {isActivating ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (

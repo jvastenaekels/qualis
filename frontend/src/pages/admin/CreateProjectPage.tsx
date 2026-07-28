@@ -189,7 +189,7 @@ export default function CreateProjectPage() {
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="h-11 rounded-xl px-8 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm border-none"
+                                        className="h-11 rounded-xl px-8 font-black shadow-sm border-none"
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting ? (

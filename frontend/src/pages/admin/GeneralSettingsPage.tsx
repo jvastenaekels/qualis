@@ -374,7 +374,7 @@ export default function GeneralSettingsPage() {
                                 <Button
                                     onClick={handleSaveQuota}
                                     disabled={isSavingQuota || isArchived}
-                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                    className="rounded-xl px-6 font-black active:scale-[0.98] transition-all shadow-sm"
                                 >
                                     {isSavingQuota ? (
                                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -433,7 +433,7 @@ export default function GeneralSettingsPage() {
                             <Button
                                 onClick={handleSaveRetention}
                                 disabled={isSavingRetention || isArchived}
-                                className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                className="rounded-xl px-6 font-black active:scale-[0.98] transition-all shadow-sm"
                             >
                                 {isSavingRetention ? (
                                     <Loader2 className="w-4 h-4 animate-spin mr-2" />

@@ -38,7 +38,7 @@ import {
 import type { BulkAnonymiseResult } from '@/api/model';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
     AlertDialog,
@@ -632,7 +632,8 @@ export default function DataPrivacyPage() {
                         <Button
                             disabled={candidateCount === 0 || anonymiseMutation.isPending}
                             onClick={() => setConfirmOpen(true)}
-                            className="rounded-xl px-6 font-black bg-amber-500 hover:bg-amber-600 text-white active:scale-[0.98] transition-all shadow-sm disabled:opacity-50"
+                            variant="warning"
+                            className="rounded-xl px-6 font-black active:scale-[0.98] transition-all shadow-sm disabled:opacity-50"
                         >
                             {anonymiseMutation.isPending ? (
                                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -688,7 +689,7 @@ export default function DataPrivacyPage() {
                                     },
                                 })
                             }
-                            className="bg-amber-500 hover:bg-amber-600"
+                            className={buttonVariants({ variant: 'warning' })}
                         >
                             {anonymiseMutation.isPending
                                 ? t('admin.privacy.confirm_in_progress', 'Anonymising…')

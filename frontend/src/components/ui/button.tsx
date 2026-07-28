@@ -9,7 +9,23 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
+                // The single primary fill for the whole product (task 4.1).
+                // Written as literal indigo rather than `bg-primary` so the
+                // invariant is greppable and testable: `--primary` is the
+                // near-black slate token, which is what produced the two-colour
+                // split (an indigo hand-rolled button next to a black
+                // `<Button>` default) this variant exists to end.
+                // white on indigo-600 = 6.29:1, on indigo-700 = 7.90:1 (AA).
+                default: 'bg-indigo-600 text-white shadow hover:bg-indigo-700',
+                // Warning / destructive-adjacent: design-lock and retention
+                // actions only. Measured against a white page:
+                //   rest  amber-600 fill 3.19:1 vs white (1.4.11 ≥3), label
+                //         slate-900 on amber-600 5.60:1 (1.4.3 ≥4.5)
+                //   hover amber-700 fill 5.02:1, label white on amber-700 5.02:1
+                // The amber-500 + white it replaces measured 2.15:1 on both
+                // counts and failed AA outright.
+                warning:
+                    'bg-amber-600 text-slate-900 shadow-sm hover:bg-amber-700 hover:text-white',
                 destructive:
                     'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
                 outline:

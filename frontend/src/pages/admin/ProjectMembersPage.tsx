@@ -495,7 +495,7 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button
-                    className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/20 border-none"
+                    className="w-full h-11 rounded-xl font-bold shadow-lg shadow-indigo-500/20 border-none"
                     disabled={!isOwner}
                 >
                     <UserPlus className="size-4 mr-2" />
@@ -565,7 +565,7 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                             <DialogFooter className="pt-2">
                                 <Button
                                     type="submit"
-                                    className="w-full h-11 rounded-xl bg-slate-900 font-bold"
+                                    className="w-full h-11 rounded-xl font-bold"
                                     disabled={inviteMutation.isPending}
                                 >
                                     {inviteMutation.isPending ? (

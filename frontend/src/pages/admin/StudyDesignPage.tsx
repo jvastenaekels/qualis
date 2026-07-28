@@ -536,9 +536,9 @@ const StudyDesignPage = () => {
                             </Button>
                             {draft.state === 'active' && (
                                 <Button
-                                    variant="default"
+                                    variant="warning"
                                     disabled={api.isSwitchingToDraft}
-                                    className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-amber-200 bg-amber-500 hover:bg-amber-600 text-white"
+                                    className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-amber-200"
                                     onClick={api.handleSwitchToDraft}
                                 >
                                     {api.isSwitchingToDraft && (
@@ -950,7 +950,7 @@ const StudyDesignPage = () => {
                                             api.isFullyReadOnly ||
                                             !api.isLaunchReady
                                         }
-                                        className="gap-2 h-12 px-8 rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 transition-all"
+                                        className="gap-2 h-12 px-8 rounded-xl font-black shadow-xl shadow-indigo-200 transition-all"
                                         data-testid="activate-button"
                                     >
                                         <Rocket className="h-5 w-5" />

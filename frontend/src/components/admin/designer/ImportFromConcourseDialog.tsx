@@ -339,10 +339,10 @@ export function ImportFromConcourseDialog({
                         onClick={handleImport}
                         disabled={selectedItemIds.size === 0 || importMutation.isPending}
                         className={cn(
-                            'h-10 rounded-xl px-6 font-bold text-white',
-                            replaceExisting
-                                ? 'bg-red-600 hover:bg-red-700'
-                                : 'bg-indigo-600 hover:bg-indigo-700'
+                            'h-10 rounded-xl px-6 font-bold',
+                            // Destructive branch only; the non-destructive branch
+                            // inherits the single primary fill from the default variant.
+                            replaceExisting && 'bg-red-600 text-white hover:bg-red-700'
                         )}
                     >
                         {importMutation.isPending ? (

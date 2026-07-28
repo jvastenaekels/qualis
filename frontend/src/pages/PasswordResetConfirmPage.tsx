@@ -105,7 +105,7 @@ export default function PasswordResetConfirmPage() {
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-slate-900 text-white py-2 rounded disabled:opacity-50"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded disabled:opacity-50"
                 >
                     {t('auth.password_reset.confirm_submit', 'Reset password')}
                 </button>

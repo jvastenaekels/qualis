@@ -256,7 +256,7 @@ export default function ConcourseDetailPage() {
                         {canEdit && (
                             <Button
                                 size="sm"
-                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                className="rounded-xl"
                                 onClick={openAddItemDialog}
                                 aria-label={t('admin.concourse.add_item', 'Add item')}
                             >
@@ -1430,7 +1430,7 @@ export default function ConcourseDetailPage() {
                                 (!activeLocale && !newItemLocale) ||
                                 isCreatingItem
                             }
-                            className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="h-10 rounded-xl px-6 font-bold"
                         >
                             {isCreatingItem ? (
                                 <Loader2 className="size-4 animate-spin mr-2" />
@@ -1475,7 +1475,7 @@ export default function ConcourseDetailPage() {
                             {t('common.cancel', 'Cancel')}
                         </Button>
                         <Button
-                            className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="rounded-xl"
                             disabled={bulkActionPending}
                             onClick={async () => {
                                 if (bulkConfirm) {
@@ -1705,7 +1705,7 @@ export default function ConcourseDetailPage() {
                         <Button
                             onClick={handleImport}
                             disabled={!importText.trim() || isImporting}
-                            className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="h-10 rounded-xl px-6 font-bold"
                         >
                             {isImporting ? (
                                 <Loader2 className="size-4 animate-spin mr-2" />
@@ -1747,7 +1747,7 @@ export default function ConcourseDetailPage() {
                             />
                             <Button
                                 size="sm"
-                                className="h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                className="h-9 rounded-xl"
                                 disabled={!newTagName.trim() || isCreatingTag}
                                 onClick={handleCreateTag}
                                 aria-label={t('admin.concourse.create_tag', 'Create tag')}
@@ -1869,7 +1869,7 @@ export default function ConcourseDetailPage() {
                         <Button
                             onClick={confirmAddLanguage}
                             disabled={!newLangCode}
-                            className="h-10 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="h-10 rounded-xl px-6 font-bold"
                         >
                             {t('common.add', 'Add')}
                         </Button>

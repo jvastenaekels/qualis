@@ -208,7 +208,7 @@ export default function ProjectSettingsPage() {
                                     <div className="flex justify-end pt-2">
                                         <Button
                                             type="submit"
-                                            className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                            className="h-11 rounded-xl px-6 font-bold shadow-sm"
                                             disabled={updateProjectMutation.isPending}
                                         >
                                             {updateProjectMutation.isPending ? (

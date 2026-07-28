@@ -71,7 +71,10 @@ export default function PasswordResetRequestPage() {
                     placeholder="name@example.com"
                     autoComplete="email"
                 />
-                <button type="submit" className="w-full bg-slate-900 text-white py-2 rounded">
+                <button
+                    type="submit"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
+                >
                     {t('auth.password_reset.request_submit', 'Send reset link')}
                 </button>
             </form>

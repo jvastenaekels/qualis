@@ -250,7 +250,7 @@ function ParticipantRow({
             <Button
                 variant="default"
                 size="icon"
-                className="h-7 w-7 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shrink-0 rounded-lg"
+                className="h-7 w-7 shadow-sm shrink-0 rounded-lg"
                 onClick={onView}
                 aria-label={t('admin.study_overview.view_data', 'View')}
             >

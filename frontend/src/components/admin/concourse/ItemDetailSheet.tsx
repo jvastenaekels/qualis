@@ -157,7 +157,7 @@ export function ItemDetailSheet({
                             />
                             <Button
                                 size="sm"
-                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                className="rounded-xl"
                                 disabled={!newComment.trim() || createCommentMutation.isPending}
                                 onClick={handleAddComment}
                             >

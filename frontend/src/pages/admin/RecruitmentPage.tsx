@@ -332,7 +332,7 @@ const RecruitmentPage = () => {
                                         slugForm.formState.isSubmitting ||
                                         !slugForm.formState.isDirty
                                     }
-                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                    className="rounded-xl px-6 font-black active:scale-[0.98] transition-all shadow-sm"
                                 >
                                     {slugForm.formState.isSubmitting ? (
                                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -607,7 +607,7 @@ const RecruitmentPage = () => {
                                     accessForm.formState.isSubmitting ||
                                     !accessForm.formState.isDirty
                                 }
-                                className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                className="rounded-xl px-6 font-black active:scale-[0.98] transition-all shadow-sm"
                             >
                                 {accessForm.formState.isSubmitting ? (
                                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -638,10 +638,7 @@ const RecruitmentPage = () => {
                                 onOpenChange={handleCreateModalOpenChange}
                             >
                                 <DialogTrigger asChild>
-                                    <Button
-                                        size="sm"
-                                        className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold rounded-xl"
-                                    >
+                                    <Button size="sm" className="shadow-sm font-bold rounded-xl">
                                         <Plus className="h-4 w-4 mr-1.5" />
                                         {t('admin.recruitment.new_link', 'New access link')}
                                     </Button>
@@ -805,7 +802,7 @@ const RecruitmentPage = () => {
                                         <Button
                                             onClick={handleCreate}
                                             disabled={isCreatingLink}
-                                            className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
+                                            className="font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
                                         >
                                             {isCreatingLink
                                                 ? t('admin.recruitment.generating', 'Generating...')

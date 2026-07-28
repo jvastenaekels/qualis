@@ -258,7 +258,7 @@ const AccountSettingsPage = () => {
                                 <Button
                                     type="submit"
                                     disabled={isUpdating}
-                                    className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                    className="h-11 rounded-xl px-6 font-bold shadow-sm"
                                 >
                                     {isUpdating
                                         ? t('admin.account.personal.saving', 'Saving...')
@@ -298,7 +298,7 @@ const AccountSettingsPage = () => {
                             {!user?.is_totp_enabled && !is2FASetupMode && (
                                 <Button
                                     onClick={() => setIs2FASetupMode(true)}
-                                    className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                    className="h-11 rounded-xl px-6 font-bold shadow-sm"
                                 >
                                     {t('admin.account.security.setup_cta', 'Set up 2FA now')}
                                 </Button>
@@ -395,7 +395,7 @@ const AccountSettingsPage = () => {
                                                 onChange={(e) => setTotpToken(e.target.value)}
                                             />
                                             <Button
-                                                className="h-12 px-8 bg-indigo-600 hover:bg-indigo-700 font-bold"
+                                                className="h-12 px-8 font-bold"
                                                 disabled={
                                                     totpToken.length !== 6 ||
                                                     enableMutation.isPending
@@ -541,7 +541,7 @@ const AccountSettingsPage = () => {
                                         <Button
                                             type="submit"
                                             disabled={isChangingPassword}
-                                            className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                            className="h-11 rounded-xl px-6 font-bold shadow-sm"
                                         >
                                             {isChangingPassword
                                                 ? t(

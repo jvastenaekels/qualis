@@ -294,7 +294,7 @@ const RegistrationPage = () => {
                         <CardFooter className="pt-2">
                             <Button
                                 type="submit"
-                                className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20"
+                                className="w-full h-12 text-lg font-bold shadow-lg shadow-indigo-500/20"
                                 disabled={registerMutation.isPending}
                             >
                                 {registerMutation.isPending ? (
