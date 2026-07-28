@@ -1057,6 +1057,42 @@ git add frontend/src
 git commit -m "refactor(admin): route every date through one 24-hour, locale-aware formatter"
 ```
 
+### Task 4.4: The English the i18n gate cannot see
+
+**Added during execution, from task 4.2's review.** This is a gap in the instrument rather
+than one more defect in the list, which is why it earned its own task instead of a line in
+4.2's report.
+
+**The defect:** `check_i18n.py` compares locale files **against each other**, so a key that
+exists in none of them is, to that tool, perfectly in sync. Re-derived count: **44 keys
+across 49 call sites** (not the 38/33 first reported — plural stems, `t(` inside comments,
+and participant-namespace scope each moved the number).
+
+**The finding nobody was looking for:** 11 of those sites pass no fallback, or use
+`t('key') || 'Fallback'` — an idiom that never fires, because i18next returns the truthy
+key itself on a miss. Those rendered the **raw dotted key** to users: a destructive confirm
+button labelled `common.confirm_delete`, and the whole access-denied alert in
+`RequireAdmin`. `e2e/admin/roles.spec.ts:212` carried a comment routing an assertion around
+one of them; the workaround had outlived the memory of what it worked around.
+
+**Outcome** (PR #342): 14 keys added to `en/admin.json` with each fallback verbatim, 2
+repointed to correct siblings, 6 moved from the participant namespace to `admin.*`. Zero
+dead keys, zero deliberate. **20 keys deferred and declared** — participant-namespace,
+whose parity is strict, so closing them honestly needs nine real translations rather than a
+machine pass.
+
+**Follow-up this opened:** `study.access.*` — the entire participant password gate, four
+keys, untranslated in **every** locale. Participant-facing; needs its own task.
+
+**The gate:** `frontend/scripts/check_orphan_keys.py`, wired into `package.json`, the
+`Makefile` `check` target and `ci.yml`. It prints its own coverage on every run, `✓` for
+what it inspects and `✗` for what it cannot — including the `file:line` list of all 17
+call sites whose key is only known at runtime. Its sole escape hatch (`DEFERRED`) is
+printed every run with reasons and live call sites. Verified adversarially: injecting one
+orphan key exits **1**, removing it exits **0**.
+
+- [x] Complete — PR #342
+
 ---
 
 # PHASE 5 — Vocabulary and naming canon
