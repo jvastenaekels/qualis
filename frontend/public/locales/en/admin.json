@@ -19,7 +19,8 @@
             "two_factor_app_prompt": "Enter the 6-digit code from your authenticator app.",
             "two_factor_submit": "Verify",
             "two_factor_invalid": "Invalid code. Try again.",
-            "lost_2fa_link": "Lost access to your 2FA?"
+            "lost_2fa_link": "Lost access to your 2FA?",
+            "back_to_home": "Back to home"
         },
         "twofa": {
             "recovery": {
@@ -485,7 +486,9 @@
             "status_for": "Status for {{code}}",
             "create_tag": "Create tag",
             "delete_tag": "Delete {{tag}}",
-            "cancel_delete_tag": "Cancel deleting {{tag}}"
+            "cancel_delete_tag": "Cancel deleting {{tag}}",
+            "viewer_empty_state": "No concourse yet. Ask the project owner or a member to create one.",
+            "retry": "Retry"
         },
         "concourse_import": {
             "title": "Import from concourse",
@@ -657,7 +660,8 @@
                 "deleted": "Analysis run deleted.",
                 "delete_error": "Failed to delete the run.",
                 "viewing_banner": "Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
-                "back_to_current": "Back to current"
+                "back_to_current": "Back to current",
+                "run_label": "Run #{{id}}"
             },
             "factor_voices": {
                 "title": "Voices on Factor {{n}}",
@@ -747,7 +751,8 @@
                 "delta_z_aria": "Δz {{delta}} vs compare run",
                 "delta_loading_aria": "Δloading {{delta}} vs compare run"
             },
-            "quote_insert_format": "> {{text}}\n> {{p}}, on statement {{code}}: \"{{stmt}}\""
+            "quote_insert_format": "> {{text}}\n> {{p}}, on statement {{code}}: \"{{stmt}}\"",
+            "loading_run": "Loading run…"
         },
         "project": {
             "remove_member": "Remove member",
@@ -906,7 +911,10 @@
                 "revoked": "Link revoked",
                 "revoke_failed": "Could not revoke this link. It may already be in use.",
                 "copied": "Copied to clipboard"
-            }
+            },
+            "copied": "Copied",
+            "copy_url": "Copy URL",
+            "generating": "Generating..."
         },
         "analytics": {
             "charts": {
@@ -1136,7 +1144,9 @@
                     "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{url}}",
                     "external_logo": "Logo URL references external resource - may not be accessible"
                 }
-            }
+            },
+            "error": "Could not import configuration. See details below and retry.",
+            "invalid_type": "Invalid file type. Please upload a JSON file."
         },
         "dialogs": {
             "create_study": {
@@ -1157,7 +1167,8 @@
         "validation": {
             "required": "Required",
             "slug_min": "Slug must be at least 3 characters",
-            "slug_regex": "Slug must contain only lowercase letters, numbers, and hyphens"
+            "slug_regex": "Slug must contain only lowercase letters, numbers, and hyphens",
+            "language_required": "Select at least one language"
         },
         "study_overview": {
             "title": "Overview",
@@ -1390,7 +1401,8 @@
                         "title": "Step title",
                         "description": "Short description",
                         "icon": "Icon",
-                        "toggle": "Toggle"
+                        "toggle": "Toggle",
+                        "color": "Color"
                     },
                     "defaults": {
                         "new_step": "New study step",
@@ -1810,7 +1822,8 @@
                 "clear_all": "Reset all data",
                 "clear_all_confirm": "DANGER: This will permanently delete ALL participant data for this study. This cannot be undone.",
                 "clear_all_success": "All data cleared",
-                "clear_all_error": "Could not clear data. Check your permissions and try again."
+                "clear_all_error": "Could not clear data. Check your permissions and try again.",
+                "confirm_delete": "Delete"
             },
             "confirm_discard": {
                 "title": "Discard participant?",
@@ -2182,7 +2195,9 @@
                         "copy_link": "Copy link",
                         "copied": "Copied"
                     },
-                    "role_for": "Role for {{name}}"
+                    "role_for": "Role for {{name}}",
+                    "role_update_success": "Role updated",
+                    "role_update_error": "Could not update role. Please try again."
                 }
             }
         },
@@ -2214,7 +2229,8 @@
                 "no_comment": "No comment provided.",
                 "select_instruction": "Select a card on the grid to view details.",
                 "read_only_mode": "Viewer mode",
-                "score": "Score"
+                "score": "Score",
+                "no_response": "No response provided."
             },
             "metadata": {
                 "title": "Session metadata",
@@ -2231,7 +2247,8 @@
                     "mobile": "Mobile",
                     "tablet": "Tablet",
                     "desktop": "Desktop"
-                }
+                },
+                "recruitment_link": "Recruitment link"
             },
             "status": {
                 "started": "Started",
@@ -2250,8 +2267,10 @@
                     "questions": "Questionnaire responses",
                     "comments": "Card comments",
                     "feedback": "General feedback"
-                }
-            }
+                },
+                "audio_recordings": "Audio recordings"
+            },
+            "previous": "Previous"
         },
         "users": {
             "title": "Users",
@@ -2334,7 +2353,17 @@
             "recording": "Audio recording",
             "play": "Play audio",
             "pause": "Pause audio",
-            "seek": "Seek audio position"
+            "seek": "Seek audio position",
+            "file_size": "File size"
+        },
+        "sync": {
+            "saving": "Saving..."
+        },
+        "errors": {
+            "access_denied": {
+                "title": "Access denied",
+                "message": "You do not have access to the researcher area. Ask a project owner to add you to a project."
+            }
         }
     }
 }

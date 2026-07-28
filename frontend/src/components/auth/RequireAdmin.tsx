@@ -50,8 +50,8 @@ const RequireAdmin = () => {
             <div className="flex h-screen w-full items-center justify-center p-4">
                 <Alert variant="destructive" className="max-w-md">
                     <ShieldAlert className="h-4 w-4" />
-                    <AlertTitle>{t('common.errors.access_denied.title')}</AlertTitle>
-                    <AlertDescription>{t('common.errors.access_denied.message')}</AlertDescription>
+                    <AlertTitle>{t('admin.errors.access_denied.title')}</AlertTitle>
+                    <AlertDescription>{t('admin.errors.access_denied.message')}</AlertDescription>
                 </Alert>
             </div>
         );

@@ -267,7 +267,7 @@ export default function ParticipantDetailsPage() {
                                 size="icon"
                                 disabled={prevId === null}
                                 onClick={() => navigate(`${baseUrl}/participants/${prevId}`)}
-                                aria-label={t('common.previous', 'Previous')}
+                                aria-label={t('admin.participant.previous', 'Previous')}
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </Button>

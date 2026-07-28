@@ -209,8 +209,8 @@ test.describe('owner can manage team', () => {
         await memberRow.getByRole('combobox').click();
         await page.getByRole('option', { name: /^viewer$/i }).click();
 
-        // Re-read row and assert new value (the role_update_success toast key
-        // has no en translation yet, so we don't wait for the toast string).
+        // Re-read row and assert new value. The role_update_success toast now
+        // has an en string, but asserting on the row is the stabler signal.
         await expect(memberRow.getByRole('combobox')).toContainText(/viewer/i);
     });
 

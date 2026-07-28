@@ -481,7 +481,7 @@ export function useStudyDesignPage(): StudyDesignPageApi {
                 params: { new_state: 'active' },
             });
 
-            toast.success(t('admin.study.state_changed_active') || 'Study is now active!');
+            toast.success(t('admin.study_status.notifications.state_changed_active'));
             window.location.reload();
         } catch (error) {
             toast.error(

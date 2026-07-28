@@ -122,7 +122,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                                                 className="bg-indigo-100 text-indigo-700 border-none"
                                             >
                                                 <Check className="h-3 w-3 mr-1" />{' '}
-                                                {t('common.active', 'Active')}
+                                                {t('admin.status.active', 'Active')}
                                             </Badge>
                                         </div>
                                     ) : (
