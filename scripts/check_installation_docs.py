@@ -68,12 +68,22 @@ def check_readme_demo_path() -> list[str]:
 def check_readme_demo_guidance() -> list[str]:
     readme = _read("README.md")
     errors: list[str] = []
-    start_link = readme.find("[Start Qualis locally with Docker](#quick-start-docker)")
+    # The Docker quick start must BE before the long overview, not merely be
+    # linked to from above it. The previous version of this check accepted a
+    # pointer at the top of the page while the section itself sat 137 lines
+    # down, behind the statement of need, the comparison table and the full
+    # feature catalogue — which is the arrangement it was written to prevent.
+    quick_start = readme.find("## Quick start (Docker)")
     statement_of_need = readme.find("## Statement of need")
 
-    if start_link == -1 or statement_of_need == -1 or start_link > statement_of_need:
+    if quick_start == -1:
+        errors.append("README.md has no '## Quick start (Docker)' section")
+    elif statement_of_need == -1:
+        errors.append("README.md has no '## Statement of need' section")
+    elif quick_start > statement_of_need:
         errors.append(
-            "README.md does not expose the Docker quick start before the long overview"
+            "README.md buries the Docker quick start below the long overview — "
+            "it must come first, since it is how Qualis is run"
         )
 
     for token in (
