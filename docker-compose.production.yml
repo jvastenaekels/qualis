@@ -18,7 +18,11 @@ services:
       # /var/lib/postgresql/data and is NOT readable through this mount.
       - qualis-pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U qualis -d qualis"]
+      # A real connection as the app's own role, not `pg_isready` — see the
+      # note in docker-compose.yml: `pg_isready` returns 0 for a role that does
+      # not exist, so it cannot tell a healthy database from one the app has no
+      # account on.
+      test: ["CMD-SHELL", "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'select 1' >/dev/null"]
       interval: 5s
       timeout: 3s
       retries: 12
