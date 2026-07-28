@@ -1436,8 +1436,17 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                         // Both dimmed values are under the 4.5:1
                                                         // floor for text; `forced` is the
                                                         // selected card, so it sits on
-                                                        // bg-indigo-50/60 (#f8faff) rather than
-                                                        // white and is the worse of the two.
+                                                        // bg-indigo-50/60 rather than white and
+                                                        // is the worse of the two. That surface
+                                                        // composites to #f5f7ff, read off the
+                                                        // raster; this comment previously said
+                                                        // #f8faff, which is what the same pixel
+                                                        // measured under the `opacity-60` this
+                                                        // commit removed — the dimmed value, not
+                                                        // the undimmed one. Under `grayscale` it
+                                                        // reads #f7f7f7. The contrast figures
+                                                        // above are unaffected.
+                                                        //
                                                         // A filter applies to foreground and
                                                         // background as a group, so unlike
                                                         // opacity it leaves the ratio within
@@ -1446,13 +1455,27 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                         // Deliberately NOT the full
                                                         // `bg-slate-50 + grayscale` pairing used
                                                         // for the discarded rows in
-                                                        // InteractiveDataView: forcing one
-                                                        // surface on all three cards would erase
-                                                        // the selected/unselected distinction,
-                                                        // which is the only thing this control
-                                                        // still says once it is read-only.
-                                                        // Draining the selected card's indigo is
-                                                        // enough to make the group read as inert.
+                                                        // InteractiveDataView — but not, as this
+                                                        // comment used to claim, because a shared
+                                                        // surface would erase the selected/
+                                                        // unselected distinction. It would not:
+                                                        // that distinction is carried by the
+                                                        // border and the 2px ring, neither of
+                                                        // which a background token touches, and
+                                                        // measured under grayscale the contrast
+                                                        // between the selected and unselected
+                                                        // borders is 4.06:1 — up from 3.62:1
+                                                        // undimmed, and up from 2.05:1 under the
+                                                        // old opacity. The precedent would have
+                                                        // been safe.
+                                                        //
+                                                        // The real reason is narrower: `grayscale`
+                                                        // alone already clears the 4.5:1 floor at
+                                                        // every card, so `bg-slate-50` would be a
+                                                        // second visual change buying no measured
+                                                        // contrast. This is the more conservative
+                                                        // of the two options, not the only safe
+                                                        // one.
                                                         readOnly && 'grayscale cursor-not-allowed'
                                                     )}
                                                 >
