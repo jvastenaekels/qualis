@@ -1,4 +1,4 @@
-import { areStudiesEqual } from '@/store/useStudyDesigner';
+import { areStudiesEqual, type SyncStatus } from '@/store/useStudyDesigner';
 import type { StudyUpdate } from '@/api/model';
 import { mergeStudyUpdates, type MergeStudyResult } from '@/utils/mergeStudy';
 
@@ -51,4 +51,35 @@ export function isDraftInSync(
         return areStudiesEqual(draft, JSON.parse(lastSavedDraftJson) as StudyUpdate);
     }
     return false;
+}
+
+/**
+ * True when the draft holds work that is not safely on the server yet, so the
+ * unload guard, the navigation blocker and the localStorage backup should all
+ * engage.
+ *
+ * This exists because those three call sites each enumerated `SyncStatus`
+ * inline as `'modified' || 'saving'` — three of its four values. The omitted
+ * one was `'error'`, which the sync effect deliberately refuses to downgrade
+ * while the draft is dirty, so it is the *resting* state after a failed save.
+ * The result was that a researcher whose save had just failed could close the
+ * tab or navigate away with no warning and no local backup: the one state
+ * where the guards matter most was the one state none of them covered.
+ *
+ * The `switch` is exhaustive on purpose. Adding a fifth `SyncStatus` without
+ * deciding what it means here is a type error, not another silent omission.
+ */
+export function hasUnsavedWork(status: SyncStatus): boolean {
+    switch (status) {
+        case 'modified':
+        case 'saving':
+        case 'error':
+            return true;
+        case 'synced':
+            return false;
+        default: {
+            const exhaustive: never = status;
+            return exhaustive;
+        }
+    }
 }
