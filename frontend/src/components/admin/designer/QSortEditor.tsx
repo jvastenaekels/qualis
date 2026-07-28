@@ -1414,7 +1414,46 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                             mode
                                                             ? 'border-indigo-500 bg-indigo-50/60 ring-2 ring-indigo-200'
                                                             : 'border-slate-200 bg-white hover:border-slate-300',
-                                                        readOnly && 'opacity-60 cursor-not-allowed'
+                                                        // Task 6.11. This used to read
+                                                        // `opacity-60`, and `readOnly` here is
+                                                        // `draft.state !== 'draft'` — every
+                                                        // launched study, i.e. the steady state
+                                                        // of this screen, not an edge case.
+                                                        // Opacity composites into the computed
+                                                        // ratio. Read off the composited pixels
+                                                        // of the label's text span in headless
+                                                        // Chromium — not computed from the
+                                                        // tokens, and clipped to the text rather
+                                                        // than to the whole card, whose radio
+                                                        // border is darker than its label and
+                                                        // silently flatters the number:
+                                                        //
+                                                        //   card       editable  opacity-60  grayscale
+                                                        //   forced      9.6796     3.2510     9.8300
+                                                        //   free       10.3547     3.3949    10.5309
+                                                        //   flexible   10.3547     3.3949    10.5309
+                                                        //
+                                                        // Both dimmed values are under the 4.5:1
+                                                        // floor for text; `forced` is the
+                                                        // selected card, so it sits on
+                                                        // bg-indigo-50/60 (#f8faff) rather than
+                                                        // white and is the worse of the two.
+                                                        // A filter applies to foreground and
+                                                        // background as a group, so unlike
+                                                        // opacity it leaves the ratio within
+                                                        // 0.18 of where the tokens put it.
+                                                        //
+                                                        // Deliberately NOT the full
+                                                        // `bg-slate-50 + grayscale` pairing used
+                                                        // for the discarded rows in
+                                                        // InteractiveDataView: forcing one
+                                                        // surface on all three cards would erase
+                                                        // the selected/unselected distinction,
+                                                        // which is the only thing this control
+                                                        // still says once it is read-only.
+                                                        // Draining the selected card's indigo is
+                                                        // enough to make the group read as inert.
+                                                        readOnly && 'grayscale cursor-not-allowed'
                                                     )}
                                                 >
                                                     <RadioGroupItem

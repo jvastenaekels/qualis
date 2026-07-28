@@ -471,4 +471,66 @@ describe('QSortEditor', () => {
             ).toBeInTheDocument();
         });
     });
+    describe('Read-only distribution-mode cards (Task 6.11)', () => {
+        // `readOnly` here is `draft.state !== 'draft'` — every launched study,
+        // i.e. the steady state of this screen. The cards used to carry
+        // `opacity-60`, which composites into the computed contrast: measured
+        // off the label text's rendered pixels in headless Chromium, the two
+        // unselected cards sat at 3.3949:1 and the selected one (on
+        // bg-indigo-50/60) at 3.2510:1, both under the 4.5:1 floor for text.
+        //
+        //   card       editable  opacity-60  grayscale
+        //   forced      9.6796     3.2510     9.8300
+        //   free       10.3547     3.3949    10.5309
+        //   flexible   10.3547     3.3949    10.5309
+        //
+        // A `filter` applies to foreground and background as a group, so
+        // grayscale keeps the de-emphasis without paying contrast for it.
+        function readOnlyCards() {
+            renderWithStore(
+                <TooltipProvider>
+                    <QSortEditor readOnly />
+                </TooltipProvider>,
+                { initialState: { draft: mockDraft, activeLocale: 'en', activeSubStep: 'grid' } }
+            );
+            return ['forced', 'free', 'flexible'].map((mode) => {
+                const el = document.querySelector(`label[for="distribution-mode-${mode}"]`);
+                if (!el) throw new Error(`no label rendered for ${mode}`);
+                return el;
+            });
+        }
+
+        it('carries no resting opacity on any card — the shade alone would not have fixed it', () => {
+            for (const card of readOnlyCards()) {
+                // `(?:^|\s)`, not `\b`: `\b` matches inside
+                // `disabled:opacity-50`, which every <Button> ships, so the
+                // word-boundary form false-positives (task 6.5).
+                expect(card.className).not.toMatch(/(?:^|\s)opacity-\d/);
+            }
+        });
+
+        it('still de-emphasises the cards, by a filter rather than by transparency', () => {
+            for (const card of readOnlyCards()) {
+                expect(card).toHaveClass('grayscale');
+                expect(card).toHaveClass('cursor-not-allowed');
+            }
+        });
+
+        // CONTROL, not a guard: this passes against the pre-fix source too
+        // (the editable branch never carried either class). It is here to
+        // pin the fix to the read-only branch, not to prove the fix.
+        it('leaves the editable cards undimmed and unfiltered', () => {
+            renderWithStore(
+                <TooltipProvider>
+                    <QSortEditor />
+                </TooltipProvider>,
+                { initialState: { draft: mockDraft, activeLocale: 'en', activeSubStep: 'grid' } }
+            );
+
+            const card = document.querySelector('label[for="distribution-mode-forced"]');
+            expect(card).not.toBeNull();
+            expect(card?.className).not.toMatch(/(?:^|\s)opacity-\d/);
+            expect(card).not.toHaveClass('grayscale');
+        });
+    });
 });
