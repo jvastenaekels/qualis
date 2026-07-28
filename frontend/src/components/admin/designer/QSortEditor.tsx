@@ -940,7 +940,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                         <Library className="h-4 w-4" />
                                         {t(
                                             'admin.concourse_import.button_label',
-                                            'Import from Concourse'
+                                            'Import from concourse'
                                         )}
                                     </Button>
                                 )}
@@ -979,7 +979,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                             className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
                                         >
                                             <RotateCcw className="h-4 w-4" />
-                                            {t('admin.design.qsort.set.reset_codes', 'Reset Codes')}
+                                            {t('admin.design.qsort.set.reset_codes', 'Reset codes')}
                                         </Button>
                                         <Button
                                             variant="ghost"

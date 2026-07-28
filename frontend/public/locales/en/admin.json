@@ -102,7 +102,7 @@
     },
     "admin": {
         "hub": {
-            "title": "Researcher Hub",
+            "title": "Researcher hub",
             "welcome": "Welcome back,",
             "new_project": "New project",
             "your_projects": "Your projects",
@@ -299,9 +299,9 @@
                 "tfa_subtitle": "Two-factor authentication",
                 "password_subtitle": "Password",
                 "enabled": "Enabled",
-                "setup_cta": "Setup 2FA now",
+                "setup_cta": "Set up 2FA now",
                 "configure_title": "Configure authenticator app",
-                "scan_desc": "Scan this QR code with your authenticator app (google authenticator, authy, etc.)",
+                "scan_desc": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
                 "enter_code": "Enter 6-digit code",
                 "enable_btn": "Enable 2FA",
                 "disable_btn": "Disable 2FA",
@@ -333,7 +333,7 @@
         "sidebar": {
             "home": "Dashboard",
             "add_study": "Add study",
-            "create_project": "CREATE NEW PROJECT",
+            "create_project": "Create new project",
             "dashboard": "Dashboard",
             "overview": "Overview",
             "design": "Design",
@@ -361,17 +361,17 @@
             "members": "Team members",
             "mobile_title": "Sidebar",
             "mobile_description": "Displays the mobile sidebar.",
-            "toggle": "Toggle Sidebar"
+            "toggle": "Toggle sidebar"
         },
         "concourse": {
             "title": "Concourse",
             "description": "Manage candidate statements for your Q-methodology study",
             "default_title": "Concourse",
             "default_title_for_project": "{{project}} concourse",
-            "create": "New Concourse",
+            "create": "New concourse",
             "create_success": "Concourse created",
             "create_error": "Failed to create concourse",
-            "create_dialog_title": "Create Concourse",
+            "create_dialog_title": "Create concourse",
             "create_dialog_desc": "A concourse is a collection of candidate statements from which you will select your Q-set.",
             "field_title": "Title",
             "field_title_placeholder": "e.g. Climate Change Attitudes",
@@ -385,8 +385,8 @@
             "updated": "Updated",
             "empty_title": "No concourses yet",
             "empty_desc": "Create a concourse to start collecting and organizing candidate statements for your Q-methodology research.",
-            "add_item": "Add Item",
-            "bulk_import": "Bulk Import",
+            "add_item": "Add item",
+            "bulk_import": "Bulk import",
             "import_desc": "Paste statements separated by newlines. Each line becomes one item.",
             "import_prefix": "Code prefix",
             "import_statements": "Statements",
@@ -406,12 +406,12 @@
             "source_placeholder": "e.g. Interview #3, Literature review",
             "no_items": "No items yet. Add your first statement.",
             "no_matches": "No items match your filters.",
-            "danger_zone": "Danger Zone",
-            "delete": "Delete Concourse",
+            "danger_zone": "Danger zone",
+            "delete": "Delete concourse",
             "delete_confirm": "Are you sure you want to delete this concourse and all its items?",
             "deleted": "Concourse deleted",
             "delete_error": "Failed to delete concourse",
-            "delete_item_title": "Delete Item",
+            "delete_item_title": "Delete item",
             "delete_item_confirm": "Delete this item? Cannot be undone.",
             "status": {
                 "proposed": "Proposed",
@@ -488,9 +488,9 @@
             "cancel_delete_tag": "Cancel deleting {{tag}}"
         },
         "concourse_import": {
-            "title": "Import from Concourse",
+            "title": "Import from concourse",
             "desc": "Select items from a concourse to import as study statements. Items are copied; changes to the concourse will not affect the study.",
-            "button_label": "Import from Concourse",
+            "button_label": "Import from concourse",
             "select_concourse": "Concourse",
             "select_placeholder": "Choose a concourse...",
             "code_prefix": "Code prefix",
@@ -526,7 +526,7 @@
             "n_factors": "Factors",
             "rotation_method": "Rotation",
             "none": "None",
-            "run": "Run Analysis",
+            "run": "Run analysis",
             "run_will_replace": "Running again will replace the current results view. Use the history panel to compare runs.",
             "running": "Analyzing...",
             "reanalyzing": "Re-analyzing...",
@@ -556,7 +556,7 @@
                 "bootstrap_on": "{{n}} iterations"
             },
             "tab_loadings": "Loadings",
-            "tab_factor_arrays": "Factor Arrays",
+            "tab_factor_arrays": "Factor arrays",
             "tab_statements": "Statements",
             "tab_summary": "Summary",
             "participant": "Participant",
@@ -569,14 +569,14 @@
             "type": "Type",
             "distinguishing": "Distinguishing",
             "consensus": "Consensus",
-            "variance_explained": "Variance Explained (%)",
-            "cumulative_variance": "Cumulative Variance (%)",
-            "n_flagged": "N Flagged Sorts",
-            "composite_reliability": "Composite Reliability",
-            "se_factor_scores": "SE of Factor Scores",
-            "factor_correlations": "Factor Correlations",
+            "variance_explained": "Variance explained (%)",
+            "cumulative_variance": "Cumulative variance (%)",
+            "n_flagged": "N flagged sorts",
+            "composite_reliability": "Composite reliability",
+            "se_factor_scores": "SE of factor scores",
+            "factor_correlations": "Factor correlations",
             "high_correlation": "High correlation",
-            "total_variance": "Total Variance Explained",
+            "total_variance": "Total variance explained",
             "method_used": "Method",
             "statements_label": "statements",
             "pca": "PCA",
@@ -609,22 +609,22 @@
             },
             "statements_help": "Z-scores show each factor's standardized position on each statement. D = distinguishing (significantly different between factors), C = consensus (no significant differences).",
             "z_scores_description": "Z-scores and factor array positions per statement",
-            "factor_statistics": "Factor Statistics",
+            "factor_statistics": "Factor statistics",
             "characteristics_help": "Eigenvalues reflect the amount of variance explained. Composite reliability reflects internal consistency among flagged sorts. SE of factor scores reflects the precision of the composite estimate.",
             "help_extraction": "PCA maximises explained variance. Centroid is less mathematically constrained.",
             "help_n_factors": "Each factor represents a distinct viewpoint.",
             "help_rotation": "Varimax separates factors for simpler structure.",
             "help_flagging": "Auto: flag participants loading on exactly one factor. Manual: override per participant.",
-            "guide_loadings_title": "Reading Factor Loadings",
+            "guide_loadings_title": "Reading factor loadings",
             "guide_loadings_1": "Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).",
             "guide_loadings_2": "Highlighted values exceed the significance threshold shown above the table.",
-            "guide_arrays_title": "Interpreting Factor Arrays",
+            "guide_arrays_title": "Interpreting factor arrays",
             "guide_arrays_1": "Each factor array is the composite Q-sort representing one shared viewpoint.",
             "guide_arrays_2": "Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.",
-            "guide_statements_title": "Understanding Statement Scores",
+            "guide_statements_title": "Understanding statement scores",
             "guide_statements_1": "Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).",
             "guide_statements_2": "D = distinguishing (placed significantly differently across factors). Stars indicate significance level.",
-            "guide_summary_title": "Evaluating Your Solution",
+            "guide_summary_title": "Evaluating your solution",
             "guide_summary_1": "Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.",
             "guide_summary_2": "Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.",
             "benchmark_above": "Above threshold",
@@ -868,7 +868,7 @@
             "copy_success": "Study link copied to clipboard",
             "types": {
                 "public": "Open access (public)",
-                "individual": "Single-Use passcode",
+                "individual": "Single-use passcode",
                 "limited": "Capped participation"
             },
             "guidance": {
@@ -1069,13 +1069,13 @@
             "error": "Export failed. Try again.",
             "csv": "Export CSV",
             "json": "Export JSON",
-            "audio": "Export Audio (ZIP)",
+            "audio": "Export audio (ZIP)",
             "formats": {
                 "csv": "CSV",
                 "pqmethod": "PQMethod (ZIP)",
                 "rkit": "R-Kit (ZIP)",
-                "package": "Research Package (ZIP)",
-                "json": "JSON Dump"
+                "package": "Research package (ZIP)",
+                "json": "JSON dump"
             },
             "download": "Download",
             "package_dialog": {
@@ -1086,7 +1086,7 @@
         },
         "import": {
             "title": "Import study configuration",
-            "config": "Import Configuration",
+            "config": "Import configuration",
             "upload_desc": "Upload a previously exported study configuration file",
             "validate_desc": "Review configuration and provide a unique slug",
             "creating_desc": "Creating study...",
@@ -1141,7 +1141,7 @@
         "dialogs": {
             "create_study": {
                 "title": "Create new study",
-                "description": "Start a new q-methodology study. You can configure statements and settings later.",
+                "description": "Start a new Q-methodology study. You can configure statements and settings later.",
                 "study_title": "Study title",
                 "study_title_placeholder": "E.g. Perspectives on AI",
                 "url_slug": "URL slug",
@@ -1171,7 +1171,7 @@
             "suspect": "Suspect",
             "recent_activity": "Recent activity",
             "latest_participants": "Latest participants (last {{count}} of {{total}})",
-            "recently_completed": "Recently completed",
+            "recently_completed": "Completed",
             "in_progress": "In progress",
             "discarded": "Discarded",
             "started": "Started",
@@ -1236,7 +1236,7 @@
             },
             "state": {
                 "activate": "Activate study",
-                "switch_to_draft": "Draft Mode",
+                "switch_to_draft": "Draft mode",
                 "manage": "Manage status"
             },
             "notifications": {
@@ -1257,7 +1257,7 @@
             "editing_language_banner": "Editing the {{language}} version. Use the language selector in the toolbar to switch.",
             "multilang": {
                 "view_others": "View in other languages",
-                "other_formulations": "Other Formulations"
+                "other_formulations": "Other formulations"
             },
             "guidance": {
                 "title": "Design guidance",
@@ -1335,7 +1335,7 @@
                     "missing_title": "Title is missing for language '{{lang}}'.",
                     "missing_consent_title": "Consent title is missing for language '{{lang}}'.",
                     "missing_consent_description": "Consent description is missing for language '{{lang}}'.",
-                    "missing_grid_instructions": "Q-Sort instructions are missing for language '{{lang}}'.",
+                    "missing_grid_instructions": "Q-sort instructions are missing for language '{{lang}}'.",
                     "missing_step_title": "Step {{index}} title is missing for language '{{lang}}'.",
                     "missing_statement_translation": "Statement '{{code}}' is missing translations for: {{missing}}.",
                     "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'.",
@@ -1375,7 +1375,7 @@
                 "desktop": "Desktop view"
             },
             "intro": {
-                "general_settings": "General Settings",
+                "general_settings": "General settings",
                 "welcome_title": "Welcome message",
                 "process_title": "Study steps overview",
                 "process_steps": {
@@ -1384,7 +1384,7 @@
                     "add_step": "Add step",
                     "empty": {
                         "title": "No custom steps defined",
-                        "desc": "The study will use the standard q-methodology workflow (meet, first impressions, perspective, why)."
+                        "desc": "The study will use the standard Q-methodology workflow (meet, first impressions, perspective, why)."
                     },
                     "fields": {
                         "title": "Step title",
@@ -1418,7 +1418,7 @@
                 "reset": "Reset instruction",
                 "consent_details": "Consent form details",
                 "fields": {
-                    "default_lang": "Default Language",
+                    "default_lang": "Default language",
                     "default_lang_help": "This language will be shown to participants by default if their browser language is not supported.",
                     "title": "Study title",
                     "title_placeholder": "Enter public title...",
@@ -1440,8 +1440,8 @@
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
                 "field_label": "Instruction text",
                 "placeholder": "E.g. Please rank the following statements from those you most agree with to those you most disagree with",
-                "grid_title": "Q-Sort instruction",
-                "grid_desc": "This is the core instruction guiding participants during the Q-Sort process.",
+                "grid_title": "Q-sort instruction",
+                "grid_desc": "This is the core instruction guiding participants during the Q-sort process.",
                 "pre_title": "Preliminary sort instruction",
                 "pre_desc": "Instruction given to participants during the initial rough sort.",
                 "pre_field_label": "Instruction text",
@@ -1450,7 +1450,7 @@
                 "pre_label": "Pre-instruction content",
                 "tips": {
                     "title": "Why is this important?",
-                    "desc": "In q-methodology, the 'condition of instruction' determines the point of view from which the participant sorts the items. It should be clear and consistent across all sorting phases."
+                    "desc": "In Q-methodology, the 'condition of instruction' determines the point of view from which the participant sorts the items. It should be clear and consistent across all sorting phases."
                 }
             },
             "questions": {
@@ -1482,7 +1482,7 @@
                     "dropdown": "Dropdown",
                     "radio": "Radio",
                     "checkboxes": "Checkboxes",
-                    "text_audio": "Text + Audio",
+                    "text_audio": "Text + audio",
                     "rating": "Rating scale"
                 },
                 "empty": {
@@ -1529,7 +1529,7 @@
                 },
                 "bulk": {
                     "title": "Bulk editor (quick paste)",
-                    "desc": "One statement per line. Supports \"code: text\" and excel copy-paste (multi-language).",
+                    "desc": "One statement per line. Supports \"code: text\" and Excel copy-paste (multi-language).",
                     "replace_all": "Replace all",
                     "append": "Append to list",
                     "sync_by_code": "Sync/Merge by code",
@@ -1569,7 +1569,7 @@
                     "randomize_desc": "Present statements in random order to each participant (consistent within session)"
                 },
                 "grid": {
-                    "title": "Q-Sort distribution grid",
+                    "title": "Q-sort distribution grid",
                     "desc": "The grid shape forces participants to discriminate between statements, approximating a normal distribution.",
                     "slot_count": "{{count}} slots allocated",
                     "stat_count": "{{count}} statements",
@@ -1582,7 +1582,7 @@
                     "add_extreme_columns": "Add extreme columns",
                     "symmetry_lock": "Symmetry lock",
                     "symmetry_lock_desc": "Automatically apply changes to opposite columns to maintain a balanced distribution.",
-                    "auto_balance": "Auto-Balance",
+                    "auto_balance": "Auto-balance",
                     "auto_balance_desc": "Reshape grid to a balanced semi-normal distribution",
                     "reshaped": "Grid reshaped to a balanced distribution",
                     "balanced": "Grid balanced to standard distribution",
@@ -1645,9 +1645,9 @@
                     "results_hint": "Email solely for results, anonymity preserved."
                 },
                 "audio": {
-                    "title": "Audio Recording",
+                    "title": "Audio recording",
                     "desc": "Allow participants to record audio responses instead of text.",
-                    "max_duration": "Maximum Duration",
+                    "max_duration": "Maximum duration",
                     "seconds": "seconds",
                     "max_duration_help": "Maximum recording time per question (30–600 seconds).",
                     "participant_choice_info": "Participants can respond with text, audio, or both for each question.",
@@ -1790,11 +1790,11 @@
                 "export": "Export hub"
             },
             "status": {
-                "started": "started",
+                "started": "Started",
                 "completed": "Completed",
                 "in_progress": "In progress",
                 "abandoned": "Abandoned",
-                "discarded": "discarded"
+                "discarded": "Discarded"
             },
             "step": {
                 "consent": "Consent",
@@ -1826,7 +1826,7 @@
                 "title": "Format guide",
                 "csv": {
                     "title": "Universal CSV",
-                    "desc": "Raw rectangular data. Best for r, python, SPSS, or excel analysis. Includes all metadata."
+                    "desc": "Raw rectangular data. Best for R, Python, SPSS, or Excel analysis. Includes all metadata."
                 },
                 "json": {
                     "title": "KenQ JSON",
@@ -1913,7 +1913,7 @@
                 "has_recruitment": "Has recruitment link"
             },
             "charts": {
-                "section_title": "Response Distributions",
+                "section_title": "Response distributions",
                 "distribution_label": "Distribution for {{question}}",
                 "multi_select_note": "Multiple selections allowed",
                 "responses_count": "{{count}} responses",
@@ -2042,10 +2042,10 @@
             "delete_error": "Could not delete study. Make sure all data has been cleared first.",
             "delete_error_desc": "Failed to delete study.",
             "storage": {
-                "title": "Audio Storage Usage",
-                "used": "Storage Used",
+                "title": "Audio storage usage",
+                "used": "Storage used",
                 "quota": "Quota",
-                "quota_label": "Storage Quota",
+                "quota_label": "Storage quota",
                 "quota_help": "Maximum total audio storage for this study (10–1000 MB).",
                 "error": "Failed to load storage usage.",
                 "warning_high_usage": "Storage usage is high. Consider increasing the quota or removing old recordings.",
@@ -2205,28 +2205,28 @@
         "participant": {
             "tabs": {
                 "session": "Metadata",
-                "presort": "Pre-Sort",
-                "grid": "Q-Sort Grid",
-                "postsort": "Post-Sort"
+                "presort": "Pre-sort",
+                "grid": "Q-sort grid",
+                "postsort": "Post-sort"
             },
             "grid": {
-                "detail_view": "Card Details",
+                "detail_view": "Card details",
                 "no_comment": "No comment provided.",
                 "select_instruction": "Select a card on the grid to view details.",
-                "read_only_mode": "Viewer Mode",
+                "read_only_mode": "Viewer mode",
                 "score": "Score"
             },
             "metadata": {
-                "title": "Session Metadata",
+                "title": "Session metadata",
                 "technology": "Technology",
                 "browser": "Browser",
-                "session": "Session Details",
-                "duration": "Total Duration",
+                "session": "Session details",
+                "duration": "Total duration",
                 "started": "Started",
                 "submitted": "Submitted",
                 "id": "Internal ID",
-                "ip_hash": "IP Hash",
-                "recruitment_token": "Recruitment Token",
+                "ip_hash": "IP hash",
+                "recruitment_token": "Recruitment token",
                 "device": {
                     "mobile": "Mobile",
                     "tablet": "Tablet",
@@ -2237,19 +2237,19 @@
                 "started": "Started",
                 "completed": "Completed",
                 "discarded": "Discarded",
-                "in_progress": "In Progress"
+                "in_progress": "In progress"
             },
             "survey": {
-                "presort": "Pre-Sort Questions",
-                "postsort": "Post-Sort Questions",
+                "presort": "Pre-sort questions",
+                "postsort": "Post-sort questions",
                 "no_answers": "No answers recorded for this section.",
                 "question_default": "Spoken response",
                 "answer_default": "Response",
                 "categories": {
-                    "identity": "Identity & Contact",
-                    "questions": "Questionnaire Responses",
-                    "comments": "Card Comments",
-                    "feedback": "General Feedback"
+                    "identity": "Identity & contact",
+                    "questions": "Questionnaire responses",
+                    "comments": "Card comments",
+                    "feedback": "General feedback"
                 }
             }
         },

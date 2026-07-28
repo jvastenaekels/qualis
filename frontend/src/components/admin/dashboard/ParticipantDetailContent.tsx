@@ -231,7 +231,7 @@ export function ParticipantDetailContent({
         <div className="flex flex-col h-full bg-white">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
                 <h3 className="text-xs font-black text-slate-500">
-                    {t('admin.participant.grid.detail_view', 'Card Details')}
+                    {t('admin.participant.grid.detail_view', 'Card details')}
                 </h3>
             </div>
             <div className="flex-1 p-3 sm:p-6 overflow-y-auto custom-scrollbar">
@@ -284,7 +284,7 @@ export function ParticipantDetailContent({
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs">
                                     <Mic className="w-3.5 h-3.5" />
-                                    {t('admin.audio.recording', 'Audio Recording')}
+                                    {t('admin.audio.recording', 'Audio recording')}
                                 </div>
                                 <AudioPlayer
                                     url={detailAudio.presigned_url}
@@ -372,12 +372,12 @@ export function ParticipantDetailContent({
                                         {t(
                                             `admin.participant.tabs.${tab}`,
                                             tab === 'presort'
-                                                ? 'Pre-Sort'
+                                                ? 'Pre-sort'
                                                 : tab === 'grid'
-                                                  ? 'Q-Sort Grid'
+                                                  ? 'Q-sort grid'
                                                   : tab === 'session'
-                                                    ? 'Session Metadata'
-                                                    : 'Post-Sort'
+                                                    ? 'Metadata'
+                                                    : 'Post-sort'
                                         )}
                                     </span>
                                 </div>
@@ -414,8 +414,8 @@ export function ParticipantDetailContent({
                                 disabled={isExporting}
                                 onClick={handleExportAudio}
                                 className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-500 hover:text-indigo-600"
-                                title={t('admin.export.audio', 'Export Audio (ZIP)')}
-                                aria-label={t('admin.export.audio', 'Export Audio (ZIP)')}
+                                title={t('admin.export.audio', 'Export audio (ZIP)')}
+                                aria-label={t('admin.export.audio', 'Export audio (ZIP)')}
                             >
                                 <FileArchive className="w-5 h-5 sm:w-4 sm:h-4" />
                             </Button>
@@ -461,7 +461,7 @@ export function ParticipantDetailContent({
                                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                         {t(
                                             'admin.participant.survey.presort',
-                                            'Pre-Sort Questions'
+                                            'Pre-sort questions'
                                         )}
                                     </h3>
                                     <SurveyResponseTable
@@ -492,7 +492,7 @@ export function ParticipantDetailContent({
                                 qsort={qsortForGridSort}
                                 conditionOfInstruction={t(
                                     'admin.participant.grid.read_only_mode',
-                                    'Viewer Mode'
+                                    'Viewer mode'
                                 )}
                                 sidebarContent={sidebarContent}
                                 onInteractionUtils={handleInteractionUtils}
@@ -544,7 +544,7 @@ export function ParticipantDetailContent({
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                         {t(
                                             'admin.participant.survey.postsort',
-                                            'Post-Sort Questions'
+                                            'Post-sort questions'
                                         )}
                                     </h3>
                                     <SurveyResponseTable
@@ -562,7 +562,7 @@ export function ParticipantDetailContent({
                                             <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                                             {t(
                                                 'admin.participant.survey.audio_recordings',
-                                                'Audio Recordings'
+                                                'Audio recordings'
                                             )}
                                         </h3>
                                         <div className="space-y-3">

@@ -99,7 +99,7 @@ describe('IntroductionEditor — field accessible names (Task 6.7b)', () => {
             initialState: { draft: mockDraft, activeLocale: 'en' },
         });
 
-    it('names the "Default Language" select and lets its label open it', async () => {
+    it('names the "Default language" select and lets its label open it', async () => {
         const user = userEvent.setup();
         renderEditor();
 
@@ -108,7 +108,7 @@ describe('IntroductionEditor — field accessible names (Task 6.7b)', () => {
         const trigger = screen.getByRole('combobox', { name: /default language/i });
         expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
-        await user.click(screen.getByText('Default Language'));
+        await user.click(screen.getByText('Default language'));
         expect(trigger).toHaveAttribute('aria-expanded', 'true');
     });
 

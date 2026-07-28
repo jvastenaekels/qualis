@@ -643,7 +643,7 @@ const RecruitmentPage = () => {
                                         className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold rounded-xl"
                                     >
                                         <Plus className="h-4 w-4 mr-1.5" />
-                                        {t('admin.recruitment.new_link', 'New Access Link')}
+                                        {t('admin.recruitment.new_link', 'New access link')}
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-[425px]">
@@ -654,7 +654,7 @@ const RecruitmentPage = () => {
                                             </div>
                                             {t(
                                                 'admin.recruitment.create_title',
-                                                'Create Access Links'
+                                                'Create access links'
                                             )}
                                         </DialogTitle>
                                     </DialogHeader>

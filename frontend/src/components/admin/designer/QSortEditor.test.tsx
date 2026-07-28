@@ -74,7 +74,7 @@ describe('QSortEditor', () => {
             await user.click(distributionTab);
 
             // UI should switch to grid config
-            expect(screen.getByText('Q-Sort distribution grid')).toBeInTheDocument();
+            expect(screen.getByText('Q-sort distribution grid')).toBeInTheDocument();
         });
 
         it('displays statements tab content by default', () => {
@@ -372,7 +372,7 @@ describe('QSortEditor', () => {
     describe('Grid Configuration', () => {
         it('displays grid columns', () => {
             renderEditor({ activeSubStep: 'grid' });
-            expect(screen.getByText('Q-Sort distribution grid')).toBeInTheDocument();
+            expect(screen.getByText('Q-sort distribution grid')).toBeInTheDocument();
             // Should see input fields for the grid
             // (Assuming grid editor renders inputs implies it's working)
         });
@@ -388,7 +388,7 @@ describe('QSortEditor', () => {
     describe('Validation & Distribution', () => {
         it('validates grid total matches statement count', () => {
             renderEditor({ activeSubStep: 'grid' });
-            expect(screen.getByText('Q-Sort distribution grid')).toBeInTheDocument();
+            expect(screen.getByText('Q-sort distribution grid')).toBeInTheDocument();
         });
 
         it('maintains symmetry when symmetry lock is enabled', async () => {

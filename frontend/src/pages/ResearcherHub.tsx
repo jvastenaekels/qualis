@@ -68,7 +68,7 @@ export default function ResearcherHub() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                                {t('admin.hub.title', 'Researcher Hub')}
+                                {t('admin.hub.title', 'Researcher hub')}
                             </h1>
                             <p className="text-sm text-muted-foreground mt-0.5">
                                 {user?.full_name || user?.email}
@@ -77,7 +77,7 @@ export default function ResearcherHub() {
                         {hasProjects && (
                             <Button size="sm" onClick={() => navigate('/app/projects/new')}>
                                 <Plus className="h-3.5 w-3.5 mr-2" />
-                                {t('admin.hub.new_project', 'New Project')}
+                                {t('admin.hub.new_project', 'New project')}
                             </Button>
                         )}
                     </div>
@@ -226,7 +226,7 @@ export default function ResearcherHub() {
                             'Create a project before adding concourses, Q-sets, or studies.'
                         )}
                         cta={{
-                            label: t('admin.hub.new_project', 'New Project'),
+                            label: t('admin.hub.new_project', 'New project'),
                             onClick: () => navigate('/app/projects/new'),
                         }}
                         variant="card"

@@ -75,7 +75,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                             <Languages className="h-5 w-5" />
                         </div>
                         <DialogTitle>
-                            {t('admin.design.languages.manage_title', 'Manage Languages')}
+                            {t('admin.design.languages.manage_title', 'Manage languages')}
                         </DialogTitle>
                     </div>
                     <DialogDescription>

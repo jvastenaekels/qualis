@@ -524,7 +524,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                     >
                                         <Mic className="w-5 h-5 text-indigo-600" />
                                         {t('admin.design.postsort.audio.title') ||
-                                            'Audio Recording'}
+                                            'Audio recording'}
                                     </Label>
                                     <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                         {t('admin.design.postsort.audio.desc') ||
@@ -587,7 +587,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                         className="text-sm font-bold text-slate-700"
                                     >
                                         {t('admin.design.postsort.audio.max_duration') ||
-                                            'Maximum Duration'}
+                                            'Maximum duration'}
                                     </Label>
                                     <div className="flex items-center gap-3">
                                         <Input

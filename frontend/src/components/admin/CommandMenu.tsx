@@ -84,7 +84,7 @@ export const CommandMenu = () => {
         <Command.Dialog
             open={open}
             onOpenChange={setOpen}
-            label={t('admin.command_menu.title', 'Global Command Menu')}
+            label={t('admin.command_menu.title', 'Global command menu')}
             className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-slate-950/20 backdrop-blur-md transition-all duration-300"
         >
             <div className="w-full max-w-[640px] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95">
@@ -106,7 +106,7 @@ export const CommandMenu = () => {
 
                     {/* Projects */}
                     <Command.Group
-                        heading={t('admin.command_menu.switch_project', 'Switch Project')}
+                        heading={t('admin.command_menu.switch_project', 'Switch project')}
                         className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
                         {(Array.isArray(projects) ? projects : []).map((ws) => (
@@ -157,7 +157,7 @@ export const CommandMenu = () => {
 
                     {/* Studies (Filtered) */}
                     <Command.Group
-                        heading={t('admin.command_menu.switch_study', 'Switch Study')}
+                        heading={t('admin.command_menu.switch_study', 'Switch study')}
                         className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
                         {filteredStudies?.map((study) => (
@@ -194,7 +194,7 @@ export const CommandMenu = () => {
                     {/* Contextual Actions (only when study is active and valid) */}
                     {isValidStudy && (
                         <Command.Group
-                            heading={t('admin.command_menu.study_actions', 'Study Actions')}
+                            heading={t('admin.command_menu.study_actions', 'Study actions')}
                             className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                         >
                             <Command.Item
@@ -291,7 +291,7 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-sky-100 dark:bg-sky-900/40">
                                     <Copy className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
                                 </div>
-                                <span>{t('admin.command_menu.copy_link', 'Copy Public Link')}</span>
+                                <span>{t('admin.command_menu.copy_link', 'Copy public link')}</span>
                             </Command.Item>
                         </Command.Group>
                     )}
@@ -325,7 +325,7 @@ export const CommandMenu = () => {
                         <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-2xs font-mono">
                             ⌘K
                         </kbd>
-                        <span>{t('admin.command_menu.to_open', 'to open')}</span>
+                        <span>{t('admin.command_menu.to_open', 'To open')}</span>
                     </div>
                 </div>
             </div>

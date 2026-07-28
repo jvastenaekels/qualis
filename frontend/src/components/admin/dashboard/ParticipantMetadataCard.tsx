@@ -88,7 +88,7 @@ export function ParticipantMetadataCard({
                     <div className="flex items-center gap-2">
                         <Fingerprint className="h-5 w-5 text-indigo-500" />
                         <CardTitle className="text-base sm:text-lg font-black text-slate-900">
-                            {t('admin.participant.metadata.title', 'Session Metadata')}
+                            {t('admin.participant.metadata.title', 'Session metadata')}
                         </CardTitle>
                     </div>
 
@@ -190,7 +190,7 @@ export function ParticipantMetadataCard({
                 </div>
                 <div className="space-y-4">
                     <h4 className="text-2xs font-black text-slate-500">
-                        {t('admin.participant.metadata.session', 'Session Details')}
+                        {t('admin.participant.metadata.session', 'Session details')}
                     </h4>
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export function ParticipantMetadataCard({
                                         : '---'}
                                 </p>
                                 <p className="text-2xs text-slate-500 font-bold mt-1">
-                                    {t('admin.participant.metadata.duration', 'Total Duration')}
+                                    {t('admin.participant.metadata.duration', 'Total duration')}
                                 </p>
                             </div>
                         </div>
@@ -280,7 +280,7 @@ export function ParticipantMetadataCard({
                                     <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t(
                                             'admin.participant.metadata.recruitment_link',
-                                            'Recruitment Link'
+                                            'Recruitment link'
                                         )}
                                     </p>
                                 </div>
@@ -296,7 +296,7 @@ export function ParticipantMetadataCard({
                                         {participant.ip_address.substring(0, 16)}...
                                     </p>
                                     <p className="text-2xs text-slate-500 font-bold mt-1">
-                                        {t('admin.participant.metadata.ip_hash', 'IP Hash')}
+                                        {t('admin.participant.metadata.ip_hash', 'IP hash')}
                                     </p>
                                 </div>
                             </div>

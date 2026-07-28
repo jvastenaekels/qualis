@@ -106,7 +106,7 @@ function handle403(
               'errors.access_denied_description',
               'You do not have permission to perform this action.'
           );
-    toast.error(i18n.t('errors.access_denied_title', 'Access Denied'), {
+    toast.error(i18n.t('errors.access_denied_title', 'Access denied'), {
         id: `403:${method}:${url}`, // dedupe identical 403s on the same endpoint
         description,
     });
@@ -132,7 +132,7 @@ function handle409(
 }
 
 function handle429(url: string): void {
-    toast.error(i18n.t('errors.rate_limited_title', 'Too Many Requests'), {
+    toast.error(i18n.t('errors.rate_limited_title', 'Too many requests'), {
         id: `429:${url}`,
         description: i18n.t(
             'errors.rate_limited_description',

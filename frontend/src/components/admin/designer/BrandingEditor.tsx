@@ -236,7 +236,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     <ImageIcon className="h-4 w-4 text-indigo-500" />
                                     {t(
                                         'admin.design.theme.partners.title',
-                                        'Institutional Partners'
+                                        'Institutional partners'
                                     )}
                                 </CardTitle>
                                 <TooltipProvider>
@@ -384,7 +384,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-bold text-sm disabled:opacity-50"
                                 >
                                     <Plus className="size-4" />
-                                    {t('admin.design.theme.partners.add', 'Add Partner')}
+                                    {t('admin.design.theme.partners.add', 'Add partner')}
                                 </button>
                             </div>
 

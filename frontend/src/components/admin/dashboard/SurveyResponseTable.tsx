@@ -162,25 +162,25 @@ export function SurveyResponseTable({
     // Define potential groups
     groups.push({
         id: 'identity',
-        title: t('admin.participant.survey.categories.identity', 'Identity & Contact'),
+        title: t('admin.participant.survey.categories.identity', 'Identity & contact'),
         icon: <UserIcon className="w-4 h-4" />,
         items: [],
     });
     groups.push({
         id: 'questions',
-        title: t('admin.participant.survey.categories.questions', 'Questionnaire Responses'),
+        title: t('admin.participant.survey.categories.questions', 'Questionnaire responses'),
         icon: <SurveyIcon className="w-4 h-4" />,
         items: [],
     });
     groups.push({
         id: 'comments',
-        title: t('admin.participant.survey.categories.comments', 'Card Comments'),
+        title: t('admin.participant.survey.categories.comments', 'Card comments'),
         icon: <MessageIcon className="w-4 h-4" />,
         items: [],
     });
     groups.push({
         id: 'feedback',
-        title: t('admin.participant.survey.categories.feedback', 'General Feedback'),
+        title: t('admin.participant.survey.categories.feedback', 'General feedback'),
         icon: <FeedbackIcon className="w-4 h-4" />,
         items: [],
     });

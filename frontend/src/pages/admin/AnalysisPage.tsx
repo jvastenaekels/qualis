@@ -1251,7 +1251,7 @@ function InterpretShell({
                                 </TabsTrigger>
                                 <TabsTrigger value="arrays" className="gap-1.5">
                                     <Grid3X3 className="size-3.5" aria-hidden="true" />
-                                    {t('admin.analysis.tab_factor_arrays', 'Factor Arrays')}
+                                    {t('admin.analysis.tab_factor_arrays', 'Factor arrays')}
                                 </TabsTrigger>
                                 <TabsTrigger value="statements" className="gap-1.5">
                                     <List className="size-3.5" aria-hidden="true" />
@@ -1267,7 +1267,7 @@ function InterpretShell({
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_loadings_title',
-                                        'Reading Factor Loadings'
+                                        'Reading factor loadings'
                                     )}
                                     type="info"
                                     collapsible
@@ -1300,7 +1300,7 @@ function InterpretShell({
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_arrays_title',
-                                        'Interpreting Factor Arrays'
+                                        'Interpreting factor arrays'
                                     )}
                                     type="info"
                                     collapsible
@@ -1336,7 +1336,7 @@ function InterpretShell({
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_statements_title',
-                                        'Understanding Statement Scores'
+                                        'Understanding statement scores'
                                     )}
                                     type="info"
                                     collapsible
@@ -1364,7 +1364,7 @@ function InterpretShell({
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_summary_title',
-                                        'Evaluating Your Solution'
+                                        'Evaluating your solution'
                                     )}
                                     type="info"
                                     collapsible

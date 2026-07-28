@@ -18,24 +18,24 @@ import { Sidebar, SidebarProvider, SidebarTrigger } from '@/components/ui/sideba
 // click behavior (which state it toggles) differs.
 vi.mock('@/hooks/use-mobile', () => ({ useIsMobile: () => true }));
 
-// SidebarTrigger's sr-only text ("Toggle Sidebar") and the mobile sheet's
+// SidebarTrigger's sr-only text ("Toggle sidebar") and the mobile sheet's
 // sr-only title/description ("Sidebar" / "Displays the mobile sidebar.")
 // were hardcoded English literals. AdminLayout renders SidebarTrigger on
 // every admin page; the mobile sheet renders whenever the admin chrome is
 // viewed below the md breakpoint.
 describe('SidebarTrigger', () => {
-    it('exposes a computed accessible name of "Toggle Sidebar"', () => {
+    it('exposes a computed accessible name of "Toggle sidebar"', () => {
         renderWithProviders(
             <SidebarProvider>
                 <SidebarTrigger />
             </SidebarProvider>
         );
 
-        expect(screen.getByRole('button', { name: 'Toggle Sidebar' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Toggle sidebar' })).toBeInTheDocument();
     });
 
     // The English name alone can't distinguish a real t() call from a
-    // literal that happens to already read "Toggle Sidebar" in English.
+    // literal that happens to already read "Toggle sidebar" in English.
     // Assert the real fr/admin.json translation.
     it("resolves to the researcher's active language, not just English", async () => {
         i18n.addResourceBundle('fr', 'admin', frAdmin, true, true);
@@ -69,7 +69,7 @@ describe('Sidebar mobile sheet', () => {
             </SidebarProvider>
         );
 
-        await user.click(screen.getByRole('button', { name: 'Toggle Sidebar' }));
+        await user.click(screen.getByRole('button', { name: 'Toggle sidebar' }));
 
         const dialog = await screen.findByRole('dialog', { name: 'Sidebar' });
         expect(dialog).toBeInTheDocument();

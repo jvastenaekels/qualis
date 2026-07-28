@@ -140,8 +140,9 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     await expect(summaryTab).toBeVisible();
     await summaryTab.click();
 
-    // FactorCharacteristicsTable renders "Factor Statistics" heading
-    await expect(page.getByText('Factor Statistics')).toBeVisible({ timeout: 10_000 });
+    // FactorCharacteristicsTable renders the "Factor statistics" heading
+    // (admin.analysis.factor_statistics — sentence case since task 4.2).
+    await expect(page.getByText('Factor statistics')).toBeVisible({ timeout: 10_000 });
 
     // The table has a visually-hidden caption
     const charTable = page.getByRole('table', {
@@ -150,7 +151,8 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     await expect(charTable).toBeVisible();
 
     // With n_factors >= 2 the correlation matrix also appears
-    await expect(page.getByText('Factor Correlations')).toBeVisible({ timeout: 5_000 });
+    // (admin.analysis.factor_correlations — sentence case since task 4.2).
+    await expect(page.getByText('Factor correlations')).toBeVisible({ timeout: 5_000 });
 
     // -----------------------------------------------------------------------
     // 7. Assert Region 4 — Statements (distinguishing / consensus)

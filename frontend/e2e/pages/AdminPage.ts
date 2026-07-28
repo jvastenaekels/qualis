@@ -157,7 +157,7 @@ export class AdminPage extends BasePage {
         const exportButton = this.page.getByRole('button', { name: /^export data$/i }).first();
         await exportButton.click();
         const downloadPromise = this.page.waitForEvent('download');
-        // Dropdown items: Research Package (ZIP), CSV, PQMethod (ZIP), R-Kit (ZIP), JSON Dump.
+        // Dropdown items: Research package (ZIP), CSV, PQMethod (ZIP), R-Kit (ZIP), JSON dump.
         // ^CSV$ avoids matching the others; case-insensitive for safety.
         await this.page.getByRole('menuitem', { name: /^csv$/i }).click();
         const download = await downloadPromise;

@@ -300,7 +300,7 @@ const AccountSettingsPage = () => {
                                     onClick={() => setIs2FASetupMode(true)}
                                     className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                 >
-                                    {t('admin.account.security.setup_cta', 'Setup 2FA now')}
+                                    {t('admin.account.security.setup_cta', 'Set up 2FA now')}
                                 </Button>
                             )}
 
@@ -328,7 +328,7 @@ const AccountSettingsPage = () => {
                                             <p className="text-sm text-slate-600 leading-relaxed">
                                                 {t(
                                                     'admin.account.security.scan_desc',
-                                                    '1. Scan this QR code with an authenticator app.'
+                                                    'Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)'
                                                 )}
                                             </p>
                                             <div className="p-3 bg-white rounded-lg border border-slate-200 font-mono text-xs flex items-center justify-between select-all group">

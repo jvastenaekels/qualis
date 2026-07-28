@@ -661,7 +661,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 >
                     {isUploadInProgress
                         ? t('audio.uploading', 'Uploading...')
-                        : t('common.next', 'Next Step')}
+                        : t('common.next', 'Next step')}
                     {!isUploadInProgress && <ArrowRight size={18} className="ml-2" />}
                 </Button>
             </div>

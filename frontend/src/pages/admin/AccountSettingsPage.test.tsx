@@ -50,7 +50,7 @@ describe('AccountSettingsPage 2FA (authenticator app)', () => {
 
     it('shows the QR code + 6-digit-code form on entering setup mode', async () => {
         renderWithProviders(<AccountSettingsPage />);
-        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+        fireEvent.click(screen.getByRole('button', { name: /set up 2fa now/i }));
 
         await waitFor(() => {
             expect(screen.getByPlaceholderText('000000')).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe('AccountSettingsPage 2FA (authenticator app)', () => {
 
     it('enabling calls the mutation with the entered token', async () => {
         renderWithProviders(<AccountSettingsPage />);
-        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+        fireEvent.click(screen.getByRole('button', { name: /set up 2fa now/i }));
 
         const codeInput = await screen.findByPlaceholderText('000000');
         fireEvent.change(codeInput, { target: { value: '123456' } });
@@ -78,7 +78,7 @@ describe('AccountSettingsPage 2FA (authenticator app)', () => {
             configurable: true,
         });
         renderWithProviders(<AccountSettingsPage />);
-        fireEvent.click(screen.getByRole('button', { name: /setup 2fa now/i }));
+        fireEvent.click(screen.getByRole('button', { name: /set up 2fa now/i }));
 
         const copyButton = await screen.findByRole('button', { name: 'Copy secret' });
         fireEvent.click(copyButton);

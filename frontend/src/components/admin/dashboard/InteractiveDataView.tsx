@@ -343,7 +343,7 @@ export default function InteractiveDataView({
                                     <Clock className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500">
-                                    {t('admin.data.stats.in_progress', 'In Progress')}
+                                    {t('admin.data.stats.in_progress', 'In progress')}
                                 </span>
                             </div>
 
@@ -689,7 +689,7 @@ export default function InteractiveDataView({
                                     className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
                                 >
                                     <Package className="h-4 w-4" />
-                                    {t('admin.export.formats.package', 'Research Package (ZIP)')}
+                                    {t('admin.export.formats.package', 'Research package (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     disabled={isExportLoading}
@@ -746,7 +746,7 @@ export default function InteractiveDataView({
                                     className="font-medium cursor-pointer gap-2"
                                 >
                                     <FileCode className="h-4 w-4" />
-                                    {t('admin.export.formats.json', 'JSON Dump')}
+                                    {t('admin.export.formats.json', 'JSON dump')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

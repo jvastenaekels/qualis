@@ -139,7 +139,7 @@ const ConditionOfInstructionEditor = ({
         ) || {};
 
     const roughSortOn = isRoughSortEnabled(draft);
-    const fieldLabel = t('admin.design.condition.field_label', 'Instruction Text');
+    const fieldLabel = t('admin.design.condition.field_label', 'Instruction text');
     const resetLabel = t('common.reset_to_default');
 
     return (
@@ -218,7 +218,7 @@ const ConditionOfInstructionEditor = ({
                                 id="pre_instruction"
                                 title={t(
                                     'admin.design.condition.pre_title',
-                                    'Preliminary Sort Instruction'
+                                    'Preliminary sort instruction'
                                 )}
                                 description={t(
                                     'admin.design.condition.pre_desc',
@@ -241,10 +241,10 @@ const ConditionOfInstructionEditor = ({
 
                         <InstructionField
                             id="condition_of_instruction"
-                            title={t('admin.design.condition.grid_title', 'Q-Sort Instruction')}
+                            title={t('admin.design.condition.grid_title', 'Q-sort instruction')}
                             description={t(
                                 'admin.design.condition.grid_desc',
-                                'This is the core instruction guiding participants during the Q-Sort process.'
+                                'This is the core instruction guiding participants during the Q-sort process.'
                             )}
                             placeholder={t(
                                 'admin.design.condition.placeholder',
