@@ -1767,3 +1767,60 @@ These came out of the audit but are judgement calls, not defects with an obvious
 **Placeholders.** None. Task 1.1 is the only task that does not name its fix, and deliberately so: the production build hides the diagnostic signal, so the task ships a reproduction test plus three ordered hypotheses instead of a guess dressed as an answer.
 
 **Type consistency.** `formatDate` / `formatDateTime` / `formatRelative` (Task 4.3) keep the same signatures at every call site. `SlugInput`'s prop names (Task 6.1) match its three adoptions. `buildColumns`' parameter object (Task 1.1) is quoted from the current source.
+
+---
+
+### Task 6.9: The Recent Activity row's vertical rhythm at 320px
+
+**Found while verifying 6.4.** Task 6.4's badge fix is a containment fix: at 320px the
+"Recently completed" pill now grows to two lines instead of letting its text paint
+outside itself. Nothing spills, but the row does not look *deliberate*:
+
+- the completed row measures 93.88px and the in-progress row 77.27px — a 16.61px mismatch
+  that reads as "one row happened to grow", not as a list with two row sizes;
+- the duration ("5m 0s") is vertically centred against a 26px pill, so it floats with
+  visible air above and below and the pair reads as misaligned.
+
+Second, independent instance of the same shrinking-flex mechanism, found in the same pass:
+at 320px in Spanish, the in-progress row's label ("Clasificación preliminar") squeezes the
+progress bar down to a ~4px dot.
+
+**The lever is the row, not the badge.** Either top-align the duration with the pill, or
+give the row a fixed min-height so both variants match. Do not re-clamp the badge — that
+was the defect 6.4 fixed, and it is verified by measurement.
+
+**Files:** `frontend/src/components/admin/dashboard/RecentActivityCard.tsx`
+
+**Verify:** measure both row heights at 320px in EN *and* ES, and check the progress bar
+keeps a usable width in the long-locale case. English is the SHORT case on this surface —
+validating only in English is what let 6.4's defect through in the first place.
+
+---
+
+### Task 6.10: `ConcourseDetailPage` tag badges clamp user-supplied labels
+
+**Found while verifying 6.4**, unrelated to that diff. Three tag badges render
+`{tag.name}` — user-supplied, multi-word, unbounded — inside an `h-5` **hard clamp**
+(20px, ~3.4px of headroom over a 16.6px line box). A wrap escapes the pill by ~13px.
+
+- `ConcourseDetailPage.tsx:1026` — **priority.** Its container is `flex gap-1 mt-2` with
+  **no `flex-wrap`**, so several tags compete for one line and each shrinks to its longest
+  word. Structurally identical to the 6.4 badge-A failure. Two findings here: the clamp,
+  and the missing `flex-wrap`.
+- `ConcourseDetailPage.tsx:972` and `:1847` — inside `flex flex-wrap gap-2`, so items wrap
+  to new lines rather than competing. Residual risk is a single tag whose name exceeds the
+  container width; lower, but real at 320px.
+
+**Fix:** `min-h-5` rather than `h-5` (the 6.4 precedent — a floor, not a clamp), plus
+`flex-wrap` on the `:1026` container.
+
+**Verify by measurement, with a deliberately long multi-word tag name in the fixture.**
+Not with a short one — the whole class of defect only appears when the label outgrows the
+box.
+
+**Explicitly NOT in scope:** the rest of the `h-5 text-2xs` family was measured and is
+safe. `InteractiveDataView.columns.tsx:449,464` are multi-word but sit inside the table's
+`overflow-x-auto` container, so nothing squeezes them (the ES step badge measures 151px
+inside a 320px viewport). `AdminDashboard.tsx:724`, `ItemDetailSheet.tsx:135` and
+`AppSidebar.tsx:337,376` carry numeric counts or a single `⌘K` token — min-content equals
+max-content, so no wrap is possible. Leave all six alone.

@@ -300,7 +300,7 @@ const StudyDesignPage = () => {
                             >
                                 <NotebookPen className="h-4 w-4" />
                                 {memoUnreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-[10px] leading-none px-1.5 py-0.5 font-medium border border-white">
+                                    <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-2xs leading-none px-1.5 py-0.5 font-medium border border-white">
                                         {memoUnreadCount}
                                     </span>
                                 )}

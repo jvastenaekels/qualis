@@ -3,8 +3,8 @@
     /* Fluid Typography Variables */
     /* Viewport range: 320px - 1280px */
 
-    /* 2xs: 10px -> 11px */
-    --font-size-2xs: clamp(0.625rem, 0.60rem + 0.16vw, 0.6875rem);
+    /* 2xs: 11px -> 12px */
+    --font-size-2xs: clamp(0.6875rem, 0.66rem + 0.16vw, 0.75rem);
 
     /* xs: 12px -> 13px */
     --font-size-xs: clamp(0.75rem, 0.72rem + 0.16vw, 0.8125rem);

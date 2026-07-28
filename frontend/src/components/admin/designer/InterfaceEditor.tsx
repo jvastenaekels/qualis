@@ -203,7 +203,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 type="button"
                                                 disabled={readOnly}
                                                 onClick={() => resetLabel(inputKey)}
-                                                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
+                                                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-2xs
                                                          font-black text-slate-400
                                                          hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                                 title={t('common.reset_to_default')}
