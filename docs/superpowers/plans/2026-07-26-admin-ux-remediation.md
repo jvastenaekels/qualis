@@ -1824,3 +1824,29 @@ safe. `InteractiveDataView.columns.tsx:449,464` are multi-word but sit inside th
 inside a 320px viewport). `AdminDashboard.tsx:724`, `ItemDetailSheet.tsx:135` and
 `AppSidebar.tsx:337,376` carry numeric counts or a single `⌘K` token — min-content equals
 max-content, so no wrap is possible. Leave all six alone.
+
+---
+
+### Task 6.11: `QSortEditor`'s readOnly dim, on every launched study
+
+**Found during Task 6.5's opacity sweep, reported rather than grabbed** — its label closes
+at `QSortEditor.tsx:1434`, before any line 6.5 promoted, so it is out of that commit's
+blast radius and was deliberately left alone.
+
+Same shape as 6.5's finding F3: a resting `opacity-*` at `QSortEditor.tsx:1417` composites
+pre-existing tokens down to **3.3542:1** — under the 4.5:1 floor for text. `readOnly` here
+means `draft.state !== 'draft'`, so this is **every launched study**: the steady state of
+the surface, not an edge case.
+
+**Fix:** the `StudyStatusControl` precedent — remove the opacity and carry the
+de-emphasis another way (6.5 used `bg-slate-50` plus a `grayscale` filter, which, unlike
+opacity, applies to foreground and background as a group and so leaves the ratio
+essentially unmoved). Record the computed ratio in a code comment and add a regression test
+asserting the token **and** the absence of a resting opacity.
+
+**Use `/(?:^|\s)opacity-\d/`, not `/\bopacity-\d/`.** Task 6.5 found the precedent's `\b`
+form false-positives on any `<Button>`, because `\b` matches inside `disabled:opacity-50`.
+
+**Verify by computation against the actual background**, not against white — several admin
+surfaces are tinted, and a promoted shade that passes on white can still fail on its own
+background (6.5 found `slate-500` at 4.34:1 on `bg-slate-100` and 4.26:1 on `bg-indigo-50`).
