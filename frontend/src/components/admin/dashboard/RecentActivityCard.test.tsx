@@ -86,11 +86,42 @@ describe('RecentActivityCard — the completed row', () => {
         const card = screen.getByTestId('recent-activity-card');
         const duration = within(card).getByText(/^\d+m \d+s$/);
 
-        // Both halves of the contract: it must not shrink (so the pill
-        // absorbs the overflow instead) and it must not wrap (so "5m 0s"
-        // stays one token even if it does end up narrow).
+        // `whitespace-nowrap` is the load-bearing half: "5m 0s" stays one
+        // token. `shrink-0` is redundant with it — a nowrap box's min-content
+        // size is its full width, so it cannot be shrunk below it either way —
+        // and is kept to state the intent. Neither of them lets the pill
+        // absorb the overflow; that takes the assertion below.
         expect(duration).toHaveClass('shrink-0');
         expect(duration).toHaveClass('whitespace-nowrap');
+    });
+
+    it('lets the status pill give way to the duration instead of pushing it off the line', () => {
+        setup();
+
+        const card = screen.getByTestId('recent-activity-card');
+        const duration = within(card).getByText(/^\d+m \d+s$/);
+        const line = duration.parentElement;
+        if (!line) throw new Error('line 2 wrapper not found');
+        const pill = line.firstElementChild;
+
+        // The other half of the pair above, and the fix for the regression the
+        // pair introduced on its own. A flex item's automatic minimum size is
+        // its min-content width — for this pill, its longest word. With the
+        // duration incompressible, 85 + 6 + 60 = 151px was being asked of the
+        // 144px line at 320px and the surplus left the line box: 7px (es),
+        // 8px (de), 4px (pt) for `12h 34m 56s`, 13/14/10px for `123h 45m 56s`,
+        // at which point the duration paints under the View button.
+        //
+        // Only `overflow-wrap: anywhere` fixes it. Asserted as a negative too,
+        // because the three plausible substitutes are all wrong and all look
+        // right: `break-words` does not reduce the automatic minimum size at
+        // all; bare `min-w-0` shrinks the pill but leaves the word unbreakable,
+        // so the label paints up to 14px outside the pill (the same escape,
+        // moved); `break-all` contains it but breaks mid-word even where a
+        // space break exists.
+        expect(pill).toHaveClass('[overflow-wrap:anywhere]');
+        expect(pill).not.toHaveClass('break-words');
+        expect(pill).not.toHaveClass('break-all');
     });
 
     it('top-aligns the duration against the pill rather than centring it', () => {

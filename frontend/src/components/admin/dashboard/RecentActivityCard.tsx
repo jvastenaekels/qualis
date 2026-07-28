@@ -125,8 +125,46 @@ function ParticipantRow({
                             instead. Not fixable by shortening the label — `Completed` in
                             English is short, but es/pt/nl render "Completados
                             recientemente" and are longer still. Measured at 320/360/375/
-                            414/768/1440. */}
-                        <Badge className="min-h-4 text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
+                            414/768/1440.
+
+                            `[overflow-wrap:anywhere]` is the other half of the
+                            duration's `shrink-0 whitespace-nowrap` below, and the
+                            two only work as a pair. A flex item's automatic
+                            minimum size is its min-content width, which for this
+                            pill is its longest word ("recientemente", 73px + 12px
+                            of padding = 85px). With the duration incompressible,
+                            85 + 6 + 60 = 151px was being asked of a 144px line at
+                            320px, and the surplus was pushed off the end of the
+                            line box: measured 7px (es), 8px (de), 4px (pt) for
+                            `12h 34m 56s`, rising to 13/14/10px for `123h 45m 56s`,
+                            at which point the duration paints under the View
+                            button (+3px es, +4px de).
+
+                            `overflow-wrap: anywhere` — NOT `break-words`, and NOT
+                            `min-w-0` — is what fixes it. `break-words`
+                            (`overflow-wrap: break-word`) does not reduce the
+                            automatic minimum size, so it changes nothing here.
+                            Bare `min-w-0` lets the pill shrink but leaves the word
+                            unbreakable, so the label then paints up to 14px
+                            OUTSIDE the pill — the same escape, moved from the
+                            duration to the label. `break-all` contains it but
+                            breaks mid-word even when a space break is available
+                            ("Recently complete" / "d" at 320px in English, where
+                            the shipped build breaks cleanly at the space).
+                            `anywhere` reduces the minimum size AND only breaks a
+                            word when the word cannot fit on a line of its own.
+
+                            Measured across 4 locales × 4 durations × 6 viewports
+                            (96 cells): text painted outside its box in 0 of them,
+                            for both the duration and the label, and geometry
+                            identical to the shipped build in the 90 cells that
+                            were already correct. The 6 that were not now cost row
+                            height instead of legibility: the completed row grows
+                            from 86.81px to 97.89px (de/pt) or 108.97px (es) at
+                            320px for a sort of 12 hours or more, because the pill
+                            takes a third line rather than the duration leaving the
+                            row. */}
+                        <Badge className="min-h-4 [overflow-wrap:anywhere] text-2xs leading-none font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
@@ -137,6 +175,15 @@ function ParticipantRow({
                             // was what made the completed row 16.61px taller than the
                             // in-progress one (93.88 vs 77.27). A duration is one token;
                             // it must never wrap between its parts.
+                            //
+                            // On its own this made the duration incompressible against a
+                            // pill that could not shrink below its longest word, and the
+                            // duration was pushed off the end of the line box. It holds
+                            // only together with `[overflow-wrap:anywhere]` on the pill
+                            // above — do not remove either one alone. `whitespace-nowrap`
+                            // is doing the work here; `shrink-0` is redundant with it
+                            // (a nowrap box's min-content size is its full width) and is
+                            // kept only to state the intent.
                             <span className="text-2xs text-slate-500 shrink-0 whitespace-nowrap">
                                 {durationSeconds >= 3600
                                     ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
