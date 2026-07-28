@@ -187,7 +187,9 @@ when needed; audio also requires S3-compatible object storage.
 
 ## Required environment variables
 
-The minimum set for any production deployment:
+The minimum set for any production deployment. The two `QUALIS_*` rows apply to
+the Docker path only, where `docker-compose.production.yml` declares them with
+`${VAR:?}` — Compose refuses to start if either is unset.
 
 | Variable | Required | Notes |
 | -------- | :------: | ----- |
@@ -200,6 +202,8 @@ The minimum set for any production deployment:
 | `ADMIN_EMAIL` | first deploy | Email of the initial owner created when the database is empty. |
 | `ADMIN_PASSWORD` | first deploy | Unique initial password. Demo/template values are rejected in production. |
 | `TRUSTED_PROXIES` | behind a proxy | Set to `*` on Scalingo; use explicit proxy IPs on infrastructure you control. |
+| `QUALIS_DB_PASSWORD` | Docker only | Password for the bundled Postgres service. `docker-compose.production.yml` refuses to start without it. |
+| `QUALIS_ALLOWED_HOST_PATTERN` | Docker only | Regex of hosts the backend will answer for. Also mandatory — use `[.]` for literal dots. |
 
 For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
 
