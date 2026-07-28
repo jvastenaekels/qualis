@@ -200,12 +200,21 @@ describe('RecruitmentPage — clear-date buttons track the watched form values (
     // called inline in JSX already re-renders correctly via react-hook-form's
     // own subscription — the freeze only appears once the compiler folds the
     // whole block into a memo keyed on `accessForm`/`isArchived`/
-    // `showWindowPickers`/`t`. The compiler-specific freeze (fixed by
-    // hoisting the watched values to `const startDate =
-    // accessForm.watch('startDate')` etc. in the component body, so the
-    // compiler emits an un-memoized read) can only be observed under a
-    // compiled build — see the E2E coverage / manual verification in
-    // task-6.4-6.8-report.md.
+    // `showWindowPickers`/`t`. It can only be observed under a compiled
+    // build — see task-6.4-6.8-report.md.
+    //
+    // DO NOT "simplify" the fix to `const startDate =
+    // accessForm.watch('startDate')` in the component body. That was tried
+    // and it does NOT work: `accessForm` is useRef-backed with stable
+    // identity, so the compiler emits `if ($[0] !== accessForm)` around the
+    // read and the value is computed once and reused forever — the identical
+    // bug, one level up. `useWatch({control, name})` is a hook call the
+    // compiler cannot fold into a memo guard, so the watched values become
+    // cache keys for the block that renders the buttons. Rationale in full
+    // at RecruitmentPage.tsx:103-116.
+    //
+    // This suite passes on BOTH the fixed and the unfixed source, so it will
+    // not catch that regression. This comment is the only guard rail here.
     //
     // baseApi()'s accessForm comes from a `useForm()` mounted via a separate
     // `renderHook()` tree, so it never causes a re-render of RecruitmentPage

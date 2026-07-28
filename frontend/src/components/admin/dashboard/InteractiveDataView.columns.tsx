@@ -174,7 +174,10 @@ export function ParticipantCell({
                     </span>
                 )}
                 {p.is_discarded && (
-                    <Badge variant="destructive" className="h-4 text-2xs px-1.5 font-semibold">
+                    <Badge
+                        variant="destructive"
+                        className="h-4 text-2xs leading-none px-1.5 font-semibold"
+                    >
                         {t('admin.data.detail.discarded_badge')}
                     </Badge>
                 )}
@@ -207,7 +210,7 @@ export function ParticipantCell({
                 // text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1.
                 <Badge
                     variant="outline"
-                    className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
+                    className="h-4 text-2xs leading-none px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
                 >
                     {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
                     {duplicateIpGroups.get(p.ip_address)}
