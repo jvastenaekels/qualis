@@ -275,3 +275,56 @@ describe('DataPrivacyPage', () => {
         expect(screen.queryByRole('button', { name: /^anonymise$/i })).not.toBeInTheDocument();
     });
 });
+
+describe('DataPrivacyPage — stat tiles (Task 6.3)', () => {
+    beforeEach(() => {
+        mockInventoryHook.mockReset();
+        mockAnonymiseMutation.mockReset();
+        mockPreviewHook.mockReset();
+        mockPreviewHook.mockReturnValue({
+            data: { candidates: 0, cutoff: new Date().toISOString() },
+            isFetching: false,
+        });
+        mockInventoryHook.mockReturnValue({
+            data: mockInventory,
+            isLoading: false,
+            error: null,
+        });
+        mockAnonymiseMutation.mockReturnValue({
+            mutate: vi.fn(),
+            isPending: false,
+        });
+    });
+
+    it('lays the four participant tiles on one row at desktop width', () => {
+        renderWithProviders(<DataPrivacyPage />);
+        // lg (1024px), not sm (640px): verified live that sm:grid-cols-4
+        // squeezes each tile to ~100px once the admin sidebar's fixed width
+        // is subtracted from a 640-900px viewport, which is too narrow for
+        // an icon + label to render legibly — the same "one row on desktop"
+        // pattern StudyOverviewPage/InteractiveDataView already use lg: for.
+        // Below lg, grid-cols-2 still avoids the orphan bug (a full 2x2
+        // grid has no leftover cell, unlike the old sm:grid-cols-3).
+        expect(screen.getByTestId('participants-snapshot')).toHaveClass('lg:grid-cols-4');
+    });
+
+    it('does not colour a zero differently from its neighbours', () => {
+        renderWithProviders(<DataPrivacyPage />);
+        const values = screen.getAllByTestId('stat-value');
+        // Started/Completed/Discarded/Anonymised + Recordings/Total size —
+        // all six tiles on this page render through the same Stat component.
+        expect(values.length).toBeGreaterThanOrEqual(4);
+        const colours = new Set(values.map((v) => v.className.match(/text-\w+-\d+/)?.[0]));
+        expect(colours.size).toBe(1);
+    });
+
+    it('gives the audio-storage tiles the same grid treatment as the participants snapshot', () => {
+        renderWithProviders(<DataPrivacyPage />);
+        const snapshot = screen.getByTestId('participants-snapshot');
+        const audio = screen.getByTestId('audio-storage-snapshot');
+        // Same column classes at both breakpoints -> tiles render at the
+        // same width in both cards, instead of two tiles stretching across
+        // a 2-column row while four tiles above share a 4-column row.
+        expect(audio.className).toBe(snapshot.className);
+    });
+});

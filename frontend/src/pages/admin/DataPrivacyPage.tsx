@@ -22,6 +22,10 @@ import {
     FileSignature,
     PencilLine,
     Eye,
+    CheckCircle2,
+    Trash2,
+    HardDrive,
+    type LucideIcon,
 } from 'lucide-react';
 
 import {
@@ -398,23 +402,29 @@ export default function DataPrivacyPage() {
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div
+                            data-testid="participants-snapshot"
+                            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+                        >
                             <Stat
+                                icon={Users}
                                 label={t('admin.privacy.stat_started', 'Started')}
                                 value={participants.started}
                             />
                             <Stat
+                                icon={CheckCircle2}
                                 label={t('admin.privacy.stat_completed', 'Completed')}
                                 value={participants.completed}
                             />
                             <Stat
+                                icon={Trash2}
                                 label={t('admin.privacy.stat_discarded', 'Discarded')}
                                 value={participants.discarded}
                             />
                             <Stat
+                                icon={ShieldCheck}
                                 label={t('admin.privacy.stat_anonymised', 'Anonymised')}
                                 value={participants.anonymised}
-                                highlight
                             />
                         </div>
 
@@ -458,12 +468,17 @@ export default function DataPrivacyPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div
+                                data-testid="audio-storage-snapshot"
+                                className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+                            >
                                 <Stat
+                                    icon={Mic2}
                                     label={t('admin.privacy.audio_count', 'Recordings')}
                                     value={audio.count}
                                 />
                                 <Stat
+                                    icon={HardDrive}
                                     label={t('admin.privacy.audio_mb', 'Total size')}
                                     value={`${audio.total_mb.toFixed(2)} MB`}
                                 />
@@ -696,20 +711,41 @@ export default function DataPrivacyPage() {
 // ─── sub-components ────────────────────────────────────────────────────────────
 
 interface StatProps {
+    icon: LucideIcon;
     label: string;
     value: number | string;
-    highlight?: boolean;
 }
 
-function Stat({ label, value, highlight = false }: StatProps) {
+/**
+ * One stat tile — used for both the participants snapshot and audio
+ * storage. Previously this page had its own uppercase, icon-less tile
+ * style, distinct from the sentence-case-with-icon convention `Data` and
+ * `Overview` use for the same kind of "label above a big number" display;
+ * task 6.3 unifies on this one. Unlike those pages' clickable filter cards,
+ * these tiles are static, so the icon badge stays a single neutral colour
+ * across every tile rather than colour-coding by category — task 6.3 also
+ * found one tile's value coloured indigo for no semantic reason, and a
+ * per-tile colour scheme here would only reintroduce that.
+ */
+function Stat({ icon: Icon, label, value }: StatProps) {
     return (
         <div className="bg-slate-50 rounded-xl p-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
-                {label}
-            </p>
-            <p
-                className={`text-2xl font-black ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}
-            >
+            <div className="flex items-center gap-2 mb-1.5">
+                <div className="p-1.5 rounded-lg bg-slate-100 text-slate-500 shrink-0">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                </div>
+                {/* min-w-0 + break-words (same convention as StudyOverviewPage's
+                    metric cards): without min-w-0, a flex child cannot shrink
+                    below its content's intrinsic width, so at narrow tile
+                    widths the label overflowed the tile and was clipped by
+                    the parent Card's overflow-hidden instead of wrapping —
+                    found live at 768-900px, where the sidebar has not yet
+                    gone off-canvas but 4 columns are already active. */}
+                <p className="min-w-0 text-xs font-semibold text-slate-500 leading-tight break-words">
+                    {label}
+                </p>
+            </div>
+            <p data-testid="stat-value" className="text-2xl font-black text-slate-900">
                 {value}
             </p>
         </div>
