@@ -11,17 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-    TrendingUp,
-    Eye,
-    Link as LinkIcon,
-    Monitor,
-    Smartphone,
-    Tablet,
-    Table as TableIcon,
-} from 'lucide-react';
+import { TrendingUp, Eye, Link as LinkIcon, Table as TableIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { parseUA } from '@/utils/uaParser';
 import { getStepInfo } from '@/utils/studySteps';
 
 const dateLocales: Record<string, Locale> = {
@@ -30,12 +21,6 @@ const dateLocales: Record<string, Locale> = {
     fi: fi,
     de: de,
 };
-
-const DEVICE_ICONS = {
-    mobile: Smartphone,
-    tablet: Tablet,
-    desktop: Monitor,
-} as const;
 
 function getParticipantColor(id: string) {
     const hue = (id.charCodeAt(0) + id.charCodeAt(1)) % 360;
@@ -80,8 +65,6 @@ function ParticipantRow({
     const colors = getParticipantColor(participant.code);
     const isCompleted = participant.status === 'completed';
     const activityTime = getActivityTime(participant);
-    const ua = parseUA(participant.user_agent as string | undefined);
-    const DeviceIcon = DEVICE_ICONS[ua.device];
     const lang = participant.language_used?.toUpperCase() || '??';
 
     const durationSeconds = computeDurationSeconds(participant);
@@ -166,11 +149,19 @@ function ParticipantRow({
                         />
                     </div>
                 ) : (
-                    <span className="text-2xs text-slate-400">—</span>
+                    <span className="text-2xs text-slate-500">—</span>
                 )}
 
-                {/* Line 3: time · device · language */}
-                <div className="flex items-center gap-1 text-2xs text-slate-400 truncate">
+                {/* Line 3: time · language.
+                    The device glyph that used to sit between these two separators is gone
+                    (task 6.5). It was a 10px lucide `Monitor`/`Smartphone`/`Tablet` with no
+                    accessible name and no text equivalent: screen-reader users got nothing,
+                    and at 10px no sighted user can tell a tablet from a phone. Removed
+                    rather than labelled — this row already truncates at 320px and a visible
+                    "Desktop"/"Escritorio" would push the timestamp out. The device is still
+                    reported, with text, on the participant detail card
+                    (ParticipantMetadataCard) and, with an aria-label, in the Data table. */}
+                <div className="flex items-center gap-1 text-2xs text-slate-500 truncate">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -192,8 +183,6 @@ function ParticipantRow({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                    <span aria-hidden="true">·</span>
-                    <DeviceIcon className="h-2.5 w-2.5 shrink-0" />
                     {showLanguage && (
                         <>
                             <span aria-hidden="true">·</span>
@@ -275,7 +264,7 @@ export default function RecentActivityCard({
             </CardHeader>
             <CardContent className="p-0">
                 {recentParticipants.length === 0 ? (
-                    <div className="p-6 text-center text-slate-400 text-xs">
+                    <div className="p-6 text-center text-slate-500 text-xs">
                         {t('admin.study_overview.no_participants', 'No participants yet.')}
                     </div>
                 ) : (

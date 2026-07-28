@@ -189,7 +189,7 @@ function ConsentLocaleRow({
                         {consent_title}
                     </span>
                 ) : (
-                    <span className="text-sm text-slate-400 italic truncate">
+                    <span className="text-sm text-slate-500 italic truncate">
                         {t('admin.privacy.consent.no_title', '(no title)')}
                     </span>
                 )}
@@ -221,7 +221,7 @@ function ConsentLocaleRow({
                     </DialogContent>
                 </Dialog>
             ) : (
-                <span className="text-xs text-slate-400 italic shrink-0">
+                <span className="text-xs text-slate-500 italic shrink-0">
                     {t('admin.privacy.consent.no_body', '(empty)')}
                 </span>
             )}
@@ -600,7 +600,7 @@ export default function DataPrivacyPage() {
                                 }}
                                 className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 {t(
                                     'admin.privacy.cutoff_help',
                                     'Only completed participants submitted strictly before this date will be anonymised.'
@@ -626,7 +626,7 @@ export default function DataPrivacyPage() {
                                 {isPreviewFetching ? '…' : candidateCount}
                             </span>
                             {!isPreviewFetching && candidateCount === 0 && (
-                                <p className="text-xs text-slate-400 mt-1">
+                                <p className="text-xs text-slate-500 mt-1">
                                     {t(
                                         'admin.privacy.preview_zero',
                                         'No participants qualify for this cutoff. Try an earlier date.'

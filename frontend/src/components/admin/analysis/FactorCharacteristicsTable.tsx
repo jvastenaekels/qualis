@@ -125,7 +125,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Info
-                                        className="size-3.5 text-slate-400 cursor-help"
+                                        className="size-3.5 text-slate-500 cursor-help"
                                         aria-hidden="true"
                                     />
                                 </TooltipTrigger>

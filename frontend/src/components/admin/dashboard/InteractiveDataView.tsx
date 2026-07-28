@@ -97,7 +97,7 @@ function CollapsibleSection({
                     <h2 className="text-sm font-bold text-slate-700 flex-1">{title}</h2>
                     <ChevronDown
                         className={cn(
-                            'h-4 w-4 text-slate-400 transition-transform duration-200',
+                            'h-4 w-4 text-slate-500 transition-transform duration-200',
                             open && 'rotate-180'
                         )}
                     />
@@ -259,7 +259,7 @@ export default function InteractiveDataView({
             {/* Section 1: Key indicators */}
             <CollapsibleSection
                 title={t('admin.data.sections.key_indicators', 'Key indicators')}
-                icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
+                icon={<BarChart3 className="h-4 w-4 text-slate-500" />}
             >
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
                     {/* Primary Metrics: Completed & In Progress */}
@@ -449,7 +449,7 @@ export default function InteractiveDataView({
             {/* Section 2: Responses */}
             <CollapsibleSection
                 title={t('admin.data.sections.responses', 'Responses')}
-                icon={<Users className="h-4 w-4 text-slate-400" />}
+                icon={<Users className="h-4 w-4 text-slate-500" />}
             >
                 {hasActiveFilters && (
                     <div className="flex items-center gap-2 flex-wrap">
@@ -639,7 +639,7 @@ export default function InteractiveDataView({
                     {/* Left Group: Search */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 sm:max-w-sm lg:max-w-2xl">
                         <div className="relative group w-full">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                             <Input
                                 placeholder={t(
                                     'admin.data.search.placeholder',
@@ -757,7 +757,7 @@ export default function InteractiveDataView({
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-9 w-9 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                                        className="h-9 w-9 rounded-lg text-slate-500 hover:text-slate-600 hover:bg-slate-100"
                                         aria-label={t('admin.design.toolbar.more_actions')}
                                     >
                                         <MoreVertical className="h-4 w-4" />
@@ -854,8 +854,30 @@ export default function InteractiveDataView({
                                         key={row.id}
                                         className={cn(
                                             'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                            // No `opacity-60` on a discarded row (task 6.5
+                                            // review, F2). `is_discarded` is a persisted
+                                            // flag, so this is a RESTING state, and the row
+                                            // keeps `cursor-pointer` and an unconditional
+                                            // onClick that navigates — it is an operable
+                                            // component, so WCAG's inactive-component
+                                            // exemption does not apply to it. At 60% the
+                                            // seven promoted cells inside (the four `—`
+                                            // empty-value markers plus the OS, browser and
+                                            // language glyphs) composited to slate-500 @ 60%
+                                            // over white = #a2acb9 → 2.30:1, under even the
+                                            // 3:1 non-text floor.
+                                            //
+                                            // The de-emphasis itself is worth keeping, so it
+                                            // is carried by two signals that do not touch
+                                            // contrast: a slate-50 surface (slate-500 on
+                                            // #f8fafc = 4.55:1, still clears 4.5:1) and the
+                                            // existing desaturation, which drains the colour
+                                            // out of the ID badge and the status chips. The
+                                            // row also names itself in words — see the
+                                            // "Discarded" badge in
+                                            // InteractiveDataView.columns.tsx.
                                             !!row.original.is_discarded &&
-                                                'opacity-60 grayscale-[0.5]'
+                                                'bg-slate-50 grayscale-[0.5]'
                                         )}
                                         onClick={(e) => {
                                             // Belt-and-braces (Task 6.7i
@@ -920,7 +942,7 @@ export default function InteractiveDataView({
                                                 variant="inline"
                                             />
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-500">
                                                 <div className="p-4 bg-slate-50 rounded-full">
                                                     <Search className="w-8 h-8 opacity-20" />
                                                 </div>
@@ -1001,7 +1023,7 @@ export default function InteractiveDataView({
             {/* Section 3: Key statistics */}
             <CollapsibleSection
                 title={t('admin.data.sections.key_statistics', 'Key statistics')}
-                icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
+                icon={<BarChart3 className="h-4 w-4 text-slate-500" />}
             >
                 {liveParticipants.length > 0 && (
                     <div className="grid gap-4 md:grid-cols-12 mb-4">

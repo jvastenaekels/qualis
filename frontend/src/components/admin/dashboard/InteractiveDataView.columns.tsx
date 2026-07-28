@@ -155,7 +155,7 @@ export function ParticipantCell({
                         title={p.user_agent}
                         className="flex items-center gap-1"
                     >
-                        <span className="inline-flex items-center text-slate-400">
+                        <span className="inline-flex items-center text-slate-500">
                             {OsIcon ? (
                                 <OsIcon className="w-3 h-3" />
                             ) : (
@@ -163,7 +163,7 @@ export function ParticipantCell({
                             )}
                         </span>
                         {ua.browser !== 'Unknown' && (
-                            <span className="inline-flex items-center text-slate-400">
+                            <span className="inline-flex items-center text-slate-500">
                                 {BrowserIcon ? (
                                     <BrowserIcon className="w-3 h-3" />
                                 ) : (
@@ -282,7 +282,7 @@ export function buildColumns({
         columnHelper.accessor('id', {
             header: () => (
                 <div className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-slate-400" />
+                    <Users className="w-3.5 h-3.5 text-slate-500" />
                     <span>{t('admin.data.table.participant')}</span>
                 </div>
             ),
@@ -303,7 +303,7 @@ export function buildColumns({
                               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                               className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
                           >
-                              <Globe className="w-3.5 h-3.5 text-slate-400" />
+                              <Globe className="w-3.5 h-3.5 text-slate-500" />
                               {t('admin.data.table.lang')}
                               {column.getIsSorted() === 'asc' ? (
                                   <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
@@ -316,7 +316,7 @@ export function buildColumns({
                       ),
                       cell: (info) => (
                           <div className="flex items-center gap-2 text-slate-600 font-medium">
-                              <Globe className="h-3.5 w-3.5 text-slate-300" />
+                              <Globe className="h-3.5 w-3.5 text-slate-500" />
                               <span className="text-xs font-medium">
                                   {info.getValue() === 'US' ? 'EN' : info.getValue()}
                               </span>
@@ -333,7 +333,7 @@ export function buildColumns({
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                         className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
                     >
-                        <Sparkles className="w-3.5 h-3.5 text-slate-400" />
+                        <Sparkles className="w-3.5 h-3.5 text-slate-500" />
                         {t('admin.data.table.status', 'Status')}
                         {column.getIsSorted() === 'asc' ? (
                             <ArrowUp className="ml-1 h-3 w-3 text-indigo-500" />
@@ -353,7 +353,7 @@ export function buildColumns({
                                     'h-6 w-6 p-0 rounded',
                                     statusFilter !== 'all' || stepFilter !== 'all'
                                         ? 'text-indigo-600 bg-indigo-50'
-                                        : 'text-slate-400 hover:text-slate-600'
+                                        : 'text-slate-500 hover:text-slate-600'
                                 )}
                             >
                                 <Filter className="h-3 w-3" />
@@ -369,7 +369,7 @@ export function buildColumns({
                                 {t('admin.data.filters.all_statuses', 'All')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuLabel className="text-2xs text-slate-400">
+                            <DropdownMenuLabel className="text-2xs text-slate-500">
                                 {t('admin.data.table.status', 'Status')}
                             </DropdownMenuLabel>
                             <DropdownMenuItem
@@ -412,7 +412,7 @@ export function buildColumns({
                                 {t('admin.data.status.abandoned', 'Abandoned')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuLabel className="text-2xs text-slate-400">
+                            <DropdownMenuLabel className="text-2xs text-slate-500">
                                 {t('admin.data.table.current_step', 'Current step')}
                             </DropdownMenuLabel>
                             {Object.entries(stepLabels).map(([step, [key, fallback]]) => (
@@ -488,7 +488,7 @@ export function buildColumns({
                                     'h-6 w-6 p-0 rounded',
                                     consentFilters.size > 0
                                         ? 'text-indigo-600 bg-indigo-50'
-                                        : 'text-slate-400 hover:text-slate-600'
+                                        : 'text-slate-500 hover:text-slate-600'
                                 )}
                             >
                                 <Filter className="h-3 w-3" />
@@ -579,7 +579,7 @@ export function buildColumns({
                         {!p.postsort.email &&
                             !p.postsort.newsletter_consent &&
                             !p.postsort.interview_consent && (
-                                <span className="text-2xs text-slate-300 font-medium">—</span>
+                                <span className="text-2xs text-slate-500 font-medium">—</span>
                             )}
                     </div>
                 );
@@ -590,7 +590,7 @@ export function buildColumns({
             header: () => (
                 <div className="flex items-center gap-1">
                     <div className="flex items-center gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-slate-400" />
+                        <AlertTriangle className="w-3.5 h-3.5 text-slate-500" />
                         <span>{t('admin.data.table.flags')}</span>
                     </div>
                     <DropdownMenu>
@@ -603,7 +603,7 @@ export function buildColumns({
                                     'h-6 w-6 p-0 rounded',
                                     qualityFilter !== 'all'
                                         ? 'text-indigo-600 bg-indigo-50'
-                                        : 'text-slate-400 hover:text-slate-600'
+                                        : 'text-slate-500 hover:text-slate-600'
                                 )}
                             >
                                 <Filter className="h-3 w-3" />
@@ -712,7 +712,7 @@ export function buildColumns({
                             </span>
                         )}
                         {!isSuspect && !hasComments && !hasAudio && !hasRecruitmentLink && (
-                            <span className="text-2xs text-slate-300 font-medium">—</span>
+                            <span className="text-2xs text-slate-500 font-medium">—</span>
                         )}
                     </div>
                 );
@@ -725,7 +725,7 @@ export function buildColumns({
                     onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                     className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center justify-end gap-1.5 w-full text-right"
                 >
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <Clock className="w-3.5 h-3.5 text-slate-500" />
                     {t('admin.data.table.duration')}
                     {column.getIsSorted() === 'asc' ? (
                         <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
@@ -739,7 +739,7 @@ export function buildColumns({
             cell: (info) => {
                 const seconds = info.getValue();
                 if (seconds === null)
-                    return <span className="text-slate-300 text-right block">—</span>;
+                    return <span className="text-slate-500 text-right block">—</span>;
                 return (
                     <div className="flex items-center justify-end gap-1.5 font-mono text-xs text-slate-600">
                         {seconds >= 3600
@@ -764,7 +764,7 @@ export function buildColumns({
                     onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                     className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
                 >
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
                     {t('admin.data.table.submitted')}
                     {column.getIsSorted() === 'asc' ? (
                         <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
@@ -777,7 +777,7 @@ export function buildColumns({
             ),
             cell: (info) => {
                 const val = info.getValue();
-                if (!val) return <span className="text-slate-300">—</span>;
+                if (!val) return <span className="text-slate-500">—</span>;
                 const date = new Date(val);
                 const shortLabel = format(date, 'MMM d, HH:mm', { locale: currentLocale });
                 const fullLabel = format(date, 'PPpp', { locale: currentLocale });

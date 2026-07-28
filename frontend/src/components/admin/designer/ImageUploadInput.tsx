@@ -129,7 +129,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                         {label}
                     </Label>
                     {recommendedSize && (
-                        <span className="text-2xs font-semibold text-slate-400 tracking-tighter">
+                        <span className="text-2xs font-semibold text-slate-500 tracking-tighter">
                             {t('admin.design.theme.upload.recommended', 'Recommended')}:{' '}
                             {recommendedSize}
                         </span>
@@ -228,7 +228,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                                 </>
                             ) : (
                                 <>
-                                    <Upload className="h-8 w-8 text-slate-400" />
+                                    <Upload className="h-8 w-8 text-slate-500" />
                                     <p className="text-sm font-medium text-slate-700">
                                         {t(
                                             'admin.design.theme.upload.drag_drop',
@@ -267,7 +267,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                     <button
                         type="button"
                         onClick={handleClear}
-                        className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                        className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-md text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all"
                         aria-label={
                             removeAriaLabel ??
                             t('admin.design.theme.upload.remove_default', 'Remove image')

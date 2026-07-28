@@ -827,7 +827,7 @@ export default function ConcourseDetailPage() {
                                                                     'common.cancel',
                                                                     'Cancel'
                                                                 )}
-                                                                className="size-8 p-0 text-slate-400 hover:bg-slate-100"
+                                                                className="size-8 p-0 text-slate-500 hover:bg-slate-100"
                                                                 onClick={() => setEditingItem(null)}
                                                             >
                                                                 <X className="size-3.5" />
@@ -842,7 +842,7 @@ export default function ConcourseDetailPage() {
                                                                     'admin.concourse.history',
                                                                     'History'
                                                                 )}
-                                                                className="size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                className="size-8 p-0 text-slate-500 hover:text-slate-700"
                                                                 onClick={() =>
                                                                     openSheet(item, 'history')
                                                                 }
@@ -856,7 +856,7 @@ export default function ConcourseDetailPage() {
                                                                     'admin.concourse.comments',
                                                                     'Comments'
                                                                 )}
-                                                                className="relative size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                className="relative size-8 p-0 text-slate-500 hover:text-slate-700"
                                                                 onClick={() =>
                                                                     openSheet(item, 'comments')
                                                                 }
@@ -887,7 +887,7 @@ export default function ConcourseDetailPage() {
                                                                     'common.delete',
                                                                     'Delete'
                                                                 )}
-                                                                className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                                className="size-8 p-0 text-slate-500 hover:text-red-500 hover:bg-red-50"
                                                                 onClick={() =>
                                                                     setDeleteConfirmId(item.id)
                                                                 }
@@ -994,7 +994,7 @@ export default function ConcourseDetailPage() {
                                                         className={cn(
                                                             'text-sm leading-normal',
                                                             isMissingTranslation
-                                                                ? 'text-slate-400 italic'
+                                                                ? 'text-slate-500 italic'
                                                                 : 'text-slate-800'
                                                         )}
                                                     >
@@ -1004,7 +1004,7 @@ export default function ConcourseDetailPage() {
                                                             </span>
                                                         )}
                                                         {text || (
-                                                            <span className="text-slate-300">
+                                                            <span className="text-slate-500">
                                                                 {t(
                                                                     'admin.concourse.no_translation',
                                                                     'No text'
@@ -1131,7 +1131,7 @@ export default function ConcourseDetailPage() {
                                                                 'common.cancel',
                                                                 'Cancel'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:bg-slate-100"
+                                                            className="size-8 p-0 text-slate-500 hover:bg-slate-100"
                                                             onClick={() => setEditingItem(null)}
                                                         >
                                                             <X className="size-3.5" />
@@ -1146,7 +1146,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.history',
                                                                 'History'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-500 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'history')
                                                             }
@@ -1160,7 +1160,7 @@ export default function ConcourseDetailPage() {
                                                                 'admin.concourse.comments',
                                                                 'Comments'
                                                             )}
-                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="relative size-8 p-0 text-slate-500 hover:text-slate-700 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 openSheet(item, 'comments')
                                                             }
@@ -1188,7 +1188,7 @@ export default function ConcourseDetailPage() {
                                                                 'common.delete',
                                                                 'Delete'
                                                             )}
-                                                            className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            className="size-8 p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                                                             onClick={() =>
                                                                 setDeleteConfirmId(item.id)
                                                             }
@@ -1302,7 +1302,7 @@ export default function ConcourseDetailPage() {
                                 className="text-2xs font-black text-slate-500"
                             >
                                 {t('admin.concourse.field_source', 'Source')}
-                                <span className="text-slate-400 font-normal ml-1">
+                                <span className="text-slate-500 font-normal ml-1">
                                     ({t('common.optional', 'optional')})
                                 </span>
                             </Label>
@@ -1561,7 +1561,7 @@ export default function ConcourseDetailPage() {
                                 )}
                                 className="rounded-xl min-h-[200px] font-mono text-sm"
                             />
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 {t(
                                     'admin.concourse.import_csv_hint',
                                     'CSV/TSV needs columns: code, language, text.'
@@ -1600,7 +1600,7 @@ export default function ConcourseDetailPage() {
                             )}
                         </div>
                         {importText.trim() && (
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 {importText.split('\n').filter((l) => l.trim()).length}{' '}
                                 {t('admin.concourse.items_to_import', 'statements to import')}
                             </p>
@@ -1698,7 +1698,7 @@ export default function ConcourseDetailPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-7 px-2 text-slate-400 text-xs"
+                                                    className="h-7 px-2 text-slate-500 text-xs"
                                                     onClick={() => setDeleteTagId(null)}
                                                     aria-label={t(
                                                         'admin.concourse.cancel_delete_tag',
@@ -1713,7 +1713,7 @@ export default function ConcourseDetailPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                className="h-7 w-7 p-0 text-slate-500 hover:text-red-500 hover:bg-red-50"
                                                 onClick={() => setDeleteTagId(tag.id)}
                                                 aria-label={t(
                                                     'admin.concourse.delete_tag',
@@ -1728,7 +1728,7 @@ export default function ConcourseDetailPage() {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-center text-sm text-slate-400 py-4">
+                            <p className="text-center text-sm text-slate-500 py-4">
                                 {t(
                                     'admin.concourse.no_tags',
                                     'No tags yet. Create your first tag above.'
@@ -1819,7 +1819,7 @@ function TagCheckboxGroup({
                 site in this file, so only one instance is ever mounted. */}
             <p id="tag-checkbox-group-heading" className="text-2xs font-black text-slate-500">
                 {label}
-                <span className="text-slate-400 font-normal ml-1">
+                <span className="text-slate-500 font-normal ml-1">
                     ({selectedIds.length}/{tags.length})
                 </span>
             </p>

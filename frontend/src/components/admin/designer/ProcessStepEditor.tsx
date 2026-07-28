@@ -111,7 +111,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                     <div className="flex flex-col min-w-0 text-left">
                                         <span className="text-sm font-bold text-slate-700 truncate tracking-tight">
                                             {step.title || (
-                                                <span className="text-slate-400 font-medium italic">
+                                                <span className="text-slate-500 font-medium italic">
                                                     {t(
                                                         'admin.design.intro.process_steps.defaults.new_step'
                                                     )}
@@ -119,14 +119,14 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                             )}
                                         </span>
                                         {step.description && (
-                                            <span className="text-xs text-slate-400 font-medium truncate mt-0.5">
+                                            <span className="text-xs text-slate-500 font-medium truncate mt-0.5">
                                                 {step.description}
                                             </span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                    <AccordionTrigger className="py-2 hover:no-underline text-slate-400 hover:text-indigo-600">
+                                    <AccordionTrigger className="py-2 hover:no-underline text-slate-500 hover:text-indigo-600">
                                         <span className="sr-only">
                                             {t('admin.design.intro.process_steps.fields.toggle')}
                                         </span>
@@ -552,7 +552,7 @@ export function ProcessStepEditor({
                         variant="ghost"
                         size="sm"
                         onClick={resetSteps}
-                        className="h-11 rounded-xl font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                        className="h-11 rounded-xl font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all"
                     >
                         <RotateCcw className="h-4 w-4 mr-2" />
                         {t('admin.design.intro.process_steps.reset.process_steps')}

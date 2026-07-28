@@ -1,4 +1,4 @@
-import { Briefcase, Settings, Save, Globe } from 'lucide-react';
+import { Briefcase, Settings, Save, Globe, ShieldAlert } from 'lucide-react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -179,8 +179,26 @@ export default function ProjectSettingsPage() {
                                                     disabled={!isOwner}
                                                 />
                                             </FormControl>
-                                            <FormDescription className="text-2xs italic">
-                                                {t('admin.projects.settings.general.slug_hint')}
+                                            {/* Task 6.5, step 3. This is not a hint, it is a
+                                                consequence: renaming the slug rewrites every
+                                                dashboard link the researcher has already
+                                                circulated. It used to render in the page's
+                                                most discreet style (text-2xs italic). It now
+                                                carries the admin's established inline-notice
+                                                treatment, copied verbatim from
+                                                GeneralSettingsPage's archiving notice, so it
+                                                reads with the same weight as other
+                                                consequential copy on a settings surface.
+                                                Still a FormDescription, so the input keeps
+                                                its aria-describedby wiring. */}
+                                            <FormDescription className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 text-xs font-medium text-amber-800 flex items-start gap-3">
+                                                <ShieldAlert
+                                                    className="w-4 h-4 mt-0.5 shrink-0"
+                                                    aria-hidden="true"
+                                                />
+                                                <span>
+                                                    {t('admin.projects.settings.general.slug_hint')}
+                                                </span>
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>

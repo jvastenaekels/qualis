@@ -433,3 +433,77 @@ describe('QuestionBuilder — action-button accessible names (Task 6.7c)', () =>
         expect(removeOption).not.toHaveClass('text-slate-300');
     });
 });
+
+/**
+ * Contrast regression test for the read-only question card (task 6.5 review,
+ * F3). `readOnly` is `api.isFullyReadOnly` = `draft.state !== 'draft'` — every
+ * active, paused or closed study, i.e. the normal steady state of any launched
+ * study. The card carried `readOnly && 'opacity-80'`, which multiplied into the
+ * computed contrast of every promoted node beneath it: the "Untitled"
+ * placeholder and the field labels landed at slate-500 @ 80% over white =
+ * #8390a2 → 3.25:1, and the question-type chip at 3.17:1 on its composited
+ * slate-50 pill. A class swap alone would have looked fixed and still failed,
+ * so the assertion is on the absence of the opacity as well as on the token.
+ */
+describe('QuestionBuilder — a read-only card carries no resting opacity (task 6.5 review, F3)', () => {
+    // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility
+    const renderCard = (readOnly: boolean, overrides: any = {}) =>
+        renderWithStore(<QuestionBuilder type="post" readOnly={readOnly} />, {
+            initialState: {
+                ...overrides,
+                draft: {
+                    slug: 'test',
+                    state: readOnly ? 'active' : 'draft',
+                    postsort_config: {
+                        questions: {
+                            q1: { type: 'text', label: 'First question', required: false },
+                        },
+                    },
+                },
+                activeLocale: 'en',
+            },
+        });
+
+    it('does not dim the whole card when the study is launched', async () => {
+        renderCard(true);
+
+        const card = (await screen.findByText('First question')).closest(
+            '[data-testid="question-item"]'
+        );
+        expect(card).not.toBeNull();
+        expect(card?.className).not.toMatch(/(?:^|\s)opacity-\d/);
+    });
+
+    it('still marks read-only on the controls, where WCAG does exempt it', async () => {
+        const user = userEvent.setup();
+        renderCard(true);
+
+        const card = (await screen.findByText('First question')).closest(
+            '[data-testid="question-item"]'
+        ) as HTMLElement;
+
+        // The drag handle and the delete button are not rendered at all on a
+        // read-only card — that, not a 20% dim, is what carries the affordance.
+        expect(within(card).queryByRole('button', { name: /reorder/i })).not.toBeInTheDocument();
+        expect(within(card).queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+
+        await user.click(within(card).getByTestId('question-accordion-trigger'));
+        expect(within(card).getByDisplayValue('First question')).toHaveAttribute('readonly');
+    });
+
+    it('gives the question-type chip a token that clears 4.5:1 on its own slate-50 pill', async () => {
+        const user = userEvent.setup();
+        renderCard(false);
+
+        const card = (await screen.findByText('First question')).closest(
+            '[data-testid="question-item"]'
+        ) as HTMLElement;
+        await user.click(within(card).getByTestId('question-accordion-trigger'));
+
+        // slate-500 on bg-slate-50 is 4.55:1 — a 1% margin. slate-600 is 7.24:1.
+        const chip = within(card).getByTestId('question-type-label');
+        expect(chip).toHaveClass('text-slate-600');
+        expect(chip).not.toHaveClass('text-slate-500');
+        expect(chip.className).not.toMatch(/(?:^|\s)opacity-\d/);
+    });
+});

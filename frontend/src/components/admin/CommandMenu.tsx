@@ -95,7 +95,7 @@ export const CommandMenu = () => {
                             'admin.command_menu.placeholder',
                             'Type a command or search...'
                         )}
-                        className="flex h-12 w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-12 w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-500 disabled:cursor-not-allowed disabled:opacity-50"
                         autoFocus
                     />
                 </div>
@@ -185,7 +185,7 @@ export const CommandMenu = () => {
                             </Command.Item>
                         ))}
                         {(!filteredStudies || filteredStudies.length === 0) && (
-                            <div className="px-4 py-3 text-sm text-slate-400 italic">
+                            <div className="px-4 py-3 text-sm text-slate-500 italic">
                                 {t('admin.command_menu.no_studies', 'No studies in this project.')}
                             </div>
                         )}
@@ -314,7 +314,7 @@ export const CommandMenu = () => {
                     </Command.Group>
                 </Command.List>
 
-                <div className="border-t px-4 py-2 flex items-center justify-between text-xs text-slate-400">
+                <div className="border-t px-4 py-2 flex items-center justify-between text-xs text-slate-500">
                     <div className="flex items-center gap-2">
                         <Search className="h-3 w-3" />
                         <span>

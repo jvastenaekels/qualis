@@ -72,7 +72,7 @@ const InstructionField = ({
                         type="button"
                         onClick={onReset}
                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-2xs
-                                   font-medium text-slate-400
+                                   font-medium text-slate-500
                                    hover:text-indigo-600 hover:bg-slate-50 transition-colors"
                     >
                         <RotateCcw className="size-3" />

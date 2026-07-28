@@ -46,7 +46,7 @@ export const MultiLangFieldIcon = ({
                     variant="ghost"
                     size="sm"
                     className={cn(
-                        'h-6 w-6 p-0 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-all',
+                        'h-6 w-6 p-0 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-all',
                         className
                     )}
                     title={t('admin.design.multilang.view_others', 'View in other languages')}
@@ -58,7 +58,7 @@ export const MultiLangFieldIcon = ({
                 align="end"
                 className="w-80 max-h-[400px] overflow-y-auto rounded-xl shadow-xl border-slate-100 p-2"
             >
-                <DropdownMenuLabel className="text-2xs font-black text-slate-400 px-2 py-1.5">
+                <DropdownMenuLabel className="text-2xs font-black text-slate-500 px-2 py-1.5">
                     {t('admin.design.multilang.other_formulations', 'Other Formulations')}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-slate-100 my-1" />

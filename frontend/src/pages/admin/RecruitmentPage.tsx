@@ -429,7 +429,7 @@ const RecruitmentPage = () => {
                                         )}
                                     </Label>
                                     <div className="relative">
-                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                         <Input
                                             id="access-password"
                                             type="text"
@@ -523,7 +523,7 @@ const RecruitmentPage = () => {
                                                 )}
                                             </Label>
                                             <div className="relative">
-                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                                                 <Input
                                                     id="start-date"
                                                     type="datetime-local"
@@ -539,7 +539,7 @@ const RecruitmentPage = () => {
                                                                 shouldDirty: true,
                                                             })
                                                         }
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                                                         aria-label={t(
                                                             'admin.recruitment.access_rules.clear_date',
                                                             'Clear date'
@@ -561,7 +561,7 @@ const RecruitmentPage = () => {
                                                 )}
                                             </Label>
                                             <div className="relative">
-                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
                                                 <Input
                                                     id="end-date"
                                                     type="datetime-local"
@@ -577,7 +577,7 @@ const RecruitmentPage = () => {
                                                                 shouldDirty: true,
                                                             })
                                                         }
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                                                         aria-label={t(
                                                             'admin.recruitment.access_rules.clear_date',
                                                             'Clear date'
@@ -742,7 +742,7 @@ const RecruitmentPage = () => {
                                                 )}
                                             </Label>
                                             <div className="relative">
-                                                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                                 <Input
                                                     id="name"
                                                     placeholder={t(
@@ -772,7 +772,7 @@ const RecruitmentPage = () => {
                                                           )}
                                                 </Label>
                                                 <div className="relative">
-                                                    <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                    <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                                     <Input
                                                         id="count"
                                                         type="number"
@@ -909,7 +909,7 @@ const RecruitmentPage = () => {
                                     <TableRow key={link.id}>
                                         <TableCell className="font-bold text-slate-900 pl-6">
                                             {link.name || (
-                                                <span className="text-slate-300 italic font-normal">
+                                                <span className="text-slate-500 italic font-normal">
                                                     {t('admin.recruitment.unnamed', 'Unnamed')}
                                                 </span>
                                             )}
@@ -996,7 +996,7 @@ const RecruitmentPage = () => {
                                                 <div className="flex flex-col gap-1.5">
                                                     <span className="text-2xs font-black text-slate-700">
                                                         {link.usage_count}
-                                                        <span className="text-slate-300 font-medium">
+                                                        <span className="text-slate-500 font-medium">
                                                             {' '}
                                                             / {link.capacity}
                                                         </span>
@@ -1066,7 +1066,7 @@ const RecruitmentPage = () => {
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-400 hover:text-indigo-600"
+                                                            className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-500 hover:text-indigo-600"
                                                             aria-label={t(
                                                                 'admin.recruitment.show_qr',
                                                                 'Show QR code'
@@ -1125,7 +1125,7 @@ const RecruitmentPage = () => {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-400 hover:text-red-600"
+                                                    className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-500 hover:text-red-600"
                                                     onClick={() => handleRevoke(link.id)}
                                                     disabled={isRevokingLink}
                                                     aria-label={t(

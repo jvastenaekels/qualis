@@ -242,7 +242,7 @@ export default function AdminUsersPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="relative w-full sm:max-w-xs">
-                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-500" />
                     <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -388,7 +388,7 @@ export default function AdminUsersPage() {
                             {linkCopied ? (
                                 <Check className="size-3 text-emerald-600" />
                             ) : (
-                                <Copy className="size-3 text-slate-400" />
+                                <Copy className="size-3 text-slate-500" />
                             )}
                         </Button>
                     </div>
@@ -579,7 +579,7 @@ function UserRow({
                             </Badge>
                         )}
                     </div>
-                    <span className="truncate text-xs font-medium text-slate-400">
+                    <span className="truncate text-xs font-medium text-slate-500">
                         {user.full_name || t('admin.users.no_name', 'No name')}
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -597,7 +597,7 @@ function UserRow({
                             );
                         })}
                     </div>
-                    <span className="text-2xs font-medium text-slate-400">
+                    <span className="text-2xs font-medium text-slate-500">
                         {lastSeen
                             ? t('admin.users.last_seen', 'Last seen {{when}}', { when: lastSeen })
                             : t('admin.users.never_logged_in', 'Never logged in')}
@@ -615,7 +615,7 @@ function UserRow({
                         aria-label={t('admin.users.actions_aria', 'Actions for {{email}}', {
                             email: user.email,
                         })}
-                        className="size-9 shrink-0 p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 rounded-lg"
+                        className="size-9 shrink-0 p-0 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg"
                     >
                         <MoreVertical className="size-4" />
                     </Button>

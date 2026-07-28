@@ -230,7 +230,7 @@ export function ParticipantDetailContent({
     const sidebarContent = (
         <div className="flex flex-col h-full bg-white">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                <h3 className="text-xs font-black text-slate-400">
+                <h3 className="text-xs font-black text-slate-500">
                     {t('admin.participant.grid.detail_view', 'Card Details')}
                 </h3>
             </div>
@@ -243,7 +243,7 @@ export function ParticipantDetailContent({
                                     {detailStatement.code ||
                                         `${t('admin.participant.metadata.id', 'ID')}: ${detailStatement.id}`}
                                 </Badge>
-                                <span className="text-xs font-medium text-slate-400">
+                                <span className="text-xs font-medium text-slate-500">
                                     {t('common.score', 'Score')}:{' '}
                                     <span className="text-slate-900 font-bold">
                                         {participant.placements[String(detailStatement.id)]}
@@ -300,15 +300,15 @@ export function ParticipantDetailContent({
 
                         {/* No Response */}
                         {!detailComment && !detailAudio && (
-                            <div className="text-center py-8 text-slate-400 text-sm">
+                            <div className="text-center py-8 text-slate-500 text-sm">
                                 {t('admin.participant.grid.no_response', 'No response provided.')}
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-slate-400 text-center space-y-2">
+                    <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center space-y-2">
                         <div className="p-3 bg-slate-50 rounded-full">
-                            <MousePointer2 className="w-6 h-6 text-slate-300" />
+                            <MousePointer2 className="w-6 h-6 text-slate-500" />
                         </div>
                         <p className="text-sm font-medium">
                             {t(
@@ -353,7 +353,7 @@ export function ParticipantDetailContent({
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="min-h-[44px] sm:h-14 min-w-[44px] rounded-none border-b-2 border-transparent px-3 sm:px-0 text-xs sm:text-xs font-black text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
+                                className="min-h-[44px] sm:h-14 min-w-[44px] rounded-none border-b-2 border-transparent px-3 sm:px-0 text-xs sm:text-xs font-black text-slate-500 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
                                 <div className="flex items-center gap-2">
                                     {tab === 'session' && (
@@ -390,7 +390,7 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportCSV}
-                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-500 hover:text-indigo-600"
                             title={t('admin.export.csv', 'Export CSV')}
                             aria-label={t('admin.export.csv', 'Export CSV')}
                         >
@@ -401,7 +401,7 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportJSON}
-                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-500 hover:text-indigo-600"
                             title={t('admin.export.json', 'Export JSON')}
                             aria-label={t('admin.export.json', 'Export JSON')}
                         >
@@ -413,7 +413,7 @@ export function ParticipantDetailContent({
                                 size="sm"
                                 disabled={isExporting}
                                 onClick={handleExportAudio}
-                                className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                                className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-500 hover:text-indigo-600"
                                 title={t('admin.export.audio', 'Export Audio (ZIP)')}
                                 aria-label={t('admin.export.audio', 'Export Audio (ZIP)')}
                             >
@@ -457,7 +457,7 @@ export function ParticipantDetailContent({
                                 className="space-y-6 max-w-7xl mx-auto"
                             >
                                 <div className="space-y-4">
-                                    <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
+                                    <h3 className="text-2xs font-black text-slate-500 flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                         {t(
                                             'admin.participant.survey.presort',
@@ -540,7 +540,7 @@ export function ParticipantDetailContent({
                                 className="space-y-8 max-w-7xl mx-auto"
                             >
                                 <div className="space-y-4">
-                                    <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
+                                    <h3 className="text-2xs font-black text-slate-500 flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                         {t(
                                             'admin.participant.survey.postsort',
@@ -558,7 +558,7 @@ export function ParticipantDetailContent({
                                 {/* Audio Recordings */}
                                 {hasAudioRecordings && (
                                     <div className="space-y-4">
-                                        <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
+                                        <h3 className="text-2xs font-black text-slate-500 flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                                             {t(
                                                 'admin.participant.survey.audio_recordings',

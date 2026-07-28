@@ -143,7 +143,7 @@ function ParticipantMaterialCard({
                                         )}
                                     />
                                 ) : (
-                                    <p className="text-2xs text-slate-400 italic">
+                                    <p className="text-2xs text-slate-500 italic">
                                         {t(
                                             'admin.analysis.factor_voices.url_unavailable',
                                             'Audio URL not available.'
@@ -187,7 +187,7 @@ function ParticipantMaterialCard({
                                                 'admin.analysis.interpret.insert_comment_quote',
                                                 'Insert comment as quote'
                                             )}
-                                            className="ml-auto text-slate-400 hover:text-emerald-700 text-xs"
+                                            className="ml-auto text-slate-500 hover:text-emerald-700 text-xs"
                                         >
                                             ▸+
                                         </button>
@@ -273,7 +273,7 @@ export function FactorVoicesPanel({
                         type="button"
                         onClick={() => setTooltipOpen((o) => !o)}
                         onBlur={() => setTooltipOpen(false)}
-                        className="text-slate-400 hover:text-slate-600 transition-colors"
+                        className="text-slate-500 hover:text-slate-600 transition-colors"
                         aria-label={t(
                             'admin.analysis.factor_voices.context_aria',
                             'About this panel'
@@ -294,7 +294,7 @@ export function FactorVoicesPanel({
 
             {isLoading && (
                 <div
-                    className="flex items-center gap-2 text-sm text-slate-400 py-2"
+                    className="flex items-center gap-2 text-sm text-slate-500 py-2"
                     role="status"
                     aria-live="polite"
                 >
@@ -317,7 +317,7 @@ export function FactorVoicesPanel({
             )}
 
             {hasNoMaterial && (
-                <p className="text-xs text-slate-400 italic py-1">
+                <p className="text-xs text-slate-500 italic py-1">
                     {t(
                         'admin.analysis.factor_voices.no_material',
                         'No post-sort audio recordings or written comments from participants flagged on this factor.'

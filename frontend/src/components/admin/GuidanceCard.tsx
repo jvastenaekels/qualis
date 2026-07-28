@@ -133,7 +133,7 @@ export const GuidanceCard: React.FC<GuidanceCardProps> = ({
                         <span className="text-sm font-medium text-slate-600 flex-1">{title}</span>
                         <ChevronDown
                             className={cn(
-                                'size-3.5 shrink-0 text-slate-400 transition-transform duration-200',
+                                'size-3.5 shrink-0 text-slate-500 transition-transform duration-200',
                                 open && 'rotate-180'
                             )}
                         />

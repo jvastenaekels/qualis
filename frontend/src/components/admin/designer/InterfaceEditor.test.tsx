@@ -189,3 +189,53 @@ describe('InterfaceEditor', () => {
         });
     });
 });
+
+/**
+ * Contrast regression test for the step-guidance block (task 6.5 review, F4).
+ * The block carried `stepEnabled ? '' : 'opacity-50'`. The <Label>/<Input> pair
+ * inside it is genuinely exempt — the input really is `disabled` — but two nodes
+ * in the same block are attached to no control at all and are precisely the ones
+ * that explain the state: the "Step N: <name>" badge (indigo-900 on
+ * bg-indigo-50/50, 10.81:1 → 2.76:1) and the "(step disabled)" marker beside it
+ * (slate-500, 4.76:1 → 1.96:1). Dimming the sentence that says why the block is
+ * dimmed, until it cannot be read, is self-defeating.
+ */
+describe('InterfaceEditor — a disabled step block carries no resting opacity (task 6.5 review, F4)', () => {
+    function renderWithPresortDisabled() {
+        return renderWithStore(<InterfaceEditor />, {
+            initialState: {
+                draft: {
+                    slug: 'test',
+                    state: 'draft',
+                    presort_config: { enabled: false },
+                    translations: [{ language_code: 'en', ui_labels: {} }],
+                },
+                activeLocale: 'en',
+            },
+        });
+    }
+
+    it('does not composite the step badge and its "(step disabled)" marker', () => {
+        renderWithPresortDisabled();
+
+        const marker = screen.getByText('(step disabled)');
+        const block = marker.closest('[aria-disabled="true"]');
+        expect(block).not.toBeNull();
+        expect((block as HTMLElement).className).not.toMatch(/(?:^|\s)opacity-\d/);
+    });
+
+    it('keeps the disabled state announced and carried by the controls themselves', () => {
+        renderWithPresortDisabled();
+
+        const marker = screen.getByText('(step disabled)');
+        const block = marker.closest('[aria-disabled="true"]') as HTMLElement;
+
+        // The state is still exposed to AT, still stated in words, and still
+        // painted on the inputs — where ui/input's `disabled:opacity-50` applies
+        // to a component WCAG genuinely exempts.
+        expect(block).toHaveAttribute('aria-disabled', 'true');
+        for (const input of Array.from(block.querySelectorAll('input'))) {
+            expect(input).toBeDisabled();
+        }
+    });
+});

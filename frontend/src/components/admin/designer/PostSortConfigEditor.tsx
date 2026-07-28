@@ -172,7 +172,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                             <div className="flex flex-wrap gap-3">
                                 {extremeColumns.length === 0 ? (
                                     <div className="flex items-center gap-4">
-                                        <span className="text-sm text-slate-400 font-medium italic">
+                                        <span className="text-sm text-slate-500 font-medium italic">
                                             {t('admin.design.postsort.extreme.no_columns')}
                                         </span>
                                         {availableScores.length >= 2 &&
@@ -204,7 +204,7 @@ const PostSortConfigEditor = ({ readOnly, structureLocked }: PostSortConfigEdito
                                                 <button
                                                     type="button"
                                                     onClick={() => removeExtremeColumn(score)}
-                                                    className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
+                                                    className="ml-1 text-slate-500 hover:text-red-500 transition-colors"
                                                     aria-label={t(
                                                         'admin.design.postsort.extreme.remove',
                                                         'Remove {{score}}',

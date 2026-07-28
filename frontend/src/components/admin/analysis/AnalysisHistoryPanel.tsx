@@ -198,9 +198,9 @@ export function AnalysisHistoryPanel({
                     )}
                 </div>
                 {collapsed ? (
-                    <ChevronDown className="size-4 text-slate-400" aria-hidden="true" />
+                    <ChevronDown className="size-4 text-slate-500" aria-hidden="true" />
                 ) : (
-                    <ChevronUp className="size-4 text-slate-400" aria-hidden="true" />
+                    <ChevronUp className="size-4 text-slate-500" aria-hidden="true" />
                 )}
             </button>
 
@@ -274,7 +274,7 @@ export function AnalysisHistoryPanel({
                                                 </span>
                                             )}
                                             {loadingRunId === run.id && (
-                                                <span className="text-xs text-slate-400">
+                                                <span className="text-xs text-slate-500">
                                                     {t(
                                                         'admin.analysis.history.loading_run',
                                                         'Loading…'
@@ -307,14 +307,14 @@ export function AnalysisHistoryPanel({
                                                     <span className="text-slate-500 text-xs">
                                                         ·
                                                     </span>
-                                                    <span className="text-xs text-slate-400 italic">
+                                                    <span className="text-xs text-slate-500 italic">
                                                         {run.ran_by_email}
                                                     </span>
                                                 </>
                                             )}
                                         </div>
                                         {run.notes && editingId !== run.id && (
-                                            <p className="mt-1 text-xs text-slate-400 italic">
+                                            <p className="mt-1 text-xs text-slate-500 italic">
                                                 {truncate(run.notes, 40)}
                                             </p>
                                         )}
@@ -357,7 +357,7 @@ export function AnalysisHistoryPanel({
                                             <button
                                                 type="button"
                                                 onClick={handleCancelEdit}
-                                                className="shrink-0 text-slate-400 hover:text-slate-600"
+                                                className="shrink-0 text-slate-500 hover:text-slate-600"
                                                 aria-label={t(
                                                     'admin.analysis.history.cancel_edit_aria',
                                                     'Cancel editing'
@@ -374,7 +374,7 @@ export function AnalysisHistoryPanel({
                                             <button
                                                 type="button"
                                                 onClick={() => handleStartEdit(run)}
-                                                className="text-slate-400 hover:text-slate-600 p-1 rounded transition-colors"
+                                                className="text-slate-500 hover:text-slate-600 p-1 rounded transition-colors"
                                                 title={t(
                                                     'admin.analysis.history.edit_notes',
                                                     'Edit notes'
@@ -389,7 +389,7 @@ export function AnalysisHistoryPanel({
                                             <button
                                                 type="button"
                                                 onClick={() => setDeleteTargetId(run.id)}
-                                                className="text-slate-400 hover:text-red-500 p-1 rounded transition-colors"
+                                                className="text-slate-500 hover:text-red-500 p-1 rounded transition-colors"
                                                 title={t(
                                                     'admin.analysis.history.delete_run',
                                                     'Delete run'

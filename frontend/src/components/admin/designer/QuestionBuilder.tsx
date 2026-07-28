@@ -201,8 +201,25 @@ const QuestionItem = (props: QuestionItemProps) => {
             data-testid="question-item"
             className={cn(
                 'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
-                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20',
-                readOnly && 'opacity-80'
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
+                // No `readOnly && 'opacity-80'` (task 6.5 review, F3). `readOnly` is
+                // `api.isFullyReadOnly` = `draft.state !== 'draft'`, i.e. every active,
+                // paused or closed study — the normal steady state of any launched
+                // study, not an edge case, and nothing here is a disabled *component*
+                // that WCAG would exempt. Opacity multiplies into the computed
+                // contrast, so at 80% the promoted text inside landed at slate-500 @
+                // 80% over white = #8390a2 → 3.25:1 (the "Untitled" placeholder and the
+                // field labels) and 3.17:1 for the question-type chip on its slate-50
+                // pill — the latter being, to two decimals, the 3.24:1 case this repo's
+                // own a11y gate documents as the failure it exists to catch
+                // (scripts/check-a11y-names.mjs). Removing it puts them at 4.76:1.
+                //
+                // Nothing is lost: read-only-ness was never carried by a 20% dim. The
+                // drag handle, the copy-from-language menu and the delete button are
+                // not rendered at all, every Input is `readOnly` with
+                // `cursor-not-allowed opacity-70`, and every Switch is `disabled` —
+                // three stronger, still-present signals, each on a control where the
+                // inactive-component exemption genuinely does apply.
             )}
         >
             <div className="flex items-start p-4 gap-4">
@@ -273,7 +290,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                         </div>
                                         <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
                                             {label || (
-                                                <span className="text-slate-400 italic font-medium">
+                                                <span className="text-slate-500 italic font-medium">
                                                     {t('admin.design.questions.defaults.untitled')}
                                                 </span>
                                             )}
@@ -300,7 +317,7 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
-                                                    <div className="px-2 py-1.5 text-2xs font-black text-slate-400">
+                                                    <div className="px-2 py-1.5 text-2xs font-black text-slate-500">
                                                         {t(
                                                             'admin.design.questions.actions.copy_from'
                                                         )}
@@ -393,7 +410,14 @@ const QuestionItem = (props: QuestionItemProps) => {
 
                                     <div
                                         data-testid="question-type-label"
-                                        className="text-2xs text-slate-400 font-black bg-slate-50 px-2 py-1 rounded-lg"
+                                        // slate-600, not slate-500 (task 6.5 review, F3):
+                                        // this chip is the one promoted node here that
+                                        // does not sit on white. slate-500 on bg-slate-50
+                                        // is 4.55:1 — a 1% margin over the 4.5:1 floor for
+                                        // 11-12px text, the same zero-margin fragility the
+                                        // review flagged elsewhere. slate-600 on slate-50
+                                        // is 7.24:1.
+                                        className="text-2xs text-slate-600 font-black bg-slate-50 px-2 py-1 rounded-lg"
                                     >
                                         {question.type}
                                     </div>
@@ -1191,7 +1215,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.basic_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1211,7 +1235,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             onClick={() => addQuestion(field.type as QuestionType)}
                                             className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                         >
-                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                             {t(`admin.design.questions.types.${field.label}`)}
                                         </Button>
                                     ))}
@@ -1221,7 +1245,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.choice_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1242,7 +1266,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             onClick={() => addQuestion(field.type as QuestionType)}
                                             className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                         >
-                                            <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                            <field.icon className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                             {t(`admin.design.questions.types.${field.label}`)}
                                         </Button>
                                     ))}
@@ -1252,7 +1276,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
                         {!readOnly && !structureLocked && (
                             <div className="space-y-4">
-                                <div className="text-2xs font-black text-slate-400">
+                                <div className="text-2xs font-black text-slate-500">
                                     {t('admin.design.questions.scale_fields')}
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -1263,7 +1287,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                         onClick={() => addQuestion('rating')}
                                         className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
                                     >
-                                        <BarChart3 className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                        <BarChart3 className="h-4 w-4 mr-2 text-slate-500 group-hover:text-indigo-500" />
                                         {t('admin.design.questions.types.rating')}
                                     </Button>
                                 </div>

@@ -203,7 +203,7 @@ function SortableStatementItem({
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingId(null)}
-                            className="h-9 w-9 text-slate-400 hover:bg-slate-50 rounded-xl"
+                            className="h-9 w-9 text-slate-500 hover:bg-slate-50 rounded-xl"
                             aria-label={t(
                                 'admin.design.qsort.set.cancel_edit',
                                 'Cancel editing {{code}}',
@@ -851,7 +851,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                         )}
                                     </div>
                                     <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                        <p className="text-xs font-black text-slate-400 px-1">
+                                        <p className="text-xs font-black text-slate-500 px-1">
                                             {t('admin.design.qsort.bulk.detected', {
                                                 count: bulkText
                                                     .split('\n')
@@ -884,7 +884,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                     <Quote className="h-4 w-4 text-slate-500" />
                                 </div>
                                 {t('admin.design.qsort.set.title')}
-                                <span className="text-slate-400 font-medium ml-1">
+                                <span className="text-slate-500 font-medium ml-1">
                                     ({statements.length})
                                 </span>
                             </h3>
@@ -1146,7 +1146,7 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-10 w-10 text-slate-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all"
+                                                    className="h-10 w-10 text-slate-500 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all"
                                                     aria-label={t(
                                                         'admin.design.qsort.grid.tooltip_title'
                                                     )}
@@ -1459,10 +1459,10 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <Quote className="h-5 w-5 text-slate-400" />
+                                        <Quote className="h-5 w-5 text-slate-500" />
                                     </div>
                                     <div>
-                                        <p className="text-2xs font-black text-slate-400">
+                                        <p className="text-2xs font-black text-slate-500">
                                             {t('admin.design.qsort.grid.statements')}
                                         </p>
                                         <p className="text-xl font-black text-slate-900">
@@ -1475,10 +1475,10 @@ const QSortEditor = ({ readOnly, structureLocked }: QSortEditorProps) => {
 
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <Grid3X3 className="h-5 w-5 text-slate-400" />
+                                        <Grid3X3 className="h-5 w-5 text-slate-500" />
                                     </div>
                                     <div>
-                                        <p className="text-2xs font-black text-slate-400">
+                                        <p className="text-2xs font-black text-slate-500">
                                             {t('common.slots')}
                                         </p>
                                         <p className="text-xl font-black text-slate-900">

@@ -214,7 +214,7 @@ export default function ProjectMembersPage() {
                                                                 member.user.email}
                                                         </span>
                                                         {member.user.full_name && (
-                                                            <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                                            <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
                                                                 <Mail className="size-3" />{' '}
                                                                 {member.user.email}
                                                             </span>
@@ -295,14 +295,14 @@ export default function ProjectMembersPage() {
                                                     </Select>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-xs font-medium text-slate-400">
+                                            <TableCell className="text-xs font-medium text-slate-500">
                                                 {new Date(member.joined_at).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell className="text-right px-6">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="size-9 min-h-[44px] min-w-[44px] p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="size-9 min-h-[44px] min-w-[44px] p-0 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                     onClick={() =>
                                                         requestRemoveMember(
                                                             member.user_id,
@@ -362,7 +362,7 @@ export default function ProjectMembersPage() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-black text-slate-900 flex items-center gap-2">
-                                <Shield className="size-4 text-slate-400" />
+                                <Shield className="size-4 text-slate-500" />
                                 {t('admin.projects.settings.team.permissions_matrix.title')}
                             </CardTitle>
                         </CardHeader>
@@ -608,7 +608,7 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                                         {copied ? (
                                             <Check className="size-3 text-emerald-600" />
                                         ) : (
-                                            <Copy className="size-3 text-slate-400" />
+                                            <Copy className="size-3 text-slate-500" />
                                         )}
                                     </Button>
                                 </div>

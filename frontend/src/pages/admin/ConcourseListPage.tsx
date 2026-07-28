@@ -122,8 +122,8 @@ export default function ConcourseListPage() {
 
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-2">
-            <Loader2 className="size-6 animate-spin text-slate-400" />
-            <p className="text-sm text-slate-400">
+            <Loader2 className="size-6 animate-spin text-slate-500" />
+            <p className="text-sm text-slate-500">
                 {t('admin.concourse.loading', 'Setting up concourse...')}
             </p>
         </div>

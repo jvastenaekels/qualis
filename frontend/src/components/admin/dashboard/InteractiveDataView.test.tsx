@@ -448,3 +448,66 @@ describe('InteractiveDataView — sort-header icon contrast (Task 6.7d)', () => 
         expect(sortButton).toBeInTheDocument();
     });
 });
+
+describe('InteractiveDataView — discarded rows carry no resting opacity (task 6.5 review, F2)', () => {
+    function renderWithDiscardedRow() {
+        mockDumpQuery.mockReturnValue({
+            data: {
+                study: {
+                    slug: 'demo',
+                    statements: [],
+                    translations: [{ lang: 'en', title: 'Study' }],
+                    presort_config: {},
+                    postsort_config: {},
+                    state: 'active',
+                    rough_sort_enabled: true,
+                },
+                participants: [makeParticipant({ id: 'p1', db_id: 1, is_discarded: true })],
+                statement_id_to_index: {},
+            } as unknown as DumpResponse,
+            isLoading: false,
+            error: null,
+        });
+        return renderWithProviders(<InteractiveDataView slug="demo" />);
+    }
+
+    it('de-emphasises a discarded row without compositing its cells below the floor', async () => {
+        // The row used to read `opacity-60 grayscale-[0.5]`. Opacity
+        // multiplies into the computed contrast, so promoting the cells'
+        // colour token alone would have left them failing: the four `—`
+        // empty-value markers and the device/browser/language glyphs sat at
+        // slate-500 @ 60% over white = #a2acb9 → 2.30:1, under even the 3:1
+        // non-text floor — and the row is not an inactive component, it stays
+        // clickable. A future "just bump the shade" edit that reinstates the
+        // opacity has to trip this.
+        renderWithDiscardedRow();
+
+        const table = await screen.findByRole('table');
+        const bodyRow = within(table).getAllByRole('row')[1];
+
+        expect(bodyRow.className).not.toMatch(/(?:^|\s)opacity-\d/);
+        // The de-emphasis is still signalled — by a surface tint and a
+        // desaturation, neither of which reduces foreground contrast.
+        expect(bodyRow).toHaveClass('bg-slate-50');
+        expect(bodyRow).toHaveClass('grayscale-[0.5]');
+    });
+
+    it('leaves the row operable, which is why the inactive-component exemption never applied', async () => {
+        renderWithDiscardedRow();
+
+        const table = await screen.findByRole('table');
+        const bodyRow = within(table).getAllByRole('row')[1];
+
+        expect(bodyRow).toHaveClass('cursor-pointer');
+    });
+
+    it('applies neither treatment to a live row', async () => {
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+
+        const table = await screen.findByRole('table');
+        const bodyRow = within(table).getAllByRole('row')[1];
+
+        expect(bodyRow).not.toHaveClass('bg-slate-50');
+        expect(bodyRow.className).not.toMatch(/(?:^|\s)opacity-\d/);
+    });
+});

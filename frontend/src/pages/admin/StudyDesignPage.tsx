@@ -17,6 +17,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Save,
+    AlertCircle,
     Languages,
     MoreHorizontal,
     Upload,
@@ -229,7 +230,7 @@ const StudyDesignPage = () => {
                                     align="end"
                                     className="w-56 rounded-xl shadow-xl border-slate-100 p-1.5"
                                 >
-                                    <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
+                                    <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-500">
                                         {t('admin.design.toolbar.select_lang', 'Select language')}
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-slate-100 my-1" />
@@ -318,7 +319,11 @@ const StudyDesignPage = () => {
                                 // Use the standardised toolbar.save key (Wave E.1).
                                 // The previous "save_changes" key was orphaned —
                                 // never present in any locale file.
-                                title={t('admin.design.toolbar.save', 'Save')}
+                                title={
+                                    api.syncStatus === 'error'
+                                        ? t('admin.design.sync.error', 'Save error')
+                                        : t('admin.design.toolbar.save', 'Save')
+                                }
                                 disabled={
                                     api.syncStatus === 'synced' ||
                                     api.syncStatus === 'saving' ||
@@ -326,13 +331,38 @@ const StudyDesignPage = () => {
                                 }
                                 className={cn(
                                     'h-9 px-2 sm:px-3 font-bold rounded-lg shadow-sm transition-all active:scale-95 gap-2',
-                                    api.syncStatus === 'modified'
-                                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
-                                        : 'bg-white text-slate-400 border-slate-200'
+                                    // `syncStatus` is a FOUR-value union
+                                    // (store/useStudyDesigner.ts:35), and 'error' is set
+                                    // on three real paths in hooks/useStudyPersistence.ts
+                                    // (:145 conflict, :161 merge failure, :165 save
+                                    // failure) — and it is sticky (:75 refuses to
+                                    // downgrade it). On a draft study none of the three
+                                    // `disabled` conditions holds there, so the button
+                                    // stays enabled and focusable: it IS the retry
+                                    // control. Task 6.5 folded that state into the muted
+                                    // "saved" arm, painting the one control the user has
+                                    // to find at text-slate-400 = 2.56:1 on white — under
+                                    // 1.4.3 (4.5:1) AND 1.4.11 (3:1) — with no
+                                    // `disabled:opacity-50` to claim WCAG's
+                                    // inactive-component exemption, because the component
+                                    // is not inactive. It gets its own arm: red-700 on
+                                    // red-50 = 5.91:1, and a failed save now reads as
+                                    // failed instead of borrowing the green "Saved" tick.
+                                    // The muted arm below is now reachable only while
+                                    // 'synced'/'saving'/read-only, i.e. only while the
+                                    // button really is disabled — which is what makes the
+                                    // exemption on it true rather than merely asserted.
+                                    api.syncStatus === 'error'
+                                        ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300'
+                                        : api.syncStatus === 'modified'
+                                          ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
+                                          : 'bg-white text-slate-400 border-slate-200'
                                 )}
                             >
                                 {api.syncStatus === 'saving' ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : api.syncStatus === 'error' ? (
+                                    <AlertCircle className="h-4 w-4" />
                                 ) : api.syncStatus === 'modified' ? (
                                     <Save className="h-4 w-4" />
                                 ) : (
@@ -341,7 +371,8 @@ const StudyDesignPage = () => {
                                 <span className="hidden md:inline">
                                     {api.syncStatus === 'saving'
                                         ? t('admin.sync.saving', 'Saving...')
-                                        : api.syncStatus === 'modified'
+                                        : api.syncStatus === 'modified' ||
+                                            api.syncStatus === 'error'
                                           ? t('admin.design.toolbar.save', 'Save')
                                           : t('admin.design.toolbar.saved', 'Saved')}
                                 </span>
@@ -358,7 +389,7 @@ const StudyDesignPage = () => {
                                             'admin.design.toolbar.more_actions',
                                             'More actions'
                                         )}
-                                        className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
+                                        className="h-9 w-9 p-0 rounded-lg text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
                                     >
                                         <MoreHorizontal className="h-4 w-4" />
                                     </Button>
@@ -684,7 +715,7 @@ const StudyDesignPage = () => {
                                         <AlertTriangle size={14} className="text-amber-500 ml-1" />
                                     )}
                                     {api.isStructureLocked && (
-                                        <Lock size={12} className="text-slate-400 ml-1" />
+                                        <Lock size={12} className="text-slate-500 ml-1" />
                                     )}
                                 </TabsTrigger>
                                 <TabsTrigger
@@ -959,7 +990,7 @@ const StudyDesignPage = () => {
                                         ) : item.required ? (
                                             <CircleDashed
                                                 data-testid="checklist-item-incomplete"
-                                                className="h-4 w-4 text-slate-300 shrink-0 mt-0.5"
+                                                className="h-4 w-4 text-slate-500 shrink-0 mt-0.5"
                                             />
                                         ) : (
                                             <CircleDashed

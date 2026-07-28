@@ -83,7 +83,7 @@ export function ProjectSwitcher() {
                                         : t('admin.sidebar.select_project')}
                                 </span>
                             </div>
-                            <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
+                            <ChevronsUpDown className="ml-auto size-4 text-slate-500" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -92,7 +92,7 @@ export function ProjectSwitcher() {
                         side={isMobile ? 'bottom' : 'right'}
                         sideOffset={4}
                     >
-                        <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
+                        <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-500">
                             {t('admin.command_menu.switch_project', 'Projects')}
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
