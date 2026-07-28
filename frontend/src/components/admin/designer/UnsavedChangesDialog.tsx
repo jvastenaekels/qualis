@@ -28,7 +28,7 @@ export function UnsavedChangesDialog({ blocker }: UnsavedChangesDialogProps) {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        {t('admin.design.unsaved_changes.title', 'Unsaved Changes')}
+                        {t('admin.design.unsaved_changes.title', 'Unsaved changes')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                         {t(

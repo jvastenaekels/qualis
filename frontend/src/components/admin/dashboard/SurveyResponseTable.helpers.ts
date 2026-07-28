@@ -35,7 +35,7 @@ export function resolveAnswerLabel(
     if (key === 'interview_consent') return t('post.contact.interview_consent', 'Follow-up');
     if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Results');
     if (key === '_recruitment_token')
-        return t('admin.participant.metadata.recruitment_token', 'Ref');
+        return t('admin.participant.metadata.recruitment_token', 'Recruitment token');
     if (key === 'missing_statement')
         return t('post.extreme.missing_statement', 'Missing Statement');
     if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');

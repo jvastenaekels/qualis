@@ -258,11 +258,11 @@ export default function ConcourseDetailPage() {
                                 size="sm"
                                 className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                                 onClick={openAddItemDialog}
-                                aria-label={t('admin.concourse.add_item', 'Add Item')}
+                                aria-label={t('admin.concourse.add_item', 'Add item')}
                             >
                                 <Plus className="size-4 sm:mr-1" />
                                 <span className="hidden sm:inline">
-                                    {t('admin.concourse.add_item', 'Add Item')}
+                                    {t('admin.concourse.add_item', 'Add item')}
                                 </span>
                             </Button>
                         )}
@@ -272,11 +272,11 @@ export default function ConcourseDetailPage() {
                                 size="sm"
                                 className="rounded-xl"
                                 onClick={openImportDialog}
-                                aria-label={t('admin.concourse.bulk_import', 'Bulk Import')}
+                                aria-label={t('admin.concourse.bulk_import', 'Bulk import')}
                             >
                                 <Upload className="size-4 sm:mr-1" />
                                 <span className="hidden sm:inline">
-                                    {t('admin.concourse.bulk_import', 'Bulk Import')}
+                                    {t('admin.concourse.bulk_import', 'Bulk import')}
                                 </span>
                             </Button>
                         )}
@@ -1212,7 +1212,7 @@ export default function ConcourseDetailPage() {
                 <DialogContent className="border-slate-200 bg-white shadow-lg max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
-                            {t('admin.concourse.add_item', 'Add Item')}
+                            {t('admin.concourse.add_item', 'Add item')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 py-2">
@@ -1303,7 +1303,7 @@ export default function ConcourseDetailPage() {
                             >
                                 {t('admin.concourse.field_source', 'Source')}
                                 <span className="text-slate-500 font-normal ml-1">
-                                    ({t('common.optional', 'optional')})
+                                    ({t('common.optional', 'Optional')})
                                 </span>
                             </Label>
                             <Input
@@ -1408,7 +1408,7 @@ export default function ConcourseDetailPage() {
                 <DialogContent className="border-slate-200 bg-white shadow-lg max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
-                            {t('admin.concourse.delete_item_title', 'Delete Item')}
+                            {t('admin.concourse.delete_item_title', 'Delete item')}
                         </DialogTitle>
                         <DialogDescription className="text-sm text-slate-500">
                             {t(
@@ -1452,7 +1452,7 @@ export default function ConcourseDetailPage() {
                 <DialogContent className="border-slate-200 bg-white shadow-lg max-w-lg">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
-                            {t('admin.concourse.bulk_import', 'Bulk Import')}
+                            {t('admin.concourse.bulk_import', 'Bulk import')}
                         </DialogTitle>
                         <DialogDescription className="text-sm text-slate-500">
                             {t(

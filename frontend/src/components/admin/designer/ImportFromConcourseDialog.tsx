@@ -159,7 +159,7 @@ export function ImportFromConcourseDialog({
                 <DialogHeader>
                     <DialogTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                         <Library className="size-5 text-indigo-600" />
-                        {t('admin.concourse_import.title', 'Import from Concourse')}
+                        {t('admin.concourse_import.title', 'Import from concourse')}
                     </DialogTitle>
                     <DialogDescription className="text-sm text-slate-500">
                         {t(

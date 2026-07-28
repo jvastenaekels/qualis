@@ -220,12 +220,12 @@ function buildChecklist(
 ): ChecklistItem[] {
     return [
         {
-            label: t('admin.design.checklist.study_title', 'Study Title'),
+            label: t('admin.design.checklist.study_title', 'Study title'),
             isComplete: !!currentTranslation?.title,
             required: true,
         },
         {
-            label: t('admin.design.checklist.consent_defined', 'Consent Form'),
+            label: t('admin.design.checklist.consent_defined', 'Consent form'),
             isComplete: !!(
                 currentTranslation?.consent_title && currentTranslation?.consent_description
             ),
@@ -455,7 +455,7 @@ export function useStudyDesignPage(): StudyDesignPageApi {
 
         if (isDirty) {
             toast.warning(
-                t('admin.design.sync.wait_save', 'Saving in progress... please wait a moment.')
+                t('admin.design.sync.wait_save', 'Saving in progress... Please wait a moment.')
             );
             return;
         }

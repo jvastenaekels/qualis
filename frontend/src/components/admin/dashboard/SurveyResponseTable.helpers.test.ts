@@ -39,7 +39,7 @@ describe('resolveAnswerLabel', () => {
     });
 
     it('returns t() fallback for "_recruitment_token"', () => {
-        expect(resolveAnswerLabel({}, '_recruitment_token', 'en', t)).toBe('Ref');
+        expect(resolveAnswerLabel({}, '_recruitment_token', 'en', t)).toBe('Recruitment token');
     });
 
     it('returns t() fallback for "missing_statement"', () => {

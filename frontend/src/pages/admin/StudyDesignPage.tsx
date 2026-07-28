@@ -262,7 +262,7 @@ const StudyDesignPage = () => {
                                         <span>
                                             {t(
                                                 'admin.design.toolbar.manage_langs',
-                                                'Manage Languages'
+                                                'Manage languages'
                                             )}
                                         </span>
                                     </DropdownMenuItem>
@@ -544,7 +544,7 @@ const StudyDesignPage = () => {
                                     {api.isSwitchingToDraft && (
                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                     )}
-                                    {t('admin.study_status.state.switch_to_draft', 'Draft Mode')}
+                                    {t('admin.study_status.state.switch_to_draft', 'Draft mode')}
                                 </Button>
                             )}
                         </div>
@@ -595,7 +595,7 @@ const StudyDesignPage = () => {
                                         )}
                                         {t(
                                             'admin.study_status.state.switch_to_draft',
-                                            'Draft Mode'
+                                            'Draft mode'
                                         )}
                                     </Button>
                                 )}
@@ -801,7 +801,7 @@ const StudyDesignPage = () => {
                                 <GuidanceCard
                                     title={t(
                                         'admin.design.guidance.intro_title',
-                                        'Welcome to the Studio'
+                                        'Welcome to the studio'
                                     )}
                                     description={t(
                                         'admin.design.guidance.intro_desc',
@@ -852,7 +852,7 @@ const StudyDesignPage = () => {
                                                 >
                                                     {t(
                                                         'admin.design.qsort.grid.unlock_hint',
-                                                        'Go to Data Explorer to purge sessions and unlock structure'
+                                                        'Go to data explorer to purge sessions and unlock structure'
                                                     )}
                                                 </Button>
                                             )}
@@ -884,7 +884,7 @@ const StudyDesignPage = () => {
                                     <GuidanceCard
                                         title={t(
                                             'admin.design.guidance.qsort_title',
-                                            'Statement & Grid Balance'
+                                            'Statement & grid balance'
                                         )}
                                         description={t(
                                             'admin.design.guidance.qsort_desc',
@@ -939,7 +939,7 @@ const StudyDesignPage = () => {
                                         className="gap-2 h-12 px-8 rounded-xl font-bold bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-md group"
                                         data-testid="next-step-button"
                                     >
-                                        {t('common.next', 'Next Step')}
+                                        {t('common.next', 'Next step')}
                                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                                     </Button>
                                 ) : (
@@ -954,7 +954,7 @@ const StudyDesignPage = () => {
                                         data-testid="activate-button"
                                     >
                                         <Rocket className="h-5 w-5" />
-                                        {t('admin.study_status.state.activate', 'Activate Study')}
+                                        {t('admin.study_status.state.activate', 'Activate study')}
                                     </Button>
                                 )}
                             </div>
@@ -1060,7 +1060,7 @@ const StudyDesignPage = () => {
                             <AlertTriangle className="h-6 w-6 text-rose-500" />
                         </div>
                         <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">
-                            {t('admin.design.validation.failed_title', 'Configuration Incomplete')}
+                            {t('admin.design.validation.failed_title', 'Configuration incomplete')}
                         </DialogTitle>
                         <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
                             {t(

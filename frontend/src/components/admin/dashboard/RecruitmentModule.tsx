@@ -67,7 +67,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
             <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
                     <label htmlFor="public-url" className="text-2xs font-bold text-slate-500">
-                        {t('admin.recruitment.public_url_label', 'Public Participation URL')}
+                        {t('admin.recruitment.public_url_label', 'Public participation URL')}
                     </label>
                     <div className="flex gap-2 min-w-0">
                         <Input
@@ -121,7 +121,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                     >
                         <ExternalLink className="h-4 w-4 shrink-0" />
                         <span className="min-w-0 break-words">
-                            {t('admin.recruitment.live_study', 'Live Study')}
+                            {t('admin.recruitment.live_study', 'Live study')}
                         </span>
                     </Button>
                 </div>
@@ -155,7 +155,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                             >
                                 <Download className="h-3.5 w-3.5 shrink-0" />
                                 <span className="min-w-0 break-words">
-                                    {t('admin.recruitment.download_qr', 'Download Image')}
+                                    {t('admin.recruitment.download_qr', 'Download image')}
                                 </span>
                             </Button>
 

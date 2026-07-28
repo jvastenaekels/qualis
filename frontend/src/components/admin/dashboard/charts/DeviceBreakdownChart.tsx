@@ -48,7 +48,7 @@ export const DeviceBreakdownChart = ({ deviceBreakdown, className }: DeviceBreak
         <Card className={className}>
             <CardHeader className="pb-2">
                 <CardTitle className="text-base font-black">
-                    {t('admin.dashboard.devices.title', 'Device Distribution')}
+                    {t('admin.dashboard.devices.title', 'Device distribution')}
                 </CardTitle>
                 <CardDescription>
                     {t('admin.dashboard.devices.subtitle', 'How participants access your study')}

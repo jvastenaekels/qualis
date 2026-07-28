@@ -181,7 +181,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {t('admin.import.title', 'Import Study Configuration')}
+                        {t('admin.import.title', 'Import study configuration')}
                     </DialogTitle>
                     <DialogDescription>
                         {step === 'upload' &&
@@ -208,7 +208,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                         >
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="file">
-                                    {t('admin.import.file_upload', 'File Upload')}
+                                    {t('admin.import.file_upload', 'File upload')}
                                 </TabsTrigger>
                                 <TabsTrigger value="paste">
                                     {t('admin.import.paste_json', 'Paste JSON')}
@@ -255,7 +255,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                                     />
                                 </div>
                                 <Button onClick={handlePasteSubmit} className="w-full">
-                                    {t('admin.import.validate', 'Validate & Continue')}
+                                    {t('admin.import.validate', 'Validate & continue')}
                                 </Button>
                             </TabsContent>
                         </Tabs>
@@ -328,7 +328,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                             <>
                                 <div className="space-y-3 p-4 bg-gray-50 rounded-lg border">
                                     <h4 className="font-semibold text-sm">
-                                        {t('admin.import.summary', 'Study Summary')}
+                                        {t('admin.import.summary', 'Study summary')}
                                     </h4>
                                     <dl className="grid grid-cols-2 gap-3 text-sm">
                                         <div>
@@ -365,7 +365,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                                         </div>
                                         <div>
                                             <dt className="text-gray-500 text-xs">
-                                                {t('admin.import.grid', 'Grid Range')}
+                                                {t('admin.import.grid', 'Grid range')}
                                             </dt>
                                             <dd className="font-medium mt-1">
                                                 {validation.summary.grid_range}
@@ -376,7 +376,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
 
                                 <div className="space-y-2 pb-2">
                                     <Label htmlFor="new-slug">
-                                        {t('admin.import.new_slug', 'New Study Slug')}{' '}
+                                        {t('admin.import.new_slug', 'New study slug')}{' '}
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
@@ -423,7 +423,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                                 onClick={handleImport}
                                 disabled={!validation?.valid || !newSlug}
                             >
-                                {t('admin.import.create_study', 'Create Study')}
+                                {t('admin.import.create_study', 'Create study')}
                             </Button>
                         </>
                     )}

@@ -71,19 +71,19 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
             })),
         },
         {
-            label: t('admin.analysis.variance_explained', 'Variance Explained (%)'),
+            label: t('admin.analysis.variance_explained', 'Variance explained (%)'),
             values: chars.map((c) => c.variance_explained.toFixed(1)),
         },
         {
-            label: t('admin.analysis.cumulative_variance', 'Cumulative Variance (%)'),
+            label: t('admin.analysis.cumulative_variance', 'Cumulative variance (%)'),
             values: chars.map((c) => c.cumulative_variance.toFixed(1)),
         },
         {
-            label: t('admin.analysis.n_flagged', 'N Flagged Sorts'),
+            label: t('admin.analysis.n_flagged', 'N flagged sorts'),
             values: chars.map((c) => String(c.n_flagged)),
         },
         {
-            label: t('admin.analysis.composite_reliability', 'Composite Reliability'),
+            label: t('admin.analysis.composite_reliability', 'Composite reliability'),
             values: chars.map((c) => c.composite_reliability.toFixed(3)),
             benchmark: chars.map((c) => ({
                 value: c.composite_reliability,
@@ -92,7 +92,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
             })),
         },
         {
-            label: t('admin.analysis.se_factor_scores', 'SE of Factor Scores'),
+            label: t('admin.analysis.se_factor_scores', 'SE of factor scores'),
             values: chars.map((c) => c.se_factor_scores.toFixed(3)),
             benchmark: chars.map((c) => ({
                 value: c.se_factor_scores,
@@ -119,7 +119,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                 <div className="overflow-x-auto">
                     <div className="flex items-center gap-2 mb-2">
                         <h4 className="text-sm font-medium text-slate-700">
-                            {t('admin.analysis.factor_statistics', 'Factor Statistics')}
+                            {t('admin.analysis.factor_statistics', 'Factor statistics')}
                         </h4>
                         <TooltipProvider delayDuration={300}>
                             <Tooltip>
@@ -210,7 +210,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
             {result.n_factors >= 2 && (
                 <div>
                     <h4 className="text-sm font-medium text-slate-700 mb-2">
-                        {t('admin.analysis.factor_correlations', 'Factor Correlations')}
+                        {t('admin.analysis.factor_correlations', 'Factor correlations')}
                     </h4>
                     <div className="relative">
                         <div className="overflow-x-auto">
@@ -288,7 +288,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
             {/* Summary stats */}
             <div className="flex flex-wrap gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100">
                 <span>
-                    {t('admin.analysis.total_variance', 'Total Variance Explained')}:{' '}
+                    {t('admin.analysis.total_variance', 'Total variance explained')}:{' '}
                     {result.total_variance_explained.toFixed(1)}%
                 </span>
                 <span>

@@ -233,39 +233,39 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     ) => {
         const config = {
             draft: {
-                title: t('admin.study_status.dialog.draft.title', 'Revert to Draft?'),
+                title: t('admin.study_status.dialog.draft.title', 'Revert to draft?'),
                 desc: t(
                     'admin.study_status.dialog.draft.desc',
                     'This will stop data collection but allow you to modify the study design. Existing data is preserved.'
                 ),
-                action: t('admin.study_status.dialog.draft.action', 'Revert to Draft'),
+                action: t('admin.study_status.dialog.draft.action', 'Revert to draft'),
                 variant: 'default' as const,
             },
             active: {
-                title: t('admin.study_status.dialog.active.title', 'Launch Study?'),
+                title: t('admin.study_status.dialog.active.title', 'Launch study?'),
                 desc: t(
                     'admin.study_status.dialog.active.desc',
                     'Activating the study will open it to participants.'
                 ),
-                action: t('admin.study_status.dialog.active.action', 'Set to Active'),
+                action: t('admin.study_status.dialog.active.action', 'Set to active'),
                 variant: 'default' as const,
             },
             paused: {
-                title: t('admin.study_status.dialog.paused.title', 'Pause Study?'),
+                title: t('admin.study_status.dialog.paused.title', 'Pause study?'),
                 desc: t(
                     'admin.study_status.dialog.paused.desc',
                     'Participants will not be able to enter the study while it is paused. You can resume later.'
                 ),
-                action: t('admin.study_status.dialog.paused.action', 'Pause Study'),
+                action: t('admin.study_status.dialog.paused.action', 'Pause study'),
                 variant: 'destructive', // Warning color
             },
             closed: {
-                title: t('admin.study_status.dialog.closed.title', 'Close Study?'),
+                title: t('admin.study_status.dialog.closed.title', 'Close study?'),
                 desc: t(
                     'admin.study_status.dialog.closed.desc',
                     'This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.'
                 ),
-                action: t('admin.study_status.dialog.closed.action', 'Close Study'),
+                action: t('admin.study_status.dialog.closed.action', 'Close study'),
                 variant: 'destructive',
             },
         }[targetState];

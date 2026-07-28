@@ -147,12 +147,12 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader className="space-y-3 pb-4 border-b border-slate-50">
                     <DialogTitle className="text-xl font-black tracking-tight text-slate-900">
-                        {t('admin.dialogs.create_study.title', 'Create New Study')}
+                        {t('admin.dialogs.create_study.title', 'Create new study')}
                     </DialogTitle>
                     <DialogDescription className="text-sm font-medium text-slate-500">
                         {t(
                             'admin.dialogs.create_study.description',
-                            'Start a new Q-Methodology study. You can configure statements and settings later.'
+                            'Start a new Q-methodology study. You can configure statements and settings later.'
                         )}
                     </DialogDescription>
                 </DialogHeader>
@@ -165,14 +165,14 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="text-2xs font-black text-slate-500">
-                                        {t('admin.dialogs.create_study.study_title', 'Study Title')}
+                                        {t('admin.dialogs.create_study.study_title', 'Study title')}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
                                             className="h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500 font-medium"
                                             placeholder={t(
                                                 'admin.dialogs.create_study.study_title_placeholder',
-                                                'e.g. Perspectives on AI'
+                                                'E.g. Perspectives on AI'
                                             )}
                                             {...field}
                                         />
@@ -188,7 +188,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="text-2xs font-black text-slate-500">
-                                        {t('admin.dialogs.create_study.url_slug', 'URL Slug')}
+                                        {t('admin.dialogs.create_study.url_slug', 'URL slug')}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
@@ -292,7 +292,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
                                 {createStudyMutation.isPending && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
-                                {t('admin.dialogs.create_study.create', 'Create Study')}
+                                {t('admin.dialogs.create_study.create', 'Create study')}
                             </Button>
                         </DialogFooter>
                     </form>

@@ -341,7 +341,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenuItem>
                         </SidebarMenu>
                         <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
-                            {t('admin.sidebar.study_tools', 'Study Tools')}
+                            {t('admin.sidebar.study_tools', 'Study tools')}
                         </SidebarGroupLabel>
                         <SidebarMenu>
                             {studyNav.map((item) => (

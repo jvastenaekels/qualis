@@ -269,7 +269,7 @@ export default function GeneralSettingsPage() {
                             <div className="flex items-center gap-2 mb-1">
                                 <HardDrive className="h-5 w-5 text-indigo-500" />
                                 <CardTitle className="text-lg font-black text-slate-900">
-                                    {t('admin.settings.storage.title', 'Audio Storage Usage')}
+                                    {t('admin.settings.storage.title', 'Audio storage usage')}
                                 </CardTitle>
                             </div>
                         </CardHeader>
@@ -294,7 +294,7 @@ export default function GeneralSettingsPage() {
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-baseline">
                                             <span className="text-sm font-medium text-slate-700">
-                                                {t('admin.settings.storage.used', 'Storage Used')}
+                                                {t('admin.settings.storage.used', 'Storage used')}
                                             </span>
                                             <span className="text-2xl font-bold text-slate-900">
                                                 {storageUsage.total_mb.toFixed(2)} MB
@@ -336,7 +336,7 @@ export default function GeneralSettingsPage() {
                                             <HardDrive className="w-3 h-3" />
                                             {t(
                                                 'admin.settings.storage.quota_label',
-                                                'Storage Quota'
+                                                'Storage quota'
                                             )}
                                         </label>
                                         <div className="flex items-center gap-3">

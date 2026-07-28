@@ -295,7 +295,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     )}
                 >
                     <span className="min-w-0 break-words [overflow-wrap:anywhere]">
-                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}
+                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get started')}
                     </span>
                     <ArrowRight
                         size={20}
