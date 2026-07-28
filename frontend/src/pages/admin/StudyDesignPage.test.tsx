@@ -115,6 +115,17 @@ describe('StudyDesignPage Feature Tests', () => {
         expect(screen.getByText(/Grid balanced/i)).toBeInTheDocument();
     });
 
+    it('heads the page with its function, not the study title (task 5.3)', async () => {
+        // The toolbar heading repeated the study title that the breadcrumb above it
+        // already carries — two identical titles, stacked. Per CLAUDE.md's admin
+        // header policy the L2 header carries the page's *function*.
+        renderPage();
+
+        const heading = await screen.findByRole('heading', { level: 1 });
+        expect(heading).toHaveTextContent('Design');
+        expect(screen.queryAllByText('Draft Study')).toHaveLength(0);
+    });
+
     it('names the language switcher by its purpose, not just its visible value', async () => {
         // Regression guard for task 6.7e: the trigger's only visible text sat in a
         // `hidden sm:inline` span, so below the `sm` breakpoint it had no accessible

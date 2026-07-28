@@ -179,6 +179,16 @@ describe('ProjectMembersPage invite modal accessible names (Task 6.7b)', () => {
         expect(roleTrigger).toHaveAttribute('aria-expanded', 'true');
     });
 
+    it('does not repeat the page title as a card title (task 5.3)', () => {
+        // `admin.members.title` and `admin.projects.settings.team.title` were both
+        // "Team members", rendered ~120px apart with the same icon. The H1 stays;
+        // the card keeps only its descriptive sub-line.
+        renderWithProviders(<ProjectMembersPage />);
+
+        expect(screen.getAllByText('Team members')).toHaveLength(1);
+        expect(screen.getByRole('heading', { name: 'Team members' })).toBeInTheDocument();
+    });
+
     it('names the copy-invite-link control and flips the name once copied (Task 6.7c)', async () => {
         const user = userEvent.setup();
         Object.defineProperty(navigator, 'clipboard', {

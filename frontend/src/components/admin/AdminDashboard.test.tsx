@@ -146,6 +146,17 @@ describe('AdminDashboard', () => {
         expect(screen.queryByText('Analysis')).not.toBeInTheDocument();
     });
 
+    it('offers exactly one study-creation action (task 5.3)', () => {
+        // The page header's "Create study" and the Studies section's "Add study"
+        // opened the same dialog ~160px apart in two different button styles.
+        // The page header is the established home for primary actions.
+        setupDefaultHooks({ studies: [makeStudy({ state: 'active' })] });
+
+        renderWithProviders(<AdminDashboard />);
+
+        expect(screen.getAllByRole('button', { name: /(create|add) study/i })).toHaveLength(1);
+    });
+
     it('shows StudyGroups when multiple studies exist', () => {
         const study1 = makeStudy({
             id: 1,

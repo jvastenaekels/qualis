@@ -122,6 +122,16 @@ describe('GeneralSettingsPage', () => {
         expect(screen.getByRole('button', { name: /Delete Study/i })).toBeInTheDocument();
     });
 
+    it('states the archive precondition once (task 5.3)', () => {
+        // mockStudy is a draft, so the delete button is disabled — the state that
+        // used to render the precondition a second time, prefixed with a stray "*",
+        // ~60px below the danger-zone notice that already carries it.
+        renderPage();
+
+        expect(screen.getAllByText(/must be archived before deletion/i)).toHaveLength(1);
+        expect(screen.queryByText(/^\*\s/)).not.toBeInTheDocument();
+    });
+
     it('does not render delete button for non-superuser', async () => {
         useAuthStore.setState({
             user: { id: 2, email: 'user@qualis.dev', is_superuser: false },

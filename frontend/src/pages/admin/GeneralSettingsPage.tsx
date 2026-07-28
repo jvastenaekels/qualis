@@ -521,12 +521,10 @@ export default function GeneralSettingsPage() {
                                 <Trash2 size={16} />
                                 {t('admin.settings.danger.delete_button')}
                             </Button>
-                            {/* text-red-700, not -400/80 — axe (task 6.7e) measured 2.27:1. */}
-                            {!isArchived && (
-                                <p className="text-xs text-red-700 font-medium">
-                                    * {t('admin.settings.danger.notice').split('. ').pop()}
-                                </p>
-                            )}
+                            {/* No repeat of the archive precondition here (task 5.3):
+                                the danger-zone notice ~60px above already ends with
+                                that exact sentence, and this copy re-stated it with a
+                                stray "*" that pointed at nothing. */}
                         </CardFooter>
                     </Card>
                 )}
