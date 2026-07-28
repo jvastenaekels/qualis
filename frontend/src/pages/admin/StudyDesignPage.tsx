@@ -71,6 +71,21 @@ import { CircleCheck, CircleDashed, ArrowLeft, CheckCircle } from 'lucide-react'
 import { useStudyDesignPage, type DesignStepId } from '@/hooks/admin/useStudyDesignPage';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
+/**
+ * The i18n key of each step's label, so the editor region's heading can name the
+ * open step. Same keys the TabsTriggers render, so every one of them is already
+ * statically visible to `check_orphan_keys.py` at its call site below.
+ */
+const DESIGN_STEP_LABEL_KEYS: Record<DesignStepId, string> = {
+    intro: 'admin.design.tabs.welcome',
+    'pre-sort': 'admin.design.tabs.presort',
+    condition: 'admin.design.tabs.condition',
+    'q-sort': 'admin.design.tabs.qsort',
+    'post-sort': 'admin.design.tabs.postsort',
+    interface: 'admin.design.tabs.interface',
+    branding: 'admin.design.tabs.branding',
+};
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 7 step-editor panels + toolbar + checklist + read-only overlay; all logic lives in useStudyDesignPage
 const StudyDesignPage = () => {
     const { t, i18n } = useTranslation();
@@ -171,9 +186,14 @@ const StudyDesignPage = () => {
                          * directly above already carries — the study title appeared twice,
                          * stacked. The h1 also satisfies axe's page-has-heading-one, which
                          * an sr-only h1 previously covered here.
+                         *
+                         * It is level 1 and the editor panels below open at level 3
+                         * (Radix's AccordionHeader is a hard-coded h3), so the tab region
+                         * carries an sr-only h2 — see the <Tabs> block. Without it the
+                         * document reads h1 → h3 and axe's `heading-order` fails.
                          */}
                         <h1 className="text-sm font-bold text-slate-800 truncate flex-1">
-                            {t('admin.sidebar.design', 'Design')}
+                            {t('admin.design.title', 'Design')}
                         </h1>
                         {/* Status Badge */}
                         <div
@@ -632,6 +652,17 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => api.setActiveStep(v as DesignStepId)}
                         className="w-full"
                     >
+                        {/*
+                         * The editor region's heading, at level 2, naming whichever step
+                         * is open. Sighted users read that from the active tab, so it is
+                         * sr-only; screen-reader users get the rung that keeps the
+                         * document at h1 → h2 → h3 instead of skipping from the toolbar's
+                         * h1 straight to the panels' h3 (Radix AccordionHeader hard-codes
+                         * h3). axe's `heading-order` fails on that skip — it is what CI
+                         * caught on the first cut of task 5.3, after the visible toolbar
+                         * h2 that used to hold this rung became the h1.
+                         */}
+                        <h2 className="sr-only">{t(DESIGN_STEP_LABEL_KEYS[api.activeStep])}</h2>
                         <div className="relative max-w-full lg:max-w-5xl mx-auto mb-8 group/tabs">
                             {showLeftArrow && (
                                 <button
@@ -780,12 +811,12 @@ const StudyDesignPage = () => {
                                         <AlertTriangle className="h-6 w-6 text-rose-500" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="font-black text-sm text-rose-500">
+                                        <h3 className="font-black text-sm text-rose-500">
                                             {t(
                                                 'admin.design.translation_needed',
                                                 'Translation Required'
                                             )}
-                                        </h4>
+                                        </h3>
                                     </div>
                                 </div>
                             );
@@ -829,9 +860,9 @@ const StudyDesignPage = () => {
                                             <Lock className="h-5 w-5 text-amber-600" />
                                         </div>
                                         <div className="flex-1 min-w-0 space-y-1">
-                                            <h4 className="text-base font-black tracking-tight">
+                                            <h3 className="text-base font-black tracking-tight">
                                                 {t('admin.design.qsort.grid.locked')}
-                                            </h4>
+                                            </h3>
                                             <p className="text-sm font-medium opacity-70 leading-relaxed break-words">
                                                 {t('admin.design.qsort.grid.locked_desc')}
                                             </p>
@@ -860,12 +891,12 @@ const StudyDesignPage = () => {
                                             <AlertTriangle className="h-5 w-5 text-rose-500" />
                                         </div>
                                         <div className="flex-1 space-y-1">
-                                            <h4 className="text-base font-black tracking-tight">
+                                            <h3 className="text-base font-black tracking-tight">
                                                 {t(
                                                     'admin.design.qsort.grid.mismatch_title',
                                                     'Grid capacity mismatch'
                                                 )}
-                                            </h4>
+                                            </h3>
                                             <p className="text-sm font-medium opacity-70 leading-relaxed">
                                                 {t('admin.design.qsort.grid.mismatch_desc', {
                                                     statements: api.statementsCount,

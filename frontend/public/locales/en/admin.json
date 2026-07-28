@@ -1262,7 +1262,7 @@
             }
         },
         "design": {
-            "title": "Study design",
+            "title": "Design",
             "translation_needed": "Review required (copy)",
             "reset_defaults": "Reset to defaults",
             "editing_language_banner": "Editing the {{language}} version. Use the language selector in the toolbar to switch.",
