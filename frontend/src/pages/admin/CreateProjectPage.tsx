@@ -21,6 +21,7 @@ import {
     FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { SlugInput } from '@/components/ui/slug-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { createProjectApiAdminProjectsPost } from '@/api/generated';
@@ -159,18 +160,14 @@ export default function CreateProjectPage() {
                                             {t('admin.project.create.url_label')}
                                         </FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <Input
-                                                    placeholder={t(
-                                                        'admin.project.create.url_placeholder'
-                                                    )}
-                                                    className="h-12 rounded-xl pl-32 bg-white/50 border-slate-200 focus:bg-white transition-all shadow-sm"
-                                                    {...field}
-                                                />
-                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none border-r pr-3 mr-3 h-4 flex items-center">
-                                                    /app/
-                                                </div>
-                                            </div>
+                                            <SlugInput
+                                                {...field}
+                                                prefix="/app/"
+                                                placeholder={t(
+                                                    'admin.project.create.url_placeholder'
+                                                )}
+                                                className="h-12 rounded-xl bg-white/50 border-slate-200 focus:bg-white transition-all shadow-sm"
+                                            />
                                         </FormControl>
                                         <FormDescription className="text-2xs italic font-medium px-1">
                                             {t('admin.project.create.url_description')}

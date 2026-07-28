@@ -41,6 +41,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { SlugInput } from '@/components/ui/slug-input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
@@ -258,27 +259,27 @@ const RecruitmentPage = () => {
                                             )}
                                         </FormLabel>
                                         {/*
-                                         * FormControl now wraps the <Input> directly, not the
+                                         * FormControl must wrap SlugInput directly, not a
                                          * decorative wrapper div (task 6.7e). shadcn's
                                          * FormControl uses Radix Slot to attach id/
                                          * aria-describedby/aria-invalid to its *only* child —
-                                         * with the div as that child, those landed on the div
-                                         * instead of the input, so FormLabel's htmlFor pointed
-                                         * at a non-labelable element and the real <input> had
-                                         * no accessible name at all (axe: label).
+                                         * SlugInput forwards those (and its ref) to the real
+                                         * <input> it renders internally, not its wrapper div.
+                                         * Wrapping anything else here regresses to the div
+                                         * receiving them instead: FormLabel's htmlFor would
+                                         * then point at a non-labelable element and the real
+                                         * <input> would have no accessible name at all
+                                         * (axe: label — task 6.1 reuses this component at
+                                         * ProjectSettingsPage/CreateProjectPage too).
                                          */}
-                                        <div className="relative">
-                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 font-mono text-xs select-none">
-                                                /study/
-                                            </div>
-                                            <FormControl>
-                                                <Input
-                                                    {...field}
-                                                    disabled={isSlugLocked}
-                                                    className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
-                                                />
-                                            </FormControl>
-                                        </div>
+                                        <FormControl>
+                                            <SlugInput
+                                                {...field}
+                                                prefix="/study/"
+                                                disabled={isSlugLocked}
+                                                className="h-11 rounded-xl bg-slate-50 border-slate-100 font-mono text-xs focus-visible:ring-indigo-500"
+                                            />
+                                        </FormControl>
                                         {isSlugLocked ? (
                                             <p className="text-xs text-amber-800 flex items-center gap-1.5 mt-1.5">
                                                 <Info className="size-3 shrink-0" />
