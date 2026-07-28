@@ -185,10 +185,13 @@ test.describe
             const anonymisedLabel = adminPage.getByText('Anonymised', { exact: true });
             await expect(anonymisedLabel).toBeVisible({ timeout: 10_000 });
 
-            // The sibling value <p> is the last <p> in the same parent div.
-            // We navigate via Playwright's locator chain: parent → last p.
-            const anonymisedCard = anonymisedLabel.locator('..');
-            const statValue = anonymisedCard.locator('p').last();
+            // The tile nests its icon and label in a row div, with the value as
+            // a sibling of that row — so the label's own parent holds no value.
+            // Walk up to the tile and take its `stat-value` testid rather than
+            // navigating by structure: task 6.3 restructured these tiles and a
+            // `parent → last p` chain silently started returning the label.
+            const anonymisedCard = anonymisedLabel.locator('../..');
+            const statValue = anonymisedCard.getByTestId('stat-value');
             await expect(statValue).toHaveText('1', { timeout: 10_000 });
 
             await adminPage.close();
