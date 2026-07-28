@@ -28,9 +28,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceToNow } from 'date-fns';
-import { de, enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 interface ParticipantMetadataCardProps {
     participant: {
@@ -58,20 +57,12 @@ export function ParticipantMetadataCard({
     onToggleDiscard,
     isDiscardPending,
 }: ParticipantMetadataCardProps) {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
+    const { formatRelative } = useDateFormat();
     const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
     const [discardReason, setDiscardReason] = useState(participant.discard_reason || '');
     const uaInfo = parseUA(participant.user_agent || '');
     const isDiscarded = !!participant.is_discarded;
-
-    // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
-    const dateLocales: Record<string, any> = {
-        en: enUS,
-        fr: fr,
-        fi: fi,
-        de: de,
-    };
-    const currentLocale = dateLocales[i18n.language] || enUS;
 
     const DeviceIcon = {
         mobile: Smartphone,
@@ -227,10 +218,7 @@ export function ParticipantMetadataCard({
                             </div>
                             <div>
                                 <p className="text-xs font-black text-slate-900 leading-none">
-                                    {formatDistanceToNow(new Date(participant.created_at), {
-                                        addSuffix: true,
-                                        locale: currentLocale,
-                                    })}
+                                    {formatRelative(participant.created_at)}
                                 </p>
                                 <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {t('admin.participant.metadata.started', 'Started')}
@@ -244,10 +232,7 @@ export function ParticipantMetadataCard({
                                 </div>
                                 <div>
                                     <p className="text-xs font-black text-slate-900 leading-none">
-                                        {formatDistanceToNow(new Date(participant.submitted_at), {
-                                            addSuffix: true,
-                                            locale: currentLocale,
-                                        })}
+                                        {formatRelative(participant.submitted_at)}
                                     </p>
                                     <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t('admin.participant.metadata.submitted', 'Submitted')}

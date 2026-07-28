@@ -57,6 +57,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { resolveApiErrorKey } from '@/lib/error-utils';
+import { formatDate } from '@/lib/datetime';
 import {
     useAdminUsersPage,
     deriveRiskBadges,
@@ -102,9 +103,9 @@ type ActionKind =
 // Pure presentational helpers (no business logic — formatting only)
 // ────────────────────────────────────────────────────────────────
 
-function formatLastSeen(value: string | null | undefined): string | null {
+function formatLastSeen(value: string | null | undefined, language: string): string | null {
     if (!value) return null;
-    return new Date(value).toLocaleDateString();
+    return formatDate(value, language);
 }
 
 // Deliberately surfaces the server's human-readable message and ignores the
@@ -544,9 +545,9 @@ function UserRow({
     onGenerateLink: (user: AdminUser) => void;
     onSetEmail: (user: AdminUser) => void;
 }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const badges = deriveRiskBadges(user, now);
-    const lastSeen = formatLastSeen(user.last_login_at);
+    const lastSeen = formatLastSeen(user.last_login_at, i18n.language);
 
     return (
         <li

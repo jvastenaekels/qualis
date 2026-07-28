@@ -17,8 +17,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { de, enUS, fr, fi } from 'date-fns/locale';
-import type { Locale } from 'date-fns';
 import {
     useListConcoursesApiAdminConcoursesGet,
     useListStudiesApiAdminStudiesGet,
@@ -26,8 +24,6 @@ import {
 import type { ConcourseRead, StudyRead } from '@/api/model';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
-
-const DATE_LOCALES: Record<string, Locale> = { en: enUS, fr, fi, de };
 
 export interface DashboardAlert {
     key: string;
@@ -49,7 +45,6 @@ export interface AdminDashboardApi {
     concourse: ConcourseRead | undefined;
     isConcourseLoading: boolean;
     alerts: DashboardAlert[];
-    currentLocale: Locale;
     showCreateDialog: boolean;
     showImportDialog: boolean;
     setShowCreateDialog: (open: boolean) => void;
@@ -72,7 +67,6 @@ export function useAdminDashboard(): AdminDashboardApi {
     const [showImportDialog, setShowImportDialog] = useState(false);
 
     const projectSlug = currentProject?.slug ?? '';
-    const currentLocale = DATE_LOCALES[i18n.language] ?? enUS;
 
     const { data: allStudiesData, isLoading } = useListStudiesApiAdminStudiesGet(undefined, {
         query: { enabled: !!currentProject?.id },
@@ -175,7 +169,6 @@ export function useAdminDashboard(): AdminDashboardApi {
         concourse,
         isConcourseLoading,
         alerts,
-        currentLocale,
         showCreateDialog,
         showImportDialog,
         setShowCreateDialog,

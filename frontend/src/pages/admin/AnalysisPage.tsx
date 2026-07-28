@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { toast } from 'sonner';
 import type { TFunction } from 'i18next';
 import {
@@ -840,6 +841,7 @@ function InterpretShell({
     onPin,
     onUnpin,
 }: InterpretShellProps) {
+    const { formatDateTime } = useDateFormat();
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') ?? 'loadings';
     const setActiveTab = useCallback(
@@ -1145,13 +1147,7 @@ function InterpretShell({
                             'admin.analysis.history.viewing_banner',
                             'Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}',
                             {
-                                date: new Date(run.ran_at).toLocaleString(undefined, {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                }),
+                                date: formatDateTime(run.ran_at),
                                 extraction: run.extraction_method.toUpperCase(),
                                 n: run.n_factors,
                                 rotation: run.rotation_method,

@@ -31,7 +31,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { de, enUS, fr, fi, type Locale } from 'date-fns/locale';
 import {
     useGetStudyDumpApiAdminStudiesSlugDumpGet,
     getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey,
@@ -75,7 +74,7 @@ export interface UseInteractiveDataViewResult {
     liveParticipants: DumpParticipant[];
     submittedParticipants: DumpParticipant[];
     stepLabels: ReturnType<typeof getStepLabels>;
-    currentLocale: Locale;
+    language: string;
     metrics: {
         liveCount: number;
         newsletterCount: number;
@@ -123,8 +122,7 @@ export function useInteractiveDataView({
     const { projectSlug } = useParams<{ projectSlug: string }>();
     const queryClient = useQueryClient();
 
-    const dateLocales: Record<string, Locale> = { en: enUS, fr, fi, de };
-    const currentLocale = dateLocales[i18n.language] || enUS;
+    const language = i18n.language;
 
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);
 
@@ -355,7 +353,7 @@ export function useInteractiveDataView({
         () =>
             buildColumns({
                 t,
-                currentLocale,
+                language,
                 duplicateIpGroups,
                 showLanguageColumn,
                 statusFilter,
@@ -372,7 +370,7 @@ export function useInteractiveDataView({
             }),
         [
             t,
-            currentLocale,
+            language,
             duplicateIpGroups,
             showLanguageColumn,
             statusFilter,
@@ -406,7 +404,7 @@ export function useInteractiveDataView({
         liveParticipants,
         submittedParticipants,
         stepLabels,
-        currentLocale,
+        language,
         metrics: {
             liveCount,
             newsletterCount,

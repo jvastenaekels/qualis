@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -82,15 +83,6 @@ function defaultCutoff(retentionMonths: number | null | undefined): string {
     const d = new Date();
     d.setMonth(d.getMonth() - retentionMonths);
     return d.toISOString().slice(0, 10);
-}
-
-function formatDate(iso: string | null | undefined): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
 }
 
 // ─── loading skeleton ──────────────────────────────────────────────────────────
@@ -234,6 +226,7 @@ function ConsentLocaleRow({
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — declarative data-privacy page shell with anonymisation preview + bulk-mutation chain + per-row action handlers; better fit for a useDataPrivacyPage hook (Phase 5G pattern in CLAUDE.md) but out of cognitive-complexity remediation scope
 export default function DataPrivacyPage() {
     const { t } = useTranslation();
+    const { formatDate } = useDateFormat();
     const { studySlug, projectSlug } = useParams<{ studySlug: string; projectSlug: string }>();
     const effectiveSlug = studySlug ?? projectSlug ?? '';
 

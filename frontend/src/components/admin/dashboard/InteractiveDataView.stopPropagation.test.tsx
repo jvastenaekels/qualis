@@ -54,7 +54,6 @@
 import { useMemo } from 'react';
 import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
-import { enUS } from 'date-fns/locale';
 import { render, renderWithProviders, screen } from '@/test-utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
@@ -176,7 +175,7 @@ function GuardlessRowHarness({ participant, onView, onRowClick }: GuardlessRowHa
         () =>
             buildColumns({
                 t: fakeT,
-                currentLocale: enUS,
+                language: 'en',
                 duplicateIpGroups: new Map(),
                 showLanguageColumn: false,
                 statusFilter: 'all',
