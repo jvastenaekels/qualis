@@ -857,7 +857,34 @@ export default function InteractiveDataView({
                                             !!row.original.is_discarded &&
                                                 'opacity-60 grayscale-[0.5]'
                                         )}
-                                        onClick={() => handleViewParticipant(row.original)}
+                                        onClick={(e) => {
+                                            // Belt-and-braces (Task 6.7i
+                                            // review finding, minor 2): the
+                                            // row_actions button already
+                                            // calls stopPropagation, but
+                                            // nothing enforced that "every
+                                            // future control inside a row
+                                            // must do the same." Guarding
+                                            // here makes that robust by
+                                            // construction instead of an
+                                            // unwritten rule. (Once this
+                                            // guard exists, it alone is
+                                            // enough to keep navigate() to a
+                                            // single call even if a future
+                                            // control's own stopPropagation
+                                            // is ever dropped — see the
+                                            // InteractiveDataView.stopPropagation.test.tsx
+                                            // header comment for how that
+                                            // was verified.)
+                                            if (
+                                                (e.target as HTMLElement).closest(
+                                                    'button,a,input,select,[role="button"]'
+                                                )
+                                            ) {
+                                                return;
+                                            }
+                                            handleViewParticipant(row.original);
+                                        }}
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell

@@ -1850,7 +1850,8 @@
                 "view": "View",
                 "actions": "Details",
                 "duplicate_ip": "Duplicate IP",
-                "duplicate_ip_hint": "Shares IP hash with other participants"
+                "duplicate_ip_hint": "Shares IP hash with other participants",
+                "view_participant": "View participant {{id}}"
             },
             "tooltips": {
                 "suspect": "Potentially suspect: session duration < 2 minutes",

@@ -20,6 +20,7 @@ import {
     ArrowUpDown,
     ArrowUp,
     ArrowDown,
+    ArrowRight,
     Clock,
     Globe,
     AlertTriangle,
@@ -61,7 +62,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { parseUA } from '@/utils/uaParser';
 import { useTranslation } from 'react-i18next';
@@ -180,27 +180,45 @@ export function ParticipantCell({
                 )}
             </div>
             {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                            {/* text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1. */}
-                            <Badge
-                                variant="outline"
-                                className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
-                            >
-                                {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
-                                {duplicateIpGroups.get(p.ip_address)}
-                            </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {t(
-                                'admin.data.table.duplicate_ip_hint',
-                                'Shares IP hash with other participants'
-                            )}{' '}
-                            ({p.ip_address.substring(0, 8)}...)
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                // Plain badge, no role (Task 6.7i review finding 2): this
+                // already has an accessible name from its own visible text
+                // ("Duplicate IP #1") — role="img" would turn that readable
+                // text into a graphic node (NVDA: "graphic, Duplicate IP
+                // #1") and force the same wording into a hand-maintained
+                // aria-label.
+                //
+                // One channel, not two (re-review, 2026-07-28): an earlier
+                // version of this fix kept BOTH a `title` and an sr-only
+                // span carrying the same hint text. That double-announces on
+                // any AT/browser pairing that surfaces the accessible
+                // description alongside the name (VoiceOver commonly; NVDA/
+                // JAWS in some modes) — once the name comes from content
+                // rather than `title` (HTML-AAM), `title` is exposed
+                // separately as the description, so the identical string
+                // reaches the tree twice. Kept the sr-only span only: it is
+                // ordinary text content, read exactly like the visible label
+                // next to it on every screen reader, with no separate
+                // "hover for description" step `title` requires — and no
+                // risk of NVDA/JAWS/VoiceOver each deciding differently
+                // whether to surface it. Traded away: the native
+                // browser-tooltip-on-hover a sighted mouse user got before.
+                // Accepted rather than solved here — see the submitted_at
+                // cell below for the same trade and the same reasoning.
+                // text-amber-800, not -600 — axe (task 6.7e) measured 3.07:1.
+                <Badge
+                    variant="outline"
+                    className="h-4 text-2xs px-1.5 font-semibold bg-amber-50 text-amber-800 border-amber-200"
+                >
+                    {t('admin.data.table.duplicate_ip', 'Duplicate IP')} #
+                    {duplicateIpGroups.get(p.ip_address)}
+                    <span className="sr-only">
+                        {' '}
+                        {`${t(
+                            'admin.data.table.duplicate_ip_hint',
+                            'Shares IP hash with other participants'
+                        )} (${p.ip_address.substring(0, 8)}...)`}
+                    </span>
+                </Badge>
             )}
         </div>
     );
@@ -227,6 +245,17 @@ export interface BuildColumnsParams {
     setStepFilter: (f: StepFilter) => void;
     setConsentFilters: (s: Set<ConsentType>) => void;
     setQualityFilter: (f: QualityFilter) => void;
+    /**
+     * The row's one real keyboard-and-mouse action (Task 6.7i). Wired to a
+     * dedicated `<Button>` in the trailing "row_actions" column so a
+     * screen-reader user tabbing through the table lands on a real,
+     * per-row-named control rather than relying on the `<TableRow>`'s
+     * mouse-only `onClick` (InteractiveDataView.tsx), which has no keyboard
+     * path at all. Kept as a real button inside a `<td>`, not a role on the
+     * `<tr>` itself, so the row keeps its native `row` semantics for table
+     * navigation (see the task report for the alternatives considered).
+     */
+    onViewParticipant: (participant: DumpParticipant) => void;
 }
 
 export function buildColumns({
@@ -244,6 +273,7 @@ export function buildColumns({
     setStepFilter,
     setConsentFilters,
     setQualityFilter,
+    onViewParticipant,
 }: BuildColumnsParams) {
     return [
         columnHelper.accessor('id', {
@@ -746,21 +776,72 @@ export function buildColumns({
                 const val = info.getValue();
                 if (!val) return <span className="text-slate-300">—</span>;
                 const date = new Date(val);
+                const shortLabel = format(date, 'MMM d, HH:mm', { locale: currentLocale });
+                const fullLabel = format(date, 'PPpp', { locale: currentLocale });
+                // Plain span, no role (Task 6.7i review finding 2): the
+                // short date is already the accessible name via its own
+                // visible text, sitting in a sorted temporal column —
+                // role="img" would make a screen reader announce it as
+                // "graphic, Jan 1, 01:10" instead of a date.
+                //
+                // One channel, not two (re-review, 2026-07-28): no `title`
+                // here alongside the sr-only span — keeping both would
+                // double-announce the full timestamp on any AT/browser
+                // pairing that surfaces the accessible description
+                // alongside the name (see the duplicate-IP badge above for
+                // the full HTML-AAM reasoning; identical trade here). The
+                // sr-only span is the one reliable channel to a screen
+                // reader; the trade-off accepted, not solved, is that a
+                // sighted mouse user no longer gets a hover tooltip for the
+                // full timestamp, and neither they nor a sighted
+                // keyboard-only/touch user without AT can reach it at all
+                // now — there is no longer any focusable trigger to reveal
+                // it on demand.
                 return (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <div className="flex flex-col text-xs text-slate-500 font-medium">
-                                    <span>
-                                        {format(date, 'MMM d, HH:mm', { locale: currentLocale })}
-                                    </span>
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {format(date, 'PPpp', { locale: currentLocale })}
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <span className="flex flex-col text-xs text-slate-500 font-medium">
+                        {shortLabel}
+                        <span className="sr-only"> {fullLabel}</span>
+                    </span>
+                );
+            },
+        }),
+        columnHelper.display({
+            id: 'row_actions',
+            header: () => (
+                <span className="sr-only">{t('admin.data.table.actions', 'Details')}</span>
+            ),
+            cell: ({ row }) => {
+                const p = row.original;
+                return (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        // text-slate-500, not -400: -400 is 2.56:1 on white,
+                        // below WCAG 1.4.11's 3:1 non-text-contrast floor, and
+                        // this icon is the control's *only* visible
+                        // affordance (Task 6.7i review finding 1). -500 is
+                        // 4.76:1.
+                        className="h-7 w-7 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50"
+                        aria-label={t(
+                            'admin.data.table.view_participant',
+                            'View participant {{id}}',
+                            {
+                                id: p.id,
+                            }
+                        )}
+                        onClick={(e) => {
+                            // The row itself also navigates on click
+                            // (InteractiveDataView.tsx's `<TableRow
+                            // onClick>`, mouse-only); stop the bubble so a
+                            // click or Enter/Space on this button doesn't
+                            // fire handleViewParticipant twice (double
+                            // navigate()/history push).
+                            e.stopPropagation();
+                            onViewParticipant(p);
+                        }}
+                    >
+                        <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
                 );
             },
         }),

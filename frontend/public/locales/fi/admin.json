@@ -1757,7 +1757,8 @@
                 "view": "Näytä",
                 "actions": "Tiedot",
                 "duplicate_ip": "Sama IP",
-                "duplicate_ip_hint": "Jakaa IP-tiivisteen muiden osallistujien kanssa"
+                "duplicate_ip_hint": "Jakaa IP-tiivisteen muiden osallistujien kanssa",
+                "view_participant": "Näytä osallistuja {{id}}"
             },
             "tooltips": {
                 "suspect": "Mahdollisesti epäilyttävä: istunnon kesto < 2 minuuttia",

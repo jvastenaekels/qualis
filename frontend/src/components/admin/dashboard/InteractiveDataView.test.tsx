@@ -28,8 +28,27 @@ import { computeAccessibleName } from 'dom-accessibility-api';
 import { renderWithProviders, screen, within } from '@/test-utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { Routes, Route } from 'react-router-dom';
+import type { ReactElement } from 'react';
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import type { DumpParticipant, DumpResponse } from './types';
 import InteractiveDataView from './InteractiveDataView';
+
+// The submitted_at cell renders `format(date, 'MMM d, HH:mm', { locale })`
+// (InteractiveDataView.columns.tsx) in the *local* timezone of whatever
+// machine runs the test — computing the expected label the same way the
+// component does (rather than hardcoding a string like "Jan 1, 00:10")
+// keeps these assertions correct regardless of the runner's TZ.
+function expectedSubmittedLabel(iso: string): string {
+    return format(new Date(iso), 'MMM d, HH:mm', { locale: enUS });
+}
+
+// The submitted_at cell's `title` carries the full timestamp (Task 6.7i) —
+// same local-timezone-independence reasoning as expectedSubmittedLabel above.
+function expectedFullSubmittedLabel(iso: string): string {
+    return format(new Date(iso), 'PPpp', { locale: enUS });
+}
 
 const { mockDumpQuery } = vi.hoisted(() => ({ mockDumpQuery: vi.fn() }));
 
@@ -212,8 +231,8 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         // Same fixture as above, plus a user_agent so ParticipantCell's
         // OS/browser chip (also in scope for 6.7g) renders too, and a
         // submitted_at timestamp (already present via makeParticipant's
-        // default) whose own TooltipTrigger is explicitly OUT of this
-        // task's scope and must remain a real tab stop.
+        // default), whose own TooltipTrigger was out of 6.7g's scope but is
+        // in 6.7i's (see below).
         const participant = makeParticipant({
             id: 'p1',
             db_id: 1,
@@ -244,17 +263,170 @@ describe('InteractiveDataView — control names (Task 6.7c)', () => {
         const row = screen.getByText('p1').closest('tr');
         if (!row) throw new Error('participant row not found');
 
-        // Before this task: 7 status chips + the OS/browser chip (unreachable
-        // today via a bare `asChild` div, so it doesn't add to the count) +
+        // Before 6.7g: 7 status chips + the OS/browser chip (unreachable at
+        // the time via a bare `asChild` div, so it didn't add to the count) +
         // the submitted_at tooltip trigger = 8 focusable `button`s in this
-        // row. After: only the out-of-scope submitted_at trigger remains.
+        // row. After 6.7g: only the (then out-of-scope) submitted_at trigger
+        // remained. After 6.7i's chip conversion (this row has no duplicate
+        // IP, so that badge never renders here): the submitted_at trigger is
+        // converted too — role="img" like the rest — but the row gained its
+        // own real action (the trailing "row_actions" column), so the count
+        // is still 1, for a different and now-functional reason.
         const focusable = within(row).getAllByRole('button');
         expect(focusable).toHaveLength(1);
+        expect(focusable[0]).toHaveAccessibleName('View participant p1');
 
         // The OS/browser fact is still announced, with the name it never had.
         expect(
             within(row).getByRole('img', { name: 'Device: Windows, Chrome' })
         ).toBeInTheDocument();
+
+        // The submitted_at date is also still announced, just no longer a
+        // tab stop (Task 6.7i). It carries no role at all now (review
+        // finding 2): it already has an accessible name from its own
+        // visible text, so role="img" would have turned it into a graphic
+        // node instead. The visible short label and the sr-only full
+        // timestamp are two separate text-node-owning elements (RTL's
+        // getByText matches an element's own direct text nodes, not its
+        // descendants' — no `title` any more, single channel, see
+        // columns.tsx), so both are queried independently.
+        expect(
+            within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+        expect(
+            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+    });
+
+    it('counts focusable controls in a duplicate-IP row: the badge and the date are no longer tab stops, leaving exactly one real, named action (Task 6.7i)', async () => {
+        // The fixture must actually trip the duplicate-IP badge — a row
+        // without it would already read "1 focusable button" before this
+        // task (the untouched submitted_at trigger), proving nothing about
+        // whether the badge itself got fixed. Two participants sharing an
+        // IP is what populates duplicateIpGroups (useInteractiveDataView.ts).
+        const participants = [
+            makeParticipant({ id: 'p1', db_id: 1, ip_address: '203.0.113.5' }),
+            makeParticipant({ id: 'p2', db_id: 2, ip_address: '203.0.113.5' }),
+        ];
+        mockDumpQuery.mockReturnValue({
+            data: { ...dumpResponseWithTranslations(['en']), participants },
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const row = screen.getByText('p1').closest('tr');
+        if (!row) throw new Error('participant row not found');
+
+        // The duplicate-IP badge is a fact, not a control: plain visible
+        // text, no role at all (Task 6.7i review finding 2 — it already had
+        // an accessible name from its own text, so role="img" would have
+        // wrongly turned it into a graphic node). "Duplicate IP #1" is the
+        // badge's own direct text (RTL's getByText matches an element's own
+        // text nodes, not its descendants' — so this specifically excludes
+        // the nested sr-only span's text); the hint/IP-hash-prefix lives
+        // only in that sr-only span now (no `title` any more, single
+        // channel — see columns.tsx), queried separately below.
+        expect(within(row).getByText('Duplicate IP #1')).toBeInTheDocument();
+        expect(within(row).getByText(/Shares IP hash with other participants/)).toBeInTheDocument();
+        expect(within(row).queryByRole('img', { name: /Duplicate IP/ })).not.toBeInTheDocument();
+        expect(within(row).queryByRole('button', { name: /Duplicate IP/ })).not.toBeInTheDocument();
+
+        // Same for the submitted_at date: was a TooltipTrigger button
+        // revealing the full timestamp on hover, now plain text, split
+        // across a visible short label and an sr-only full timestamp — not
+        // a role="img" either, for the same reason.
+        expect(
+            within(row).getByText(expectedSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+        expect(
+            within(row).getByText(expectedFullSubmittedLabel('2026-01-01T00:10:19Z'))
+        ).toBeInTheDocument();
+        expect(
+            within(row).queryByRole('img', { name: expectedSubmittedLabel('2026-01-01T00:10:19Z') })
+        ).not.toBeInTheDocument();
+
+        // Before this task, a duplicate-IP row carried two inert tab stops
+        // (this badge's own TooltipTrigger, plus the untouched submitted_at
+        // trigger from 6.7g) and zero paths to the row's real action. After:
+        // exactly one focusable button, and it is that real action, not a
+        // leftover inert trigger.
+        const focusable = within(row).getAllByRole('button');
+        expect(focusable).toHaveLength(1);
+        expect(focusable[0]).toHaveAccessibleName('View participant p1');
+    });
+});
+
+describe('InteractiveDataView — row keyboard path (Task 6.7i)', () => {
+    // Real navigation (Routes/Route), not a mocked `useNavigate` — same
+    // pattern as AdminDashboard.test.tsx's keyboard-operable-cards suite.
+    // Proves the whole chain: focusable -> Enter -> onClick ->
+    // handleViewParticipant -> navigate() -> route change, not just that
+    // some callback fired with the right argument.
+    function renderWithRoutes(ui: ReactElement) {
+        return renderWithProviders(
+            <Routes>
+                <Route path="/" element={ui} />
+                <Route
+                    path="/admin/studies/demo/participants/:id"
+                    element={<div data-testid="participant-detail" />}
+                />
+            </Routes>
+        );
+    }
+
+    it("gives the row a keyboard path to its own action: focus the row's View control, press Enter, and the participant opens", async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const viewButton = screen.getByRole('button', { name: 'View participant abcd1234' });
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        viewButton.focus();
+        await user.keyboard('{Enter}');
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
+    });
+
+    it('still lets a mouse user click anywhere in the row, unchanged', async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const row = screen.getByText('abcd1234').closest('tr');
+        if (!row) throw new Error('participant row not found');
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        // Click a cell that is NOT the new View button — the row's own
+        // onClick (InteractiveDataView.tsx, mouse-only, untouched by this
+        // task) must still fire.
+        await user.click(within(row).getByText('abcd1234'));
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
+    });
+
+    it('also lets a mouse user click the View control directly, not only the row at large', async () => {
+        const user = userEvent.setup();
+        renderWithRoutes(<InteractiveDataView slug="demo" />);
+        await screen.findByRole('table');
+
+        const viewButton = screen.getByRole('button', { name: 'View participant abcd1234' });
+        expect(screen.queryByTestId('participant-detail')).not.toBeInTheDocument();
+
+        // The button sits inside the row, which has its own onClick
+        // (InteractiveDataView.tsx). Clicking the button dispatches one
+        // native click that bubbles to the row; the button's handler calls
+        // stopPropagation so the row's handler doesn't also fire — a real
+        // double-navigate would still land here (same destination), so this
+        // is a smoke check that the button itself is independently
+        // clickable, not a substitute for the stopPropagation reasoning
+        // documented at the call site.
+        await user.click(viewButton);
+
+        expect(await screen.findByTestId('participant-detail')).toBeInTheDocument();
     });
 });
 

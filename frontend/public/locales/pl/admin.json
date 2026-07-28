@@ -1848,7 +1848,8 @@
         "view": "Pokaż",
         "actions": "Szczegóły",
         "duplicate_ip": "Duplikat IP",
-        "duplicate_ip_hint": "Współdzieli hash IP z innymi uczestnikami"
+        "duplicate_ip_hint": "Współdzieli hash IP z innymi uczestnikami",
+        "view_participant": "Pokaż uczestnika {{id}}"
       },
       "tooltips": {
         "suspect": "Potencjalnie podejrzane: czas trwania sesji < 2 minuty",
