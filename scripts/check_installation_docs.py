@@ -73,11 +73,11 @@ def check_readme_demo_guidance() -> list[str]:
     # pointer at the top of the page while the section itself sat 137 lines
     # down, behind the statement of need, the comparison table and the full
     # feature catalogue — which is the arrangement it was written to prevent.
-    quick_start = readme.find("## Quick start (Docker)")
+    quick_start = readme.find("## Where to start")
     statement_of_need = readme.find("## Statement of need")
 
     if quick_start == -1:
-        errors.append("README.md has no '## Quick start (Docker)' section")
+        errors.append("README.md has no '## Where to start' section")
     elif statement_of_need == -1:
         errors.append("README.md has no '## Statement of need' section")
     elif quick_start > statement_of_need:
@@ -85,6 +85,22 @@ def check_readme_demo_guidance() -> list[str]:
             "README.md buries the Docker quick start below the long overview — "
             "it must come first, since it is how Qualis is run"
         )
+
+    # The demo stack ships a published signing key, a known admin account, an
+    # unauthenticated /api/test/cleanup-all, and fsync=off. A reader must not
+    # be able to mistake it for something to put participants in front of —
+    # an earlier revision of this page invited exactly that ("use it to run a
+    # pilot, or as the basis of a self-hosted deployment").
+    for token in (
+        "Never point real participants at it",
+        "cleanup-all",
+        "docs/guides/deployment.md",
+    ):
+        if token not in readme:
+            errors.append(
+                f"README.md no longer warns that the demo stack is evaluation-only "
+                f"(missing {token!r})"
+            )
 
     for token in (
         "**Expected result:**",
