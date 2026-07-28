@@ -12,6 +12,7 @@ export function usePlatformConfigBootstrap(): void {
     const { data } = useGetPublicConfigApiConfigGet();
     const setEmailDelivery = usePlatformConfigStore((s) => s.setEmailDelivery);
     const setAudioStorage = usePlatformConfigStore((s) => s.setAudioStorage);
+    const setIsDemo = usePlatformConfigStore((s) => s.setIsDemo);
 
     useEffect(() => {
         if (data?.email_delivery) {
@@ -20,5 +21,8 @@ export function usePlatformConfigBootstrap(): void {
         if (data?.audio_storage) {
             setAudioStorage(data.audio_storage);
         }
-    }, [data, setEmailDelivery, setAudioStorage]);
+        // Explicit === true, not truthiness: the field is optional in the
+        // generated client, and only a real `true` may turn the banner on.
+        setIsDemo(data?.demo_mode === true);
+    }, [data, setEmailDelivery, setAudioStorage, setIsDemo]);
 }

@@ -12,6 +12,18 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Qualis API"
     ENVIRONMENT: str = "production"
 
+    # Opt-in, and only ever for the throwaway `docker-compose.yml` demo stack.
+    # When true, GET /api/config reports demo_mode and the sign-in page offers
+    # to fill the published demo account for you, so nobody has to go hunting
+    # back through their terminal for credentials the README already prints.
+    #
+    # Two independent gates, because the failure mode here is advertising a
+    # real account: this flag is opt-in and defaults off, AND `is_demo_mode`
+    # refuses to report it whenever ENVIRONMENT is "production". No credential
+    # is ever served by the API — the sign-in page carries the published demo
+    # constants itself, so a misconfigured instance can leak nothing.
+    DEMO_MODE: bool = False
+
     # Security
     SECRET_KEY: str = "CHANGEME-insecure-dev-only"
     ALGORITHM: str = "HS256"
@@ -196,6 +208,20 @@ class Settings(BaseSettings):
         - SMTP is configured (otherwise users could never receive the link).
         """
         return self.EMAIL_VERIFICATION_REQUIRED and self.is_smtp_configured
+
+    @property
+    def is_demo_mode(self) -> bool:
+        """True only for the throwaway compose demo stack.
+
+        The second of DEMO_MODE's two gates, and the reason the flag alone is
+        not enough: a production deployment that inherits DEMO_MODE=true — from
+        a copied .env, a stale compose override, an image built for evaluation
+        and then promoted — must not start telling visitors there is a demo
+        account to try. ENVIRONMENT is the one setting a production operator
+        always sets deliberately, so it wins over the flag rather than the
+        other way round.
+        """
+        return self.DEMO_MODE and self.ENVIRONMENT != "production"
 
 
 settings = Settings()

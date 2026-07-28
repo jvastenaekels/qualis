@@ -20270,6 +20270,7 @@ export const getGetPublicConfigApiConfigGetResponseMock = (
 ): PublicConfig => ({
     email_delivery: faker.helpers.arrayElement(['smtp', 'manual'] as const),
     audio_storage: faker.helpers.arrayElement(['available', 'unavailable'] as const),
+    demo_mode: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     ...overrideResponse,
 });
 

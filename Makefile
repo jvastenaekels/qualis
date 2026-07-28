@@ -3,6 +3,24 @@ export
 
 .PHONY: install preflight db-check run-backend run-frontend seed demo-up demo-seed demo-lipset validate-lipset demo-smoke demo-down lint check test ci run-ci ci-full run-ci-full
 
+# The demo path is the first thing a newcomer runs, and its two lines that
+# matter used to be typographically identical to the several hundred BuildKit
+# lines above them. Colour only when stdout is a terminal, and never when
+# NO_COLOR is set (https://no-color.org) — `make demo-up | tee log` must not
+# embed escape codes.
+TTYCOL = if [ -t 1 ] && [ -z "$$NO_COLOR" ]; then B=$$(printf '\033[1m'); D=$$(printf '\033[2m'); G=$$(printf '\033[32m'); R=$$(printf '\033[0m'); else B=; D=; G=; R=; fi
+
+# say <headline> <next step> — the end of a step: what happened, then where to go.
+define say
+$(TTYCOL); printf '\n  %s%s%s\n' "$$G$$B" "$(1)" "$$R"; printf '  %s%s%s\n\n' "$$D" "$(2)" "$$R"
+endef
+
+# probe <what> <url> <what to do about it> — a named check that says which one
+# failed and what to try, instead of a bare curl error and a line number.
+define probe
+$(TTYCOL); printf '  %-40s' "checking $(1)"; if curl -fsS "$(2)" >/dev/null 2>&1; then printf '%sok%s\n' "$$G" "$$R"; else printf '%sfailed%s\n\n  Could not reach %s\n  %s\n\n' "$$B" "$$R" "$(2)" "$(3)"; exit 1; fi
+endef
+
 # Toolchain versions CI exercises. Keep in sync with .python-version, .nvmrc,
 # backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
 PYTHON_VERSION := 3.14
@@ -97,11 +115,11 @@ demo-up:
 		echo "   registry hiccup — retrying in $$((i * 5))s"; sleep $$((i * 5)); \
 	done
 	docker compose up -d --wait --wait-timeout 240
-	@printf '\nQualis services are running.\nNext: make demo-seed\n\n'
+	@$(call say,Your Qualis stack is up and healthy.,Next: make demo-seed  — loads the Bioeconomy Futures example)
 
 demo-seed:
 	docker compose exec backend .venv/bin/python seed_demo.py
-	@printf '\nDemo data is ready.\nNext: make demo-smoke\n\n'
+	@$(call say,The demo data is in place.,Next: make demo-smoke  — checks the whole path end to end)
 
 demo-lipset:
 	docker compose exec backend .venv/bin/python seed_lipset.py
@@ -109,11 +127,16 @@ demo-lipset:
 validate-lipset:
 	python3 validation/lipset/compare.py
 
+# Each check is named. Three bare `curl`s printed the same shape of error and
+# only a Makefile line number, so a 502 on the study API read exactly like a
+# dead frontend — you had to open the Makefile to tell which of the three had
+# failed.
 demo-smoke:
-	@curl -fsS http://localhost:3000/ >/dev/null
-	@curl -fsS http://localhost:3000/health >/dev/null
-	@curl -fsS http://localhost:3000/api/study/bioeconomy-futures >/dev/null
-	@printf '\nQualis demo is ready: http://localhost:3000/login\nLogin: admin@example.com / admin123\n\n'
+	@$(call probe,the frontend,http://localhost:3000/,Is the stack up? Run: make demo-up)
+	@$(call probe,the backend health endpoint,http://localhost:3000/health,The frontend answered but the backend did not. Check: docker compose logs backend)
+	@$(call probe,the demo study API,http://localhost:3000/api/study/bioeconomy-futures,The app is running but the demo data is missing. Run: make demo-seed)
+	@$(call say,Everything checks out — your demo is ready.,Open http://localhost:3000/login   ·   admin@example.com / admin123)
+	@$(TTYCOL); printf '  %sFirst stop: open "Bioeconomy Futures" then Analysis and click\n' "$$D"; printf '  "Commit and interpret" — 18 Q-sorts are waiting for you.%s\n\n' "$$R"
 
 demo-down:
 	docker compose down
@@ -125,8 +148,14 @@ migration-new:
 	@read -p "Enter migration name: " name; \
 	cd backend && uv run alembic revision --autogenerate -m "$$name"
 
+# ENVIRONMENT=production, and not by accident: main.py mounts the /api/test/*
+# router whenever ENVIRONMENT is "test" or "development", and the README tells
+# you to set development locally. Generating from that spec silently adds seven
+# test-only endpoints — cleanup-all among them — to the client the app ships.
+# Passed as a command-line variable so it beats the `-include .env` at the top
+# of this file, which would otherwise win over a plain environment variable.
 generate-api:
-	cd backend && uv run python ../export_openapi.py
+	cd backend && ENVIRONMENT=production uv run python ../export_openapi.py
 	cd frontend && npm run generate:api
 
 check-api: generate-api

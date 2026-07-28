@@ -20,7 +20,13 @@
             "two_factor_submit": "Verify",
             "two_factor_invalid": "Invalid code. Try again.",
             "lost_2fa_link": "Lost access to your 2FA?",
-            "back_to_home": "Back to home"
+            "back_to_home": "Back to home",
+            "demo": {
+                "title": "Welcome — this is the Qualis demo",
+                "body": "Everything here is sample data, so explore freely — nothing you do can break anything.",
+                "fill": "Fill in the demo account for me",
+                "credentials": "{{email}} · password {{password}}"
+            }
         },
         "twofa": {
             "recovery": {

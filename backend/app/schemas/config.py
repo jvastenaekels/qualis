@@ -15,7 +15,14 @@ class PublicConfig(BaseModel):
     configured and "unavailable" otherwise. When "unavailable", the
     participant audio UI is suppressed and audio-enabled studies degrade to
     text-only (see docs/guides/running-without-s3.md).
+
+    ``demo_mode`` is True only for the throwaway compose demo stack, and lets
+    the sign-in page offer to fill the published demo account. It is a boolean
+    and nothing more: no credential crosses this endpoint, so an instance that
+    reports it wrongly still discloses nothing. See ``Settings.is_demo_mode``
+    for the two gates that produce it.
     """
 
     email_delivery: Literal["smtp", "manual"]
     audio_storage: Literal["available", "unavailable"]
+    demo_mode: bool = False
