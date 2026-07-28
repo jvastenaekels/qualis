@@ -58,6 +58,7 @@ Dry, accurate technical descriptions of the system.
 | [API Reference](reference/api.md) | All endpoints with methods, auth requirements, and rate limits |
 | [Configuration Options](reference/configuration.md) | Study fields and application environment variables |
 | [Admin Dashboard](reference/admin-dashboard.md) | Page-by-page catalog of the admin UI |
+| [Feature Reference](reference/features.md) | Complete feature catalogue by area — participant experience, design, concourse, analysis, export, privacy |
 | [Frontend Components](reference/components.md) | Sorting primitives + component index |
 | [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export format specification |
 | [GDPR Memo for Self-Hosters](reference/gdpr-self-hosters.md) | Controls the software provides, for the operator's own DPIA and DPA |
