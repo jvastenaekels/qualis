@@ -167,7 +167,7 @@
     "welcome": {
         "start": "Get started",
         "consent": {
-            "label": "I confirm that i have read the above information and consent to the processing of my data for the purposes of this study.",
+            "label": "I confirm that I have read the above information and consent to the processing of my data for the purposes of this study.",
             "error": "Please accept the terms to continue."
         },
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
