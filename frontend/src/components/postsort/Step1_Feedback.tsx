@@ -371,6 +371,21 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     )}
                                 </Label>
 
+                                {/*
+                                    The reassurance belongs here — before the
+                                    participant writes anything — not in red after
+                                    they fail. It used to be the validation message
+                                    itself, which meant an empty field was answered
+                                    with "a few words are enough": encouragement in
+                                    the position where an error belongs.
+                                */}
+                                <p className="-mt-1 text-sm text-slate-500">
+                                    {t(
+                                        'post.extreme.hint',
+                                        'A few words are enough to help us understand the context.'
+                                    )}
+                                </p>
+
                                 <div className="space-y-4">
                                     <Textarea
                                         id={`comment-${card.statementId}`}
@@ -413,8 +428,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                 </div>
 
                                 {!isValid && isTouched && (
-                                    <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
-                                        <AlertCircle size={16} />
+                                    <div
+                                        role="alert"
+                                        className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1"
+                                    >
+                                        <AlertCircle size={16} aria-hidden="true" />
                                         <span>
                                             {isAudioEffectivelyEnabled
                                                 ? t(
@@ -423,7 +441,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                                   )
                                                 : t(
                                                       'post.extreme.min_chars',
-                                                      'A few words are enough to help us understand the context.'
+                                                      'Please explain your choice before continuing.'
                                                   )}
                                         </span>
                                     </div>
