@@ -31,7 +31,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     y,
     ref,
 }) => {
-    const { width } = useViewport();
+    const { width, height } = useViewport();
     const { t } = useTranslation();
     const controls = useAnimation();
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
@@ -53,18 +53,24 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     else if (textLength > 100) fontSizeClass = 'text-3xl @sm:text-4xl @md:text-5xl';
     else if (textLength > 40) fontSizeClass = 'text-4xl @sm:text-6xl @md:text-7xl';
 
-    // Overflow Detection — re-check when the displayed statement changes
-    // biome-ignore lint/correctness/useExhaustiveDependencies: statement.id triggers re-check when card changes
+    /*
+     * Overflow Detection — re-check on the statement AND on the viewport.
+     *
+     * Keying this on `statement.id` alone meant it ran once per card and never
+     * again, so a viewport change silently invalidated the answer. The harmful
+     * direction is a participant rotating their phone mid-sort: the text becomes
+     * truncated, and because the box clips on height before `-webkit-line-clamp`
+     * binds there is no ellipsis either, so they read a statement that stops
+     * mid-sentence with nothing offering the rest of it — and rank it on that.
+     *
+     * `height` matters as much as `width`. The box is height-bound, so the
+     * on-screen keyboard opening, or browser chrome collapsing on scroll, changes
+     * truncation without changing width.
+     */
     useEffect(() => {
-        const checkOverflow = () => {
-            if (textRef.current) {
-                const hasOverflow = textRef.current.scrollHeight > textRef.current.clientHeight;
-                setIsOverflowing(hasOverflow);
-            }
-        };
-
-        checkOverflow();
-    }, [statement.id]);
+        if (!textRef.current) return;
+        setIsOverflowing(textRef.current.scrollHeight > textRef.current.clientHeight);
+    }, [statement.id, width, height]);
 
     useImperativeHandle(ref, () => ({
         swipe: async (direction) => {
