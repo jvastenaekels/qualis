@@ -380,7 +380,7 @@ const StudyLayoutContent: React.FC = () => {
             {/* Header */}
             <header
                 data-testid="layout-header"
-                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
+                className="px-3 sm:px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
             >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
@@ -399,9 +399,23 @@ const StudyLayoutContent: React.FC = () => {
                     />
                 </div>
 
-                {/* LEFT: Branding / Context */}
-                <div className="flex items-center gap-3 min-w-0 shrink-0 z-10">
-                    <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-[160px] lg:max-w-md">
+                {/*
+                 * LEFT: Branding / Context
+                 *
+                 * `min-w-0` and not `shrink-0`. Both clusters used to be `shrink-0`, so
+                 * neither yielded and the row simply overflowed — and because
+                 * `index.css` puts `overflow-x-hidden` on the body, the excess was
+                 * clipped rather than scrollable. The result was that the language
+                 * switcher sat at `right: 455` in a 390px viewport: present in the DOM,
+                 * focusable by keyboard, invisible and untappable. Measured off-screen
+                 * at every width up to and including 430px — every phone in common use.
+                 *
+                 * The right cluster is the one that must not compress: three 44px
+                 * targets are already at the minimum. So the title yields instead,
+                 * taking whatever space is left over and truncating into it.
+                 */}
+                <div className="flex items-center gap-3 min-w-0 flex-1 md:flex-none md:shrink-0 z-10">
+                    <div className="font-semibold text-slate-800 text-lg truncate min-w-0 flex-1 md:flex-none md:max-w-[160px] lg:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* Show Main Logo if available */}
                         {branding?.logo_url && (
@@ -445,7 +459,7 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
 
                     {/* Mobile Step Counter & Menu */}
-                    <div className="md:hidden relative" ref={stepMenuRef}>
+                    <div className="md:hidden relative shrink-0" ref={stepMenuRef}>
                         <button
                             type="button"
                             onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
