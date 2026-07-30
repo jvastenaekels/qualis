@@ -4,8 +4,9 @@ import { BasePage } from './BasePage';
 export class PostSortPage extends BasePage {
     async waitForLoad() {
         await expect(this.page).toHaveURL(/.*\/post-sort/, { timeout: 20000 });
-        // The title in en.json is "To conclude" (post.title)
-        // or it might be "Why" (welcome.steps.post.title)
+        // The heading is `post.title` — "Why these choices", the step's one
+        // name — but assert only that a level-1 heading is there: the wizard's
+        // second page swaps it for `post.step2_title`.
         await expect(this.page.getByRole('heading', { level: 1 })).toBeVisible({
             timeout: 10000,
         });
