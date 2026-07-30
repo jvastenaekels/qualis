@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowRight, Info } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
@@ -696,7 +696,13 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
              */}
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-6px_rgba(15,23,42,0.15)] pb-4 z-10">
                 <Button variant="outline" size="pill" onClick={() => navigate('../fine-sort')}>
-                    ← {t('post.back', 'Back to sort')}
+                    {/* The sibling button's arrow is a lucide SVG; a literal
+                        U+2190 next to it is a different weight, size and
+                        baseline. Using the icon set also keeps the direction
+                        out of the text node, where a future RTL locale would
+                        have had to flip it by hand. */}
+                    <ArrowLeft size={18} className="mr-2" />
+                    {t('post.back', 'Back to sort')}
                 </Button>
                 <Button
                     variant="brand"
