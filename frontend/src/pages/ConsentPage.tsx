@@ -203,8 +203,16 @@ const ConsentPage: React.FC = () => {
                         className="w-full sm:w-auto min-w-0 h-auto min-h-12 px-6 sm:px-8 py-3 text-white rounded-md font-bold text-base leading-tight hover:brightness-110 shadow-md flex items-center justify-center gap-2 whitespace-normal text-center disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         <span className="min-w-0 break-words [overflow-wrap:anywhere]">
-                            {config.ui_labels?.['welcome.start'] ||
-                                t('welcome.start', 'Get started')}
+                            {/*
+                             * Not `welcome.start` — that is the previous
+                             * screen's CTA, and reusing it put "Get started"
+                             * on two consecutive screens. This button is an
+                             * act of consent and the form under it is a
+                             * consent form; the label has to say what the
+                             * click means.
+                             */}
+                            {config.ui_labels?.['welcome.consent.submit'] ||
+                                t('welcome.consent.submit', 'I agree — start the study')}
                         </span>
                         <ArrowRight size={18} className="shrink-0" />
                     </button>

@@ -152,7 +152,8 @@
         "start": "Comenzar",
         "consent": {
             "label": "Confirmo que he leído la información anterior y doy mi consentimiento para el tratamiento de mis datos con fines de este estudio.",
-            "error": "Por favor, acepte los términos para continuar."
+            "error": "Por favor, acepte los términos para continuar.",
+            "submit": "Acepto — comenzar el estudio"
         },
         "reset_confirm": "¿Está seguro de que desea iniciar una nueva sesión? Esto borrará su progreso actual.",
         "restart": "Iniciar una nueva sesión",

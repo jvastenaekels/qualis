@@ -164,7 +164,8 @@
         "start": "Rozpocznij",
         "consent": {
             "label": "Potwierdzam, że zapoznałem/am się z powyższymi informacjami i wyrażam zgodę na przetwarzanie moich danych na potrzeby tego badania.",
-            "error": "Proszę zaakceptować warunki, aby kontynuować."
+            "error": "Proszę zaakceptować warunki, aby kontynuować.",
+            "submit": "Zgadzam się — rozpocznij badanie"
         },
         "reset_confirm": "Czy na pewno chcesz rozpocząć nową sesję? Spowoduje to usunięcie bieżącego postępu.",
         "restart": "Rozpocznij nową sesję",

@@ -164,7 +164,8 @@
         "start": "Aloita",
         "consent": {
             "label": "Vahvistan lukeneeni yllä olevat tiedot ja annan suostumukseni tietojeni käsittelyyn tätä tutkimusta varten.",
-            "error": "Hyväksy ehdot jatkaaksesi."
+            "error": "Hyväksy ehdot jatkaaksesi.",
+            "submit": "Hyväksyn — aloita tutkimus"
         },
         "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
         "restart": "Aloita uusi istunto",

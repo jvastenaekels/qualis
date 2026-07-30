@@ -164,7 +164,8 @@
         "start": "Loslegen",
         "consent": {
             "label": "Ich bestätige, dass ich die obigen Informationen gelesen habe und der Verarbeitung meiner Daten für die Zwecke dieser Studie zustimme.",
-            "error": "Bitte akzeptieren Sie die Bedingungen, um fortzufahren."
+            "error": "Bitte akzeptieren Sie die Bedingungen, um fortzufahren.",
+            "submit": "Ich stimme zu — Studie starten"
         },
         "reset_confirm": "Sind Sie sicher, dass Sie eine neue Sitzung starten möchten? Ihr aktueller Fortschritt wird gelöscht.",
         "restart": "Neue Sitzung starten",

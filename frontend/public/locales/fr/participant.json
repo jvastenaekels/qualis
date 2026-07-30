@@ -164,7 +164,8 @@
         "start": "Commencer",
         "consent": {
             "label": "Je confirme avoir lu les informations ci-dessus et je consens au traitement de mes données dans le cadre de cette étude.",
-            "error": "Vous devez accepter les conditions pour continuer."
+            "error": "Vous devez accepter les conditions pour continuer.",
+            "submit": "J'accepte — commencer l'étude"
         },
         "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
         "restart": "Commencer une nouvelle session",

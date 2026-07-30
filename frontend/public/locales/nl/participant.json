@@ -164,7 +164,8 @@
         "start": "Beginnen",
         "consent": {
             "label": "Ik bevestig dat ik bovenstaande informatie heb gelezen en toestemming geef voor de verwerking van mijn gegevens voor de doeleinden van dit onderzoek.",
-            "error": "Accepteer de voorwaarden om door te gaan."
+            "error": "Accepteer de voorwaarden om door te gaan.",
+            "submit": "Ik ga akkoord — start het onderzoek"
         },
         "reset_confirm": "Weet u zeker dat u een nieuwe sessie wilt starten? Dit wist uw huidige voortgang.",
         "restart": "Nieuwe sessie starten",
