@@ -12,7 +12,9 @@
 
 A fresh Docker instance (`docker compose down -v`, then `make demo-up` / `demo-seed` / `demo-smoke`), walked end to end as a participant at 1440×900, 820×1180 and 390×844, plus a width sweep at 320/360/375/390/414/430/480/560/640/768. Every number quoted below is a live measurement from that run, not an estimate.
 
-**One measurement was thrown away.** The first mobile fine-sort observations were invalid: headless Chromium reports `screen.orientation.type = "landscape-primary"` at 390×844, and `ViewportContext.tsx:89` trusts it (`orientationOverride ?? width > height`), so the app served the landscape-mobile layout to a portrait viewport. With orientation stubbed correctly, the portrait fine sort is sound — deck below, full width, 38×25 px cells. Nothing in this plan rests on those discarded captures. Task 6.4 addresses the seeding gap the episode exposed, but as a code-level observation, not an observed defect.
+**One measurement was thrown away.** The first mobile fine-sort observations were invalid: headless Chromium reports `screen.orientation.type = "landscape-primary"` at 390×844, and `ViewportContext` trusts that signal in preference to `width > height` — correctly, since it is the keyboard-immune one. The app therefore served the landscape-mobile layout to what the browser insisted was a landscape device. With orientation stubbed, the portrait fine sort is sound: deck below, full width, 38×25 px cells. Nothing in this plan rests on those discarded captures.
+
+**And one task was withdrawn.** Task 6.4 originally claimed the orientation signal was never seeded at mount. It is, at `ViewportContext.tsx:36-41`, in the `useState` initialiser — the task was written from the effect at `:71-89` without reading the state declaration above it. See Task 6.4 for the retraction; what remains there is the Playwright hazard, recorded as a comment rather than a fix.
 
 ---
 
@@ -997,43 +999,89 @@ git commit -m "style(participant): give the stepper a legible tablet state"
 
 ---
 
-### Task 6.4: Seed the orientation override at mount
+### Task 6.4: ~~Seed the orientation override at mount~~ — WITHDRAWN, the premise was false
 
-**The observation, not an observed defect.** `ViewportContext.tsx:89` reads `isLandscape = orientationOverride ?? width > height`, but `orientationOverride` is only ever set inside the `screen.orientation` **change** handler (`:71-81`). Until the user rotates the device for the first time, the "keyboard-immune" signal the comment at `:69-70` promises is not in effect, and the code falls back to the `width > height` heuristic that comment exists to avoid.
-
-The practical impact on a real phone is narrow — the on-screen keyboard rarely makes a portrait viewport wider than it is tall. It is worth fixing because the code says it does something it does not yet do, and because this is the mechanism that made the audit's first mobile measurements wrong.
-
-**Files:**
-- Modify: `frontend/src/contexts/ViewportContext.tsx:71-81`
-- Test: `frontend/src/contexts/ViewportContext.test.tsx`
-
-- [ ] **Step 1: Initialise from `screen.orientation.type` in the same effect**
+**Retracted on 2026-07-30, during Phase 1.** This task claimed `orientationOverride` was
+"only ever set inside the `screen.orientation` change handler (`:71-81`)" and therefore
+never seeded at mount. That is wrong. `ViewportContext.tsx:36-41` seeds it in the
+`useState` initialiser:
 
 ```tsx
-useEffect(() => {
-    const so = screen.orientation;
-    if (!so) return;
-    const read = () => setOrientationOverride(so.type.startsWith('landscape'));
-    read();                                  // seed, do not wait for the first rotation
-    so.addEventListener?.('change', read);
-    return () => so.removeEventListener?.('change', read);
-}, []);
+const [orientationOverride, setOrientationOverride] = useState<boolean | null>(() => {
+    if (typeof window !== 'undefined' && screen.orientation?.type) {
+        return screen.orientation.type.startsWith('landscape');
+    }
+    return null;
+});
 ```
 
-- [ ] **Step 2: Keep the dimension fallback for browsers with no `screen.orientation`**
+The `?? width > height` fallback at `:89` is therefore reached only where
+`screen.orientation` is genuinely unavailable, which is what it is for. There is no
+defect here and nothing to fix. The task was written from `:71-89` without reading
+`:26-42` — the effect looked like the only writer because it was the only writer I
+looked at.
 
-`?? width > height` stays. Test both branches: an environment with the API and one without.
+**What survives, and is worth keeping:** headless Chromium reports
+`screen.orientation.type === 'landscape-primary'` at *any* viewport size, including
+390×844 where `screen.width`/`screen.height` themselves report portrait. Because the
+seeding above works correctly, the app faithfully serves the landscape-mobile layout to
+what the browser insists is a landscape device. Anyone auditing the participant flow
+with Playwright must stub `screen.orientation` or they will measure a layout no real
+phone ever shows — as the first pass of the 2026-07-29 audit did.
 
-- [ ] **Step 3: Note the audit hazard in the test file**
+- [ ] **Step 1: Record the hazard where it will be found**
 
-Add a comment recording that headless Chromium reports `landscape-primary` at any viewport size, so anyone auditing the participant flow with Playwright must stub `screen.orientation` or they will measure the wrong layout. This is the kind of thing that costs an afternoon twice if it is not written down.
+Add the paragraph above as a comment in `frontend/e2e/accessibility/participant-pages.spec.ts`,
+next to any viewport-dependent test. No source change.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 2: Commit**
 
 ```bash
-git add frontend/src/contexts/ViewportContext.tsx frontend/src/contexts/ViewportContext.test.tsx
-git commit -m "fix(viewport): seed the orientation signal at mount instead of on first rotation"
+git add frontend/e2e/accessibility/participant-pages.spec.ts
+git commit -m "docs(e2e): record that headless Chromium misreports screen.orientation"
 ```
+
+---
+
+## Found while executing Phase 1
+
+Two things the audit did not see, both worth acting on separately.
+
+### The committed E2E screenshots are not a gate, and they drift by machine
+
+`e2e/participant/fine-sort-screenshots/` holds 100 PNGs described as "visual baselines
+committed alongside the spec files". Nothing compares them. `captureTransition()`
+(`e2e/helpers/rough-sort.ts:33`) calls `page.screenshot({path})` — it *writes* them on
+every run and asserts nothing. So they dirty the working tree after any participant E2E
+run, and a real visual regression would be silently overwritten rather than caught.
+
+They also do not match what this machine renders. Measured on
+`mobile_portrait-rough-03-presort.png`:
+
+| comparison | differing pixels |
+|---|---|
+| two runs, identical code, same machine | **4** |
+| committed baseline vs a fresh run of `main`'s own code | **13,566** |
+| committed baseline vs a fresh run with the Phase 1 header fix | 8,166 |
+
+Run-to-run noise is negligible, so the 13,566 is real — and it is present with *no source
+change at all*, over the whole page rather than just the header. The committed images
+encode some other environment's font rasterisation. Phase 1 therefore restored them
+rather than committing the churn: recording this machine's rendering as the new truth
+would produce a 100-file diff that means nothing and would mask the next real change.
+
+**Proposed:** either promote them to a real gate (`toHaveScreenshot` with a tolerance, and
+per-platform baselines committed from CI, not from a developer laptop), or stop committing
+them and write to a gitignored directory. The current middle position has the cost of
+baselines and the benefit of none.
+
+### `uv.lock` is stale on `main`
+
+The lock recorded `qualis-backend 0.7.3` against `pyproject.toml`'s 0.7.4, so
+`make check-requirements` → `uv lock --check` fails on a clean checkout. It passes locally
+only because `uv run` rewrites the lock before the check reads it — the gate is repaired
+by the command that runs just before it. Fixed in Phase 1 (`c406d816`); worth checking why
+CI does not surface it.
 
 ---
 
