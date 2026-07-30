@@ -946,17 +946,17 @@ git commit -m "style(post-sort): use the icon set for the back arrow"
 - Modify: `frontend/src/components/survey/SurveyField.tsx:32-62`
 - Test: `frontend/src/components/survey/SurveyField.test.tsx`
 
-- [ ] **Step 1: Bind the two rows to one width**
+- [x] **Step 1: Bind the two rows to one width**
 
 Wrap the radiogroup and the anchor row in a single `inline-flex flex-col w-fit` so the anchors can only ever be as wide as the scale. Keep the anchor row's `justify-between` — inside the narrower wrapper it now does the right thing.
 
 Guard the wrap case: at very narrow widths the radios wrap to two lines, and `justify-between` on a wrapped scale is meaningless. Below `sm`, stack the anchors under their end options instead.
 
-- [ ] **Step 2: Add the geometric assertion to the participant axe spec**
+- [x] **Step 2: Add the geometric assertion to the participant axe spec**
 
 A jsdom test cannot catch this. Add to `participant-pages.spec.ts`: the right anchor's right edge must be within 24 px of the last radio's right edge.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/src/components/survey/SurveyField.tsx frontend/e2e/accessibility/participant-pages.spec.ts
@@ -972,13 +972,13 @@ git commit -m "fix(pre-sort): anchor the rating labels to the scale they describ
 **Files:**
 - Modify: wherever the resume toast is mounted (grep `resume.restored` / `Welcome back`)
 
-- [ ] **Step 1: Offset the toast below the sticky header**
+- [x] **Step 1: Offset the toast below the sticky header**
 
 The header is `sticky top-0 h-16` (`StudyLayout.tsx:383`). The toast container needs `top-16` — or better, the same `--header-height` custom property, so the two cannot drift.
 
-- [ ] **Step 2: Bring the close button inside the toast**
+- [x] **Step 2: Bring the close button inside the toast**
 
-- [ ] **Step 3: Verify with `elementFromPoint`, and commit**
+- [x] **Step 3: Verify with `elementFromPoint`, and commit**
 
 ```bash
 git commit -m "fix(participant): stop the resume toast covering the header"
@@ -990,13 +990,13 @@ git commit -m "fix(participant): stop the resume toast covering the header"
 
 **The defect:** the stepper's labels are `hidden lg:block` (`StudyLayout.tsx`), so between 768 and 1023 px only the current step is named — the other four are unlabelled circles, and the trailing one is a bare dot with a short connector going nowhere. This is *deliberate*, so it is finish work rather than a defect; but the result at iPad-portrait width reads as unfinished, and the participant cannot see what comes next.
 
-- [ ] **Step 1: Choose one of two, do not do both**
+- [x] **Step 1: Choose one of two, do not do both**
 
 (a) Show the *next* step's label alongside the current one below `lg` — the participant's actual question is "what's after this". (b) Fall back to the mobile "Step 3/5 ▾" pill, which is compact and already built, for everything below `lg`.
 
 (b) is less work and reuses a component that already exists. Prefer it unless the tablet is a primary target.
 
-- [ ] **Step 2: Verify at 768, 820, 1024 and commit**
+- [x] **Step 2: Verify at 768, 820, 1024 and commit**
 
 ```bash
 git commit -m "style(participant): give the stepper a legible tablet state"
@@ -1034,12 +1034,12 @@ what the browser insists is a landscape device. Anyone auditing the participant 
 with Playwright must stub `screen.orientation` or they will measure a layout no real
 phone ever shows — as the first pass of the 2026-07-29 audit did.
 
-- [ ] **Step 1: Record the hazard where it will be found**
+- [x] **Step 1: Record the hazard where it will be found**
 
 Add the paragraph above as a comment in `frontend/e2e/accessibility/participant-pages.spec.ts`,
 next to any viewport-dependent test. No source change.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add frontend/e2e/accessibility/participant-pages.spec.ts
@@ -1391,6 +1391,65 @@ tree is red at `106d11a1` and green from `77d57233` on. The inner-loop disciplin
 `CLAUDE.md` says between every change, and this phase did not honour it.
 
 
+## Found while executing Phase 6
+
+### The toaster is not mounted until a toast exists
+
+The first version of Task 6.2's gate asserted on `[data-sonner-toaster]`'s
+computed `top`, on the reasoning that the container is always present and carries
+the offset — which would have let the assertion run without a resume session. It
+is not: sonner mounts nothing until a toast is queued, so the selector matched
+nothing at all six phone widths and the test failed on `not.toBeNull()` rather
+than on geometry.
+
+The replacement reloads past step 1, which is what fires the real toast in normal
+use (`useStudyLocaleSync.ts:88-105`), and asserts on the toast itself: its top
+edge against the header's bottom, and `elementFromPoint` over the header. Both
+were confirmed to fail on the previous code — "toast starts at 16, header ends at
+64", and the toast intercepting the pointer — so the gate measures something.
+
+### Sonner places the close button with custom properties, and its rule outranks a class
+
+`toastOptions.classNames.closeButton` attaches a class, but sonner's own rule is
+`[data-sonner-toast][data-styled='true'] [data-close-button]` — three
+selectors. A single class at equal-or-lower specificity loses on source order,
+because sonner injects its stylesheet at runtime, after ours. Measured: the class
+applied, and the button stayed at x=10 outside a toast starting at x=16. The
+override needed the library's own selector plus the class.
+
+Moving the button inside also required reserving the space: outside the box it
+needed none.
+
+### Task 6.1's fix needs no breakpoint, and the plan's guard would have been wrong
+
+The plan asked for a `sm`-and-below special case, on the grounds that
+`justify-between` is meaningless once the scale wraps. It is not needed:
+`w-fit` is `fit-content`, which resolves to the *available* width as soon as the
+scale's max-content exceeds it — which is exactly the wrap case, and exactly
+today's full-width behaviour. Adding the breakpoint would have introduced a
+second layout to maintain for a case the first one already handles.
+
+### Task 6.3 fixes 768-1023 and leaves the same state at 1024-1279
+
+Promoting the pill to `lg` clears the range the plan named. It does not clear the
+next one up: at 1024-1279 the stepper labels the current and completed steps
+(`lg:block`) but not the upcoming ones (`xl:block`), so the last two are still
+anonymous circles ending in a bare dot. Measured at 1024: labels end at x≈570,
+the icon cluster starts at x≈900. Five labels at `max-w-[8rem]` plus dots,
+connectors and gaps need roughly 900 px against ~790 free. So this is a width
+fact, not an oversight — but the row does look the same way at 1024 as it did at
+768, and anyone reading the Phase 6 commit should know the fix has a ceiling.
+
+### A flake in `RoughSortPage.completeRoughSort`
+
+While verifying Task 6.1, the mobile a11y walk failed at
+`e2e/pages/RoughSortPage.ts:50` — `expect(nextBtn).toBeHidden()` timed out with
+the button still visible after 13 polls. It passed on an immediate rerun with no
+change, and again on every subsequent run. Unrelated to anything in Phase 6, and
+not investigated: recorded so the next intermittent red on this spec is not
+mistaken for a regression.
+
+
 ## What this plan does not cover
 
 Stated so the next audit does not assume it was checked.
@@ -1407,4 +1466,7 @@ Stated so the next audit does not assume it was checked.
 - **Existing studies' step names.** The Phase 5 canon governs the i18n keys and the backend seed. Any study already in the database keeps whatever `process_steps[].title` it was created with, including "Why" and any researcher edit. No migration was written and none should be.
 - **The designer's editable-label list.** `welcome.consent.submit` is honoured as a `ui_labels` override but is not offered in `InterfaceEditor`, so no researcher can set it through the UI yet.
 - **The nine locales' step names as rendered.** Task 5.1 propagated by copying each locale's own `welcome.steps.*.title`, so the non-English names are as good as they already were. Only `en` and `fi` were read closely; the two new strings ("Why these choices", "First impressions recorded") were translated without a native reader.
+- **Landscape phones, still.** Task 6.4's note now says how to measure them. Nobody has.
+- **The stepper at 1024-1279.** See the Phase 6 finding above: labelled current and completed steps, anonymous upcoming ones. Left as is.
+- **Toast geometry anywhere but the participant header.** The gate runs on the participant flow. The admin header is also `h-16` and reads the same `--header-height`, but no admin test asserts it.
 - **`results.incomplete`.** Task 2.1's gate drops it, exactly as the admin gate does. Contrast over the fine-sort board's transform and over the rough sort's translucent tints is therefore unmeasured by a green run.
