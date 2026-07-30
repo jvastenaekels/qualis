@@ -143,12 +143,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 return null;
             }
             return (
-                <NativeSelect
-                    id={id}
-                    {...register(id)}
-                    {...requiredAria}
-                    className={commonClasses}
-                >
+                <NativeSelect id={id} {...register(id)} {...requiredAria} className={commonClasses}>
                     <option value="">{t('presort.select_placeholder', 'Select...')}</option>
                     {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;

@@ -457,7 +457,8 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 </Card>
             )}
 
-            <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
+            {/* Same opaque bar as Step 1 — see the note there for why not blur. */}
+            <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-8 sticky bottom-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-6px_rgba(15,23,42,0.15)] pb-4 z-10">
                 <Button variant="outline" size="pill" onClick={onBack} disabled={isLoading}>
                     <ArrowLeft size={18} className="mr-2" />
                     {t('common.back', 'Back')}

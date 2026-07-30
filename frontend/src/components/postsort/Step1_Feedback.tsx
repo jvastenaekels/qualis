@@ -680,7 +680,21 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             )}
 
             {/* NAVIGATION ACTIONS */}
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
+            {/*
+             * An opaque surface, not a white gradient. The gradient's upper
+             * band was transparent, so the next textarea (y=817-917, against a
+             * bar at y=816-900) showed through it: a participant typing into
+             * that field read their own text through the button bar. The
+             * gradient was also *white* over tinted extreme cards, washing out
+             * the bottom of the green one and half of its badge.
+             *
+             * No `backdrop-blur`, despite that being the house style for the
+             * grid toolbar: a blurred ancestor makes axe report every
+             * descendant's contrast as `incomplete` rather than measuring it,
+             * and these two buttons would stop being covered by the pass
+             * Phase 2 added.
+             */}
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-6px_rgba(15,23,42,0.15)] pb-4 z-10">
                 <Button variant="outline" size="pill" onClick={() => navigate('../fine-sort')}>
                     ← {t('post.back', 'Back to sort')}
                 </Button>
