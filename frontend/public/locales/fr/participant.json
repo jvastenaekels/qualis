@@ -120,11 +120,7 @@
         "loading_content": "Chargement du contenu de l'étude...",
         "change_lang_title": "Changer de langue",
         "steps": {
-            "welcome": "Bienvenue",
-            "consent": "Confidentialité & Consentement",
-            "rough": "Premières impressions",
-            "fine": "Grille Q-Sort",
-            "post": "Dernières questions"
+            "welcome": "Bienvenue"
         },
         "mobile_step": "Étape",
         "navigation": "Navigation",
@@ -158,10 +154,10 @@
             }
         },
         "steps": {
-            "presort": "Formulaire de pré-tri",
-            "rough": "Tri préliminaire",
-            "fine": "Placement sur la grille",
-            "post": "Phase post-tri"
+            "presort": "Faisons connaissance",
+            "rough": "Premières impressions",
+            "fine": "Votre perspective",
+            "post": "Pourquoi ces choix"
         }
     },
     "welcome": {
@@ -192,7 +188,7 @@
                 "description": "Lors de l'étape du classement, vous placerez les énoncés sur une grille pour affiner votre point de vue. Vous classerez et rangerez les énoncés de « tout à fait d'accord » à « pas du tout d’accord » en plaçant chaque énoncé dans la case correspondante. Il n'y a pas de bonnes ou de mauvaises réponses. La meilleure réponse est celle qui reflète votre opinion ou vos convictions."
             },
             "post": {
-                "title": "Pourquoi",
+                "title": "Pourquoi ces choix",
                 "description": "Avant la fin de la session, vous devrez répondre à quelques questions de clarification pour nous aider à mieux comprendre vos choix les plus significatifs, ainsi qu'à quelques questions sur votre parcours."
             }
         }
@@ -204,7 +200,7 @@
         "default_text": "1. Nature de l'étude et compréhension du participant\nEn cochant la case ci-dessous, vous confirmez avoir pris connaissance des objectifs de l'étude décrits sur la page d'accueil. Vous comprenez que cet exercice utilise la méthodologie Q, une technique de recherche conçue pour modéliser les points de vue subjectifs. La tâche consiste à trier des énoncés selon leur importance relative à votre perspective personnelle ; par conséquent, il n'y a pas de \"bonnes\" ou de \"mauvaises\" réponses objectives.\n\n2. Traitement des données et pseudonymisation (conformité RGPD)\n\nCollecte des données : Vos réponses (configuration du Q-sort et explications) se verront attribuer un code alphanumérique unique lors de la soumission.\n\nDésidentification et conservation :\n\nProcédure standard : Les identifiants directs (tels que les adresses IP) sont immédiatement convertis en un code anonyme et ne sont jamais conservés dans leur format d'origine. Ce procédé technique garantit que votre empreinte numérique ne peut être utilisée pour vous réidentifier une fois la session terminée.\n\nException pour le suivi : Si vous fournissez volontairement vos coordonnées à la fin de l'étude pour un contact de suivi, le lien entre votre identité (e-mail) et votre réponse sera maintenu strictement pour la durée de cette phase de suivi spécifique.\n\nDiffusion des résultats : Les résultats finaux seront présentés sous une forme anonymisée. Les données seront agrégées pour révéler des perspectives sociales partagées (facteurs). Les commentaires qualitatifs pourront être cités pour contextualiser ces facteurs, mais seront filtrés pour supprimer tout détail identifiant.\n\n3. Participation volontaire et droit de retrait\nVotre participation est strictement volontaire. Vous conservez le droit d'interrompre le processus de tri et de fermer votre navigateur à tout moment avant la soumission, sans pénalité.\n\nAvant soumission : Si vous vous retirez avant de finaliser votre tri, aucune donnée partielle ne sera conservée.\n\nAprès soumission : En raison de la nature statistique de la méthodologie Q (analyse factorielle), une fois vos données soumises et agrégées dans le jeu de données, le retrait individuel pourrait ne plus être réalisable.\n\n4. Conservation des données et droits\nConformément au Règlement général sur la protection des données (RGPD), vous conservez le droit de demander l'accès ou la rectification de vos données personnelles tant qu'elles restent identifiables (c'est-à-dire avant l'anonymisation finale)."
     },
     "presort": {
-        "title": "Avant de commencer",
+        "title": "Faisons connaissance",
         "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
         "submit": "Continuer vers le tri",
         "select_placeholder": "Sélectionner...",
@@ -219,7 +215,7 @@
             "close": "Fermer l'aide"
         },
         "complete": {
-            "title": "Première étape validée",
+            "title": "Premières impressions enregistrées",
             "subtitle": "Nous allons maintenant affiner les nuances.",
             "button": "Continuer vers le Q-sort"
         },
@@ -287,7 +283,7 @@
         }
     },
     "post": {
-        "title": "Votre perspective & retours",
+        "title": "Pourquoi ces choix",
         "description": "Nous y sommes presque ! Vos explications sur les énoncés les plus significatifs sont précieuses pour l'analyse.",
         "step2_title": "Presque fini !",
         "step2_description": "Veuillez répondre à ces dernières questions pour terminer l'étude.",

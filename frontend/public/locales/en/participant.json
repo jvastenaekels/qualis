@@ -120,11 +120,7 @@
         "loading_content": "Loading study content...",
         "change_lang_title": "Change language",
         "steps": {
-            "welcome": "Welcome",
-            "consent": "Privacy & Consent",
-            "rough": "First impressions",
-            "fine": "Q-sort",
-            "post": "Final questions"
+            "welcome": "Welcome"
         },
         "mobile_step": "Step",
         "navigation": "Navigation",
@@ -158,10 +154,10 @@
             }
         },
         "steps": {
-            "presort": "Pre-sort survey",
-            "rough": "Preliminary sort",
-            "fine": "Grid placement",
-            "post": "Post-sort stage"
+            "presort": "Let's meet",
+            "rough": "First impressions",
+            "fine": "Your perspective",
+            "post": "Why these choices"
         }
     },
     "welcome": {
@@ -192,7 +188,7 @@
                 "description": "During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs."
             },
             "post": {
-                "title": "Why",
+                "title": "Why these choices",
                 "description": "Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background."
             }
         }
@@ -204,7 +200,7 @@
         "default_text": "1. Nature of the study and participant understanding. You understand that this exercise employs q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance).\n\nDe-identification and retention:. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: if you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: the final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: if you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: due to the statistical nature of q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights"
     },
     "presort": {
-        "title": "Before we start",
+        "title": "Let's meet",
         "description": "Please answer a few questions to help us situate your viewpoint.",
         "submit": "Continue to sorting",
         "select_placeholder": "Select...",
@@ -219,7 +215,7 @@
             "close": "Close tip"
         },
         "complete": {
-            "title": "First step complete",
+            "title": "First impressions recorded",
             "subtitle": "We will now refine the nuances.",
             "button": "Continue to fine sort"
         },
@@ -287,7 +283,7 @@
         }
     },
     "post": {
-        "title": "Your perspective & feedback",
+        "title": "Why these choices",
         "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
         "step2_title": "Almost done!",
         "step2_description": "Please answer these final questions to complete the study.",

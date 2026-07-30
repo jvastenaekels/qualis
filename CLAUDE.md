@@ -217,3 +217,29 @@ hierarchy; every other piece of header chrome must respect that.
 `admin.sidebar.<s>` (may use a shorter variant if width-constrained),
 `admin.breadcrumbs.<s>`, `admin.<s>.title`. Default values in `t(key, 'fallback')` must
 match the canonical English label.
+
+### Participant naming canon
+
+Same rule, one audience further out. Each step of the participant flow has **one** name,
+and it is the one that addresses the participant — `welcome.steps.<s>.title` ("Let's
+meet", "First impressions", "Your perspective", "Why these choices"), not the
+researcher's vocabulary ("Pre-sort survey", "Preliminary sort", "Grid placement").
+
+That name is propagated to three places, all in `participant.json`:
+
+| key | where it shows |
+|---|---|
+| `welcome.steps.<s>.title` | the welcome page's step list **and** the header stepper (`StudyLayout.tsx:62-66`) |
+| `study.steps.<s>` | the in-flow help dialog (`HelpOverlay.tsx`) and the designer's step tabs (`InterfaceEditor.tsx`) |
+| the page's own `<h1>` key | `presort.title`, `post.title`, … |
+
+A completion screen names the step it completed (`rough.complete.title` = "First
+impressions recorded"), never its ordinal — "First step complete" appeared with two
+steps already ticked in the stepper.
+
+Adding a fourth place for a step name means adding it to this table, not inventing a
+synonym. `layout.steps` holds `welcome` only; its four other entries were a third,
+readerless set of names and were removed.
+
+The admin-side step names (`admin.data.step.*`, defaults in `utils/studySteps.ts`) are
+researcher vocabulary on purpose and are **not** covered by this canon.

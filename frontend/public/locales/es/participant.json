@@ -120,11 +120,7 @@
         "loading_content": "Cargando contenido del estudio...",
         "change_lang_title": "Cambiar idioma",
         "steps": {
-            "welcome": "Bienvenida",
-            "consent": "Privacidad y consentimiento",
-            "rough": "Primeras impresiones",
-            "fine": "Clasificación Q",
-            "post": "Preguntas finales"
+            "welcome": "Bienvenida"
         },
         "mobile_step": "Paso",
         "navigation": "Navegación",
@@ -180,7 +176,7 @@
                 "description": "Durante la etapa de clasificación, colocará los enunciados en una cuadrícula para precisar su punto de vista. Ordenará y clasificará los enunciados de «más de acuerdo» a «más en desacuerdo» colocando cada enunciado en la casilla correspondiente. No hay respuestas correctas ni incorrectas. La mejor respuesta es aquella que refleja su opinión o sus creencias."
             },
             "post": {
-                "title": "Por qué",
+                "title": "Por qué estas elecciones",
                 "description": "Antes de que finalice la sesión, se le harán algunas preguntas aclaratorias para ayudarnos a comprender mejor sus elecciones más significativas, así como algunas preguntas sobre su trayectoria."
             }
         }
@@ -192,7 +188,7 @@
         "default_text": "1. Naturaleza del estudio y comprensión del participante. Usted entiende que este ejercicio emplea la metodología Q, una técnica de investigación diseñada para modelar puntos de vista subjetivos. La tarea requiere clasificar enunciados según su importancia en relación con su perspectiva personal; en consecuencia, no existen respuestas \"correctas\" ni \"incorrectas\" objetivas.\n\n2. Tratamiento de datos y seudonimización (cumplimiento del RGPD).\n\nAnonimización y conservación: este proceso técnico garantiza que su huella digital no pueda utilizarse para reidentificarle una vez finalice la sesión.\n\nExcepción para seguimiento: si facilita voluntariamente sus datos de contacto al final del estudio para un contacto de seguimiento, el vínculo entre su identidad (correo electrónico) y su respuesta se mantendrá estrictamente durante la duración de esa fase de seguimiento específica.\n\nInformes: los resultados finales se presentarán en formato anonimizado. Los datos se agregarán para revelar perspectivas sociales compartidas (factores). Los comentarios cualitativos podrán citarse para contextualizar estos factores, pero serán revisados para eliminar detalles identificativos.\n\n3. Participación voluntaria y derecho de retirada. Usted mantiene el derecho a interrumpir el proceso de clasificación y cerrar su navegador en cualquier momento antes del envío, sin penalización.\n\nAntes del envío: si se retira antes de finalizar su clasificación, no se conservará ningún dato parcial.\n\nTras el envío: debido a la naturaleza estadística de la metodología Q (análisis factorial), una vez que sus datos hayan sido enviados e integrados en el conjunto de datos, la retirada individual podría no ser factible.\n\n4. Conservación de datos y derechos"
     },
     "presort": {
-        "title": "Antes de comenzar",
+        "title": "Conociéndonos",
         "description": "Por favor, responda algunas preguntas para ayudarnos a contextualizar su punto de vista.",
         "submit": "Continuar a la clasificación",
         "select_placeholder": "Seleccionar...",
@@ -207,7 +203,7 @@
             "close": "Cerrar consejo"
         },
         "complete": {
-            "title": "Primer paso completado",
+            "title": "Primeras impresiones registradas",
             "subtitle": "Ahora refinaremos los matices.",
             "button": "Continuar a la clasificación fina"
         },
@@ -275,7 +271,7 @@
         }
     },
     "post": {
-        "title": "Su perspectiva y comentarios",
+        "title": "Por qué estas elecciones",
         "description": "¡Ya casi ha terminado! Sus comentarios sobre los enunciados más significativos son fundamentales para nuestro análisis.",
         "step2_title": "¡Casi listo!",
         "step2_description": "Por favor, responda estas preguntas finales para completar el estudio.",
@@ -452,10 +448,10 @@
             }
         },
         "steps": {
-            "presort": "Encuesta de pre-clasificación",
-            "rough": "Clasificación preliminar",
-            "fine": "Colocación en la cuadrícula",
-            "post": "Etapa de post-clasificación"
+            "presort": "Conociéndonos",
+            "rough": "Primeras impresiones",
+            "fine": "Su perspectiva",
+            "post": "Por qué estas elecciones"
         }
     }
 }
