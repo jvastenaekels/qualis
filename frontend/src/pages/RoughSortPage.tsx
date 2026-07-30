@@ -151,14 +151,24 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             <div className="relative flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
                 <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900 flex items-center gap-2">
-                    <SafeMarkdown
-                        components={{
-                            p: ({ children }) => <span>{children}</span>,
-                        }}
-                    >
-                        {config.pre_instruction || config.condition_of_instruction}
-                    </SafeMarkdown>
-                    <span className="text-slate-400 text-2xs sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
+                    {/*
+                     * The condition of instruction is this screen's subject, so it is
+                     * the page's <h1> — the route had no heading at all before, which
+                     * axe reports as `page-has-heading-one`. Tailwind's preflight
+                     * resets heading size, weight and margin to inherit, so this is a
+                     * semantic change with no visual one. The counter stays outside
+                     * it: "2/6" is progress, not part of the question.
+                     */}
+                    <h1>
+                        <SafeMarkdown
+                            components={{
+                                p: ({ children }) => <span>{children}</span>,
+                            }}
+                        >
+                            {config.pre_instruction || config.condition_of_instruction}
+                        </SafeMarkdown>
+                    </h1>
+                    <span className="text-slate-600 text-2xs sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
                         {config &&
                             `${config.statements.length - unsortedCards.length + 1}/${config.statements.length}`}
                     </span>
@@ -270,7 +280,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             {config.ui_labels?.['common.undo'] || t('common.undo')}
                         </button>
                         {/* Desktop Keyboard Shortcuts Hint */}
-                        <div className="hidden lg:flex items-center gap-1.5 text-2xs text-slate-400 font-medium">
+                        <div className="hidden lg:flex items-center gap-1.5 text-2xs text-slate-600 font-medium">
                             <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
                                 ←
                             </kbd>
@@ -280,7 +290,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
                                 →
                             </kbd>
-                            <Keyboard size={14} className="text-slate-400" />
+                            <Keyboard size={14} className="text-slate-600" />
                         </div>
                     </div>
                 </div>
@@ -367,7 +377,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                 return {
                     className: cn(
                         base,
-                        'bg-green-50 text-green-600 hover:bg-green-100 border-green-100'
+                        'bg-green-50 text-green-700 hover:bg-green-100 border-green-100'
                     ),
                     icon: (
                         <Smile size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
@@ -379,7 +389,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                 };
             case 'disagree':
                 return {
-                    className: cn(base, 'bg-red-50 text-red-600 hover:bg-red-100 border-red-100'),
+                    className: cn(base, 'bg-red-50 text-red-700 hover:bg-red-100 border-red-100'),
                     icon: (
                         <Frown size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
                     ),
@@ -392,7 +402,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                 return {
                     className: cn(
                         base,
-                        'bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-100'
+                        'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100'
                     ),
                     icon: <Meh size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />,
                     badgeClass: 'bg-blue-600',
