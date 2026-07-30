@@ -856,19 +856,19 @@ git commit -m "style(fine-sort): make card text legible at board scale and stop 
 - Modify: all nine `frontend/public/locales/*/participant.json`
 - Modify: `frontend/src/pages/PreSortPage.tsx:102`, `frontend/src/pages/RoughSortPage.tsx`
 
-- [ ] **Step 1: Fix the canonical name per step, and write it down**
+- [x] **Step 1: Fix the canonical name per step, and write it down**
 
 Extend `CLAUDE.md`'s existing "Naming canon" section to cover the participant flow: one label per step, propagated to `steps.<s>` (the i18n step list), the stepper label, and the page `<h1>`. The stepper's names are the better set — they address the participant ("Let's meet", "First impressions", "Your perspective") where `steps.*` is researcher vocabulary ("Pre-sort survey", "Preliminary sort").
 
-- [ ] **Step 2: Fix "First step complete"**
+- [x] **Step 2: Fix "First step complete"**
 
 It should name what was completed, and not miscount. `t('rough.complete.title', 'First impressions recorded')`.
 
-- [ ] **Step 3: Propagate all nine locales, run the gates**
+- [x] **Step 3: Propagate all nine locales, run the gates**
 
 Run: `cd frontend && npm run i18n-check && npm run check-interpolations`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/public/locales/*/participant.json frontend/src/pages/ CLAUDE.md
@@ -884,11 +884,11 @@ git commit -m "fix(i18n): give each participant step one name"
 **Files:**
 - Modify: `frontend/src/pages/ConsentPage.tsx`, all nine locales (new key `welcome.consent.submit`)
 
-- [ ] **Step 1: Add the key and use it**
+- [x] **Step 1: Add the key and use it**
 
 English: `"I agree — start the study"`. Translate into all eight others. Strict parity applies.
 
-- [ ] **Step 2: Run the gates and commit**
+- [x] **Step 2: Run the gates and commit**
 
 ```bash
 git add frontend/src/pages/ConsentPage.tsx frontend/public/locales/*/participant.json
@@ -901,11 +901,11 @@ git commit -m "fix(consent): label the consent action as consent"
 
 **The defect:** `Key Choices` is the only Title Case heading in a flow of sentence-case ones (`Your perspective & feedback`, `Before we start`, `First impressions`).
 
-- [ ] **Step 1: `Key Choices` → `Key choices`, all nine locales where the target language uses sentence case** (German capitalises nouns; do not "fix" `Wichtige Entscheidungen`).
+- [x] **Step 1: `Key Choices` → `Key choices`, all nine locales where the target language uses sentence case** (German capitalises nouns; do not "fix" `Wichtige Entscheidungen`).
 
-- [ ] **Step 2: Sweep the participant namespace for other Title Case headings** and fix in the same commit.
+- [x] **Step 2: Sweep the participant namespace for other Title Case headings** and fix in the same commit.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/public/locales/*/participant.json
@@ -918,16 +918,16 @@ git commit -m "style(i18n): use sentence case for participant headings"
 
 **The defect:** `Step1_Feedback.tsx:657` renders `← {t('post.back')}` — a literal U+2190 in a text node — immediately beside a button whose arrow is `<ArrowRight size={18} />`, a lucide SVG. Different weights, different sizes, different baselines, side by side. The glyph also lives *inside* the translated string's neighbourhood, so a RTL locale added later would need the arrow flipped by hand.
 
-- [ ] **Step 1: Replace the glyph with `<ArrowLeft size={18} className="mr-2" />`** and remove the `←` from the JSX.
+- [x] **Step 1: Replace the glyph with `<ArrowLeft size={18} className="mr-2" />`** and remove the `←` from the JSX.
 
-- [ ] **Step 2: Grep the participant flow for other literal arrows**
+- [x] **Step 2: Grep the participant flow for other literal arrows**
 
 ```bash
 grep -rn $'←\|→\|↑\|↓' frontend/src/pages frontend/src/components --include=*.tsx | grep -v test
 ```
 The rough sort's `<kbd>` hints legitimately use literal arrow characters — those represent keyboard keys, not direction, and stay.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/src/components/postsort/Step1_Feedback.tsx
@@ -1326,6 +1326,71 @@ subset each run. Reproduced on a stashed, clean tree, so it predates this phase 
 caused by it. Local-only as far as this session can tell; worth confirming against CI.
 
 
+## Found while executing Phase 5
+
+### There is a fifth place a step name lives, and it beats the four in the plan
+
+Task 5.1 tabulated four sources for a step's name. There is a fifth, and it is the one
+that actually renders: `DEFAULT_PROCESS_STEPS` in
+`backend/app/services/study_defaults.py` seeds `process_steps[].title` at study creation,
+and `StudyLayout.tsx:565-571` prefers that stored value over `t(step.labelKey)`. Every
+study created since the defaults landed has it, so renaming the step in
+`participant.json` alone changes nothing a participant sees.
+
+Nothing caught this. `make ci-fast` was green, `npm run i18n-check` was green, and the
+frontend tests pass because their `process_steps` fixtures are inline. It surfaced in a
+regenerated E2E screenshot: the stepper still read "Why" after the rename. Fixed in the
+three locales `study_defaults.py` carries, and the canon in `CLAUDE.md` now names this
+source and says it wins.
+
+Studies already in the database keep their stored title. That is correct — the column is
+a researcher-editable label, not a translation — but it means the two vocabularies can
+legitimately diverge per study, and the canon only governs new ones.
+
+### The post step had the same defect as the pre-sort, plus a collision
+
+The plan tabulated the pre-sort's four names. The post-sort had three of its own —
+"Why" (stepper), "Post-sort stage" (`study.steps.post`), "Your perspective & feedback"
+(`post.title`) — and the third collided head-on with the fine sort's canonical name,
+"Your perspective". Unified to "Why these choices" across all five sources.
+
+### `layout.steps` held four names nobody could read
+
+`layout.steps.consent/rough/fine/post` ("Q-sort", "Final questions", …) have no reader:
+`StudyLayout.tsx` uses only `layout.steps.welcome`, and steps 2-5 come from
+`welcome.steps.*.title`. A third, unreachable set of names is how the divergence
+regenerates, so they were removed rather than aligned.
+
+### Only English was in Title Case, and Finnish was not translated at all
+
+Task 5.3 predicted `Key Choices` was the only Title Case heading. The sweep found six
+English strings, not one — `Unknown Card`, `Missing Statement`, `General Comment`,
+`Study Code`, `Go to Study` alongside it — and confirmed the eight other locales already
+wrote all six in sentence case. German needed no change: it capitalises nouns.
+
+The same sweep found something the parity gate structurally cannot: `fi`'s
+`landing.study_code_label` and `landing.go_to_study` both contained the literal English
+strings "Study Code" and "Go to Study". `check_i18n.py` compares key sets, so an
+untranslated value is "in sync". Both translated.
+
+### The consent screen inherited the welcome screen's researcher override
+
+Beyond sharing the label, the consent button read
+`config.ui_labels['welcome.start']` — so a researcher renaming the welcome CTA silently
+renamed the consent button too. It now reads `welcome.consent.submit`. The designer
+(`InterfaceEditor.tsx:154-162`) does not yet expose the new key as editable; adding it
+needs an admin label and tip key, which is a separate change.
+
+### Task 5.1 left the suite red for one commit
+
+`make ci-fast` was run at the end of the phase rather than after each commit, and the
+step rename broke two assertions in `PostSortPage.test.tsx` — one naming the old
+`post.title`, one matching `/why/i` unscoped and picking up the new `<h1>` instead of the
+first card label. Repaired in a follow-up commit rather than by rewriting history, so the
+tree is red at `106d11a1` and green from `77d57233` on. The inner-loop discipline in
+`CLAUDE.md` says between every change, and this phase did not honour it.
+
+
 ## What this plan does not cover
 
 Stated so the next audit does not assume it was checked.
@@ -1339,4 +1404,7 @@ Stated so the next audit does not assume it was checked.
 - **The nine locales as rendered.** Every string finding is from the English UI. A French or Finnish run would put different pressure on every width finding in Phase 1 and Phase 6 — German especially, where compound nouns will test Task 1.1's truncation ceiling.
 - **A pyramid grid at desktop.** Every fine-sort measurement in Phases 3 and 4 comes from the E2E fixtures, whose grids are flat (three columns, equal capacity). The staircase Task 4.3 describes, and the worst case for Task 4.4's line-clamp occlusion, both need unequal capacities. The fix is not capacity-dependent, but the numbers are.
 - **Task 4.4's screenshots, as a gate.** Step 5 asked to commit `frontend/e2e/participant/`. They were reviewed and then restored, per the Phase 1 finding that they drift by machine and assert nothing. Committing this machine's renders would have written 96 files of noise.
+- **Existing studies' step names.** The Phase 5 canon governs the i18n keys and the backend seed. Any study already in the database keeps whatever `process_steps[].title` it was created with, including "Why" and any researcher edit. No migration was written and none should be.
+- **The designer's editable-label list.** `welcome.consent.submit` is honoured as a `ui_labels` override but is not offered in `InterfaceEditor`, so no researcher can set it through the UI yet.
+- **The nine locales' step names as rendered.** Task 5.1 propagated by copying each locale's own `welcome.steps.*.title`, so the non-English names are as good as they already were. Only `en` and `fi` were read closely; the two new strings ("Why these choices", "First impressions recorded") were translated without a native reader.
 - **`results.incomplete`.** Task 2.1's gate drops it, exactly as the admin gate does. Contrast over the fine-sort board's transform and over the rough sort's translucent tints is therefore unmeasured by a green run.
