@@ -475,7 +475,7 @@ const StudyLayoutContent: React.FC = () => {
                             }}
                             className={`
                                 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5
-                                ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
+                                ${!isStepMenuOpen ? 'text-slate-600 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
                             {t('layout.mobile_step')} {currentVisibleIndex + 1}/
@@ -489,7 +489,7 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Mobile Step Selection Menu */}
                         {isStepMenuOpen && (
                             <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-[60] py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
-                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-400">
+                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-600">
                                     {t('layout.navigation')}
                                 </div>
                                 {visibleSteps.map((step, index) => {

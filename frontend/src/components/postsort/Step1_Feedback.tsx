@@ -474,7 +474,16 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                     </div>
 
                     <div className="w-full">
+                        {/*
+                         * A disabled placeholder <option> is not an accessible name:
+                         * a screen reader announced this as "combo box", with no
+                         * indication of what picking from it would do.
+                         */}
                         <select
+                            aria-label={t(
+                                'post.optional.select_placeholder',
+                                'Select a statement to comment...'
+                            )}
                             className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 bg-white truncate pr-10"
                             onChange={(e) => {
                                 if (e.target.value) {

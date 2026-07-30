@@ -241,11 +241,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                             />
                                         </div>
                                         <div className="pt-0.5">
+                                            {/*
+                                             * `black 20%` left two of the four default
+                                             * step colours under AA on this panel:
+                                             * amber #f59e0b at 3.09:1 and emerald
+                                             * #10b981 at 3.59:1, against the panel's
+                                             * near-white #f4f7fe. `text-lg` is 18.15px
+                                             * rendered — just under the 18.66px large-
+                                             * text threshold — so the floor is 4.5, not
+                                             * 3. Measured across all four at each step
+                                             * of the ramp, 40% is the first shared value
+                                             * that clears it: 7.56 / 5.05 / 8.36 / 5.77.
+                                             * 35% gets amber only to 4.43.
+                                             */}
                                             <h3
                                                 className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
                                                 style={{
                                                     color: step.color
-                                                        ? `color-mix(in srgb, ${step.color}, black 20%)`
+                                                        ? `color-mix(in srgb, ${step.color}, black 40%)`
                                                         : undefined,
                                                 }}
                                             >
