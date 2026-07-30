@@ -24,6 +24,12 @@ const mockConfig = {
             options: ['Male', 'Female'],
         },
         job: { type: 'text', label: 'Job Title', required: false },
+        familiarity: {
+            type: 'rating',
+            label: 'How familiar are you with debates about the bioeconomy?',
+            required: false,
+            scale_points: 5,
+        },
     },
     statements: [],
     title: 'Test Study',
@@ -41,6 +47,32 @@ describe('PreSortPage', () => {
         useSessionStore.getState().resetSession();
         useSessionStore.getState().setConsent(true);
         useResponseStore.getState().resetResponses();
+    });
+
+    /**
+     * The defect this guards: `SurveyField` sets `aria-labelledby={`${id}-label`}` on
+     * the rating field's radiogroup, and nothing in the tree ever carried that id —
+     * `PreSortPage` rendered `<label htmlFor={key}>` with no `id` at all. Verified
+     * live before the fix: `document.getElementById('familiarity-label')` → null. A
+     * screen-reader user heard "radio group" followed by five unlabelled radios, and
+     * never heard the question.
+     *
+     * It has to be guarded here rather than in the E2E axe pass, and that is a fact
+     * about axe's rule set, not an oversight: `aria-input-field-name` covers combobox,
+     * listbox, searchbox, slider, spinbutton and textbox, while
+     * `aria-toggle-field-name` covers the individual radios — which are named by their
+     * wrapping `<label>` and pass. No smoke rule names a `radiogroup`. The E2E spec
+     * asserts the field renders, precisely so that clean scan is not mistaken for
+     * coverage.
+     */
+    it('names the rating scale with its question', () => {
+        renderWithProviders(<PreSortPage />);
+
+        expect(
+            screen.getByRole('radiogroup', {
+                name: /how familiar are you with debates about the bioeconomy\?$/i,
+            })
+        ).toBeInTheDocument();
     });
 
     it('renders form fields based on config', () => {

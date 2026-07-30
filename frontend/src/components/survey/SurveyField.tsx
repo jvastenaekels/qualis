@@ -34,6 +34,7 @@ const RatingField: React.FC<RatingFieldProps> = ({ id, fieldConfig, register, lo
             <div
                 role="radiogroup"
                 aria-labelledby={`${id}-label`}
+                aria-required={fieldConfig.required || undefined}
                 className="flex flex-wrap items-center gap-2 sm:gap-3"
             >
                 {Array.from({ length: points }, (_, i) => i + 1).map((n) => (
@@ -80,6 +81,10 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
 
     const placeholderText = t('common.placeholders.text_response');
 
+    // The visible asterisk is `aria-hidden` in PreSortPage — it would otherwise land
+    // inside the field's accessible name — so the requirement has to be conveyed here.
+    const requiredAria = { 'aria-required': fieldConfig.required || undefined };
+
     switch (fieldConfig.type) {
         case 'number':
             return (
@@ -87,6 +92,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="number"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     min={fieldConfig.min}
@@ -99,18 +105,28 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="email"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                 />
             );
         case 'date':
-            return <input id={id} type="date" {...register(id)} className={commonClasses} />;
+            return (
+                <input
+                    id={id}
+                    type="date"
+                    {...register(id)}
+                    {...requiredAria}
+                    className={commonClasses}
+                />
+            );
         case 'text_audio':
         case 'textarea':
             return (
                 <textarea
                     id={id}
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     rows={fieldConfig.rows || 4}
@@ -122,7 +138,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 return null;
             }
             return (
-                <select id={id} {...register(id)} className={commonClasses}>
+                <select id={id} {...register(id)} {...requiredAria} className={commonClasses}>
                     <option value="">{t('presort.select_placeholder', 'Select...')}</option>
                     {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -209,6 +225,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="text"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     minLength={fieldConfig.minLength}
