@@ -217,7 +217,7 @@ const InstructionHeader: React.FC<{
                         <button
                             type="button"
                             onClick={() => setIsMinimized(true)}
-                            className="flex items-center justify-center transition-colors gap-1.5 mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 text-xs font-medium"
+                            className="flex items-center justify-center transition-colors gap-1.5 mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 text-xs font-medium"
                             aria-label={t(
                                 'fine.header.minimize_instructions',
                                 'Minimize instructions'
@@ -273,7 +273,7 @@ const GridToolbar: React.FC<{
 
 const ScoreLabel: React.FC<{ score: number; className?: string; id?: string }> = React.memo(
     ({ score, className, id }) => (
-        <div id={id} className={cn('text-slate-400 font-bold leading-none', className)}>
+        <div id={id} className={cn('text-slate-600 font-bold leading-none', className)}>
             <span className="text-3xl">{score > 0 ? `+${score}` : score}</span>
         </div>
     )
@@ -287,9 +287,9 @@ const LegendLabel: React.FC<{
     testId?: string;
 }> = React.memo(({ label, type, highlight, fontSize, testId }) => {
     const typeStyles = {
-        disagree: 'text-red-600 text-left',
-        neutral: 'text-blue-600 text-center',
-        agree: 'text-green-600 text-right',
+        disagree: 'text-red-700 text-left',
+        neutral: 'text-blue-700 text-center',
+        agree: 'text-green-700 text-right',
     };
 
     return (
@@ -470,7 +470,7 @@ const ValidationFooter: React.FC<{
                 </button>
             ) : (
                 <div className="flex items-center justify-center min-h-[44px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
-                    <div className="flex items-center gap-3 text-slate-500">
+                    <div className="flex items-center gap-3 text-slate-600">
                         {selectedCardId ? (
                             <>
                                 <span
@@ -498,7 +498,7 @@ const ValidationFooter: React.FC<{
                             </>
                         ) : (
                             <>
-                                <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-2xs text-slate-500 font-black">
+                                <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-2xs text-slate-700 font-black">
                                     1
                                 </span>
                                 <span className="text-xs font-bold">
@@ -852,6 +852,16 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             >
                 {/* PANEL: THE GRID (Canvas) */}
                 <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300 pl-safe">
+                    {/*
+                     * The route had no <h1> at all (`page-has-heading-one`). It cannot
+                     * live in InstructionHeader: that panel collapses to a pill, and a
+                     * page heading that disappears when the participant minimises the
+                     * instructions is not a page heading — the accessibility scan
+                     * caught exactly that state. So it sits here, always rendered, and
+                     * names the task rather than repeating the specific instruction,
+                     * which the panel already announces through its own live region.
+                     */}
+                    <h1 className="sr-only">{t('fine.header.title')}</h1>
                     <InstructionHeader
                         instruction={conditionOfInstruction || null}
                         defaultText={t('fine.header.title')}

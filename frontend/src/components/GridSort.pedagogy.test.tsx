@@ -71,9 +71,16 @@ describe('GridSort Pedagogy', () => {
             </DndContext>
         );
 
-        expect(screen.getByText('fine.header.title')).toBeInTheDocument();
-        const header = screen.getByText('fine.header.title').parentElement;
-        expect(header?.querySelector('svg')).toBeDefined();
+        // Two nodes now carry this string: the always-rendered `sr-only` <h1> the
+        // route needs for `page-has-heading-one`, and the instruction panel's own
+        // copy. This assertion is about the panel — the one with the Target icon
+        // beside it — so it has to say which.
+        const heading = screen.getByRole('heading', { level: 1 });
+        expect(heading).toHaveTextContent('fine.header.title');
+
+        const panelCopy = screen.getAllByText('fine.header.title').find((node) => node !== heading);
+        expect(panelCopy).toBeInTheDocument();
+        expect(panelCopy?.parentElement?.querySelector('svg')).toBeDefined();
     });
 
     it('shows selected card text in Reading Zone when a card is selected', () => {
