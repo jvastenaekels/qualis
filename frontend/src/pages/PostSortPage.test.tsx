@@ -176,7 +176,7 @@ describe('PostSortPage', () => {
         await user.click(screen.getByRole('button', { name: /Back/i }));
 
         // Expect Step 1 again
-        expect(await screen.findByText(/Your Perspective/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Why these choices/i)).toBeInTheDocument();
     });
 
     it('Allows selecting a statement from the optional comments dropdown', async () => {
@@ -312,7 +312,10 @@ describe('PostSortPage', () => {
             const fields = await screen.findAllByRole('textbox', { name: /why/i });
             expect(fields).toHaveLength(2);
 
-            const labels = screen.getAllByText(/why/i);
+            // Scoped to `label`: the page's own <h1> is "Why these choices"
+            // since the step names were unified, so a bare text match picks
+            // up the heading first and clicking it focuses nothing.
+            const labels = screen.getAllByText(/why/i, { selector: 'label' });
             await user.click(labels[0]);
             expect(fields[0]).toHaveFocus();
 
