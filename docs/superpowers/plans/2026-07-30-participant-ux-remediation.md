@@ -544,7 +544,7 @@ Four screens establish one primary button; the fifth replaces it. `Step1_Feedbac
 - Modify: `frontend/src/components/postsort/Step2_Questionnaire.tsx` (same pattern, verify)
 - Test: `frontend/src/components/postsort/Step1_Feedback.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 it('uses the study brand colour for its primary action, not a hard-coded indigo', () => {
@@ -554,15 +554,15 @@ it('uses the study brand colour for its primary action, not a hard-coded indigo'
 });
 ```
 
-- [ ] **Step 2: Run it, confirm FAIL**
+- [x] **Step 2: Run it, confirm FAIL**
 
-- [ ] **Step 3: Adopt the flow's primary button**
+- [x] **Step 3: Adopt the flow's primary button**
 
 Replace the hard-coded classes with the same shape the four preceding steps use — `rounded-full`, `px-8 py-3`, `text-base font-bold`, `style={{ backgroundColor: 'var(--brand-accent)' }}`. Extract it if it is now used in five places; a `PrimaryActionButton` in `components/ui/` is justified at that count, but do not block this task on the extraction.
 
 Check `--brand-accent` is actually defined on this route before switching — it is set from study branding, and `document.documentElement`'s computed value came back empty in the audit while the buttons still rendered blue. Confirm where the fallback lives, and keep it.
 
-- [ ] **Step 4: Verify at three widths and commit**
+- [x] **Step 4: Verify at three widths and commit**
 
 ```bash
 git add frontend/src/components/postsort/
@@ -584,7 +584,7 @@ git commit -m "style(post-sort): use the flow's primary button instead of a seco
 **Interfaces:**
 - Produces: `NativeSelect` — `React.SelectHTMLAttributes<HTMLSelectElement>` plus nothing. A styled `<select>`, not a Radix `Select`: this is inside a `react-hook-form` `register()` call, and swapping in a Radix component would change the form contract. Keep the native element and style it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 it('renders the pre-sort dropdown on the same white as its sibling fields', () => {
@@ -593,15 +593,15 @@ it('renders the pre-sort dropdown on the same white as its sibling fields', () =
 });
 ```
 
-- [ ] **Step 2: Run it, confirm FAIL**
+- [x] **Step 2: Run it, confirm FAIL**
 
-- [ ] **Step 3: Build `NativeSelect` and use it in both places**
+- [x] **Step 3: Build `NativeSelect` and use it in both places**
 
 Base it on the post-sort's existing classes, which are already right: `w-full p-3 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[var(--brand-accent)]`, plus `min-h-[44px]` from `commonClasses` for the touch target. Add `appearance-none` and a chevron only if you also handle the arrow yourself — a half-styled select with the UA arrow removed and nothing in its place is worse than the grey one.
 
 Also add `bg-white` to `commonClasses` so the next field type added does not repeat this.
 
-- [ ] **Step 4: Verify both screens and commit**
+- [x] **Step 4: Verify both screens and commit**
 
 ```bash
 git add frontend/src/components/ui/native-select.tsx frontend/src/components/survey/SurveyField.tsx \
@@ -620,22 +620,22 @@ git commit -m "style(forms): give the pre-sort dropdown the same field styling a
 - Modify: `frontend/src/components/postsort/Step2_Questionnaire.tsx:367`
 - Modify: `frontend/tailwind.config.js` (fontFamily.sans)
 
-- [ ] **Step 1: Swap both for lucide icons**
+- [x] **Step 1: Swap both for lucide icons**
 
 `💡` → `<Lightbulb size={18} aria-hidden="true" />`, `✉️` → `<Mail size={18} aria-hidden="true" />`. Both are already in the project's icon set. Match the surrounding text colour rather than introducing a new one.
 
-- [ ] **Step 2: Add the emoji fallback anyway**
+- [x] **Step 2: Add the emoji fallback anyway**
 
 Append `"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"` to `fontFamily.sans` in `tailwind.config.js`. This task removes the two known emoji, but study *content* is author-supplied: a researcher who writes an emoji into a statement should not get tofu.
 
-- [ ] **Step 3: Grep for the rest**
+- [x] **Step 3: Grep for the rest**
 
 ```bash
 grep -rnP "[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]" frontend/src/pages frontend/src/components --include=*.tsx | grep -v test
 ```
 Five admin files also match. Out of scope here — log them for a follow-up rather than widening this commit.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/pages/RoughSortPage.tsx frontend/src/components/postsort/Step2_Questionnaire.tsx \
@@ -656,17 +656,17 @@ git commit -m "style(participant): replace raw emoji with the icon set, and decl
 - Modify: `frontend/src/components/postsort/Step1_Feedback.tsx:655`
 - Modify: `frontend/src/components/postsort/Step2_Questionnaire.tsx:453`
 
-- [ ] **Step 1: Give the bar a real surface**
+- [x] **Step 1: Give the bar a real surface**
 
 Replace the gradient with an opaque bar: `bg-white/95 backdrop-blur border-t border-slate-200`. This is the pattern `GridSort.tsx:242` already uses for the floating grid toolbar and `:199` for the instruction banner — the app has a house style for a floating surface and this is not it.
 
 If a fade above the bar is wanted, add it as a separate `pointer-events-none` element *above* the opaque bar, so the buttons always sit on a solid ground.
 
-- [ ] **Step 2: Verify against a tinted card**
+- [x] **Step 2: Verify against a tinted card**
 
 Scroll the post-sort so the bar sits over the green "Strongest agreement" card. The badge and the card's tint must be unaltered above the bar and fully hidden below it — no wash.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/src/components/postsort/
@@ -1159,11 +1159,85 @@ and re-runs.
 
 ---
 
+## Found while executing Phase 3
+
+### The single primary button Task 3.1 was told to adopt does not exist
+
+The task's premise — "four screens establish one primary button; the fifth replaces it" —
+is wrong on its own terms. The four are already three shapes:
+
+| | radius | height | font |
+|---|---|---|---|
+| welcome | `rounded-full` | `min-h-14` | `text-lg` |
+| consent | **`rounded-md`** | `min-h-12` | `text-base` |
+| pre-sort | `rounded-full` | `py-3` | `text-base` |
+| rough sort | `rounded-full` | `py-4` | `text-lg` |
+
+What all four *do* share is `--brand-accent`, and that is the part the post-sort broke.
+So the task's fix is right and its diagnosis is not: the post-sort was not the odd one
+out of a uniform set, it was the only one that dropped the token.
+
+Which shape should win — and in particular whether consent's `rounded-md` is a deliberate
+mark of a legal affirmation or just drift — is a design decision, not a refactor. It was
+not made here. The commit adds a `brand` variant and a `pill` size to `buttonVariants`
+and uses them at the two post-sort call sites only; the four participant pages still hand-roll
+their own `<button>`. **Follow-up:** decide the canonical shape, then collapse all six.
+
+### The post-sort was not hard-coding a rogue indigo — it was inheriting the product's
+
+`Button`'s `default` variant *is* `bg-indigo-600`, decided by an earlier audit as "the
+single primary fill for the whole product". The post-sort wrote `bg-indigo-600
+hover:bg-indigo-700` in `className` on top of it, so the colour was stated twice and
+neither statement was wrong by the product's own rule.
+
+The defect is still real, but it is a conflict between two systems rather than an
+oversight: inside `StudyLayout` the primary fill is the study owner's, and the product
+default silently wins wherever a participant screen reaches for `<Button>`. Anything else
+in the participant flow that uses a bare `<Button>` has the same problem. Not swept.
+
+### Task 3.2's prescription would have created the inconsistency it was closing
+
+The plan says to base `NativeSelect` on the post-sort's classes, "which are already
+right" (`rounded-lg`, `border-slate-300`), and separately to add `bg-white` to
+`SurveyField`'s shared classes. Doing both would have made the two selects match each
+other while leaving the pre-sort's select the only `rounded-lg`, `slate-300` control in a
+form of `rounded-md`, `gray-300` ones — the same defect, moved one property along.
+
+`NativeSelect` was built on `SurveyField`'s tokens instead, and the post-sort's select
+adopted those. The visible change on the post-sort is 8px → 6px radius and
+`slate-300` → `gray-300`.
+
+### A third emoji, and a contrast failure under it
+
+`Step2_Questionnaire.tsx:446` renders `ℹ️` in the GDPR note. The plan's grep range
+(`\x{1F300}-\x{1FAFF}`, `\x{2600}-\x{27BF}`) does not contain `U+2139`, so it was never
+listed. Fixed with the other two.
+
+That line was also `text-slate-500` on the card's `blue-50` tint — 4.2:1, under the floor
+Phase 2 set. Raised to `slate-600` while the line was open.
+
+Nine emoji remain, across four admin files; two of the nine are inside code comments.
+
+### `backdrop-blur` would have cost Phase 2's gate two elements
+
+Task 3.4 prescribes `bg-white/95 backdrop-blur`, citing the grid toolbar's house style.
+But Phase 2 established that a `backdrop-blur` ancestor makes axe return every descendant
+as `incomplete` rather than measuring it — so adopting the house style here would have
+removed both post-sort buttons from the pass that was built one phase earlier to cover
+them. The bar is plain `bg-white` with a top border and an upward shadow.
+
+This is the second time in this plan that a house style and the accessibility gate have
+pulled in opposite directions. Worth deciding once, at the level of the design system,
+rather than per-component.
+
+---
+
 ## What this plan does not cover
 
 Stated so the next audit does not assume it was checked.
 
-- **The admin space.** Five files there still render raw emoji (Task 3.3, step 3). Untouched.
+- **The admin space.** Nine raw emoji remain across four files there (Task 3.3, step 3). Untouched.
+- **The post-sort's second step's sticky bar, over content.** The step itself is walked by two specs and was captured at 375px, which confirmed the pill buttons and the absence of indigo. But both specs configure a study with no custom questions, so the page is short and the bar never actually sticks: the one thing Task 3.4 changed was not exercised on step 2. Step 1's opaque bar *was* verified over a scrolled page at 1280px.
 - **Landscape phones.** The audit ran portrait at 390×844 and desktop/tablet landscape. `isLandscapeMobile` (`GridSort.tsx:659`) selects a distinct fine-sort layout for landscape phones that was never walked with correct orientation reporting.
 - **The audio path.** Seven spoken comments are in the demo seed; none were played, recorded, or re-recorded.
 - **Resume by code, and the completion screen.** The flow was walked once, straight through.
