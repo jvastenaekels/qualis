@@ -23,7 +23,7 @@
         "submitting": "Submitting...",
         "cards": "statements",
         "close": "Close",
-        "unknown_card": "Unknown Card",
+        "unknown_card": "Unknown card",
         "unknown": "Unknown",
         "duration_short": "{{m}}m {{s}}s",
         "duration_long": "{{h}}h {{m}}m {{s}}s",
@@ -289,7 +289,7 @@
         "step2_title": "Almost done!",
         "step2_description": "Please answer these final questions to complete the study.",
         "extreme": {
-            "title": "Key Choices",
+            "title": "Key choices",
             "why": "Why did you choose to place this statement here? How is it significant to you?",
             "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "Please explain your choice before continuing.",
@@ -297,8 +297,8 @@
             "label_agree": "Strongest agreement",
             "label_disagree": "Strongest disagreement",
             "label_neutral": "Neutral",
-            "missing_statement": "Missing Statement",
-            "general_comment": "General Comment"
+            "missing_statement": "Missing statement",
+            "general_comment": "General comment"
         },
         "optional": {
             "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
@@ -422,9 +422,9 @@
     "landing": {
         "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
-        "study_code_label": "Study Code",
+        "study_code_label": "Study code",
         "study_code_placeholder": "e.g. my-study",
-        "go_to_study": "Go to Study",
+        "go_to_study": "Go to study",
         "resetting_session": "Resetting study session…"
     },
     "erasure": {

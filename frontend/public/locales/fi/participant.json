@@ -422,9 +422,9 @@
     "landing": {
         "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
-        "study_code_label": "Study Code",
+        "study_code_label": "Tutkimuskoodi",
         "study_code_placeholder": "e.g. my-study",
-        "go_to_study": "Go to Study",
+        "go_to_study": "Siirry tutkimukseen",
         "resetting_session": "Resetting study session…"
     },
     "erasure": {

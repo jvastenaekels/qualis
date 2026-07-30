@@ -47,11 +47,11 @@ describe('resolveAnswerLabel', () => {
     });
 
     it('returns t() fallback for "missing_statement"', () => {
-        expect(resolveAnswerLabel({}, 'missing_statement', 'en', t)).toBe('Missing Statement');
+        expect(resolveAnswerLabel({}, 'missing_statement', 'en', t)).toBe('Missing statement');
     });
 
     it('returns t() fallback for "general_comment"', () => {
-        expect(resolveAnswerLabel({}, 'general_comment', 'en', t)).toBe('General Comment');
+        expect(resolveAnswerLabel({}, 'general_comment', 'en', t)).toBe('General comment');
     });
 
     it('returns a generic fallback — never the raw key — when no match found', () => {

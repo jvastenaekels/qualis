@@ -298,7 +298,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-800">
-                        {t('post.extreme.title', 'Key Choices')}
+                        {t('post.extreme.title', 'Key choices')}
                     </h2>
                     <span className="text-sm text-slate-500 font-medium">
                         {extremeCards.length} {t('common.cards')}
