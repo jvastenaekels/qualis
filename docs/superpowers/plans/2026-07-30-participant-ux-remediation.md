@@ -85,7 +85,7 @@ The globe is unreachable up to and including 430 px — iPhone SE, iPhone 14/15,
 
 **Interfaces:** no prop or signature change. The contract this task establishes is geometric: for every viewport ≥ 320 px, every interactive element in `[data-testid="layout-header"]` has `getBoundingClientRect().right <= header.right`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 A jsdom test cannot measure layout. Put the assertion where it can be measured — in the Playwright suite, alongside the a11y specs — and keep a cheap structural unit test as a regression tripwire.
 
@@ -115,12 +115,12 @@ for (const width of PHONE_WIDTHS) {
 }
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx playwright test e2e/accessibility --grep 'header controls stay on screen'`
 Expected: FAIL at 320–390 with `["Help", "lucide-globe"]`, FAIL at 414–430 with `["lucide-globe"]`.
 
-- [ ] **Step 3: Let the left cluster yield**
+- [x] **Step 3: Let the left cluster yield**
 
 The right cluster is the one that must never compress — three 44 px targets are already at the minimum. So the left cluster gives way:
 
@@ -129,17 +129,17 @@ The right cluster is the one that must never compress — three 44 px targets ar
 
 Do not delete a control to make room. If 320 px still overflows after truncation, collapse the study title to the logo mark below `sm` rather than dropping the globe — the language switcher is the one header control a participant may genuinely need.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd frontend && npx playwright test e2e/accessibility --grep 'header controls stay on screen'`
 Expected: PASS at all six widths.
 
-- [ ] **Step 5: Verify no regression above the fold**
+- [x] **Step 5: Verify no regression above the fold**
 
 Run: `cd frontend && npx vitest run src/layouts/StudyLayout.test.tsx`
 Then, with the demo stack up, check 1440 px: the full title, the five-step stepper and all three right-hand icons must be unchanged.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/src/layouts/StudyLayout.tsx frontend/e2e/accessibility/
@@ -167,7 +167,7 @@ The first direction is the harmful one, and it is what a phone rotation does.
 - Consumes: `useViewport()` → `{ width, height }`, already imported at `CardStack.tsx:34`.
 - Produces: no prop change.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 // frontend/src/components/CardStack.test.tsx
@@ -193,12 +193,12 @@ it('re-checks overflow when the viewport changes, not only when the card does', 
 
 `setViewportWidth` should drive the real `ViewportProvider` (dispatch a `resize` on `window`), not stub the context — the point of the test is that the component reacts to the provider.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx vitest run src/components/CardStack.test.tsx -t 're-checks overflow'`
 Expected: FAIL — the button never appears.
 
-- [ ] **Step 3: Add the viewport to the dependency array**
+- [x] **Step 3: Add the viewport to the dependency array**
 
 ```tsx
 const { width, height } = useViewport();
@@ -213,15 +213,15 @@ Drop the `biome-ignore lint/correctness/useExhaustiveDependencies` at `:57` if t
 
 `height` matters as much as `width`: the box is height-bound, so the on-screen keyboard opening in the post-sort — or a browser chrome bar collapsing on scroll — changes truncation without changing width.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `cd frontend && npx vitest run src/components/CardStack.test.tsx`
 
-- [ ] **Step 5: Verify in the running app**
+- [x] **Step 5: Verify in the running app**
 
 Rough sort at 1100×900, advance to a statement of ~130 characters with no eye button, then resize to 390×844 without navigating. The eye button must appear. Then run the three participant E2E specs: `npx playwright test e2e/participant`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/src/components/CardStack.tsx frontend/src/components/CardStack.test.tsx
@@ -238,7 +238,7 @@ git commit -m "fix(rough-sort): re-check statement overflow on resize, not only 
 - Modify: `frontend/public/locales/en/participant.json:170`
 - Test: `frontend/src/pages/ConsentPage.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 // frontend/src/pages/ConsentPage.test.tsx
@@ -250,26 +250,26 @@ it('capitalises the first person pronoun in the consent sentence', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx vitest run src/pages/ConsentPage.test.tsx -t 'capitalises'`
 
-- [ ] **Step 3: Fix the string**
+- [x] **Step 3: Fix the string**
 
 Change `that i have read` → `that I have read` in `en/participant.json` only. This is a value change, not a key change, so no propagation is required — but re-run `npm run i18n-check` anyway to confirm parity is untouched.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `cd frontend && npx vitest run src/pages/ConsentPage.test.tsx && npm run i18n-check`
 
-- [ ] **Step 5: Grep for the same shape elsewhere**
+- [x] **Step 5: Grep for the same shape elsewhere**
 
 ```bash
 grep -rnE "\b(that|and|but|because) i\b" frontend/public/locales/en/*.json
 ```
 Fix anything else this turns up in the same commit.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/public/locales/en/participant.json frontend/src/pages/ConsentPage.test.tsx
@@ -295,7 +295,7 @@ This is the same shape as the `common.confirm_delete`-rendered-as-a-label defect
 
 **Interfaces:** the minimum length is already known at the validation site. Pass it into the message via interpolation rather than hard-coding a number in nine strings.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 it('tells the participant what is required, not that a short answer would be fine', async () => {
@@ -310,11 +310,11 @@ it('tells the participant what is required, not that a short answer would be fin
 
 Note the `role="alert"`: the current markup at `:416` is a bare `<div>`, so the message is never announced. Adding the role is part of the fix.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx vitest run src/components/postsort/Step1_Feedback.test.tsx -t 'what is required'`
 
-- [ ] **Step 3: Rewrite the message and give it a role**
+- [x] **Step 3: Rewrite the message and give it a role**
 
 English:
 - `post.extreme.min_chars` → `"Please explain your choice in at least {{count}} characters."`
@@ -322,15 +322,15 @@ English:
 
 Add `role="alert"` to the wrapper at `:416`. Keep the hint text — it is good copy — but move it to a permanent helper line *under the label*, in slate, where it belongs, rather than surfacing it only on failure.
 
-- [ ] **Step 4: Propagate to all nine locales**
+- [x] **Step 4: Propagate to all nine locales**
 
 Participant parity is strict. Translate the new `{{count}}` form into `de, es, fi, fr, it, nl, pl, pt`. Run `npm run check-interpolations` — it verifies per-key `{{var}}` parity and will fail on any locale that drops `{{count}}`.
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `cd frontend && npx vitest run src/components/postsort/ && npm run i18n-check && npm run check-interpolations`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/src/components/postsort/Step1_Feedback.tsx \
@@ -357,7 +357,7 @@ The gate first. Every contrast defect below has been live since the participant 
 - Consumes: `expectNoA11yViolations(page)` from `./rules`, the seeded `bioeconomy-futures` study.
 - Produces: nothing importable. This file is a gate.
 
-- [ ] **Step 1: Write the spec, with its coverage boundary stated in the file**
+- [x] **Step 1: Write the spec, with its coverage boundary stated in the file**
 
 Mirror `admin-pages.spec.ts`: same `SMOKE_RULES`, two viewports (375×800 and 1440×900), and a header comment that names what a green run does **not** prove. Required content for that comment, because a gate that hides its blind spots is worse than no gate:
 
@@ -377,7 +377,7 @@ const PARTICIPANT_ROUTES = [
 ];
 ```
 
-- [ ] **Step 2: Run it and record the baseline**
+- [x] **Step 2: Run it and record the baseline**
 
 Run: `cd frontend && npx playwright test e2e/accessibility/participant-pages.spec.ts`
 Expected: FAIL. Record the full violation list in the PR body — it is the evidence that this gate was worth building. The audit predicts at minimum:
@@ -391,11 +391,16 @@ Expected: FAIL. Record the full violation list in the PR body — it is the evid
 | fine sort | ×18 axis labels `-4…+4` (slate-400 on slate-100, 38 px bold) | **2.34** | 3 |
 | pre-sort | rating radiogroup — no accessible name | — | `aria-input-field-name` |
 
-- [ ] **Step 3: Do not fix anything yet**
+> **Superseded by the run.** This table was partly wrong and substantially incomplete —
+> the `<kbd>` hints and the axis labels are axe *incompletes*, not violations, and the
+> radiogroup is caught by no smoke rule at all. See "Found while executing Phase 2" at
+> the end of this document for what the gate actually reported.
+
+- [x] **Step 3: Do not fix anything yet**
 
 Commit the failing spec on its own branch or leave it uncommitted until Tasks 2.2–2.4 land. Whichever you choose, the commit that turns it green must be a *different* commit from the one that created it, so the diff shows the gate catching real defects.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/e2e/accessibility/participant-pages.spec.ts
@@ -412,11 +417,11 @@ git commit -m "test(a11y): add the axe pass the participant flow has never had"
 - Modify: `frontend/src/pages/RoughSortPage.tsx:161` (the `n/25` counter), `:273-283` (the keyboard hint row)
 - Modify: wherever the disagree/agree pile labels take `text-red-600` / `text-green-600` on their tinted backgrounds (rough-sort drop zones)
 
-- [ ] **Step 1: Confirm the failures are in the axe baseline**
+- [x] **Step 1: Confirm the failures are in the axe baseline**
 
 They are, from Task 2.1. Do not add a second bespoke contrast harness.
 
-- [ ] **Step 2: Fix by moving one step down the ramp, not by inventing colours**
+- [x] **Step 2: Fix by moving one step down the ramp, not by inventing colours**
 
 - `text-slate-400` → `text-slate-600` on slate-100 gives **6.92:1** (was 2.34). Applies to the counter at `:161` and the `<kbd>` hints at `:273-283`.
 - `text-green-600` on `green-50` → `text-green-700` gives **4.79:1** (was 3.15).
@@ -426,12 +431,12 @@ They are, from Task 2.1. Do not add a second bespoke contrast harness.
 
 Do not lighten the backgrounds instead; the tints carry the agree/disagree semantics and are already faint.
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `cd frontend && npx playwright test e2e/accessibility/participant-pages.spec.ts --grep 'rough sort'`
 Expected: the four rough-sort violations are gone.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/pages/RoughSortPage.tsx frontend/src/components/
@@ -447,19 +452,19 @@ git commit -m "fix(a11y): raise the rough sort's contrast floor to AA"
 **Files:**
 - Modify: `frontend/src/components/GridSort.tsx:274-280` (`ScoreLabel`)
 
-- [ ] **Step 1: Fix**
+- [x] **Step 1: Fix**
 
 `text-slate-400` → `text-slate-600` in `ScoreLabel`'s base class. **6.92:1** — clears AA for normal text as well as large, so it holds when the board is zoomed out and the labels stop counting as "large". `slate-500` does not (4.34:1); see Task 2.2.
 
-- [ ] **Step 2: Verify the board still reads as a background grid**
+- [x] **Step 2: Verify the board still reads as a background grid**
 
 The labels must not now compete with the cards. Check at 1440 with a full grid: the numbers should read as structure, the cards as content. If slate-600 is too assertive at 38 px bold, drop the weight to `font-semibold` rather than lightening the colour back.
 
-- [ ] **Step 3: Run the fine-sort specs**
+- [x] **Step 3: Run the fine-sort specs**
 
 Run: `cd frontend && npx playwright test e2e/participant e2e/accessibility/participant-pages.spec.ts --grep 'fine sort'`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/components/GridSort.tsx
@@ -479,7 +484,7 @@ The same `htmlFor={key}` is also inert for rating fields specifically, because `
 - Modify: `frontend/src/components/survey/SurveyField.tsx:34-38`
 - Test: `frontend/src/pages/PreSortPage.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 it('names the rating scale with its question', () => {
@@ -490,12 +495,12 @@ it('names the rating scale with its question', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `cd frontend && npx vitest run src/pages/PreSortPage.test.tsx -t 'names the rating scale'`
 Expected: FAIL — no accessible name.
 
-- [ ] **Step 3: Give the label the id the group already points at**
+- [x] **Step 3: Give the label the id the group already points at**
 
 ```tsx
 <label id={`${key}-label`} htmlFor={key} className="block text-sm font-medium text-gray-700">
@@ -503,11 +508,11 @@ Expected: FAIL — no accessible name.
 
 While here: move the required asterisk out of the accessible name. `<span className="text-red-500 ml-1" aria-hidden="true">*</span>` plus `aria-required` on the field, so the name is the question and not "…bioeconomy? star".
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `cd frontend && npx vitest run src/pages/PreSortPage.test.tsx src/components/survey/ && npx playwright test e2e/accessibility/participant-pages.spec.ts --grep 'pre-sort'`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add frontend/src/pages/PreSortPage.tsx frontend/src/components/survey/SurveyField.tsx \
@@ -1082,6 +1087,75 @@ The lock recorded `qualis-backend 0.7.3` against `pyproject.toml`'s 0.7.4, so
 only because `uv run` rewrites the lock before the check reads it — the gate is repaired
 by the command that runs just before it. Fixed in Phase 1 (`c406d816`); worth checking why
 CI does not surface it.
+
+---
+
+## Found while executing Phase 2
+
+The gate was worth building: it found more than the audit predicted, and it corrected
+the audit where the audit was wrong.
+
+### Two of the four defects Phase 2 targets are invisible to axe
+
+`expectNoA11yViolations` drops `results.incomplete`, which the admin spec already
+documents as a known blind spot. On the participant flow it is not a marginal loss.
+Instrumented and counted:
+
+| screen | element | axe verdict |
+|---|---|---|
+| fine sort | six score labels | **incomplete** — board under a `react-zoom-pan-pinch` transform |
+| fine sort | both pile legend labels | **incomplete** |
+| fine sort | statement card text | **incomplete** |
+| rough sort | three `<kbd>` key hints | **incomplete** — under a `backdrop-blur` bar |
+
+Task 2.3's entire subject and half of Task 2.2's would have reported "no violations"
+forever. `expectContrastAtLeast` (`e2e/accessibility/rules.ts`) now covers exactly
+those, compositing the background down the ancestor chain the way axe does, minus the
+bail-out. Cross-checked against axe on two elements axe *does* judge: probe 4.41 / 3.15
+against axe 4.41 / 3.14.
+
+### The tip-banner "defect" was the instrument
+
+The audit recorded the rough sort's tip banner as a contrast failure. It is not.
+`waitForAnimationsToSettle` only watched Tailwind's `.animate-in`; framer-motion writes
+an interpolated inline opacity and carries no marker class, so the scan was landing
+mid-fade. The same `text-yellow-800` measured 2.28, 2.48, 2.81 and 4.17 across four runs
+of identical code. Once the settle wait covers any in-flight inline opacity, it reads
+clean. **Any contrast number taken from a fading element is worthless** — worth
+remembering before filing the next one.
+
+### The plan's predicted violation table was partly wrong
+
+Right: the 2.34 counter, the 3.15 agree label, the 2.34 axis labels.
+Wrong: the `<kbd>` hints and axis labels are incompletes, not violations (above).
+Missing entirely: the mobile step pill at 4.34 **on every screen**, the "Neutral" pile
+label at 4.23, the welcome page's accent-derived step headings at 3.09 and 3.59, the
+fine sort's "Tap statement" at 4.25 and "Tip: …" at 3.30, no `<h1>` on either sort
+screen, and an unnamed `<select>` in the post-sort.
+
+### Task 2.4's defect is invisible to axe too, for a structural reason
+
+The plan expected `aria-input-field-name` to flag the anonymous radiogroup. That rule
+covers combobox, listbox, searchbox, slider, spinbutton and textbox;
+`aria-toggle-field-name` covers the individual radios, which are named by their wrapping
+`<label>` and pass. **No smoke rule names a `radiogroup`.** The fix is guarded by a unit
+test, and the E2E spec asserts the rating field renders so that a clean scan is never
+mistaken for coverage.
+
+### A page heading that can be collapsed is not a page heading
+
+`page-has-heading-one` fired on both sort screens. On the fine sort, adding the `<h1>`
+to `InstructionHeader` did not clear it: that panel collapses to a pill, and by scan
+time it had. The heading moved to the always-rendered shell.
+
+### An accessibility gate has to be readable and non-aborting
+
+Two changes to `rules.ts` that are not about any single defect. Violations are summarised
+to one line each — asserting on raw axe objects emitted several hundred lines per node,
+and the first run buried five screens' findings under the first one's. And both the scan
+and the probe are soft, because the walk cannot re-enter the flow at screen four: a hard
+failure on the welcome page leaves the rest of the flow unmeasured until someone fixes it
+and re-runs.
 
 ---
 
