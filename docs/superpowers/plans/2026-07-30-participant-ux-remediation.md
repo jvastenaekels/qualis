@@ -691,7 +691,7 @@ git commit -m "fix(post-sort): give the sticky action bar an opaque surface"
 **Interfaces:**
 - Produces: `SafeMarkdown` gains `hyphenate?: boolean`, **default `false`**. Opt-in, not opt-out: the majority of call sites are prose, and a new call site added later should get the safe default.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Unmock `useHyphenation` locally — `setupTests.ts:87` mocks it globally, so a test written without that will assert nothing.
 
@@ -709,9 +709,9 @@ it('hyphenates when the caller asks — the narrow-card case', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm the first fails**
+- [x] **Step 2: Run, confirm the first fails**
 
-- [ ] **Step 3: Add the flag and opt the three card sites in**
+- [x] **Step 3: Add the flag and opt the three card sites in**
 
 ```tsx
 export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, hyphenate = false, className, ...props }) => {
@@ -721,11 +721,11 @@ export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, hyp
 
 Then add `hyphenate` at the `SortableCard`, `GridSort` and `CardStack` call sites, and nowhere else.
 
-- [ ] **Step 4: Check the prose sites visually**
+- [x] **Step 4: Check the prose sites visually**
 
 Welcome, consent and the post-sort must show no mid-word breaks. The grid and rough-sort cards must be unchanged from today — this task must not alter fine-sort card wrapping.
 
-- [ ] **Step 5: Run the participant E2E and commit**
+- [x] **Step 5: Run the participant E2E and commit**
 
 ```bash
 cd frontend && npx playwright test e2e/participant
@@ -746,15 +746,15 @@ Note this is a *presentation* fix, not a content one: the text is study-authored
 **Files:**
 - Modify: `frontend/src/pages/WelcomePage.tsx` (the description block)
 
-- [ ] **Step 1: Left-align the description, keep the title and subtitle centred**
+- [x] **Step 1: Left-align the description, keep the title and subtitle centred**
 
 Title and subtitle are display text and stay centred. The description becomes `text-left` with a measure cap — `max-w-[62ch] mx-auto` — and drops to weight 400. Keep the size drop from 24 px to something nearer 18 px; at nine lines, 24 px is display sizing applied to body copy.
 
-- [ ] **Step 2: Check the two extremes**
+- [x] **Step 2: Check the two extremes**
 
 A one-sentence description must not now look orphaned left in a wide centred layout — if it does, centre below a line-count threshold is *not* the answer (it makes the layout jump); instead keep the block left-aligned and let the container centre it.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/src/pages/WelcomePage.tsx
@@ -771,11 +771,11 @@ git commit -m "style(welcome): set the study description as body copy, not displ
 - Modify: `frontend/src/components/GridSort.tsx:906-912, 1008-1013`
 - Test: `frontend/src/components/GridSort.test.tsx`
 
-- [ ] **Step 1: Decide which set to keep, on evidence not taste**
+- [x] **Step 1: Decide which set to keep, on evidence not taste**
 
 The bottom row is the one that reads as an axis, because it is aligned. The top set exists so that a column's score is visible when the board is scrolled and the bottom row is out of view. Confirm whether that scroll case actually occurs at any supported viewport before removing it — if it does not, remove the top set; if it does, keep it and mark the second `aria-hidden="true"` so it is not announced twice.
 
-- [ ] **Step 2: Write the test for whichever you chose**
+- [x] **Step 2: Write the test for whichever you chose**
 
 ```tsx
 it('announces each column score once', () => {
@@ -785,12 +785,12 @@ it('announces each column score once', () => {
 });
 ```
 
-- [ ] **Step 3: Implement, then run the fine-sort specs**
+- [x] **Step 3: Implement, then run the fine-sort specs**
 
 Run: `cd frontend && npx playwright test e2e/participant && npx vitest run src/components/GridSort.test.tsx`
 This task touches the fine sort. All three participant specs must pass before commit.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/src/components/GridSort.tsx frontend/src/components/GridSort.test.tsx
@@ -810,24 +810,24 @@ git commit -m "style(fine-sort): render each column score once"
 - Modify: `frontend/src/components/SortableCard.tsx` (text scale, badge placement)
 - Modify: `frontend/src/components/CardStack.tsx:199-215` (badge placement)
 
-- [ ] **Step 1: Raise the authored size to survive the transform**
+- [x] **Step 1: Raise the authored size to survive the transform**
 
 The board's scale is computed to fit; the type must be authored so that `authored × scale` clears a floor. Either author larger (`text-sm sm:text-base`) or — better — read the scale that `GridSort` already computes and clamp the effective size, so the relationship is expressed once rather than guessed. Target: no less than 12 px effective at the default 1440 fit.
 
-- [ ] **Step 2: Move the badge out of the text**
+- [x] **Step 2: Move the badge out of the text**
 
 Reserve space for it instead of overlaying: give the card's text container `pr-5` when the badge is present, or move the badge to a corner the clamped text does not reach. Do not solve it with a higher `z-index` — the problem is occlusion, not stacking.
 
-- [ ] **Step 3: Reconsider `hover:scale-[1.05]`**
+- [x] **Step 3: Reconsider `hover:scale-[1.05]`**
 
 `SortableCard`'s inner div scales on hover inside a tightly packed grid, so a hovered card overlaps its neighbours. Either drop it or reduce it to a shadow/border change. Verify it is not load-bearing for the drag affordance first.
 
-- [ ] **Step 4: Run the fine-sort specs and the screenshot suite**
+- [x] **Step 4: Run the fine-sort specs and the screenshot suite**
 
 Run: `cd frontend && npx playwright test e2e/participant`
 `e2e/participant/fine-sort-screenshots/` exists — expect snapshot diffs and review each one deliberately rather than blanket-updating.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add frontend/src/components/SortableCard.tsx frontend/src/components/CardStack.tsx \
@@ -1232,6 +1232,100 @@ rather than per-component.
 
 ---
 
+## Found while executing Phase 4
+
+### GridSort renders no cards through `SafeMarkdown` — the plan's third "card" is prose
+
+Task 4.1 named `SortableCard`, `GridSort` and `CardStack` as the three narrow-card call
+sites to opt into hyphenation. `GridSort`'s two `SafeMarkdown` usages are not cards: both
+are the instruction banner above the board, `max-w-2xl` on desktop and `max-w-[90%]` on
+mobile. The board's cards are `SortableCard`, which `GridSort` renders. Opting `GridSort`
+in would have hyphenated the one piece of prose a participant re-reads on every single
+placement — the exact defect the task exists to remove. Two sites opted in, not three.
+
+The strongest argument for opting `SortableCard` in was not in the plan: its plain-text
+branch already calls `hyphenate(text)` directly, and only its markdown branch went through
+`SafeMarkdown`. Without the flag, the same statement would break mid-word or not depending
+on whether it happened to contain a `*`.
+
+### The plan's test for 4.1 would have asserted nothing
+
+It prescribed `vi.unmock('@/hooks/useHyphenation')` inside the test body. `vi.unmock` is
+hoisted to module scope; calling it inside `it()` does not affect an already-imported
+module. A file-level `vi.mock` does override `setupTests.ts`'s global neutraliser, and a
+sentinel replacement is the better probe anyway: what is under test is whether the hook is
+applied at all, not how well it hyphenates German.
+
+### There is no scroll case for the duplicated score labels
+
+Task 4.3 asked, correctly, to establish whether the upper `ScoreLabel` set exists so a
+column's score stays visible when the board is scrolled past the lower row. It does not.
+The board is a `react-zoom-pan-pinch` canvas, not a scroll container: both sets sit inside
+the same transform and translate together. Probed at 390×844, 768×1024, 1024×768 and
+1280×800 — on the auto-fit grid both sets are inside the viewport at all four, at identical
+font sizes. There is no state in which one persists and the other leaves, so the upper set
+was removed rather than hidden.
+
+Removing it has a side effect the plan did not anticipate: auto-fit reclaims the freed
+height, and the rendered cards grow ~20 % at 1280. Task 4.4's defect partly solves itself.
+
+### `getAllByText('0')` also matches the deck's pile counters
+
+The assertion Task 4.3 sketched passes when its file runs alone and fails in a full run.
+Asserting by id (`[id^="footer-"]`) is both narrower and closer to what the task changed.
+
+### The card type was ~7.5 px effective, not 10.3 — and the mobile floor is unreachable
+
+Measured after Task 4.3, before 4.4: **7.18 px** at 390×844, **7.28** at 768×1024, **7.81**
+at 1024×768, **7.94** at 1280×800. Worse than the 10.3 px the plan reported, at every
+form factor.
+
+The cause is structural rather than a bad constant. `computeCardDimensions` lays the board
+out in CSS pixels derived from the column count, and the whole board is then scaled to fit
+(0.53–0.63 measured). The card geometry therefore responds to the grid; the type, authored
+at a fixed 14 px, did not. Sizing the text as a fraction of the card's own width expresses
+that relationship once, which is what the plan asked for.
+
+It gets 13.9 px effective at 1280 — past the 12 px target — and 8.8 / 8.0 on the tablets.
+**Phones do not reach 12 px and cannot.** `computeCardDimensions` floors the card at
+MIN_W = 140 and lets the auto-fit absorb the rest, so on a phone the ratio alone drops the
+type below the 14 px it replaces; the clamp's floor is what keeps mobile at 14 px CSS, up
+from 12. Clearing 12 px effective there would mean roughly halving the characters visible
+on a card. That is a trade about the instrument, not a defect, and it is the researcher's
+to make.
+
+### The mobile board's auto-fit is not deterministic
+
+Three runs of one identical scenario at 390×844 produced board scales of 0.43, 0.48 and
+0.51 — a 20 % spread in rendered card size with no input difference. `performAutoFit` is
+driven by a 300 ms debounce, a double-`requestAnimationFrame`, and a `ResizeObserver` on a
+deck panel that is `h-auto` on mobile and therefore resizes as cards leave it. Any measured
+mobile number in this plan, including the ones above, carries that spread. Not addressed —
+it is a behaviour bug, not a typography one, and it deserves its own task.
+
+### Reserving space on one side only pushes the text off-axis
+
+Task 4.4's step 2 prescribed `pr-5` for the reveal badge. The card text is centred, so a
+one-sided reservation visibly shifts every statement left — caught on the 1280 capture
+after the first attempt. The reservation is symmetric, and sized to the overlay it clears
+(32 px for a 22 px badge inset 8 px) rather than to a scale factor, because the overlays
+are fixed-size while the cards are not.
+
+### The `hover:scale-[1.05]` sat on the wrong cva branch
+
+It was on `isSelected: false`, so it applied to the deck and sidebar as well as the packed
+grid. Moved to a `hand`-only compound variant rather than overridden per-variant: cva
+concatenates without `twMerge`, so a `hover:scale-100` override would have been an
+unpredictable specificity tie rather than a removal.
+
+### Four admin accessibility specs fail on this machine, before Phase 4
+
+`e2e/accessibility/admin-pages.spec.ts` fails on project dashboard, concourse detail, study
+design and access — all `getByRole('heading', { level: 1 })` not found, and a different
+subset each run. Reproduced on a stashed, clean tree, so it predates this phase and is not
+caused by it. Local-only as far as this session can tell; worth confirming against CI.
+
+
 ## What this plan does not cover
 
 Stated so the next audit does not assume it was checked.
@@ -1243,4 +1337,6 @@ Stated so the next audit does not assume it was checked.
 - **Resume by code, and the completion screen.** The flow was walked once, straight through.
 - **Dialogs and overlays.** The help overlay, the zoom/reading overlay behind the eye badge, and the mobile step menu were opened but not audited.
 - **The nine locales as rendered.** Every string finding is from the English UI. A French or Finnish run would put different pressure on every width finding in Phase 1 and Phase 6 — German especially, where compound nouns will test Task 1.1's truncation ceiling.
+- **A pyramid grid at desktop.** Every fine-sort measurement in Phases 3 and 4 comes from the E2E fixtures, whose grids are flat (three columns, equal capacity). The staircase Task 4.3 describes, and the worst case for Task 4.4's line-clamp occlusion, both need unequal capacities. The fix is not capacity-dependent, but the numbers are.
+- **Task 4.4's screenshots, as a gate.** Step 5 asked to commit `frontend/e2e/participant/`. They were reviewed and then restored, per the Phase 1 finding that they drift by machine and assert nothing. Committing this machine's renders would have written 96 files of noise.
 - **`results.incomplete`.** Task 2.1's gate drops it, exactly as the admin gate does. Contrast over the fine-sort board's transform and over the rough sort's translucent tints is therefore unmeasured by a green run.
