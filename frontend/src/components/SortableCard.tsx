@@ -41,6 +41,28 @@ interface SortableCardProps {
     readOnly?: boolean;
 }
 
+/**
+ * Type size for a grid-placed card, as a fraction of the card's own width.
+ *
+ * The board is laid out in CSS pixels by `computeCardDimensions` (which sizes
+ * cards from the column count) and then scaled as a whole to fit the wrapper —
+ * measured at 0.53–0.59 across the four form factors. So a card authored at a
+ * fixed 14 px rendered at 7.2–7.9 px effective: the geometry responded to the
+ * grid and the type did not.
+ *
+ * Tying the size to `dimensions.width` expresses that relationship once. At the
+ * desktop fit (card 286 px CSS, scale 0.57) 7.5 % gives 21 px CSS ≈ 12 px
+ * effective, which is the floor this was aiming at.
+ *
+ * The clamp is not decoration. `computeCardDimensions` floors the card at
+ * MIN_W = 140 and lets the auto-fit absorb the rest, so on a phone the ratio
+ * alone would put the type *below* the 14 px it replaces. The ceiling keeps a
+ * two-column grid from setting statements at headline size.
+ */
+const GRID_TEXT_RATIO = 0.075;
+const GRID_TEXT_MIN_PX = 14;
+const GRID_TEXT_MAX_PX = 28;
+
 const CARD_SPRING_TRANSITION = {
     type: 'spring' as const,
     stiffness: 350,
@@ -85,12 +107,22 @@ const innerCardStyles = cva(
             },
             isSelected: {
                 true: 'border-blue-500 ring-2 ring-blue-300 shadow-md scale-[1.02] z-10',
-                false: 'border-slate-200 hover:border-indigo-300 hover:shadow-md hover:scale-[1.05]',
+                false: 'border-slate-200 hover:border-indigo-300 hover:shadow-md',
             },
             isOverlay: {
                 true: 'shadow-xl ring-2 ring-indigo-500',
             },
         },
+        compoundVariants: [
+            /*
+             * The grid packs cards edge to edge with an 8 px gap, so a hovered
+             * card growing 5 % lands on its neighbours. The hover affordance
+             * survives in the border and shadow on the same line; the drag
+             * affordance is `cursor-grab` on the wrapper, not the scale. The
+             * deck keeps it — its cards are not packed.
+             */
+            { variant: 'hand', isSelected: false, className: 'hover:scale-[1.05]' },
+        ],
         defaultVariants: {
             variant: 'grid',
             isSelected: false,
@@ -200,6 +232,18 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             observer.observe(container);
             return () => observer.disconnect();
         }, [allowScroll, variant, dimensions?.height]);
+
+        // Only grid-placed cards are sized in board space; the deck and sidebar
+        // are laid out in real CSS pixels and their authored sizes are correct.
+        const gridFontSize =
+            dimensions && variant === 'grid'
+                ? Math.round(
+                      Math.min(
+                          Math.max(dimensions.width * GRID_TEXT_RATIO, GRID_TEXT_MIN_PX),
+                          GRID_TEXT_MAX_PX
+                      )
+                  )
+                : undefined;
 
         const handleMouseEnter = () => {
             // Immediate hover feedback for Reading Zone
@@ -314,18 +358,45 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         </div>
                     )}
 
+                    {/*
+                     * Reserve the corners rather than stack above them. Both
+                     * overlays sit `top-2`, and the text is vertically centred
+                     * under a line clamp that fills the card, so on a long
+                     * statement the first line runs under the code on the left
+                     * and under the reveal on the right. A higher z-index would
+                     * only decide which of the two wins the collision.
+                     *
+                     * Symmetric even when only one corner is occupied: the text
+                     * is centred, so reserving on one side alone visibly pushes
+                     * every statement off-axis.
+                     *
+                     * The reservation is a fixed width because the overlays are
+                     * a fixed size — they do not scale with the board the way
+                     * the card and (now) its type do. 32 px clears the reveal,
+                     * which measures 22 px inset 8 px from the edge. The cost is
+                     * line width on the smallest cards that still carry one.
+                     */}
                     <div
                         ref={scrollRef}
-                        className={`w-full h-full flex ${variant === 'compact' ? 'items-start pt-0.5' : 'items-center'} justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
+                        className={cn(
+                            'w-full h-full flex justify-center',
+                            variant === 'compact' ? 'items-start pt-0.5' : 'items-center',
+                            allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden',
+                            variant !== 'hand' && (code || !disableHoverZoom) && 'px-8'
+                        )}
                     >
                         <div
                             ref={textRef}
                             className={textStyles({ variant, allowScroll })}
-                            style={
-                                dynamicLineClamp != null
-                                    ? { WebkitLineClamp: dynamicLineClamp }
-                                    : undefined
-                            }
+                            style={{
+                                ...(dynamicLineClamp != null && {
+                                    WebkitLineClamp: dynamicLineClamp,
+                                }),
+                                // Wins over the variant's `text-xs sm:text-sm`, which
+                                // stays as the fallback for cards rendered without
+                                // board dimensions (the designer preview).
+                                ...(gridFontSize != null && { fontSize: `${gridFontSize}px` }),
+                            }}
                         >
                             {/[*_~#]/.test(text) ? (
                                 <SafeMarkdown

@@ -135,6 +135,29 @@ describe('SortableCard', () => {
         expect(card.style.width).toBe('100px');
         expect(card.style.height).toBe('150px');
     });
+    /**
+     * The board scales itself down to fit — measured at 0.53–0.59 across the
+     * four form factors — but the card text was authored at a fixed 14 px, so
+     * it landed at 7.2–7.9 px effective. The card *geometry* is responsive
+     * (`computeCardDimensions` sizes it from the column count); the type has to
+     * be too, or the relationship is guessed rather than expressed.
+     */
+    it('scales the grid card text with the card, not against it', () => {
+        const wide = { width: 286, height: 200 };
+        render(<SortableCard {...defaultProps} dimensions={wide} />);
+        const text = screen.getByTestId('card-123').querySelector('.text-center') as HTMLElement;
+        expect(parseFloat(text.style.fontSize)).toBeGreaterThanOrEqual(20);
+    });
+
+    it('floors the grid card text so a small card does not become unreadable', () => {
+        // `computeCardDimensions` clamps to MIN_W = 140; a pure ratio would put
+        // the type below the authored 14 px there, which is a regression.
+        const narrow = { width: 140, height: 90 };
+        render(<SortableCard {...defaultProps} dimensions={narrow} />);
+        const text = screen.getByTestId('card-123').querySelector('.text-center') as HTMLElement;
+        expect(parseFloat(text.style.fontSize)).toBe(14);
+    });
+
     it('renders statement code when provided', () => {
         render(<SortableCard {...defaultProps} code="S1" />);
         expect(screen.getByText('S1')).toBeTruthy();
