@@ -304,6 +304,23 @@ test.describe('Participant header geometry', () => {
  *     `color-mix`, so their ratio is a property of the researcher's chosen accent as
  *     much as of the code. A green run says the default clears AA, nothing more.
  */
+/*
+ * A viewport size is not an orientation, and this app reads both.
+ *
+ * Headless Chromium reports `screen.orientation.type === 'landscape-primary'`
+ * at any viewport, including 390×844 where `screen.width`/`screen.height`
+ * themselves report portrait. `ViewportContext.tsx:36-41` seeds
+ * `orientationOverride` from `screen.orientation.type` in its `useState`
+ * initialiser — correctly — so the app faithfully serves the
+ * landscape-mobile layout to what the browser insists is a landscape device.
+ *
+ * `GridSort.tsx:659` branches on `isLandscapeMobile` and picks a distinct
+ * fine-sort layout for it. Anything measured through this suite at a phone
+ * width is therefore measuring that branch, not the portrait one a real phone
+ * shows. Stub `screen.orientation` before asserting on a portrait layout; the
+ * first pass of the 2026-07-29 audit did not, and measured a screen no
+ * participant has ever seen.
+ */
 const A11Y_VIEWPORTS = [
     { name: 'desktop', width: 1440, height: 900 },
     { name: 'mobile', width: 375, height: 800 },
