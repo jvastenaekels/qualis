@@ -302,6 +302,33 @@ for (const vp of A11Y_VIEWPORTS) {
             await expect(page.locator('[role="radiogroup"]')).toHaveCount(1);
             await audit('pre-sort');
 
+            /*
+             * The anchors have to sit under the options they qualify.
+             *
+             * jsdom cannot catch this — it has no layout — and axe has no rule
+             * for "the label is 354 px from its referent", which is what this
+             * was: the radiogroup is content-width, the anchor row was
+             * card-width, so at 1440 "Very familiar" rendered well to the right
+             * of option 5. 24 px of slack covers the anchor row's `gap-2` and
+             * the option label's own padding without admitting a real drift.
+             */
+            const lastOption = page.locator('[role="radiogroup"] label').last();
+            const rightAnchor = page.getByTestId('familiarity-scale-anchors').locator('span').last();
+            const optionBox = await lastOption.boundingBox();
+            const anchorBox = await rightAnchor.boundingBox();
+            expect(optionBox, 'rating scale: last option has no box').not.toBeNull();
+            expect(anchorBox, 'rating scale: right anchor has no box').not.toBeNull();
+            if (optionBox && anchorBox) {
+                const optionRight = optionBox.x + optionBox.width;
+                const anchorRight = anchorBox.x + anchorBox.width;
+                expect
+                    .soft(
+                        Math.abs(anchorRight - optionRight),
+                        `rating scale: right anchor ends at ${anchorRight}, last option at ${optionRight}`
+                    )
+                    .toBeLessThanOrEqual(24);
+            }
+
             // Filled by hand rather than through `presort.completePreSort()`: that
             // helper expects an Education field this study does not declare, and the
             // rating field it would ignore is the one this scan exists for.

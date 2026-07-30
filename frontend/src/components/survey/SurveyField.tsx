@@ -32,36 +32,55 @@ const RatingField: React.FC<RatingFieldProps> = ({ id, fieldConfig, register, lo
     const hasLabels = !!(leftLabel || rightLabel || middleLabel);
     return (
         <div className="mt-2">
-            <div
-                role="radiogroup"
-                aria-labelledby={`${id}-label`}
-                aria-required={fieldConfig.required || undefined}
-                className="flex flex-wrap items-center gap-2 sm:gap-3"
-            >
-                {Array.from({ length: points }, (_, i) => i + 1).map((n) => (
-                    <label
-                        key={n}
-                        className="flex flex-col items-center gap-1 cursor-pointer p-2 rounded-md hover:bg-gray-50 active:bg-gray-100 min-w-[44px]"
-                    >
-                        <input
-                            type="radio"
-                            {...register(id)}
-                            value={String(n)}
-                            // biome-ignore lint/suspicious/noExplicitAny: style override
-                            style={{ accentColor: 'var(--brand-accent)' } as any}
-                            className="h-5 w-5"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">{n}</span>
-                    </label>
-                ))}
-            </div>
-            {hasLabels && (
-                <div className="flex justify-between items-start mt-1 text-xs text-gray-500 gap-2">
-                    <span className="text-left">{leftLabel}</span>
-                    {middleLabel && <span className="text-center flex-1">{middleLabel}</span>}
-                    <span className="text-right">{rightLabel}</span>
+            {/*
+             * The anchors and the scale are bound to one width.
+             *
+             * The radiogroup is a `flex flex-wrap` only as wide as its
+             * content, but the anchor row under it was a `justify-between`
+             * spanning the whole card: at 1440 the radios ran x=427→671 and
+             * the anchors x=415→1025, putting "Very familiar" 354 px to the
+             * right of option 5, the option it qualifies.
+             *
+             * `w-fit` needs no breakpoint to survive the wrap case: once the
+             * scale's max-content exceeds the space available, fit-content
+             * resolves to that available width and the row behaves exactly as
+             * it does today on a phone.
+             */}
+            <div className="flex flex-col w-fit max-w-full">
+                <div
+                    role="radiogroup"
+                    aria-labelledby={`${id}-label`}
+                    aria-required={fieldConfig.required || undefined}
+                    className="flex flex-wrap items-center gap-2 sm:gap-3"
+                >
+                    {Array.from({ length: points }, (_, i) => i + 1).map((n) => (
+                        <label
+                            key={n}
+                            className="flex flex-col items-center gap-1 cursor-pointer p-2 rounded-md hover:bg-gray-50 active:bg-gray-100 min-w-[44px]"
+                        >
+                            <input
+                                type="radio"
+                                {...register(id)}
+                                value={String(n)}
+                                // biome-ignore lint/suspicious/noExplicitAny: style override
+                                style={{ accentColor: 'var(--brand-accent)' } as any}
+                                className="h-5 w-5"
+                            />
+                            <span className="text-sm font-semibold text-gray-700">{n}</span>
+                        </label>
+                    ))}
                 </div>
-            )}
+                {hasLabels && (
+                    <div
+                        data-testid={`${id}-scale-anchors`}
+                        className="flex justify-between items-start mt-1 text-xs text-gray-500 gap-2"
+                    >
+                        <span className="text-left">{leftLabel}</span>
+                        {middleLabel && <span className="text-center flex-1">{middleLabel}</span>}
+                        <span className="text-right">{rightLabel}</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
