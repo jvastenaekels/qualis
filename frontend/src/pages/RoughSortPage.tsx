@@ -21,7 +21,18 @@ import {
     useMotionValue,
     useTransform,
 } from 'framer-motion';
-import { ArrowRight, Check, Frown, Keyboard, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
+import {
+    ArrowRight,
+    Check,
+    Frown,
+    Keyboard,
+    Lightbulb,
+    Meh,
+    RotateCcw,
+    Smile,
+    Target,
+    X,
+} from 'lucide-react';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -185,7 +196,11 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             className="absolute top-full left-0 right-0 z-30 flex justify-center pt-2 px-4 pointer-events-none"
                         >
                             <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-md max-w-sm pointer-events-auto">
-                                <span className="text-lg">💡</span>
+                                <Lightbulb
+                                    size={18}
+                                    aria-hidden="true"
+                                    className="shrink-0 text-yellow-800"
+                                />
                                 <div className="text-xs text-yellow-800 font-medium leading-tight text-left [&_strong]:font-bold">
                                     <SafeMarkdown
                                         components={{

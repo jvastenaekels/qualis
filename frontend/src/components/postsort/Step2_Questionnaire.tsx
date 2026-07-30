@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
-import { Check, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Check, Loader2, ArrowLeft, AlertCircle, Info, Mail } from 'lucide-react';
 import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
@@ -364,7 +364,8 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 <Card className="border-blue-100 bg-blue-50/50 shadow-sm">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-lg font-black text-blue-900 flex items-center gap-2">
-                            ✉️ {t('post.contact.title', 'Results & contact')}
+                            <Mail size={18} aria-hidden="true" className="shrink-0" />
+                            {t('post.contact.title', 'Results & contact')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -442,8 +443,14 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                             </div>
                         )}
                         <div className="pt-2 border-t border-blue-100/50">
-                            <p className="text-xs text-slate-500 italic">
-                                ℹ️ {t('post.contact.gdpr_note')}
+                            {/*
+                             * slate-500 on this card's blue-50 tint measured
+                             * 4.2:1, under the 4.5 floor Phase 2 set for the
+                             * flow. Raised while the line was being touched.
+                             */}
+                            <p className="text-xs text-slate-600 italic flex items-start gap-1.5">
+                                <Info size={14} aria-hidden="true" className="shrink-0 mt-0.5" />
+                                <span>{t('post.contact.gdpr_note')}</span>
                             </p>
                         </div>
                     </CardContent>
