@@ -680,13 +680,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
             {/* NAVIGATION ACTIONS */}
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
-                <Button variant="outline" onClick={() => navigate('../fine-sort')}>
+                <Button variant="outline" size="pill" onClick={() => navigate('../fine-sort')}>
                     ← {t('post.back', 'Back to sort')}
                 </Button>
                 <Button
+                    variant="brand"
+                    size="pill"
                     onClick={handleNext}
                     disabled={isUploadInProgress}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px] shadow-md shadow-indigo-200"
+                    className="min-w-[140px]"
                     data-testid="postsort-step1-next-btn"
                 >
                     {isUploadInProgress

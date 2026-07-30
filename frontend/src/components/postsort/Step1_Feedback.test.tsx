@@ -106,6 +106,20 @@ describe('Step1_Feedback validation message', () => {
         expect(screen.getAllByText(/a few words are enough/i).length).toBeGreaterThan(0);
     });
 
+    /**
+     * The four screens before this one paint their primary action with
+     * `--brand-accent`, the colour a study owner sets. This one painted itself
+     * indigo, so a rebranded study went green, green, green, green — then indigo
+     * at the last step. `bg-indigo-600` was also written twice: once here in
+     * `className`, once inherited from `Button`'s `default` variant.
+     */
+    it('carries the study brand colour, not a hard-coded indigo', () => {
+        render(<Step1_Feedback onNext={vi.fn()} />);
+        const next = screen.getByTestId('postsort-step1-next-btn');
+        expect(next.className).not.toMatch(/bg-indigo-600/);
+        expect(next.className).toMatch(/bg-\[var\(--brand-accent\)\]/);
+    });
+
     it('does not block a participant who answered', async () => {
         const user = userEvent.setup();
         const onNext = vi.fn();

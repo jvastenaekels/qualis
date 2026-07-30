@@ -451,15 +451,17 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
             )}
 
             <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
-                <Button variant="outline" onClick={onBack} disabled={isLoading}>
+                <Button variant="outline" size="pill" onClick={onBack} disabled={isLoading}>
                     <ArrowLeft size={18} className="mr-2" />
                     {t('common.back', 'Back')}
                 </Button>
 
                 <Button
+                    variant="brand"
+                    size="pill"
                     onClick={handleFinalSubmit}
                     data-testid="postsort-submit-btn"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-full sm:min-w-[200px]"
+                    className="min-w-full sm:min-w-[200px]"
                     disabled={isLoading || isUploadInProgress}
                 >
                     {isLoading ? (

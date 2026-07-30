@@ -17,6 +17,14 @@ const buttonVariants = cva(
                 // `<Button>` default) this variant exists to end.
                 // white on indigo-600 = 6.29:1, on indigo-700 = 7.90:1 (AA).
                 default: 'bg-indigo-600 text-white shadow hover:bg-indigo-700',
+                // The *participant flow's* primary fill, which is not the
+                // product's: `--brand-accent` is set on StudyLayout's root from
+                // `branding.accent_color` (default `#2563eb`, white-on-fill
+                // 5.17:1 — a study owner picking a pale accent is on their own,
+                // and that is true of the four screens that already use it).
+                // Only valid inside StudyLayout; anywhere else the var is
+                // undefined and the button renders transparent.
+                brand: 'bg-[var(--brand-accent)] text-white shadow-lg hover:brightness-110 hover:shadow-xl',
                 // Warning / destructive-adjacent: design-lock and retention
                 // actions only. Measured against a white page:
                 //   rest  amber-600 fill 3.19:1 vs white (1.4.11 ≥3), label
@@ -39,6 +47,10 @@ const buttonVariants = cva(
                 sm: 'h-8 rounded-md px-3 text-xs',
                 lg: 'h-10 rounded-md px-8',
                 icon: 'h-9 w-9',
+                // The participant flow's button geometry — a full-height pill,
+                // not the 36px product default. `whitespace-normal` because
+                // `ui_labels` are study-supplied and can be arbitrarily long.
+                pill: 'h-auto min-h-12 rounded-full px-8 py-3 text-base font-bold whitespace-normal',
             },
         },
         defaultVariants: {
