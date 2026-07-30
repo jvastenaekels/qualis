@@ -216,6 +216,57 @@ test.describe('Participant header geometry', () => {
             // And not by making the document scroll sideways instead.
             const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
             expect(scrollWidth).toBeLessThanOrEqual(width);
+
+            /*
+             * The resume toast has to clear the header rather than cover it.
+             *
+             * A reload past step 1 is what fires it in real use
+             * (`useStudyLocaleSync.ts:88-105`), and it is also the only way to
+             * get a toast on screen here: sonner mounts nothing until one
+             * exists, so there is no container to measure in the quiet state.
+             *
+             * Both halves are asserted because they are different failures.
+             * The box test says the toast does not sit on the title; the
+             * `elementFromPoint` test says it does not swallow taps aimed at
+             * the header, which is what `pointer-events` on an overlay does
+             * even where it looks transparent.
+             */
+            await page.reload();
+            await page.waitForSelector('[data-testid="layout-header"]');
+            const toast = page.locator('[data-sonner-toast]').first();
+            await expect(toast).toBeVisible({ timeout: 15000 });
+            // Sonner slides the toast in; a box read mid-animation is the
+            // start of the transition, not where it lands.
+            await page.waitForTimeout(1000);
+
+            const geometry = await page.evaluate(() => {
+                const el = document.querySelector('[data-sonner-toast]');
+                const header = document.querySelector('[data-testid="layout-header"]');
+                if (!el || !header) return null;
+                const headerBox = header.getBoundingClientRect();
+                const hit = document.elementFromPoint(
+                    Math.round(headerBox.width / 4),
+                    Math.round(headerBox.height / 2)
+                );
+                return {
+                    toastTop: el.getBoundingClientRect().top,
+                    headerBottom: headerBox.bottom,
+                    hitIsToast: hit ? !!hit.closest('[data-sonner-toast]') : false,
+                };
+            });
+
+            expect(geometry, 'toast or header missing after reload').not.toBeNull();
+            if (geometry) {
+                expect
+                    .soft(
+                        geometry.toastTop,
+                        `toast starts at ${geometry.toastTop}, header ends at ${geometry.headerBottom}`
+                    )
+                    .toBeGreaterThanOrEqual(geometry.headerBottom);
+                expect
+                    .soft(geometry.hitIsToast, 'the toast intercepts pointer events over the header')
+                    .toBe(false);
+            }
         });
     }
 });
