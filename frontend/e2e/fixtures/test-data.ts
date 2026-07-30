@@ -228,6 +228,7 @@ export type PresortFieldType =
     | 'radio'
     | 'date'
     | 'textarea'
+    | 'rating'
     | 'text_audio';
 
 export type GridDistribution = 'symmetric' | 'asymmetric' | 'minimal';
@@ -281,6 +282,10 @@ export interface PresortField {
     maxLength?: number;
     rows?: number;
     placeholder?: string;
+    /** `rating` only — SurveyField clamps to 2..10, defaulting to 5. */
+    scale_points?: number;
+    /** `rating` only — the anchors rendered under the radio row. */
+    scale_labels?: { left?: string; middle?: string; right?: string };
 }
 
 export interface PresortConfig {
