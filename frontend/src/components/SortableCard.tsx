@@ -331,6 +331,10 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                                 <SafeMarkdown
                                     components={inlineMarkdownComponents}
                                     className="!prose-none text-inherit"
+                                    // The plain-text branch below hyphenates directly, so
+                                    // without this a statement would break mid-word or not
+                                    // depending on whether it happens to contain a `*`.
+                                    hyphenate
                                 >
                                     {text}
                                 </SafeMarkdown>

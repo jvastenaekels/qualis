@@ -8,6 +8,15 @@ interface Props extends Options {
     children: string | null | undefined;
     allowLinks?: boolean;
     className?: string;
+    /**
+     * Inject soft hyphens so the text may break mid-word.
+     *
+     * Opt-in, and off by default: of the fourteen call sites only the two
+     * statement cards are narrow enough to want it. On prose it is actively
+     * wrong — a 500 px column renders `compare dif-/ferent`, and in the
+     * fine-sort rail it stacks with truncation to give `because it re-…`.
+     */
+    hyphenate?: boolean;
 }
 
 /**
@@ -18,6 +27,7 @@ export const SafeMarkdown: React.FC<Props> = ({
     children,
     allowLinks = true,
     className,
+    hyphenate = false,
     ...props
 }) => {
     const hyphenateText = useHyphenation();
@@ -31,8 +41,8 @@ export const SafeMarkdown: React.FC<Props> = ({
             ALLOWED_TAGS: [],
             KEEP_CONTENT: true,
         });
-        return hyphenateText(sanitized);
-    }, [children, hyphenateText]);
+        return hyphenate ? hyphenateText(sanitized) : sanitized;
+    }, [children, hyphenate, hyphenateText]);
 
     const urlTransform = (url: string) => {
         if (!allowLinks) return '#';

@@ -195,7 +195,10 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                         ref={textRef}
                         className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none [hyphens:manual]`}
                     >
-                        <SafeMarkdown components={inlineMarkdownComponents}>
+                        {/* A narrow card at 375 px, and the container above already
+                            declares `[hyphens:manual]` — it was written expecting
+                            soft hyphens. */}
+                        <SafeMarkdown components={inlineMarkdownComponents} hyphenate>
                             {statement.text}
                         </SafeMarkdown>
                     </div>
