@@ -133,7 +133,23 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     )}
                 </div>
 
-                <p className="text-base sm:text-xl text-gray-800 leading-relaxed font-medium">
+                {/*
+                 * Body copy, not display text. The title and subtitle above are
+                 * display and stay centred; this paragraph is the first thing a
+                 * participant actually reads, and it ran nine centred lines at
+                 * 768 px and eleven at 390 px. Centred setting gives both edges a
+                 * ragged return, which is what makes a long paragraph hard to
+                 * re-enter after each break.
+                 *
+                 * The block stays centred in the column (`mx-auto`) while its
+                 * text is left-aligned, so a one-sentence description does not
+                 * look orphaned against a wide layout — and the measure cap keeps
+                 * the line length readable regardless of what the researcher wrote.
+                 */}
+                <p
+                    data-testid="welcome-description"
+                    className="text-base sm:text-lg text-gray-800 leading-relaxed font-normal text-left max-w-[62ch] mx-auto"
+                >
                     {config.description}
                 </p>
 
