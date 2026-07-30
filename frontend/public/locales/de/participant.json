@@ -120,11 +120,7 @@
         "loading_content": "Studieninhalt wird geladen...",
         "change_lang_title": "Sprache wechseln",
         "steps": {
-            "welcome": "Willkommen",
-            "consent": "Datenschutz & Einwilligung",
-            "rough": "Erste Eindrücke",
-            "fine": "Q-Sortierung",
-            "post": "Abschlussfragen"
+            "welcome": "Willkommen"
         },
         "mobile_step": "Schritt",
         "navigation": "Navigation",
@@ -158,17 +154,18 @@
             }
         },
         "steps": {
-            "presort": "Vorsortierungsbefragung",
-            "rough": "Vorläufige Sortierung",
-            "fine": "Rasterplatzierung",
-            "post": "Nachsortierungsphase"
+            "presort": "Kennenlernen",
+            "rough": "Erste Eindrücke",
+            "fine": "Ihre Perspektive",
+            "post": "Warum diese Entscheidungen"
         }
     },
     "welcome": {
         "start": "Loslegen",
         "consent": {
             "label": "Ich bestätige, dass ich die obigen Informationen gelesen habe und der Verarbeitung meiner Daten für die Zwecke dieser Studie zustimme.",
-            "error": "Bitte akzeptieren Sie die Bedingungen, um fortzufahren."
+            "error": "Bitte akzeptieren Sie die Bedingungen, um fortzufahren.",
+            "submit": "Ich stimme zu — Studie starten"
         },
         "reset_confirm": "Sind Sie sicher, dass Sie eine neue Sitzung starten möchten? Ihr aktueller Fortschritt wird gelöscht.",
         "restart": "Neue Sitzung starten",
@@ -192,7 +189,7 @@
                 "description": "In der Sortierfase platzieren Sie die Aussagen auf einem Raster, um Ihren Standpunkt zu verfeinern. Sie sortieren und ordnen die Aussagen von „am meisten zustimmend\" bis „am meisten ablehnend\", indem Sie jede Aussage in das entsprechende Feld platzieren. Es gibt keine richtigen oder falschen Antworten. Die beste Antwort ist die, die Ihre Meinung oder Überzeugungen widerspiegelt."
             },
             "post": {
-                "title": "Warum",
+                "title": "Warum diese Entscheidungen",
                 "description": "Bevor die Sitzung endet, werden Ihnen einige klärende Fragen gestellt, damit wir Ihre bedeutsamsten Entscheidungen besser verstehen können, sowie einige Fragen zu Ihrem Hintergrund."
             }
         }
@@ -204,7 +201,7 @@
         "default_text": "1. Art der Studie und Verständnis des Teilnehmers. Sie verstehen, dass diese Übung die Q-Methodologie einsetzt, eine Forschungstechnik, die entwickelt wurde, um subjektive Standpunkte zu modellieren. Die Aufgabe erfordert, dass Sie Aussagen nach ihrer Bedeutung für Ihre persönliche Perspektive sortieren; daher gibt es keine objektiv \"richtigen\" oder \"falschen\" Antworten.\n\n2. Datenverarbeitung und Pseudonymisierung (DSGVO-Konformität).\n\nDe-Identifizierung und Aufbewahrung: Dieses technische Verfahren stellt sicher, dass Ihr digitaler Fußabdruck nicht verwendet werden kann, um Sie nach dem Ende der Sitzung wieder zu identifizieren.\n\nAusnahme für Nachverfolgung: Wenn Sie am Ende der Studie freiwillig Ihre Kontaktdaten für eine Folgekontaktaufnahme angeben, wird die Verbindung zwischen Ihrer Identität (E-Mail) und Ihrer Antwort ausschließlich für die Dauer dieser spezifischen Nachverfolgungsphase aufrechterhalten.\n\nBerichterstattung: Die Endergebnisse werden in anonymisierter Form präsentiert. Die Daten werden aggregiert, um gemeinsame soziale Perspektiven (Faktoren) aufzuzeigen. Qualitative Kommentare können zur Kontextualisierung dieser Faktoren zitiert werden, werden aber auf identifizierende Details geprüft.\n\n3. Freiwillige Teilnahme und Rücktrittsrecht. Sie haben das Recht, den Sortierprozess zu unterbrechen und Ihren Browser jederzeit vor der Einreichung ohne Konsequenzen zu schließen.\n\nVor der Einreichung: Wenn Sie sich zurückziehen, bevor Sie Ihre Sortierung abgeschlossen haben, werden keine Teildaten aufbewahrt.\n\nNach der Einreichung: Aufgrund der statistischen Natur der Q-Methodologie (Faktoranalyse) ist ein individueller Rücktritt möglicherweise nicht mehr durchführbar, sobald Ihre Daten eingereicht und in den Datensatz integriert wurden.\n\n4. Datenspeicherung und Rechte"
     },
     "presort": {
-        "title": "Bevor wir beginnen",
+        "title": "Kennenlernen",
         "description": "Bitte beantworten Sie einige Fragen, damit wir Ihren Standpunkt einordnen können.",
         "submit": "Weiter zur Sortierung",
         "select_placeholder": "Auswählen...",
@@ -219,7 +216,7 @@
             "close": "Hinweis schließen"
         },
         "complete": {
-            "title": "Erster Schritt abgeschlossen",
+            "title": "Erste Eindrücke erfasst",
             "subtitle": "Wir verfeinern nun die Nuancen.",
             "button": "Weiter zur Feinsortierung"
         },
@@ -287,7 +284,7 @@
         }
     },
     "post": {
-        "title": "Ihre Perspektive & Feedback",
+        "title": "Warum diese Entscheidungen",
         "description": "Sie sind fast fertig! Ihre Kommentare zu den bedeutsamsten Aussagen sind entscheidend für unsere Analyse.",
         "step2_title": "Fast geschafft!",
         "step2_description": "Bitte beantworten Sie diese abschließenden Fragen, um die Studie abzuschließen.",
@@ -295,7 +292,8 @@
             "title": "Wichtigste Entscheidungen",
             "why": "Warum haben Sie sich entschieden, diese Aussage hier zu platzieren? Was bedeutet sie für Sie?",
             "placeholder": "Z.B. ein bestimmtes Ereignis, eine starke Überzeugung oder ein besonderes Wort in der Aussage...",
-            "min_chars": "Ein paar Worte genügen, um uns den Kontext zu verdeutlichen.",
+            "min_chars": "Bitte erläutern Sie Ihre Wahl, bevor Sie fortfahren.",
+            "hint": "Ein paar Worte genügen, um uns den Kontext zu verdeutlichen.",
             "label_agree": "Stärkste Zustimmung",
             "label_disagree": "Stärkste Ablehnung",
             "label_neutral": "Neutral",

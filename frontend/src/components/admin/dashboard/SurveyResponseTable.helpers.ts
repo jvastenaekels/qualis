@@ -45,8 +45,8 @@ export function resolveAnswerLabel(
     if (key === '_recruitment_token')
         return t('admin.participant.metadata.recruitment_token', 'Link token');
     if (key === 'missing_statement')
-        return t('post.extreme.missing_statement', 'Missing Statement');
-    if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');
+        return t('post.extreme.missing_statement', 'Missing statement');
+    if (key === 'general_comment') return t('post.extreme.general_comment', 'General comment');
     return genericFallback;
 }
 

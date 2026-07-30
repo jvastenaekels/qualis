@@ -393,14 +393,29 @@ const App = () => {
                     <RouterProvider router={router} />
                 </MotionConfig>
             </ViewportProvider>
+            {/*
+             * `offset` and `mobileOffset` both, because sonner 2 applies the
+             * second below 600 px and would otherwise put the toast back on
+             * the header exactly where a phone can least afford it.
+             */}
             <Toaster
                 richColors
                 position="top-center"
                 closeButton
+                offset={{ top: 'calc(var(--header-height) + 0.75rem)' }}
+                mobileOffset={{ top: 'calc(var(--header-height) + 0.5rem)' }}
                 toastOptions={{
                     style: {
                         fontFamily: '"Google Sans Flex", "Google Sans Flex Local", sans-serif',
                         fontSize: '0.9375rem',
+                    },
+                    classNames: {
+                        // Sonner parks the close button at the toast's top-left
+                        // corner and pulls it outward with a translate, so it
+                        // floats over the page on its own, disconnected from
+                        // the box it closes. Brought inside, on the trailing
+                        // edge, vertically centred.
+                        closeButton: 'sonner-close-inside',
                     },
                 }}
             />

@@ -120,11 +120,7 @@
         "loading_content": "Caricamento dei contenuti dello studio...",
         "change_lang_title": "Cambia lingua",
         "steps": {
-            "welcome": "Benvenuto",
-            "consent": "Privacy e consenso",
-            "rough": "Prime impressioni",
-            "fine": "Classificazione Q",
-            "post": "Domande finali"
+            "welcome": "Benvenuto"
         },
         "mobile_step": "Passo",
         "navigation": "Navigazione",
@@ -156,7 +152,8 @@
         "start": "Inizia",
         "consent": {
             "label": "Confermo di aver letto le informazioni precedenti e di acconsentire al trattamento dei miei dati per le finalità di questo studio.",
-            "error": "Accetti i termini per continuare."
+            "error": "Accetti i termini per continuare.",
+            "submit": "Accetto — inizia lo studio"
         },
         "reset_confirm": "È sicuro di voler avviare una nuova sessione? Il progresso attuale andrà perso.",
         "restart": "Avvia una nuova sessione",
@@ -180,7 +177,7 @@
                 "description": "Durante la fase di classificazione, posizionerà le affermazioni su una griglia per affinare il suo punto di vista. Ordinerà e classificherà le affermazioni da «più d'accordo» a «più in disaccordo» collocando ciascuna affermazione nella casella corrispondente. Non esistono risposte giuste o sbagliate. La risposta migliore è quella che riflette la sua opinione o le sue convinzioni."
             },
             "post": {
-                "title": "Perché",
+                "title": "Perché queste scelte",
                 "description": "Prima della fine della sessione, Le verranno poste alcune domande di chiarimento per aiutarci a comprendere meglio le sue scelte più significative, nonché alcune domande sul suo percorso."
             }
         }
@@ -192,7 +189,7 @@
         "default_text": "1. Natura dello studio e comprensione del partecipante. Lei comprende che questo esercizio impiega la metodologia Q, una tecnica di ricerca progettata per modellare punti di vista soggettivi. Il compito richiede di classificare le affermazioni in base alla loro rilevanza rispetto alla sua prospettiva personale; di conseguenza, non esistono risposte \"corrette\" o \"errate\" in senso oggettivo.\n\n2. Trattamento dei dati e pseudonimizzazione (conformità al GDPR).\n\nDe-identificazione e conservazione: questo processo tecnico garantisce che la sua impronta digitale non possa essere utilizzata per re-identificarla una volta terminata la sessione.\n\nEccezione per il follow-up: se fornisce volontariamente i suoi dati di contatto al termine dello studio per un contatto di follow-up, il collegamento tra la sua identità (e-mail) e la sua risposta sarà mantenuto esclusivamente per la durata di quella specifica fase di follow-up.\n\nResoconto: i risultati finali saranno presentati in formato anonimizzato. I dati saranno aggregati per rivelare prospettive sociali condivise (fattori). I commenti qualitativi potranno essere citati per contestualizzare questi fattori, ma saranno esaminati per rimuovere dettagli identificativi.\n\n3. Partecipazione volontaria e diritto di recesso. Lei mantiene il diritto di interrompere il processo di classificazione e chiudere il browser in qualsiasi momento prima dell'invio, senza alcuna penalità.\n\nPrima dell'invio: se si ritira prima di finalizzare la sua classificazione, nessun dato parziale sarà conservato.\n\nDopo l'invio: a causa della natura statistica della metodologia Q (analisi fattoriale), una volta che i suoi dati siano stati inviati e aggregati nel dataset, il recesso individuale potrebbe non essere fattibile.\n\n4. Conservazione dei dati e diritti"
     },
     "presort": {
-        "title": "Prima di iniziare",
+        "title": "Facciamo conoscenza",
         "description": "Risponda ad alcune domande per aiutarci a contestualizzare il suo punto di vista.",
         "submit": "Continua alla classificazione",
         "select_placeholder": "Seleziona...",
@@ -207,7 +204,7 @@
             "close": "Chiudi suggerimento"
         },
         "complete": {
-            "title": "Primo passo completato",
+            "title": "Prime impressioni registrate",
             "subtitle": "Ora affineremo le sfumature.",
             "button": "Continua alla classificazione fine"
         },
@@ -275,7 +272,7 @@
         }
     },
     "post": {
-        "title": "La sua prospettiva e i suoi commenti",
+        "title": "Perché queste scelte",
         "description": "Ci siamo quasi! I suoi commenti sulle affermazioni più significative sono fondamentali per la nostra analisi.",
         "step2_title": "Quasi fatto!",
         "step2_description": "Risponda a queste ultime domande per completare lo studio.",
@@ -283,7 +280,8 @@
             "title": "Scelte chiave",
             "why": "Perché ha scelto di collocare questa affermazione qui? Che importanza ha per Lei?",
             "placeholder": "Ad esempio, un evento specifico, una convinzione profonda, o una parola particolare nell'affermazione...",
-            "min_chars": "Poche parole sono sufficienti per aiutarci a comprendere il contesto.",
+            "min_chars": "La preghiamo di spiegare la sua scelta prima di continuare.",
+            "hint": "Poche parole sono sufficienti per aiutarci a comprendere il contesto.",
             "label_agree": "Massimo accordo",
             "label_disagree": "Massimo disaccordo",
             "label_neutral": "Neutrale",
@@ -451,10 +449,10 @@
             }
         },
         "steps": {
-            "presort": "Sondaggio di pre-classificazione",
-            "rough": "Classificazione preliminare",
-            "fine": "Posizionamento sulla griglia",
-            "post": "Fase di post-classificazione"
+            "presort": "Facciamo conoscenza",
+            "rough": "Prime impressioni",
+            "fine": "La sua prospettiva",
+            "post": "Perché queste scelte"
         }
     }
 }

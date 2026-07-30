@@ -120,11 +120,7 @@
         "loading_content": "Ladataan tutkimuksen sisältöä...",
         "change_lang_title": "Vaihda kieli",
         "steps": {
-            "welcome": "Tervetuloa",
-            "consent": "Yksityisyys & Suostumus",
-            "rough": "Ensivaikutelmat",
-            "fine": "Q-lajitteluruudukko",
-            "post": "Viimeiset kysymykset"
+            "welcome": "Tervetuloa"
         },
         "mobile_step": "Vaihe",
         "navigation": "Navigointi",
@@ -158,17 +154,18 @@
             }
         },
         "steps": {
-            "presort": "Esikysely",
-            "rough": "Alustava lajittelu",
-            "fine": "Tarkka lajittelu",
-            "post": "Lopullinen arviointi"
+            "presort": "Tutustutaan",
+            "rough": "Ensivaikutelmat",
+            "fine": "Näkökulmasi",
+            "post": "Miksi nämä valinnat"
         }
     },
     "welcome": {
         "start": "Aloita",
         "consent": {
             "label": "Vahvistan lukeneeni yllä olevat tiedot ja annan suostumukseni tietojeni käsittelyyn tätä tutkimusta varten.",
-            "error": "Hyväksy ehdot jatkaaksesi."
+            "error": "Hyväksy ehdot jatkaaksesi.",
+            "submit": "Hyväksyn — aloita tutkimus"
         },
         "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
         "restart": "Aloita uusi istunto",
@@ -192,7 +189,7 @@
                 "description": "Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät \"eniten samaa mieltä\" -vaihtoehdosta \"eniten eri mieltä\" -vaihtoehtoon asettamalla kunkin väittämän vastaavaan ruutuun. Oikeita tai vääriä vastauksia ei ole. Paras vastaus on se, joka heijastaa omaa mielipidettäsi tai uskomuksiasi."
             },
             "post": {
-                "title": "Miksi",
+                "title": "Miksi nämä valinnat",
                 "description": "Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä, jotka auttavat meitä ymmärtämään paremmin merkittävimmät valintasi, sekä muutamia kysymyksiä taustastasi."
             }
         }
@@ -204,7 +201,7 @@
         "default_text": "1. Tutkimuksen luonne ja osallistujan ymmärrys\nRastittamalla alla olevan ruudun vahvistat tutustuneesi etusivulla kuvattuihin tutkimuksen tavoitteisiin. Ymmärrät, että tässä harjoituksessa käytetään Q-metodologiaa, joka on subjektiivisten näkökulmien mallintamiseen suunniteltu tutkimusmenetelmä. Tehtävänäsi on lajitella väitteitä sen perusteella, kuinka merkityksellisiä ne ovat oman näkökulmasi kannalta; näin ollen objektiivisesti \"oikeita\" tai \"vääriä\" vastauksia ei ole.\n\n2. Tietojenkäsittely ja pseudonymisointi (GDPR:n noudattaminen)\n\nTietojen keruu: Vastauksillesi (Q-lajittelu ja selitykset) annetaan yksilöllinen aakkosnumeerinen koodi lähettämisen yhteydessä.\n\nTunnisteiden poistaminen ja säilytys:\n\nVakiomenettely: Suorat tunnisteet (kuten IP-osoitteet) muutetaan välittömästi tunnistamattomaan muotoon, eikä niitä koskaan tallenneta alkuperäisessä asussaan. Tämä tekninen prosessi varmistaa, ettei digitaalista jalanjälkeäsi voida käyttää tunnistamiseesi istunnon päätyttyä.\n\nPoikkeus jatkotutkimusta varten: Jos annat vapaaehtoisesti yhteystietosi tutkimuksen lopussa jatkoyhteydenottoa varten, yhteys henkilöllisyytesi (sähköposti) ja vastauksesi välillä säilytetään tiukasti kyseisen seurantavaiheen keston ajan.\n\nRaportointi: Lopulliset tulokset esitetään anonymisoidussa muodossa. Tiedot yhdistetään jaettujen sosiaalisten näkökulmien (faktorien) tunnistamiseksi. Laadullisia kommentteja voidaan lainata näiden faktorien havainnollistamiseksi, mutta ne tarkistetaan tunnistetietojen poistamiseksi.\n\n3. Vapaaehtoinen osallistuminen ja peruuttamisoikeus\nOsallistumisesi on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ennen vastausten lähettämistä ilman seuraamuksia.\n\nEnnen lähettämistä: Jos keskeytät ennen lajittelun viimeistelyä, osittaisia tietoja ei tallenneta.\n\nLähettämisen jälkeen: Q-metodologian tilastollisen luonteen (faktorianalyysi) vuoksi yksittäisen vastauksen poistaminen ei välttämättä ole mahdollista sen jälkeen, kun tiedot on lähetetty ja yhdistetty aineistoon.\n\n4. Tietojen säilytys ja oikeudet\nYleisen tietosuoja-asetuksen (GDPR) mukaisesti sinulla on oikeus pyytää pääsyä henkilötietoihisi tai niiden oikaisemista niin kauan kuin ne ovat tunnistettavissa (ts. ennen lopullista anonymisointia)."
     },
     "presort": {
-        "title": "Ennen kuin aloitamme",
+        "title": "Tutustutaan",
         "description": "Ole hyvä ja vastaa muutamaan kysymykseen auttaaksesi meitä ymmärtämään näkökulmaasi.",
         "submit": "Jatka lajitteluun",
         "select_placeholder": "Valitse...",
@@ -219,7 +216,7 @@
             "close": "Sulje vinkki"
         },
         "complete": {
-            "title": "Ensimmäinen vaihe valmis",
+            "title": "Ensivaikutelmat tallennettu",
             "subtitle": "Nyt tarkennetaan nyansseja.",
             "button": "Jatka Q-lajitteluun"
         },
@@ -287,7 +284,7 @@
         }
     },
     "post": {
-        "title": "Näkökulmasi ja palautteesi",
+        "title": "Miksi nämä valinnat",
         "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
         "step2_title": "Melkein valmista!",
         "step2_description": "Vastaa vielä näihin viimeisiin kysymyksiin viimeistelläksesi tutkimuksen.",
@@ -295,7 +292,8 @@
             "title": "Keskeiset valinnat",
             "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
-            "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
+            "min_chars": "Perustele valintasi ennen jatkamista.",
+            "hint": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",
             "label_disagree": "Vahvin eri mieltä oleminen",
             "label_neutral": "Neutraali",
@@ -424,9 +422,9 @@
     "landing": {
         "page_title": "Qualis study access",
         "instruction": "Enter your study code to begin.",
-        "study_code_label": "Study Code",
+        "study_code_label": "Tutkimuskoodi",
         "study_code_placeholder": "e.g. my-study",
-        "go_to_study": "Go to Study",
+        "go_to_study": "Siirry tutkimukseen",
         "resetting_session": "Resetting study session…"
     },
     "erasure": {

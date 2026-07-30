@@ -120,11 +120,7 @@
         "loading_content": "Onderzoeksinhoud laden...",
         "change_lang_title": "Taal wijzigen",
         "steps": {
-            "welcome": "Welkom",
-            "consent": "Privacy & toestemming",
-            "rough": "Eerste indrukken",
-            "fine": "Q-sortering",
-            "post": "Afsluitende vragen"
+            "welcome": "Welkom"
         },
         "mobile_step": "Stap",
         "navigation": "Navigatie",
@@ -158,17 +154,18 @@
             }
         },
         "steps": {
-            "presort": "Voorsorteringsvragenlijst",
-            "rough": "Voorlopige sortering",
-            "fine": "Rasterplaatsing",
-            "post": "Fase na de sortering"
+            "presort": "Kennismaking",
+            "rough": "Eerste indrukken",
+            "fine": "Uw perspectief",
+            "post": "Waarom deze keuzes"
         }
     },
     "welcome": {
         "start": "Beginnen",
         "consent": {
             "label": "Ik bevestig dat ik bovenstaande informatie heb gelezen en toestemming geef voor de verwerking van mijn gegevens voor de doeleinden van dit onderzoek.",
-            "error": "Accepteer de voorwaarden om door te gaan."
+            "error": "Accepteer de voorwaarden om door te gaan.",
+            "submit": "Ik ga akkoord — start het onderzoek"
         },
         "reset_confirm": "Weet u zeker dat u een nieuwe sessie wilt starten? Dit wist uw huidige voortgang.",
         "restart": "Nieuwe sessie starten",
@@ -192,7 +189,7 @@
                 "description": "Tijdens de sorteerfase plaatst u de stellingen op een raster om uw standpunt te verfijnen. U sorteert en rangschikt de stellingen van 'meest eens' tot 'meest oneens' door elke stelling in het bijbehorende vakje te plaatsen. Er zijn geen juiste of foute antwoorden. Het beste antwoord is het antwoord dat uw mening of overtuigingen weerspiegelt."
             },
             "post": {
-                "title": "Waarom",
+                "title": "Waarom deze keuzes",
                 "description": "Voordat de sessie eindigt, worden u een paar verduidelijkende vragen gesteld om ons uw meest significante keuzes beter te helpen begrijpen, evenals een paar vragen over uw achtergrond."
             }
         }
@@ -204,7 +201,7 @@
         "default_text": "1. Aard van het onderzoek en begrip van de deelnemer. U begrijpt dat deze oefening gebruik maakt van Q-methodologie, een onderzoekstechniek die ontworpen is om subjectieve standpunten te modelleren. De taak vereist dat u stellingen sorteert op hun betekenis ten opzichte van uw persoonlijk perspectief; bijgevolg bestaan er geen objectief \"juiste\" of \"foute\" antwoorden.\n\n2. Gegevensverwerking en pseudonimisering (GDPR-naleving).\n\nDe-identificatie en bewaring: dit technisch proces garandeert dat uw digitale voetafdruk niet kan worden gebruikt om u te heridentificeren nadat de sessie is beëindigd.\n\nUitzondering voor opvolging: als u vrijwillig uw contactgegevens aan het einde van het onderzoek verstrekt voor een vervolgcontact, wordt de koppeling tussen uw identiteit (e-mail) en uw antwoord strikt gehandhaafd gedurende de looptijd van die specifieke opvolgingsfase.\n\nRapportage: de eindresultaten worden gepresenteerd in een geanonimiseerd formaat. Gegevens worden geaggregeerd om gedeelde sociale perspectieven (factoren) te onthullen. Kwalitatieve opmerkingen kunnen worden geciteerd om deze factoren te contextualiseren, maar worden gescreend om identificerende details te verwijderen.\n\n3. Vrijwillige deelname en recht op terugtrekking. U behoudt het recht om het sorteerproces te staken en uw browser op elk moment vóór indiening te sluiten zonder gevolgen.\n\nVóór indiening: als u zich terugtrekt voordat u uw sortering heeft afgerond, worden er geen gedeeltelijke gegevens bewaard.\n\nNa indiening: vanwege de statistische aard van Q-methodologie (factoranalyse) is individuele terugtrekking mogelijk niet haalbaar zodra uw gegevens zijn ingediend en geaggregeerd in de dataset.\n\n4. Gegevensbewaring en rechten"
     },
     "presort": {
-        "title": "Voordat we beginnen",
+        "title": "Kennismaking",
         "description": "Beantwoord enkele vragen om ons te helpen uw standpunt te situeren.",
         "submit": "Doorgaan naar de sortering",
         "select_placeholder": "Selecteer...",
@@ -219,7 +216,7 @@
             "close": "Tip sluiten"
         },
         "complete": {
-            "title": "Eerste stap voltooid",
+            "title": "Eerste indrukken vastgelegd",
             "subtitle": "We verfijnen nu de nuances.",
             "button": "Doorgaan naar fijne sortering"
         },
@@ -287,7 +284,7 @@
         }
     },
     "post": {
-        "title": "Uw perspectief & feedback",
+        "title": "Waarom deze keuzes",
         "description": "U bent bijna klaar! Uw opmerkingen over de meest significante stellingen zijn cruciaal voor onze analyse.",
         "step2_title": "Bijna klaar!",
         "step2_description": "Beantwoord deze laatste vragen om het onderzoek te voltooien.",
@@ -295,7 +292,8 @@
             "title": "Belangrijkste keuzes",
             "why": "Waarom heeft u ervoor gekozen deze stelling hier te plaatsen? Wat betekent ze voor u?",
             "placeholder": "Bijv. een specifieke gebeurtenis, een sterke overtuiging, of een bepaald woord in de stelling...",
-            "min_chars": "Een paar woorden volstaan om ons de context te helpen begrijpen.",
+            "min_chars": "Licht uw keuze toe voordat u verdergaat.",
+            "hint": "Een paar woorden volstaan om ons de context te helpen begrijpen.",
             "label_agree": "Sterkste overeenstemming",
             "label_disagree": "Sterkste onenigheid",
             "label_neutral": "Neutraal",

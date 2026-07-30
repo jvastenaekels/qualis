@@ -42,6 +42,7 @@ const mockConfig = {
     },
     ui_labels: {
         'welcome.start': 'Start Study',
+        'welcome.consent.submit': 'Start Study',
     },
 };
 
@@ -72,6 +73,22 @@ describe('ConsentPage', () => {
         // It might be used elsewhere if we change the H1, but currently H1 is hardcoded/localized.
         // So we expect the generic localized label instead:
         expect(screen.getByText('welcome.consent.label')).toBeInTheDocument();
+    });
+
+    it('does not label the consent action with the welcome screen CTA', () => {
+        // The two screens are consecutive, so sharing `welcome.start` put the
+        // same words on both — and made a researcher's welcome-CTA override
+        // silently rename the consent button too.
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            ui_labels: { 'welcome.start': 'Start Study' },
+        } as unknown as import('../schemas/study').StudyConfig);
+
+        renderWithProviders(<ConsentPage />);
+
+        expect(screen.getByTestId('consent-accept-btn')).toHaveTextContent(
+            'welcome.consent.submit'
+        );
     });
 
     it('validates consent checkbox', async () => {

@@ -2,6 +2,7 @@ import type React from 'react';
 import type { UseFormRegister } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { PreSortField } from '../../schemas/study';
+import { NativeSelect } from '../ui/native-select';
 
 interface SurveyFieldProps {
     id: string;
@@ -31,35 +32,55 @@ const RatingField: React.FC<RatingFieldProps> = ({ id, fieldConfig, register, lo
     const hasLabels = !!(leftLabel || rightLabel || middleLabel);
     return (
         <div className="mt-2">
-            <div
-                role="radiogroup"
-                aria-labelledby={`${id}-label`}
-                className="flex flex-wrap items-center gap-2 sm:gap-3"
-            >
-                {Array.from({ length: points }, (_, i) => i + 1).map((n) => (
-                    <label
-                        key={n}
-                        className="flex flex-col items-center gap-1 cursor-pointer p-2 rounded-md hover:bg-gray-50 active:bg-gray-100 min-w-[44px]"
-                    >
-                        <input
-                            type="radio"
-                            {...register(id)}
-                            value={String(n)}
-                            // biome-ignore lint/suspicious/noExplicitAny: style override
-                            style={{ accentColor: 'var(--brand-accent)' } as any}
-                            className="h-5 w-5"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">{n}</span>
-                    </label>
-                ))}
-            </div>
-            {hasLabels && (
-                <div className="flex justify-between items-start mt-1 text-xs text-gray-500 gap-2">
-                    <span className="text-left">{leftLabel}</span>
-                    {middleLabel && <span className="text-center flex-1">{middleLabel}</span>}
-                    <span className="text-right">{rightLabel}</span>
+            {/*
+             * The anchors and the scale are bound to one width.
+             *
+             * The radiogroup is a `flex flex-wrap` only as wide as its
+             * content, but the anchor row under it was a `justify-between`
+             * spanning the whole card: at 1440 the radios ran x=427→671 and
+             * the anchors x=415→1025, putting "Very familiar" 354 px to the
+             * right of option 5, the option it qualifies.
+             *
+             * `w-fit` needs no breakpoint to survive the wrap case: once the
+             * scale's max-content exceeds the space available, fit-content
+             * resolves to that available width and the row behaves exactly as
+             * it does today on a phone.
+             */}
+            <div className="flex flex-col w-fit max-w-full">
+                <div
+                    role="radiogroup"
+                    aria-labelledby={`${id}-label`}
+                    aria-required={fieldConfig.required || undefined}
+                    className="flex flex-wrap items-center gap-2 sm:gap-3"
+                >
+                    {Array.from({ length: points }, (_, i) => i + 1).map((n) => (
+                        <label
+                            key={n}
+                            className="flex flex-col items-center gap-1 cursor-pointer p-2 rounded-md hover:bg-gray-50 active:bg-gray-100 min-w-[44px]"
+                        >
+                            <input
+                                type="radio"
+                                {...register(id)}
+                                value={String(n)}
+                                // biome-ignore lint/suspicious/noExplicitAny: style override
+                                style={{ accentColor: 'var(--brand-accent)' } as any}
+                                className="h-5 w-5"
+                            />
+                            <span className="text-sm font-semibold text-gray-700">{n}</span>
+                        </label>
+                    ))}
                 </div>
-            )}
+                {hasLabels && (
+                    <div
+                        data-testid={`${id}-scale-anchors`}
+                        className="flex justify-between items-start mt-1 text-xs text-gray-500 gap-2"
+                    >
+                        <span className="text-left">{leftLabel}</span>
+                        {middleLabel && <span className="text-center flex-1">{middleLabel}</span>}
+                        <span className="text-right">{rightLabel}</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
@@ -75,10 +96,18 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
         return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
     };
 
+    // `bg-white` is not redundant: <input> and <textarea> are white by UA
+    // default, <select> is grey, and that asymmetry is exactly how the pre-sort
+    // ended up with one grey field in a form of white ones. Stating it here
+    // means the next field type added does not repeat it.
     const commonClasses =
-        'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
+        'mt-1 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
 
     const placeholderText = t('common.placeholders.text_response');
+
+    // The visible asterisk is `aria-hidden` in PreSortPage — it would otherwise land
+    // inside the field's accessible name — so the requirement has to be conveyed here.
+    const requiredAria = { 'aria-required': fieldConfig.required || undefined };
 
     switch (fieldConfig.type) {
         case 'number':
@@ -87,6 +116,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="number"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     min={fieldConfig.min}
@@ -99,18 +129,28 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="email"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                 />
             );
         case 'date':
-            return <input id={id} type="date" {...register(id)} className={commonClasses} />;
+            return (
+                <input
+                    id={id}
+                    type="date"
+                    {...register(id)}
+                    {...requiredAria}
+                    className={commonClasses}
+                />
+            );
         case 'text_audio':
         case 'textarea':
             return (
                 <textarea
                     id={id}
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     rows={fieldConfig.rows || 4}
@@ -122,7 +162,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 return null;
             }
             return (
-                <select id={id} {...register(id)} className={commonClasses}>
+                <NativeSelect id={id} {...register(id)} {...requiredAria} className={commonClasses}>
                     <option value="">{t('presort.select_placeholder', 'Select...')}</option>
                     {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -134,7 +174,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                             </option>
                         );
                     })}
-                </select>
+                </NativeSelect>
             );
         case 'radio':
             if (!Array.isArray(fieldConfig.options)) {
@@ -209,6 +249,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                     id={id}
                     type="text"
                     {...register(id)}
+                    {...requiredAria}
                     className={commonClasses}
                     placeholder={placeholderText}
                     minLength={fieldConfig.minLength}

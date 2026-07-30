@@ -118,13 +118,29 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
                     return (
                         <div key={key}>
+                            {/*
+                             * The `id` is not decorative: `SurveyField` points the
+                             * rating field's radiogroup at `${key}-label` via
+                             * `aria-labelledby`, and until this existed that reference
+                             * dangled — the group had no accessible name at all, and
+                             * `htmlFor` alone could not give it one, because
+                             * `RatingField` renders no element with `id={key}` for the
+                             * label to attach to.
+                             *
+                             * The asterisk is `aria-hidden` so the name is the question
+                             * and not "…bioeconomy? star"; `SurveyField` carries the
+                             * requirement as `aria-required` instead.
+                             */}
                             <label
+                                id={`${key}-label`}
                                 htmlFor={key}
                                 className="block text-sm font-medium text-gray-700"
                             >
                                 {getLocalizedText(fieldConfig.label, i18n.language)}
                                 {fieldConfig.required && (
-                                    <span className="text-red-500 ml-1">*</span>
+                                    <span className="text-red-500 ml-1" aria-hidden="true">
+                                        *
+                                    </span>
                                 )}
                             </label>
                             <SurveyField

@@ -120,11 +120,7 @@
         "loading_content": "Ładowanie treści badania...",
         "change_lang_title": "Zmień język",
         "steps": {
-            "welcome": "Powitanie",
-            "consent": "Prywatność i zgoda",
-            "rough": "Pierwsze wrażenia",
-            "fine": "Sortowanie Q",
-            "post": "Pytania końcowe"
+            "welcome": "Powitanie"
         },
         "mobile_step": "Krok",
         "navigation": "Nawigacja",
@@ -158,17 +154,18 @@
             }
         },
         "steps": {
-            "presort": "Ankieta wstępna",
-            "rough": "Sortowanie wstępne",
-            "fine": "Umiejscowienie na siatce",
-            "post": "Etap po sortowaniu"
+            "presort": "Poznajmy się",
+            "rough": "Pierwsze wrażenia",
+            "fine": "Twoja perspektywa",
+            "post": "Dlaczego te wybory"
         }
     },
     "welcome": {
         "start": "Rozpocznij",
         "consent": {
             "label": "Potwierdzam, że zapoznałem/am się z powyższymi informacjami i wyrażam zgodę na przetwarzanie moich danych na potrzeby tego badania.",
-            "error": "Proszę zaakceptować warunki, aby kontynuować."
+            "error": "Proszę zaakceptować warunki, aby kontynuować.",
+            "submit": "Zgadzam się — rozpocznij badanie"
         },
         "reset_confirm": "Czy na pewno chcesz rozpocząć nową sesję? Spowoduje to usunięcie bieżącego postępu.",
         "restart": "Rozpocznij nową sesję",
@@ -192,7 +189,7 @@
                 "description": "Na etapie sortowania proszę umieścić stwierdzenia na siatce, aby doprecyzować swój punkt widzenia. Proszę posortować i uszeregować stwierdzenia od „najbardziej zgadzam się” do „najbardziej nie zgadzam się”, umieszczając każde stwierdzenie w odpowiednim polu. Nie ma odpowiedzi prawidłowych ani błędnych. Najlepsza odpowiedź to ta, która odzwierciedla opinię lub przekonania uczestnika."
             },
             "post": {
-                "title": "Dlaczego",
+                "title": "Dlaczego te wybory",
                 "description": "Przed zakończeniem sesji zostanie zadanych kilka pytań wyjaśniających, które pomogą nam lepiej zrozumieć najbardziej znaczące wybory, a także kilka pytań dotyczących Pana/Pani tła."
             }
         }
@@ -204,7 +201,7 @@
         "default_text": "1. Charakter badania i zrozumienie uczestnika. Rozumie Pan/Pani, że ćwiczenie to wykorzystuje metodologię Q — technikę badawczą zaprojektowaną do modelowania subiektywnych punktów widzenia. Zadanie polega na sortowaniu stwierdzeń według ich znaczenia względem osobistej perspektywy uczestnika; w związku z tym nie istnieją obiektywnie „prawidłowe” ani „błędne” odpowiedzi.\n\n2. Przetwarzanie danych i pseudonimizacja (zgodność z RODO).\n\nDe-identyfikacja i okres przechowywania: Ten techniczny proces zapewnia, że cyfrowy ślad uczestnika nie może zostać użyty do jego ponownej identyfikacji po zakończeniu sesji.\n\nWyjątek dotyczący badania uzupełniającego: jeśli uczestnik dobrowolnie poda dane kontaktowe na końcu badania w celu kontaktu uzupełniającego, powiązanie między tożsamością (e-mail) a odpowiedzią będzie utrzymywane wyłącznie przez czas trwania tej konkretnej fazy uzupełniającej.\n\nRaportowanie: ostateczne wyniki zostaną przedstawione w formie zanonimizowanej. Dane zostaną zagregowane w celu ujawnienia wspólnych perspektyw społecznych (czynników). Komentarze jakościowe mogą być cytowane w celu kontekstualizacji tych czynników, ale zostaną sprawdzone pod kątem usunięcia ujawniających szczegółów.\n\n3. Dobrowolne uczestnictwo i prawo do wycofania się. Uczestnik zachowuje prawo do przerwania procesu sortowania i zamknięcia przeglądarki w dowolnym momencie przed przesłaniem danych bez żadnych konsekwencji.\n\nPrzed przesłaniem: jeśli uczestnik wycofa się przed sfinalizowaniem sortowania, żadne częściowe dane nie zostaną zachowane.\n\nPo przesłaniu: ze względu na statystyczny charakter metodologii Q (analiza czynnikowa), po przesłaniu i zagregowaniu danych w zbiorze danych indywidualne wycofanie może nie być możliwe.\n\n4. Przechowywanie danych i prawa"
     },
     "presort": {
-        "title": "Zanim zaczniemy",
+        "title": "Poznajmy się",
         "description": "Proszę odpowiedzieć na kilka pytań, które pomogą nam zlokalizować Pana/Pani punkt widzenia.",
         "submit": "Przejdź do sortowania",
         "select_placeholder": "Wybierz...",
@@ -219,7 +216,7 @@
             "close": "Zamknij wskazówkę"
         },
         "complete": {
-            "title": "Pierwszy krok ukończony",
+            "title": "Pierwsze wrażenia zapisane",
             "subtitle": "Teraz doprecyzujemy niuanse.",
             "button": "Przejdź do sortowania szczegółowego"
         },
@@ -287,7 +284,7 @@
         }
     },
     "post": {
-        "title": "Twoja perspektywa i opinia",
+        "title": "Dlaczego te wybory",
         "description": "Prawie gotowe! Komentarze dotyczące najbardziej znaczących stwierdzeń są kluczowe dla naszej analizy.",
         "step2_title": "Prawie gotowe!",
         "step2_description": "Proszę odpowiedzieć na te ostatnie pytania, aby ukończyć badanie.",
@@ -295,7 +292,8 @@
             "title": "Kluczowe wybory",
             "why": "Dlaczego zdecydował/a się Pan/Pani umieścić to stwierdzenie w tym miejscu? Jakie ma ono dla Pana/Pani znaczenie?",
             "placeholder": "Np. konkretne zdarzenie, mocne przekonanie lub szczególne słowo w stwierdzeniu...",
-            "min_chars": "Kilka słów wystarczy, aby pomóc nam zrozumieć kontekst.",
+            "min_chars": "Prosimy o wyjaśnienie wyboru przed przejściem dalej.",
+            "hint": "Kilka słów wystarczy, aby pomóc nam zrozumieć kontekst.",
             "label_agree": "Najsilniejsza zgoda",
             "label_disagree": "Najsilniejszy sprzeciw",
             "label_neutral": "Neutralnie",

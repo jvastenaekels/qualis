@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '../fixtures/db-setup';
 import { gridConfig23, testDataBuilders } from '../fixtures/test-data';
-import { expectNoA11yViolations } from './rules';
+import { expectNoA11yViolations, waitForAnimationsToSettle } from './rules';
 
 /**
  * E2E: admin accessibility smoke (task 6.7e)
@@ -55,57 +55,13 @@ const MOBILE_VIEWPORT = { width: 375, height: 800 };
 /**
  * Every one of these pages wraps its content in Tailwind's `animate-in fade-in`
  * (`tailwindcss-animate`), typically `duration-500`/`duration-700`, sometimes nested
- * (a card inside the page's own fade-in animating a second time on top). Playwright's
- * `toBeVisible()` does not wait out a CSS transition — an element mid-fade already has
- * a bounding box and non-zero opacity, so it satisfies "visible" well before the
- * animation settles. axe's `color-contrast`, in contrast, reads the *actual* computed
- * opacity at scan time, so scanning mid-fade measures a foreground blended toward the
- * background and reports a spuriously low ratio for a color that is fine once settled
- * — confirmed by reproducing it: the same route audited with a generous fixed wait
- * instead of `waitReady()` alone comes back clean. `public-pages.spec.ts` already hits
- * this on the login page's fade-in and waits it out with a single
- * `toHaveCSS('opacity', '1')` on the one container that animates there; the admin
- * pages routinely animate several independent elements (the page shell, individual
- * `GuidanceCard`s, dashboard cards), so this waits out every `.animate-in` element
- * still short of full opacity instead of hardcoding one selector per route.
- */
-async function waitForAnimationsToSettle(page: Page) {
-    type SettleState = { __a11yLastAnimateInCount?: number; __a11yStableTicks?: number };
-
-    // Reset the stability counters below before each call — this helper runs twice
-    // per test (once at desktop, once after the mobile resize) and each pass needs
-    // its own count, not one carried over from the previous viewport.
-    await page.evaluate(() => {
-        const state = window as unknown as SettleState;
-        state.__a11yLastAnimateInCount = -1;
-        state.__a11yStableTicks = 0;
-    });
-
-    await page.waitForFunction(() => {
-        const state = window as unknown as SettleState;
-        const animating = document.querySelectorAll('.animate-in');
-        const allSettled = Array.from(animating).every(
-            (el) => getComputedStyle(el).opacity === '1'
-        );
-
-        // `Array.every` on an empty NodeList returns `true` — a poll landing before
-        // any `.animate-in` element has mounted would otherwise resolve immediately
-        // and wait for nothing (the investigation named this hazard explicitly:
-        // `.animate-in` count was 0 at scan time on 4 of 7 routes it measured).
-        // Require the element count to be unchanged across two consecutive polls
-        // before trusting an empty-or-settled result: that rules out "polled before
-        // mount" while still resolving normally on routes that never render an
-        // `.animate-in` element at all (the count stabilises at 0 there too).
-        const count = animating.length;
-        state.__a11yStableTicks =
-            count === state.__a11yLastAnimateInCount ? (state.__a11yStableTicks ?? 0) + 1 : 0;
-        state.__a11yLastAnimateInCount = count;
-
-        return allSettled && state.__a11yStableTicks >= 2;
-    });
-}
-
-/**
+ * (a card inside the page's own fade-in animating a second time on top), so every
+ * scan waits the fades out first — see `waitForAnimationsToSettle` in `./rules`,
+ * which the participant spec shares. Confirmed by reproducing it: the same route
+ * audited with a generous fixed wait instead of `waitReady()` alone comes back clean.
+ *
+ * ---
+ *
  * Runs the smoke rule set at the project's default desktop viewport, then again at
  * 375px. `waitReady` is re-run after the resize (rather than a fixed sleep) because
  * the defect this spec exists to catch — a name that only exists above `sm` — only

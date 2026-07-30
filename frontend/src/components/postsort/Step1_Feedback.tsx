@@ -3,8 +3,9 @@ import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { NativeSelect } from '@/components/ui/native-select';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowRight, Info } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
@@ -297,7 +298,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-800">
-                        {t('post.extreme.title', 'Key Choices')}
+                        {t('post.extreme.title', 'Key choices')}
                     </h2>
                     <span className="text-sm text-slate-500 font-medium">
                         {extremeCards.length} {t('common.cards')}
@@ -371,6 +372,21 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     )}
                                 </Label>
 
+                                {/*
+                                    The reassurance belongs here — before the
+                                    participant writes anything — not in red after
+                                    they fail. It used to be the validation message
+                                    itself, which meant an empty field was answered
+                                    with "a few words are enough": encouragement in
+                                    the position where an error belongs.
+                                */}
+                                <p className="-mt-1 text-sm text-slate-500">
+                                    {t(
+                                        'post.extreme.hint',
+                                        'A few words are enough to help us understand the context.'
+                                    )}
+                                </p>
+
                                 <div className="space-y-4">
                                     <Textarea
                                         id={`comment-${card.statementId}`}
@@ -413,8 +429,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                 </div>
 
                                 {!isValid && isTouched && (
-                                    <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
-                                        <AlertCircle size={16} />
+                                    <div
+                                        role="alert"
+                                        className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1"
+                                    >
+                                        <AlertCircle size={16} aria-hidden="true" />
                                         <span>
                                             {isAudioEffectivelyEnabled
                                                 ? t(
@@ -423,7 +442,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                                   )
                                                 : t(
                                                       'post.extreme.min_chars',
-                                                      'A few words are enough to help us understand the context.'
+                                                      'Please explain your choice before continuing.'
                                                   )}
                                         </span>
                                     </div>
@@ -456,8 +475,17 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                     </div>
 
                     <div className="w-full">
-                        <select
-                            className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 bg-white truncate pr-10"
+                        {/*
+                         * A disabled placeholder <option> is not an accessible name:
+                         * a screen reader announced this as "combo box", with no
+                         * indication of what picking from it would do.
+                         */}
+                        <NativeSelect
+                            aria-label={t(
+                                'post.optional.select_placeholder',
+                                'Select a statement to comment...'
+                            )}
+                            className="truncate pr-10"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);
@@ -503,7 +531,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         </option>
                                     );
                                 })}
-                        </select>
+                        </NativeSelect>
                     </div>
 
                     <div className="space-y-4">
@@ -652,14 +680,36 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             )}
 
             {/* NAVIGATION ACTIONS */}
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pb-4 z-10">
-                <Button variant="outline" onClick={() => navigate('../fine-sort')}>
-                    ← {t('post.back', 'Back to sort')}
+            {/*
+             * An opaque surface, not a white gradient. The gradient's upper
+             * band was transparent, so the next textarea (y=817-917, against a
+             * bar at y=816-900) showed through it: a participant typing into
+             * that field read their own text through the button bar. The
+             * gradient was also *white* over tinted extreme cards, washing out
+             * the bottom of the green one and half of its badge.
+             *
+             * No `backdrop-blur`, despite that being the house style for the
+             * grid toolbar: a blurred ancestor makes axe report every
+             * descendant's contrast as `incomplete` rather than measuring it,
+             * and these two buttons would stop being covered by the pass
+             * Phase 2 added.
+             */}
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-6px_rgba(15,23,42,0.15)] pb-4 z-10">
+                <Button variant="outline" size="pill" onClick={() => navigate('../fine-sort')}>
+                    {/* The sibling button's arrow is a lucide SVG; a literal
+                        U+2190 next to it is a different weight, size and
+                        baseline. Using the icon set also keeps the direction
+                        out of the text node, where a future RTL locale would
+                        have had to flip it by hand. */}
+                    <ArrowLeft size={18} className="mr-2" />
+                    {t('post.back', 'Back to sort')}
                 </Button>
                 <Button
+                    variant="brand"
+                    size="pill"
                     onClick={handleNext}
                     disabled={isUploadInProgress}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px] shadow-md shadow-indigo-200"
+                    className="min-w-[140px]"
                     data-testid="postsort-step1-next-btn"
                 >
                     {isUploadInProgress

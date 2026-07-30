@@ -380,7 +380,7 @@ const StudyLayoutContent: React.FC = () => {
             {/* Header */}
             <header
                 data-testid="layout-header"
-                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
+                className="px-3 sm:px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
             >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
@@ -389,8 +389,13 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
                 )}
 
-                {/* Mobile Progress Bar (Top Edge) */}
-                <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
+                {/*
+                 * Compact progress (top edge), paired with the step pill below.
+                 * `lg:hidden` and not `md:hidden`: the pill now serves the
+                 * tablet too, and a progress indicator that vanished at 768
+                 * while its counterpart stayed would be the odd one out.
+                 */}
+                <div className="lg:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
                         className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
                         style={{
@@ -399,9 +404,29 @@ const StudyLayoutContent: React.FC = () => {
                     />
                 </div>
 
-                {/* LEFT: Branding / Context */}
-                <div className="flex items-center gap-3 min-w-0 shrink-0 z-10">
-                    <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-[160px] lg:max-w-md">
+                {/*
+                 * LEFT: Branding / Context
+                 *
+                 * `min-w-0` and not `shrink-0`. Both clusters used to be `shrink-0`, so
+                 * neither yielded and the row simply overflowed — and because
+                 * `index.css` puts `overflow-x-hidden` on the body, the excess was
+                 * clipped rather than scrollable. The result was that the language
+                 * switcher sat at `right: 455` in a 390px viewport: present in the DOM,
+                 * focusable by keyboard, invisible and untappable. Measured off-screen
+                 * at every width up to and including 430px — every phone in common use.
+                 *
+                 * The right cluster is the one that must not compress: three 44px
+                 * targets are already at the minimum. So the title yields instead —
+                 * `min-w-0` lets it shrink below its content width and `truncate`
+                 * absorbs the difference.
+                 *
+                 * `min-w-0` and NOT `flex-1`. `flex-1` also makes the title *grow*
+                 * into any spare space, which shoves the step pill away from the
+                 * study name and into the middle of the header when the title is
+                 * short. Shrinking is wanted here; growing is not.
+                 */}
+                <div className="flex items-center gap-3 min-w-0 z-10">
+                    <div className="font-semibold text-slate-800 text-lg truncate min-w-0 md:max-w-[160px] lg:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* Show Main Logo if available */}
                         {branding?.logo_url && (
@@ -444,8 +469,18 @@ const StudyLayoutContent: React.FC = () => {
                             ))}
                     </div>
 
-                    {/* Mobile Step Counter & Menu */}
-                    <div className="md:hidden relative" ref={stepMenuRef}>
+                    {/*
+                     * Step counter & menu — up to `lg`, not just up to `md`.
+                     *
+                     * Between 768 and 1023 the full stepper showed one label
+                     * and four anonymous circles, the last of them a bare dot
+                     * with a connector running to it: the participant could
+                     * see they were somewhere in five steps but not what came
+                     * next, and the row read as unfinished rather than
+                     * deliberate. This pill answers both — "Step 4/5" plus,
+                     * on tap, every step by name — and it already existed.
+                     */}
+                    <div className="lg:hidden relative shrink-0" ref={stepMenuRef}>
                         <button
                             type="button"
                             onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
@@ -455,7 +490,7 @@ const StudyLayoutContent: React.FC = () => {
                             }}
                             className={`
                                 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5
-                                ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
+                                ${!isStepMenuOpen ? 'text-slate-600 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
                             {t('layout.mobile_step')} {currentVisibleIndex + 1}/
@@ -469,7 +504,7 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Mobile Step Selection Menu */}
                         {isStepMenuOpen && (
                             <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-[60] py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
-                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-400">
+                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-600">
                                     {t('layout.navigation')}
                                 </div>
                                 {visibleSteps.map((step, index) => {
@@ -521,8 +556,8 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
                 </div>
 
-                {/* CENTER: Stepper (Desktop Only) */}
-                <div className="hidden md:flex flex-1 justify-center items-center min-w-0 mx-4">
+                {/* CENTER: Stepper — from `lg`, where every label has room. */}
+                <div className="hidden lg:flex flex-1 justify-center items-center min-w-0 mx-4">
                     <div
                         data-testid="stepper-container"
                         className="flex items-center gap-1 lg:gap-2 min-w-0"

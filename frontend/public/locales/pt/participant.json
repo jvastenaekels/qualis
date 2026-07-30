@@ -120,11 +120,7 @@
         "loading_content": "A carregar o conteúdo do estudo...",
         "change_lang_title": "Alterar idioma",
         "steps": {
-            "welcome": "Boas-vindas",
-            "consent": "Privacidade e consentimento",
-            "rough": "Primeiras impressões",
-            "fine": "Classificação Q",
-            "post": "Perguntas finais"
+            "welcome": "Boas-vindas"
         },
         "mobile_step": "Passo",
         "navigation": "Navegação",
@@ -158,17 +154,18 @@
             }
         },
         "steps": {
-            "presort": "Questionário de pré-classificação",
-            "rough": "Classificação preliminar",
-            "fine": "Colocação na grelha",
-            "post": "Fase de pós-classificação"
+            "presort": "Vamo-nos conhecer",
+            "rough": "Primeiras impressões",
+            "fine": "A sua perspetiva",
+            "post": "Porquê estas escolhas"
         }
     },
     "welcome": {
         "start": "Começar",
         "consent": {
             "label": "Confirmo que li as informações acima e consinto no tratamento dos meus dados para os fins deste estudo.",
-            "error": "Aceite os termos para continuar."
+            "error": "Aceite os termos para continuar.",
+            "submit": "Aceito — iniciar o estudo"
         },
         "reset_confirm": "Tem a certeza de que pretende iniciar uma nova sessão? O seu progresso atual será eliminado.",
         "restart": "Iniciar uma nova sessão",
@@ -192,7 +189,7 @@
                 "description": "Durante a fase de classificação, irá colocar as afirmações numa grelha para refinar o seu ponto de vista. Irá ordenar e classificar as afirmações de «mais concordo» a «mais discordo», colocando cada afirmação na caixa correspondente. Não há respostas certas ou erradas. A melhor resposta é aquela que reflete a sua opinião ou as suas convicções."
             },
             "post": {
-                "title": "Porquê",
+                "title": "Porquê estas escolhas",
                 "description": "Antes de a sessão terminar, ser-lhe-ão colocadas algumas perguntas esclarecedoras para nos ajudar a compreender melhor as suas escolhas mais significativas, bem como algumas perguntas sobre o seu percurso."
             }
         }
@@ -204,7 +201,7 @@
         "default_text": "1. Natureza do estudo e compreensão do participante. Compreende que este exercício emprega a metodologia Q, uma técnica de investigação concebida para modelar pontos de vista subjetivos. A tarefa requer que classifique as afirmações de acordo com a sua importância relativamente à sua perspetiva pessoal; consequentemente, não existem respostas objetivamente \"certas\" ou \"erradas\".\n\n2. Tratamento de dados e pseudonimização (conformidade com o RGPD).\n\nDes-identificação e conservação: este processo técnico garante que a sua pegada digital não possa ser utilizada para o reidentificar após o términus da sessão.\n\nExceção para acompanhamento: se fornecer voluntariamente os seus dados de contacto no final do estudo para um contacto de acompanhamento, a ligação entre a sua identidade (e-mail) e a sua resposta será mantida estritamente durante a duração dessa fase de acompanhamento específica.\n\nRelatório: os resultados finais serão apresentados num formato anonimizado. Os dados serão agregados para revelar perspetivas sociais partilhadas (fatores). Os comentários qualitativos poderão ser citados para contextualizar esses fatores, mas serão analisados para remover detalhes identificativos.\n\n3. Participação voluntária e direito de retirada. Mantém o direito de interromper o processo de classificação e fechar o seu browser em qualquer momento antes do envio, sem penalização.\n\nAntes do envio: se se retirar antes de finalizar a sua classificação, não serão conservados quaisquer dados parciais.\n\nApós o envio: devido à natureza estatística da metodologia Q (análise fatorial), uma vez que os seus dados tenham sido enviados e agregados no conjunto de dados, a retirada individual poderá não ser viável.\n\n4. Conservação de dados e direitos"
     },
     "presort": {
-        "title": "Antes de começarmos",
+        "title": "Vamo-nos conhecer",
         "description": "Por favor, responda a algumas perguntas para nos ajudar a situar o seu ponto de vista.",
         "submit": "Continuar para a classificação",
         "select_placeholder": "Selecionar...",
@@ -219,7 +216,7 @@
             "close": "Fechar dica"
         },
         "complete": {
-            "title": "Primeiro passo concluído",
+            "title": "Primeiras impressões registadas",
             "subtitle": "Vamos agora refinar as nuances.",
             "button": "Continuar para a classificação fina"
         },
@@ -287,7 +284,7 @@
         }
     },
     "post": {
-        "title": "A sua perspetiva e comentários",
+        "title": "Porquê estas escolhas",
         "description": "Está quase a terminar! Os seus comentários sobre as afirmações mais significativas são fundamentais para a nossa análise.",
         "step2_title": "Quase concluído!",
         "step2_description": "Por favor, responda a estas perguntas finais para completar o estudo.",
@@ -295,7 +292,8 @@
             "title": "Escolhas-chave",
             "why": "Por que escolheu colocar esta afirmação aqui? Qual é a sua importância para si?",
             "placeholder": "Ex.: um evento específico, uma convicção firme ou uma palavra concreta na afirmação...",
-            "min_chars": "Algumas palavras são suficientes para nos ajudar a compreender o contexto.",
+            "min_chars": "Explique a sua escolha antes de continuar.",
+            "hint": "Algumas palavras são suficientes para nos ajudar a compreender o contexto.",
             "label_agree": "Maior concordância",
             "label_disagree": "Maior discordância",
             "label_neutral": "Neutro",

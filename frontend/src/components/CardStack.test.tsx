@@ -12,7 +12,7 @@ import {
     screen,
 } from '../test-utils/test-utils';
 import { useMotionValue } from 'framer-motion';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useUIStore } from '../store/useUIStore';
 import CardStack from './CardStack';
 
@@ -76,6 +76,51 @@ describe('CardStack', () => {
         // In JSDOM, scrollHeight equals clientHeight (both 0), so overflow is never detected
         const readButton = screen.queryByLabelText('Read full statement');
         expect(readButton).toBeNull();
+    });
+
+    /**
+     * The overflow check used to run in a `useEffect` keyed on `statement.id` alone,
+     * so it fired once per card and never again. A participant who rotated their
+     * phone mid-sort was then reading a statement that had *become* truncated, with
+     * no ellipsis (the box clips on height before `-webkit-line-clamp` binds, so the
+     * clamp never draws one) and no reveal button — and ranked it on what they could
+     * see. Measured live: at 1100×900 a 132-character statement fits and shows no
+     * button; narrowing to 390×844 without changing card makes it overflow while the
+     * button stays absent.
+     *
+     * `height` is in the dependency list as well as `width`, and deliberately: the
+     * box is height-bound, so the on-screen keyboard opening or browser chrome
+     * collapsing on scroll changes truncation without changing width.
+     */
+    it('re-checks overflow when the viewport changes, not only when the card changes', async () => {
+        const overflow = { scroll: 100, client: 100 };
+        const scrollSpy = vi
+            .spyOn(HTMLElement.prototype, 'scrollHeight', 'get')
+            .mockImplementation(() => overflow.scroll);
+        const clientSpy = vi
+            .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+            .mockImplementation(() => overflow.client);
+
+        try {
+            const statement = { id: 1, text: 'A statement long enough to overflow when narrow.' };
+            render(<CardStackWrapper statement={statement} />);
+
+            expect(screen.queryByLabelText('Read full statement')).toBeNull();
+
+            // Same card, narrower viewport — the text now overflows its box.
+            overflow.scroll = 400;
+            await act(async () => {
+                window.innerWidth = 390;
+                window.innerHeight = 844;
+                window.dispatchEvent(new Event('resize'));
+                await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+            });
+
+            expect(screen.getByLabelText('Read full statement')).toBeTruthy();
+        } finally {
+            scrollSpy.mockRestore();
+            clientSpy.mockRestore();
+        }
     });
 
     it('updates hoveredCard in store when read button is clicked', async () => {

@@ -49,6 +49,13 @@ export default {
                     'Helvetica Neue',
                     'Arial',
                     'sans-serif',
+                    // Study content is author-supplied: a researcher who writes
+                    // an emoji into a statement should not get tofu. The stack
+                    // above ends at a text-only face, so an emoji codepoint had
+                    // no glyph to fall back to and rendered as a box.
+                    'Apple Color Emoji',
+                    'Segoe UI Emoji',
+                    'Noto Color Emoji',
                 ],
             },
             colors: {

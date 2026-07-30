@@ -36,7 +36,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         {
             "id": "post",
             "icon": "MessageSquare",
-            "title": "Why",
+            "title": "Why these choices",
             "description": "A few words to explain your most significant choices.",
             "color": "#10b981",
         },
@@ -66,7 +66,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         {
             "id": "post",
             "icon": "MessageSquare",
-            "title": "Pourquoi",
+            "title": "Pourquoi ces choix",
             "description": "Quelques mots pour expliquer vos choix les plus significatifs.",
             "color": "#10b981",
         },
@@ -96,7 +96,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         {
             "id": "post",
             "icon": "MessageSquare",
-            "title": "Miksi",
+            "title": "Miksi nämä valinnat",
             "description": "Muutama sana perustellaksesi merkittävimmät valintasi.",
             "color": "#10b981",
         },

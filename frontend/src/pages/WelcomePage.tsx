@@ -133,7 +133,23 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     )}
                 </div>
 
-                <p className="text-base sm:text-xl text-gray-800 leading-relaxed font-medium">
+                {/*
+                 * Body copy, not display text. The title and subtitle above are
+                 * display and stay centred; this paragraph is the first thing a
+                 * participant actually reads, and it ran nine centred lines at
+                 * 768 px and eleven at 390 px. Centred setting gives both edges a
+                 * ragged return, which is what makes a long paragraph hard to
+                 * re-enter after each break.
+                 *
+                 * The block stays centred in the column (`mx-auto`) while its
+                 * text is left-aligned, so a one-sentence description does not
+                 * look orphaned against a wide layout — and the measure cap keeps
+                 * the line length readable regardless of what the researcher wrote.
+                 */}
+                <p
+                    data-testid="welcome-description"
+                    className="text-base sm:text-lg text-gray-800 leading-relaxed font-normal text-left max-w-[62ch] mx-auto"
+                >
                     {config.description}
                 </p>
 
@@ -241,11 +257,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                             />
                                         </div>
                                         <div className="pt-0.5">
+                                            {/*
+                                             * `black 20%` left two of the four default
+                                             * step colours under AA on this panel:
+                                             * amber #f59e0b at 3.09:1 and emerald
+                                             * #10b981 at 3.59:1, against the panel's
+                                             * near-white #f4f7fe. `text-lg` is 18.15px
+                                             * rendered — just under the 18.66px large-
+                                             * text threshold — so the floor is 4.5, not
+                                             * 3. Measured across all four at each step
+                                             * of the ramp, 40% is the first shared value
+                                             * that clears it: 7.56 / 5.05 / 8.36 / 5.77.
+                                             * 35% gets amber only to 4.43.
+                                             */}
                                             <h3
                                                 className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
                                                 style={{
                                                     color: step.color
-                                                        ? `color-mix(in srgb, ${step.color}, black 20%)`
+                                                        ? `color-mix(in srgb, ${step.color}, black 40%)`
                                                         : undefined,
                                                 }}
                                             >

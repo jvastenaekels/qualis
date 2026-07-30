@@ -45,6 +45,20 @@ describe('WelcomePage', () => {
         expect(screen.getByText('Test Objective')).toBeInTheDocument();
     });
 
+    /**
+     * The title and subtitle are display text and stay centred; the description
+     * is body copy. It inherits `text-center` from the block around it, so the
+     * override has to be stated on the paragraph and is easy to lose in a later
+     * edit of that class string.
+     */
+    it('sets the description as left-aligned body copy, not centred display text', () => {
+        renderWithProviders(<WelcomePage />);
+        const description = screen.getByTestId('welcome-description');
+        expect(description.className).toContain('text-left');
+        expect(description.className).toContain('max-w-[62ch]');
+        expect(description.className).not.toContain('font-medium');
+    });
+
     it('renders instructions markdown', () => {
         renderWithProviders(<WelcomePage />);
         // Label

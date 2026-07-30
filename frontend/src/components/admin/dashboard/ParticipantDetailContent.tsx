@@ -596,12 +596,12 @@ export function ParticipantDetailContent({
                                                 } else if (key === 'missing_statement') {
                                                     label = t(
                                                         'post.extreme.missing_statement',
-                                                        'Missing Statement'
+                                                        'Missing statement'
                                                     );
                                                 } else if (key === 'general_comment') {
                                                     label = t(
                                                         'post.extreme.general_comment',
-                                                        'General Comment'
+                                                        'General comment'
                                                     );
                                                 } else {
                                                     // Custom post-sort question (text_audio type),
