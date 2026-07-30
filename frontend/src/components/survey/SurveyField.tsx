@@ -2,6 +2,7 @@ import type React from 'react';
 import type { UseFormRegister } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { PreSortField } from '../../schemas/study';
+import { NativeSelect } from '../ui/native-select';
 
 interface SurveyFieldProps {
     id: string;
@@ -76,8 +77,12 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
         return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
     };
 
+    // `bg-white` is not redundant: <input> and <textarea> are white by UA
+    // default, <select> is grey, and that asymmetry is exactly how the pre-sort
+    // ended up with one grey field in a form of white ones. Stating it here
+    // means the next field type added does not repeat it.
     const commonClasses =
-        'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
+        'mt-1 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
 
     const placeholderText = t('common.placeholders.text_response');
 
@@ -138,7 +143,12 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                 return null;
             }
             return (
-                <select id={id} {...register(id)} {...requiredAria} className={commonClasses}>
+                <NativeSelect
+                    id={id}
+                    {...register(id)}
+                    {...requiredAria}
+                    className={commonClasses}
+                >
                     <option value="">{t('presort.select_placeholder', 'Select...')}</option>
                     {fieldConfig.options.map((opt) => {
                         const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -150,7 +160,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
                             </option>
                         );
                     })}
-                </select>
+                </NativeSelect>
             );
         case 'radio':
             if (!Array.isArray(fieldConfig.options)) {

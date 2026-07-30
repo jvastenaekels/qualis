@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { NativeSelect } from '@/components/ui/native-select';
 import { Label } from '@/components/ui/label';
 import { AlertCircle, ArrowRight, Info } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
@@ -479,12 +480,12 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                          * a screen reader announced this as "combo box", with no
                          * indication of what picking from it would do.
                          */}
-                        <select
+                        <NativeSelect
                             aria-label={t(
                                 'post.optional.select_placeholder',
                                 'Select a statement to comment...'
                             )}
-                            className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 bg-white truncate pr-10"
+                            className="truncate pr-10"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);
@@ -530,7 +531,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         </option>
                                     );
                                 })}
-                        </select>
+                        </NativeSelect>
                     </div>
 
                     <div className="space-y-4">
