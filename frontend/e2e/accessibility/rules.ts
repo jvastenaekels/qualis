@@ -134,7 +134,7 @@ function summarise(violations: Awaited<ReturnType<AxeBuilder['analyze']>>['viola
  *
  * `expectNoA11yViolations` drops `results.incomplete`, and on the participant flow that
  * is not a marginal loss — it is where half the known defects live. Measured on the
- * fine sort: all six score labels (`#header-score--1 > .text-3xl` and friends), both
+ * fine sort: every score label (`#footer--1 > .text-3xl` and friends), both
  * legend labels and the statement card text come back incomplete, never as violations,
  * because the board sits under a `react-zoom-pan-pinch` transform. Same on the rough
  * sort's `<kbd>` key hints, under a `backdrop-blur` bar. A gate that reports those as

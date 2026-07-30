@@ -915,12 +915,26 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 id={`column-${col.score}`}
                                                 className="flex flex-col gap-2 items-center flex-shrink-0"
                                             >
-                                                <ScoreLabel
-                                                    score={col.score}
-                                                    id={`header-score-${col.score}`}
-                                                    className="mb-1"
-                                                />
-
+                                                {/*
+                                                 * The score is labelled once, under the
+                                                 * column. There used to be a second label
+                                                 * above it: eighteen elements for nine
+                                                 * values, and because the columns are
+                                                 * bottom-aligned (`items-end`) the upper
+                                                 * set followed the pyramid's silhouette
+                                                 * and read as a scattered staircase rather
+                                                 * than an axis.
+                                                 *
+                                                 * It was not there for a scroll case. The
+                                                 * board is a pan/zoom canvas, not a scroll
+                                                 * container: both sets sit inside the same
+                                                 * transform and translate together, so
+                                                 * there is no state in which the upper set
+                                                 * persists while the lower one leaves.
+                                                 * Measured on the auto-fit grid at 390,
+                                                 * 768×1024, 1024×768 and 1280 — both sets
+                                                 * inside the viewport at all four.
+                                                 */}
                                                 <div
                                                     className="flex flex-col gap-2"
                                                     role="row"

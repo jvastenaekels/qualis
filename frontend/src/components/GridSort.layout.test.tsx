@@ -65,6 +65,24 @@ describe('GridSort Detailed UI Verification', () => {
         renderSlotContent: () => null,
     };
 
+    /**
+     * Each column carried two `ScoreLabel`s — one above the slots, one below —
+     * so a nine-column grid announced eighteen labels for nine values. Neither
+     * id was referenced by any `aria-labelledby`/`aria-describedby`, so both
+     * were purely decorative and either could go.
+     */
+    it('announces each column score once', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} selectedCardId={null} isAllPlaced={false} />
+            </DndContext>
+        );
+
+        // By id, not by text: "0" also matches the deck's pile counters.
+        const labels = document.querySelectorAll('[id^="footer-"], [id^="header-score-"]');
+        expect(Array.from(labels).map((el) => el.textContent)).toEqual(['-2', '0', '+2']);
+    });
+
     // 1. Footer Instructions Verification
     it('shows "Drag or Tap" in footer when deck has cards and no card is selected', () => {
         render(

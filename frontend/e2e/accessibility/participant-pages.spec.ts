@@ -332,7 +332,7 @@ for (const vp of A11Y_VIEWPORTS) {
             await test.step('contrast: fine sort axis', async () => {
                 await expectContrastAtLeast(
                     page,
-                    '[id^="header-score-"], [id^="footer-"]',
+                    '[id^="footer-"]',
                     4.5,
                     'fine sort: score labels'
                 );
