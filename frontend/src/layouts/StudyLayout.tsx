@@ -411,11 +411,17 @@ const StudyLayoutContent: React.FC = () => {
                  * at every width up to and including 430px — every phone in common use.
                  *
                  * The right cluster is the one that must not compress: three 44px
-                 * targets are already at the minimum. So the title yields instead,
-                 * taking whatever space is left over and truncating into it.
+                 * targets are already at the minimum. So the title yields instead —
+                 * `min-w-0` lets it shrink below its content width and `truncate`
+                 * absorbs the difference.
+                 *
+                 * `min-w-0` and NOT `flex-1`. `flex-1` also makes the title *grow*
+                 * into any spare space, which shoves the step pill away from the
+                 * study name and into the middle of the header when the title is
+                 * short. Shrinking is wanted here; growing is not.
                  */}
-                <div className="flex items-center gap-3 min-w-0 flex-1 md:flex-none md:shrink-0 z-10">
-                    <div className="font-semibold text-slate-800 text-lg truncate min-w-0 flex-1 md:flex-none md:max-w-[160px] lg:max-w-md">
+                <div className="flex items-center gap-3 min-w-0 z-10">
+                    <div className="font-semibold text-slate-800 text-lg truncate min-w-0 md:max-w-[160px] lg:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* Show Main Logo if available */}
                         {branding?.logo_url && (
