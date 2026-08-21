@@ -132,7 +132,18 @@ const ConsentPage: React.FC = () => {
     return (
         <div className="w-full max-w-2xl min-w-0 mx-auto py-6 sm:py-12 px-4 animate-in fade-in duration-500">
             <div className="mb-8 text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {/*
+                 * `hyphens-auto` plus an anywhere-break: German has no
+                 * space to wrap at inside a compound, and this heading is
+                 * "Informierte Einwilligung und
+                 * Datenverarbeitungsvereinbarung" — measured at 390 px it
+                 * ran off the right edge and lost the last two letters
+                 * outright, with no ellipsis to admit it. Hyphenation
+                 * needs `<html lang>`, which `useStudyLocaleSync` sets;
+                 * the break is the fallback for a locale Chromium has no
+                 * dictionary for.
+                 */}
+                <h1 className="text-2xl font-bold text-gray-900 mb-2 hyphens-auto [overflow-wrap:anywhere]">
                     {t('consent.title', 'Informed consent and data processing agreement')}
                 </h1>
                 <p className="text-gray-600">

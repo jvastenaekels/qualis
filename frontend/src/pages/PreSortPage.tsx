@@ -99,7 +99,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     return (
         <div className="max-w-3xl mx-auto py-6 sm:py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('presort.title')}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 hyphens-auto [overflow-wrap:anywhere]">{t('presort.title')}</h1>
                 <p className="text-gray-600">{t('presort.description')}</p>
             </div>
 

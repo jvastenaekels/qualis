@@ -123,11 +123,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             {/* 1. Context Section (The "Why") */}
             <div className="text-center max-w-3xl mx-auto mb-8 space-y-6">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight hyphens-auto [overflow-wrap:anywhere]">
                         {config.title}
                     </h1>
                     {config.subtitle && (
-                        <h2 className="text-lg sm:text-xl text-slate-600 font-normal mt-3">
+                        <h2 className="text-lg sm:text-xl text-slate-600 font-normal mt-3 hyphens-auto [overflow-wrap:anywhere]">
                             {config.subtitle}
                         </h2>
                     )}
