@@ -246,3 +246,43 @@ export async function expectNoA11yViolations(page: Page, options: { soft?: boole
         : expect(summarise(results.violations));
     assertion.toEqual([]);
 }
+
+/**
+ * What a visible toast covers, and what that costs.
+ *
+ * A top-anchored toast covers something by definition; the question is whether it is
+ * text the participant can read a second later, or a control they cannot reach.
+ * Measured at 390 and 1280 on the resume toast: it lands on the sorting instruction
+ * and the progress counter — both transient, both harmless — and the only control it
+ * covers is its own close button, which is excluded here. Anything else in this list
+ * is a regression.
+ *
+ * Returns the accessible names of covered controls, empty when the toast blocks
+ * nothing.
+ */
+export async function controlsCoveredByToast(page: Page): Promise<string[]> {
+    return page.evaluate(() => {
+        const covered = new Set<string>();
+        const controls = document.querySelectorAll(
+            'button, a, input, select, textarea, [role="tab"], [role="button"]'
+        );
+        for (const control of controls) {
+            const element = control as HTMLElement;
+            const box = element.getBoundingClientRect();
+            if (box.width === 0 || box.height === 0) continue;
+            if (element.closest('[data-sonner-toast]')) continue;
+            const over = document.elementFromPoint(
+                Math.round(box.left + box.width / 2),
+                Math.round(box.top + box.height / 2)
+            );
+            if (over?.closest('[data-sonner-toast]')) {
+                covered.add(
+                    (element.getAttribute('aria-label') ?? element.textContent ?? element.tagName)
+                        .trim()
+                        .slice(0, 30)
+                );
+            }
+        }
+        return [...covered];
+    });
+}
