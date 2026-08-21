@@ -248,10 +248,44 @@ test.describe('Participant header geometry', () => {
                     Math.round(headerBox.width / 4),
                     Math.round(headerBox.height / 2)
                 );
+                /*
+                 * What the toast covers, and what that costs.
+                 *
+                 * A top-anchored toast covers something by definition; the
+                 * question is whether it is text the participant can read a
+                 * second later, or a control they cannot reach. Measured at
+                 * 390 and 1280 it covers the sorting instruction and the
+                 * progress counter — both transient, both harmless — and the
+                 * only control it lands on is its own close button, which is
+                 * excluded here. Anything else appearing in this list is a
+                 * regression.
+                 */
+                const blocked = new Set<string>();
+                for (const control of document.querySelectorAll(
+                    'button, a, input, select, textarea, [role="tab"], [role="button"]'
+                )) {
+                    const c = control as HTMLElement;
+                    const box = c.getBoundingClientRect();
+                    if (box.width === 0 || box.height === 0) continue;
+                    if (c.closest('[data-sonner-toast]')) continue;
+                    const over = document.elementFromPoint(
+                        Math.round(box.left + box.width / 2),
+                        Math.round(box.top + box.height / 2)
+                    );
+                    if (over?.closest('[data-sonner-toast]')) {
+                        blocked.add(
+                            (c.getAttribute('aria-label') ?? c.textContent ?? c.tagName)
+                                .trim()
+                                .slice(0, 30)
+                        );
+                    }
+                }
+
                 return {
                     toastTop: el.getBoundingClientRect().top,
                     headerBottom: headerBox.bottom,
                     hitIsToast: hit ? !!hit.closest('[data-sonner-toast]') : false,
+                    blockedControls: [...blocked],
                 };
             });
 
@@ -266,6 +300,12 @@ test.describe('Participant header geometry', () => {
                 expect
                     .soft(geometry.hitIsToast, 'the toast intercepts pointer events over the header')
                     .toBe(false);
+                expect
+                    .soft(
+                        geometry.blockedControls,
+                        'the toast covers a control the participant needs'
+                    )
+                    .toEqual([]);
             }
         });
     }
