@@ -1445,9 +1445,12 @@ fact, not an oversight — but the row does look the same way at 1024 as it did 
 While verifying Task 6.1, the mobile a11y walk failed at
 `e2e/pages/RoughSortPage.ts:50` — `expect(nextBtn).toBeHidden()` timed out with
 the button still visible after 13 polls. It passed on an immediate rerun with no
-change, and again on every subsequent run. Unrelated to anything in Phase 6, and
-not investigated: recorded so the next intermittent red on this spec is not
-mistaken for a regression.
+change, and again on every subsequent run.
+
+**Closed 2026-08-21.** The completion screen animates out, so "hidden" was a property
+of an animation finishing rather than of the step being done. Every caller of
+`completeRoughSort` goes straight to the fine sort, so the method now waits for that
+navigation instead — the real post-condition, and a stabler one.
 
 
 ## Found while auditing the declared blind spots (2026-08-21)
@@ -1537,7 +1540,7 @@ Stated so the next audit does not assume it was checked.
 - **The admin space.** Nine raw emoji remain across four files there (Task 3.3, step 3). Untouched.
 - **The post-sort's second step's sticky bar, over content.** The step itself is walked by two specs and was captured at 375px, which confirmed the pill buttons and the absence of indigo. But both specs configure a study with no custom questions, so the page is short and the bar never actually sticks: the one thing Task 3.4 changed was not exercised on step 2. Step 1's opaque bar *was* verified over a scrolled page at 1280px.
 - **Landscape phones.** The audit ran portrait at 390×844 and desktop/tablet landscape. `isLandscapeMobile` (`GridSort.tsx:659`) selects a distinct fine-sort layout for landscape phones that was never walked with correct orientation reporting.
-- **The audio path.** Seven spoken comments are in the demo seed; none were played, recorded, or re-recorded.
+- **The audio path's upload, playback and re-record.** Walked as far as it can be walked 2026-08-21: without object storage `/api/config` reports `audio_storage: "unavailable"` and the affordance is hidden, so no E2E run reaches it. Forcing the flag shows the recorder is properly named and handles a denied microphone; everything past pressing record needs real storage.
 - **Resume by code, and the completion screen.** The flow was walked once, straight through.
 - **Dialogs and overlays.** The help overlay, the zoom/reading overlay behind the eye badge, and the mobile step menu were opened but not audited.
 - **The nine locales as rendered.** Every string finding is from the English UI. A French or Finnish run would put different pressure on every width finding in Phase 1 and Phase 6 — German especially, where compound nouns will test Task 1.1's truncation ceiling.
