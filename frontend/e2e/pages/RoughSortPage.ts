@@ -46,7 +46,18 @@ export class RoughSortPage extends BasePage {
         // Use JS click for robustness against dnd-kit sensors
         await nextBtn.evaluate((node: HTMLElement) => node.click());
 
-        // Ensure it's hidden before proceeding to prevent locator conflicts
-        await expect(nextBtn).toBeHidden({ timeout: 5000 });
+        /*
+         * Wait for the navigation the click causes, not for the button to
+         * disappear.
+         *
+         * `toBeHidden({timeout: 5000})` on this button flaked: observed once
+         * on the mobile accessibility walk, the button was still visible after
+         * 13 polls and the run failed, then passed on an immediate rerun and
+         * every run after. The completion screen animates out, so "hidden" is
+         * a property of an animation finishing rather than of the step being
+         * done — and every caller of this method goes straight to the fine
+         * sort, so the URL is both the real post-condition and a stabler one.
+         */
+        await this.page.waitForURL(/\/fine-sort(\?|$)/, { timeout: 15000 });
     }
 }

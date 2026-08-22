@@ -91,6 +91,18 @@ describe('ConsentPage', () => {
         );
     });
 
+    it('lets a long compound heading break instead of running off the screen', () => {
+        // German: "Informierte Einwilligung und Datenverarbeitungsvereinbarung"
+        // has no space to wrap at inside the compound. Measured at 390 px it
+        // ran past the right edge and lost its last two letters, with no
+        // ellipsis to admit it. jsdom has no layout, so this asserts the rule
+        // that prevents it rather than the geometry.
+        renderWithProviders(<ConsentPage />);
+        const heading = screen.getByRole('heading', { level: 1 });
+        expect(heading.className).toContain('hyphens-auto');
+        expect(heading.className).toContain('[overflow-wrap:anywhere]');
+    });
+
     it('validates consent checkbox', async () => {
         renderWithProviders(<ConsentPage />);
 

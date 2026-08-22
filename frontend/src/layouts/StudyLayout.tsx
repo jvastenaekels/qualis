@@ -391,11 +391,12 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/*
                  * Compact progress (top edge), paired with the step pill below.
-                 * `lg:hidden` and not `md:hidden`: the pill now serves the
-                 * tablet too, and a progress indicator that vanished at 768
-                 * while its counterpart stayed would be the odd one out.
+                 * `xl:hidden` and not `md:hidden`: the pill now serves the
+                 * tablet and the small desktop too, and a progress indicator
+                 * that vanished at 768 while its counterpart stayed would be
+                 * the odd one out.
                  */}
-                <div className="lg:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
+                <div className="xl:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
                         className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
                         style={{
@@ -470,7 +471,7 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
 
                     {/*
-                     * Step counter & menu — up to `lg`, not just up to `md`.
+                     * Step counter & menu — up to `xl`, not just up to `md`.
                      *
                      * Between 768 and 1023 the full stepper showed one label
                      * and four anonymous circles, the last of them a bare dot
@@ -480,7 +481,7 @@ const StudyLayoutContent: React.FC = () => {
                      * deliberate. This pill answers both — "Step 4/5" plus,
                      * on tap, every step by name — and it already existed.
                      */}
-                    <div className="lg:hidden relative shrink-0" ref={stepMenuRef}>
+                    <div className="xl:hidden relative shrink-0" ref={stepMenuRef}>
                         <button
                             type="button"
                             onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
@@ -556,8 +557,18 @@ const StudyLayoutContent: React.FC = () => {
                     </div>
                 </div>
 
-                {/* CENTER: Stepper — from `lg`, where every label has room. */}
-                <div className="hidden lg:flex flex-1 justify-center items-center min-w-0 mx-4">
+                {/*
+                 * CENTER: Stepper — from `xl`, which is where it first fits.
+                 *
+                 * `lg` was a guess and it was wrong. Measured with a five-step
+                 * flow: at 1024 and 1152 only two labels render at all (the
+                 * upcoming ones are `xl:block`), and once several completed
+                 * labels do show they compete for the same row and each one
+                 * truncates — a German run at 1024 rendered "Welc…",
+                 * "Let's …", "First impres…", "Your perspe…". At 1280 all five
+                 * render whole. So the pill serves everything below `xl`.
+                 */}
+                <div className="hidden xl:flex flex-1 justify-center items-center min-w-0 mx-4">
                     <div
                         data-testid="stepper-container"
                         className="flex items-center gap-1 lg:gap-2 min-w-0"

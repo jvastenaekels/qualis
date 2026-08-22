@@ -1445,9 +1445,92 @@ fact, not an oversight — but the row does look the same way at 1024 as it did 
 While verifying Task 6.1, the mobile a11y walk failed at
 `e2e/pages/RoughSortPage.ts:50` — `expect(nextBtn).toBeHidden()` timed out with
 the button still visible after 13 polls. It passed on an immediate rerun with no
-change, and again on every subsequent run. Unrelated to anything in Phase 6, and
-not investigated: recorded so the next intermittent red on this spec is not
-mistaken for a regression.
+change, and again on every subsequent run.
+
+**Closed 2026-08-21.** The completion screen animates out, so "hidden" was a property
+of an animation finishing rather than of the step being done. Every caller of
+`completeRoughSort` goes straight to the fine sort, so the method now waits for that
+navigation instead — the real post-condition, and a stabler one.
+
+
+## Found while auditing the declared blind spots (2026-08-21)
+
+The `What this plan does not cover` list below was written so the next audit would not
+assume those things were checked. This is that audit, on six of them.
+
+### The fine-sort board has no scaling defect — the measurement did
+
+The first pass reported the board rendering at 0.20-0.59 scale on a seven-column pyramid,
+non-deterministically, leaving statements at 3 px. That was wrong, and the way it was
+wrong is worth keeping: the probe reached the filled board through `placeAllCards`, and
+that helper calls `tryZoomOut` — **two clicks on the zoom-out control**, -0.4 of scale.
+Every number was the probe's own zoom.
+
+Measured on arrival instead, before any interaction, on a 1-2-3-5-3-2-1 pyramid of 17
+statements: **0.791 at 1280x800, 0.715 at 1200, 0.549 at 1024, 0.479 on a 844x390
+landscape phone** — each one exactly what `computeAutoFitTransform` prescribes for its
+inputs, and stable across runs. There is no bug.
+
+A fix was written for the imagined bug (re-run the auto-fit when `cardDimensions`
+settle), it changed nothing, and that is what exposed the error: instrumenting
+`performAutoFit` showed all four of its calls already seeing settled values — wrapper
+908x695, content 1060x692, scale 0.79. The fix and its two unit tests were reverted.
+
+**This casts doubt on a Phase 4 finding.** "The mobile board's auto-fit is not
+deterministic" came from a probe built on the same helper. It was not re-measured here
+and should be treated as unconfirmed.
+
+### A German compound heading ran off the screen
+
+`consent.title` in German is "Informierte Einwilligung und
+Datenverarbeitungsvereinbarung". At 390 px it ran past the right edge and lost its last
+two letters, with no ellipsis to admit it — a compound offers no space to wrap at, and
+the heading declared neither hyphenation nor a break rule. Fixed on the four participant
+page headings. This is precisely the case the list below predicted: "German especially,
+where compound nouns will test Task 1.1's truncation ceiling."
+
+Finnish, the other locale walked, is clean at both 390 and 1024.
+
+### Phase 4's hyphenation earns its keep on the language that tests it
+
+The same German run renders a statement card as "Die Kreislauf-wirtschaft ist der
+wichtigste Hebel für Nachhaltig-keit." — correct break points, inside a 390 px card.
+Task 4.1's opt-in was the right call and this is the first evidence for it.
+
+### Task 6.3 put the stepper boundary at the wrong breakpoint
+
+`lg` was a guess. Measured with a five-step flow: at 1024 and 1152 only two labels render
+at all, and once several completed labels show they compete for one row and each
+truncates — a German run at 1024 gave "Welc…", "Let's …", "First impres…",
+"Your perspe…". At 1280 and 1440 all five render whole. The pill now serves everything
+below `xl`.
+
+### The resume toast covers text, and blocks nothing
+
+Phase 6 moved the toast off the header; the first reading of this audit was that it had
+merely relocated the collision, since it now lands on the sorting instruction and, in
+another case, on a section heading. Measuring what that costs says otherwise: at 390 and
+1280 the only control whose centre resolves to the toast is **its own close button**. It
+covers text a participant can read a second later, which is what a top-anchored toast
+does, and it reaches nothing they need to tap.
+
+No change made. The measurement became an assertion instead: the header-geometry test now
+fails if the toast ever covers a control.
+
+### The audio path cannot be walked without object storage
+
+`/api/config` reports `audio_storage: "unavailable"` when S3 credentials are absent, and
+the affordance is then hidden entirely — so no E2E run can reach it. Forcing the flag via
+route interception renders the recorder: it is properly named ("Record audio response if
+you prefer"), and a denied microphone produces a clear, actionable message. Upload,
+playback and re-record remain untested and need real storage.
+
+### Dialogs and overlays are sound
+
+The help dialog shows the canonical step name and reads cleanly at 390. The mobile step
+menu lists all five steps by name with the current one marked and the upcoming ones
+greyed — which is what makes the pill a real substitute for the stepper rather than a
+degradation.
 
 
 ## What this plan does not cover
@@ -1457,7 +1540,7 @@ Stated so the next audit does not assume it was checked.
 - **The admin space.** Nine raw emoji remain across four files there (Task 3.3, step 3). Untouched.
 - **The post-sort's second step's sticky bar, over content.** The step itself is walked by two specs and was captured at 375px, which confirmed the pill buttons and the absence of indigo. But both specs configure a study with no custom questions, so the page is short and the bar never actually sticks: the one thing Task 3.4 changed was not exercised on step 2. Step 1's opaque bar *was* verified over a scrolled page at 1280px.
 - **Landscape phones.** The audit ran portrait at 390×844 and desktop/tablet landscape. `isLandscapeMobile` (`GridSort.tsx:659`) selects a distinct fine-sort layout for landscape phones that was never walked with correct orientation reporting.
-- **The audio path.** Seven spoken comments are in the demo seed; none were played, recorded, or re-recorded.
+- **The audio path's upload, playback and re-record.** Walked as far as it can be walked 2026-08-21: without object storage `/api/config` reports `audio_storage: "unavailable"` and the affordance is hidden, so no E2E run reaches it. Forcing the flag shows the recorder is properly named and handles a denied microphone; everything past pressing record needs real storage.
 - **Resume by code, and the completion screen.** The flow was walked once, straight through.
 - **Dialogs and overlays.** The help overlay, the zoom/reading overlay behind the eye badge, and the mobile step menu were opened but not audited.
 - **The nine locales as rendered.** Every string finding is from the English UI. A French or Finnish run would put different pressure on every width finding in Phase 1 and Phase 6 — German especially, where compound nouns will test Task 1.1's truncation ceiling.
@@ -1466,7 +1549,7 @@ Stated so the next audit does not assume it was checked.
 - **Existing studies' step names.** The Phase 5 canon governs the i18n keys and the backend seed. Any study already in the database keeps whatever `process_steps[].title` it was created with, including "Why" and any researcher edit. No migration was written and none should be.
 - **The designer's editable-label list.** `welcome.consent.submit` is honoured as a `ui_labels` override but is not offered in `InterfaceEditor`, so no researcher can set it through the UI yet.
 - **The nine locales' step names as rendered.** Task 5.1 propagated by copying each locale's own `welcome.steps.*.title`, so the non-English names are as good as they already were. Only `en` and `fi` were read closely; the two new strings ("Why these choices", "First impressions recorded") were translated without a native reader.
-- **Landscape phones, still.** Task 6.4's note now says how to measure them. Nobody has.
-- **The stepper at 1024-1279.** See the Phase 6 finding above: labelled current and completed steps, anonymous upcoming ones. Left as is.
+- ~~**Landscape phones, still.**~~ Walked 2026-08-21 at 844x390: board fits, no overflow. The pyramid's top row sits slightly under the instruction pill.
+- ~~**The stepper at 1024-1279.**~~ Measured and closed 2026-08-21: the pill now serves below `xl`.
 - **Toast geometry anywhere but the participant header.** The gate runs on the participant flow. The admin header is also `h-16` and reads the same `--header-height`, but no admin test asserts it.
 - **`results.incomplete`.** Task 2.1's gate drops it, exactly as the admin gate does. Contrast over the fine-sort board's transform and over the rough sort's translucent tints is therefore unmeasured by a green run.

@@ -44,7 +44,12 @@ import { PreSortPage } from '../pages/PreSortPage';
 import { RoughSortPage } from '../pages/RoughSortPage';
 import { WelcomePage } from '../pages/WelcomePage';
 import { placeAllCards } from '../helpers/rough-sort';
-import { expectContrastAtLeast, expectNoA11yViolations, waitForAnimationsToSettle } from './rules';
+import {
+    controlsCoveredByToast,
+    expectContrastAtLeast,
+    expectNoA11yViolations,
+    waitForAnimationsToSettle,
+} from './rules';
 
 test.setTimeout(120_000);
 
@@ -264,9 +269,18 @@ test.describe('Participant header geometry', () => {
                     )
                     .toBeGreaterThanOrEqual(geometry.headerBottom);
                 expect
-                    .soft(geometry.hitIsToast, 'the toast intercepts pointer events over the header')
+                    .soft(
+                        geometry.hitIsToast,
+                        'the toast intercepts pointer events over the header'
+                    )
                     .toBe(false);
             }
+            expect
+                .soft(
+                    await controlsCoveredByToast(page),
+                    'the toast covers a control the participant needs'
+                )
+                .toEqual([]);
         });
     }
 });
@@ -381,7 +395,10 @@ for (const vp of A11Y_VIEWPORTS) {
              * the option label's own padding without admitting a real drift.
              */
             const lastOption = page.locator('[role="radiogroup"] label').last();
-            const rightAnchor = page.getByTestId('familiarity-scale-anchors').locator('span').last();
+            const rightAnchor = page
+                .getByTestId('familiarity-scale-anchors')
+                .locator('span')
+                .last();
             const optionBox = await lastOption.boundingBox();
             const anchorBox = await rightAnchor.boundingBox();
             expect(optionBox, 'rating scale: last option has no box').not.toBeNull();

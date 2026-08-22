@@ -126,9 +126,9 @@
     },
     "overrides": {
         "@stoplight/spectral-functions": "1.10.2",
-        "js-yaml": "4.3.0",
+        "js-yaml": "4.3.1",
         "minimatch@3.1.5": {
-            "brace-expansion": "1.1.16"
+            "brace-expansion": "1.1.18"
         },
         "exceljs": {
             "uuid": "11.1.1"
