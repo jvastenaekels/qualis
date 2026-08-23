@@ -367,6 +367,7 @@
         "invalid_recording": "Aufnahme fehlgeschlagen – keine Audiodaten erfasst",
         "permission_denied": "Mikrofonzugriff verweigert",
         "unsupported": "Audioaufnahme wird in diesem Browser nicht unterstützt.",
+        "https_required": "Audioaufnahmen erfordern HTTPS. Öffnen Sie diese Studie erneut über eine sichere HTTPS-Adresse.",
         "permission_revoked": "Mikrofonzugriff verloren – Aufnahme gestoppt",
         "refresh_failed": "Audio konnte nicht aktualisiert werden. Ihre Aufnahme ist noch gespeichert.",
         "refreshing": "Audio wird aktualisiert...",

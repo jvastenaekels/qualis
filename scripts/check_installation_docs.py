@@ -117,6 +117,7 @@ def check_readme_demo_guidance() -> list[str]:
 def check_demo_make_targets() -> list[str]:
     makefile = _read("Makefile")
     compose = _read("docker-compose.yml")
+    example_env = _read(".env.example")
     backend_dockerfile = _read("backend/Dockerfile")
     errors: list[str] = []
 
@@ -125,6 +126,20 @@ def check_demo_make_targets() -> list[str]:
     # exists to protect is the health-wait itself.
     if "docker compose up -d --wait --wait-timeout" not in makefile:
         errors.append("Makefile demo-up does not wait for service health")
+
+    for token in (
+        "${QUALIS_ALLOWED_HOST_PATTERN:-",
+        "${QUALIS_PUBLIC_URL:-http://localhost:3000}",
+    ):
+        if token not in compose:
+            errors.append(f"Docker demo configuration is missing {token!r}")
+
+    for token in ("QUALIS_ALLOWED_HOST_PATTERN=", "QUALIS_PUBLIC_URL="):
+        if token not in example_env:
+            errors.append(f".env.example does not document {token!r}")
+
+    if "$${QUALIS_PUBLIC_URL:-http://localhost:3000}" not in makefile:
+        errors.append("Makefile demo-up does not print the configured public URL")
 
     frontend_marker = "\n  frontend:\n"
     if frontend_marker not in compose:

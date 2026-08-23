@@ -367,6 +367,7 @@
         "invalid_recording": "Opname mislukt - geen audiogegevens vastgelegd",
         "permission_denied": "Microfoontoegang geweigerd",
         "unsupported": "Audio-opname wordt niet ondersteund in deze browser.",
+        "https_required": "Audio-opname vereist HTTPS. Open dit onderzoek opnieuw via een beveiligd HTTPS-adres.",
         "permission_revoked": "Microfoontoegang verloren - opname gestopt",
         "refresh_failed": "Audio kon niet worden vernieuwd. Uw opname is nog steeds opgeslagen.",
         "refreshing": "Audio vernieuwen...",

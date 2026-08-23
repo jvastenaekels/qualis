@@ -153,6 +153,57 @@ describe('ConsentPage', () => {
         });
     });
 
+    it('starts a study when randomUUID is unavailable on an insecure HTTP origin', async () => {
+        const descriptor = Object.getOwnPropertyDescriptor(crypto, 'randomUUID');
+        Object.defineProperty(crypto, 'randomUUID', { configurable: true, value: undefined });
+
+        try {
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                    <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+                </Routes>,
+                { initialEntries: ['/study/test-study/consent'] }
+            );
+
+            fireEvent.click(screen.getByRole('checkbox'));
+            const button = screen.getByRole('button', { name: /Start Study/i });
+            await waitFor(() => expect(button).toBeEnabled());
+            fireEvent.click(button);
+
+            await waitFor(() => expect(screen.getByText('Presort Page')).toBeInTheDocument());
+            expect(useSessionStore.getState().token).toMatch(
+                /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+            );
+        } finally {
+            if (descriptor) Object.defineProperty(crypto, 'randomUUID', descriptor);
+        }
+    });
+
+    it('starts a study when subtle crypto is unavailable on an insecure HTTP origin', async () => {
+        const descriptor = Object.getOwnPropertyDescriptor(crypto, 'subtle');
+        Object.defineProperty(crypto, 'subtle', { configurable: true, value: undefined });
+
+        try {
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                    <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+                </Routes>,
+                { initialEntries: ['/study/test-study/consent'] }
+            );
+
+            fireEvent.click(screen.getByRole('checkbox'));
+            const button = screen.getByRole('button', { name: /Start Study/i });
+            await waitFor(() => expect(button).toBeEnabled());
+            fireEvent.click(button);
+
+            await waitFor(() => expect(screen.getByText('Presort Page')).toBeInTheDocument());
+        } finally {
+            if (descriptor) Object.defineProperty(crypto, 'subtle', descriptor);
+        }
+    });
+
     it('persists consent state after form submission', async () => {
         const { unmount } = renderWithProviders(
             <Routes>

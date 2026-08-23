@@ -367,6 +367,7 @@
         "invalid_recording": "L'enregistrement a échoué - aucune donnée audio capturée",
         "permission_denied": "Accès au microphone refusé",
         "unsupported": "L'enregistrement audio n'est pas pris en charge par ce navigateur.",
+        "https_required": "L'enregistrement audio nécessite HTTPS. Rouvrez cette étude avec une adresse HTTPS sécurisée.",
         "permission_revoked": "Accès au microphone perdu - enregistrement arrêté",
         "refresh_failed": "Impossible de rafraîchir l'audio. Votre enregistrement reste sauvegardé.",
         "refreshing": "Rafraîchissement de l'audio...",

@@ -359,22 +359,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     )}
 
                     {/*
-                     * Reserve the corners rather than stack above them. Both
-                     * overlays sit `top-2`, and the text is vertically centred
-                     * under a line clamp that fills the card, so on a long
-                     * statement the first line runs under the code on the left
-                     * and under the reveal on the right. A higher z-index would
-                     * only decide which of the two wins the collision.
-                     *
-                     * Symmetric even when only one corner is occupied: the text
-                     * is centred, so reserving on one side alone visibly pushes
-                     * every statement off-axis.
-                     *
-                     * The reservation is a fixed width because the overlays are
-                     * a fixed size — they do not scale with the board the way
-                     * the card and (now) its type do. 32 px clears the reveal,
-                     * which measures 22 px inset 8 px from the edge. The cost is
-                     * line width on the smallest cards that still carry one.
+                     * Keep the overlay strip above the statement instead of
+                     * reserving 32 px on both sides of every line. The old
+                     * `px-8` left only 76 px of a 140 px card for text. It was
+                     * also conditional on `disableHoverZoom`, so every card
+                     * reflowed when a drag started. A small, unconditional top
+                     * strip preserves nearly the full line width and keeps the
+                     * layout stable throughout dragging.
                      */}
                     <div
                         ref={scrollRef}
@@ -382,7 +373,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                             'w-full h-full flex justify-center',
                             variant === 'compact' ? 'items-start pt-0.5' : 'items-center',
                             allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden',
-                            variant !== 'hand' && (code || !disableHoverZoom) && 'px-8'
+                            variant !== 'hand' && 'pt-4'
                         )}
                     >
                         <div

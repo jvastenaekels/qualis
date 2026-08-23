@@ -89,7 +89,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://qualis:qualis@db:5432/qualis
       SECRET_KEY: docker-dev-secret-change-in-production
       IP_HASH_SALT: docker-dev-salt-change-in-production
-      FRONTEND_URL: http://localhost:3000
+      FRONTEND_URL: "${QUALIS_PUBLIC_URL:-http://localhost:3000}"
       ENVIRONMENT: development
       # Only ever here. This stack is disposable and its credentials are
       # published in the README, so the sign-in page may offer to fill them.
@@ -142,7 +142,7 @@ services:
   frontend:
     build: ./frontend
     environment:
-      QUALIS_ALLOWED_HOST_PATTERN: "^(qualis[.]example[.]org|localhost|127[.]0[.]0[.]1)$"
+      QUALIS_ALLOWED_HOST_PATTERN: "${QUALIS_ALLOWED_HOST_PATTERN:-^(qualis[.]example[.]org|localhost|127[.]0[.]0[.]1)$$}"
     ports:
       - "3000:80"
     depends_on:

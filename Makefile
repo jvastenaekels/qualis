@@ -115,11 +115,12 @@ demo-up:
 		echo "   registry hiccup — retrying in $$((i * 5))s"; sleep $$((i * 5)); \
 	done
 	docker compose up -d --wait --wait-timeout 240
-	@$(call say,Your Qualis stack is up and healthy.,Next: make demo-seed  — loads the Bioeconomy Futures example)
+	@$(call say,Your Qualis stack is up and healthy.,Open $${QUALIS_PUBLIC_URL:-http://localhost:3000}   ·   Next: make demo-seed)
 
 demo-seed:
 	docker compose exec backend .venv/bin/python seed_demo.py
-	@$(call say,The demo data is in place.,Next: make demo-smoke  — checks the whole path end to end)
+	@$(call say,The demo data is in place.,Open $${QUALIS_PUBLIC_URL:-http://localhost:3000}/login   ·   admin@example.com / admin123)
+	@$(TTYCOL); printf '  %sOptional check: make demo-smoke%s\n\n' "$$D" "$$R"
 
 demo-lipset:
 	docker compose exec backend .venv/bin/python seed_lipset.py

@@ -367,6 +367,7 @@
         "invalid_recording": "Nagrywanie nie powiodło się — nie przechwycono danych audio",
         "permission_denied": "Odmówiono dostępu do mikrofonu",
         "unsupported": "Nagrywanie audio nie jest obsługiwane w tej przeglądarce.",
+        "https_required": "Nagrywanie dźwięku wymaga HTTPS. Otwórz ponownie to badanie, używając bezpiecznego adresu HTTPS.",
         "permission_revoked": "Utracono dostęp do mikrofonu — nagrywanie zatrzymane",
         "refresh_failed": "Nie udało się odświeżyć audio. Nagranie jest nadal zapisane.",
         "refreshing": "Odświeżanie audio...",

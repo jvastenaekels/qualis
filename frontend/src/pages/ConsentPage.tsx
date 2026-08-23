@@ -19,6 +19,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { isPresortEnabled } from '../utils/studyConfig';
+import { createSessionToken, hashConsent } from '../utils/browserCrypto';
 
 const consentSchema = z.object({
     consent: z.boolean().refine((val) => val === true, {
@@ -27,15 +28,6 @@ const consentSchema = z.object({
 });
 
 type ConsentForm = z.infer<typeof consentSchema>;
-
-// Simple SHA-256 hash function for consent text
-async function hashConsent(text: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 
 const ConsentPage: React.FC = () => {
     const { slug } = useParams();
@@ -68,7 +60,7 @@ const ConsentPage: React.FC = () => {
     // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — consent recording flow; branching IS the contract: pilot-mode skip → session-token init → consent hash construction → record-consent fetch → block navigation on failure (load-bearing GDPR guarantee — see CLAUDE.md security invariants)
     const onSubmit = async (data: ConsentForm) => {
         if (data.consent) {
-            const sessionToken = token || crypto.randomUUID();
+            const sessionToken = token || createSessionToken();
             if (!token) {
                 // New session — clear any stale response data (e.g. audio recordings from a prior session)
                 useResponseStore.getState().resetResponses();

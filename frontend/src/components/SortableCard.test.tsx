@@ -229,4 +229,24 @@ describe('SortableCard', () => {
         const textContainer = screen.getByTestId('card-123').querySelector('.line-clamp-4');
         expect(textContainer).toBeTruthy();
     });
+
+    it('keeps the grid text area stable when hover zoom is disabled during drag', () => {
+        const { rerender } = render(
+            <SortableCard {...defaultProps} dimensions={{ width: 140, height: 90 }} />
+        );
+        const textAreaBefore = screen.getByText(defaultProps.text).parentElement?.parentElement;
+        const classesBefore = textAreaBefore?.className;
+
+        rerender(
+            <SortableCard
+                {...defaultProps}
+                dimensions={{ width: 140, height: 90 }}
+                disableHoverZoom
+            />
+        );
+        const textAreaDuringDrag = screen.getByText(defaultProps.text).parentElement?.parentElement;
+
+        expect(textAreaDuringDrag?.className).toBe(classesBefore);
+        expect(textAreaDuringDrag).not.toHaveClass('px-8');
+    });
 });

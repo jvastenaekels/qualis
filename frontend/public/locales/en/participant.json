@@ -367,6 +367,7 @@
         "invalid_recording": "Recording failed - no audio data captured",
         "permission_denied": "Microphone permission denied",
         "unsupported": "Audio recording is not supported in this browser.",
+        "https_required": "Audio recording requires HTTPS. Reopen this study using a secure HTTPS address.",
         "permission_revoked": "Microphone access lost - recording stopped",
         "refresh_failed": "Could not refresh audio. Your recording is still saved.",
         "refreshing": "Refreshing audio...",

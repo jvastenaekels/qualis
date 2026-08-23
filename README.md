@@ -62,8 +62,10 @@ make demo-up
 ```
 
 **Expected result:** after the images are built and the services become healthy,
-the command ends with `Your Qualis stack is up and healthy.` and tells you what to
-run next. The first build can take several minutes; later starts reuse the images.
+the command ends with `Your Qualis stack is up and healthy.`, prints the configured
+public URL, and tells you what to run next. The first build can take several
+minutes; later starts reuse the images. Remote installations can set
+`QUALIS_PUBLIC_URL` and `QUALIS_ALLOWED_HOST_PATTERN` in `.env`.
 
 Load the guided example:
 
@@ -72,8 +74,9 @@ make demo-seed
 ```
 
 **Expected result:** the final lines read `The demo data is in place.` and point
-you to the smoke test. This step reuses the Python environment already built into
-the backend image and does not install development tools.
+you to the login URL and demo credentials; the smoke test remains optional. This
+step reuses the Python environment already built into the backend image and does
+not install development tools.
 
 Verify the complete path:
 

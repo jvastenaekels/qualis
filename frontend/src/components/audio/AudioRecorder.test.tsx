@@ -723,6 +723,43 @@ describe('AudioRecorder', () => {
         global.MediaRecorder = savedMR;
     });
 
+    it('explains that HTTPS is required when recording is opened on insecure HTTP', async () => {
+        const secureContextDescriptor = Object.getOwnPropertyDescriptor(
+            globalThis,
+            'isSecureContext'
+        );
+        const savedMediaDevices = navigator.mediaDevices;
+        Object.defineProperty(globalThis, 'isSecureContext', {
+            configurable: true,
+            value: false,
+        });
+        Object.defineProperty(navigator, 'mediaDevices', {
+            configurable: true,
+            value: undefined,
+        });
+
+        try {
+            render(<AudioRecorder {...defaultProps} />);
+            fireEvent.click(screen.getByText('Record audio response if you prefer'));
+
+            await waitFor(() => {
+                expect(mockToast.error).toHaveBeenCalledWith(
+                    'Audio recording requires HTTPS. Reopen this study using a secure HTTPS address.'
+                );
+            });
+        } finally {
+            Object.defineProperty(navigator, 'mediaDevices', {
+                configurable: true,
+                value: savedMediaDevices,
+            });
+            if (secureContextDescriptor) {
+                Object.defineProperty(globalThis, 'isSecureContext', secureContextDescriptor);
+            } else {
+                Reflect.deleteProperty(globalThis, 'isSecureContext');
+            }
+        }
+    });
+
     it('shows specific error for SecurityError', async () => {
         const onError = vi.fn();
         render(<AudioRecorder {...defaultProps} onError={onError} />);

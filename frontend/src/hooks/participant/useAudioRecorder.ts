@@ -367,6 +367,17 @@ export function useAudioRecorder(props: AudioRecorderProps): UseAudioRecorderRes
     }, [state, disabled]);
 
     const startRecording = async () => {
+        if (globalThis.isSecureContext === false) {
+            toast.error(
+                t(
+                    'audio.https_required',
+                    'Audio recording requires HTTPS. Reopen this study using a secure HTTPS address.'
+                )
+            );
+            onError?.('unsupported');
+            return;
+        }
+
         // Check browser support before attempting anything
         if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
             toast.error(

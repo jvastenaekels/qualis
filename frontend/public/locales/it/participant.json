@@ -355,6 +355,7 @@
         "invalid_recording": "Registrazione non riuscita - nessun dato audio acquisito",
         "permission_denied": "Autorizzazione al microfono negata",
         "unsupported": "La registrazione audio non è supportata in questo browser.",
+        "https_required": "La registrazione audio richiede HTTPS. Riapra questo studio utilizzando un indirizzo HTTPS sicuro.",
         "permission_revoked": "Accesso al microfono perso - registrazione interrotta",
         "refresh_failed": "Impossibile aggiornare l'audio. La registrazione è ancora salvata.",
         "refreshing": "Aggiornamento audio in corso...",

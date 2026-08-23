@@ -367,6 +367,7 @@
         "invalid_recording": "Gravação falhou - não foram capturados dados de áudio",
         "permission_denied": "Permissão de microfone negada",
         "unsupported": "A gravação áudio não é suportada neste browser.",
+        "https_required": "A gravação de áudio requer HTTPS. Volte a abrir este estudo através de um endereço HTTPS seguro.",
         "permission_revoked": "Acesso ao microfone perdido - gravação parada",
         "refresh_failed": "Não foi possível atualizar o áudio. A sua gravação ainda está guardada.",
         "refreshing": "A atualizar áudio...",

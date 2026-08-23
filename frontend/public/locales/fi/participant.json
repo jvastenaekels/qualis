@@ -367,6 +367,7 @@
         "invalid_recording": "Tallennus epäonnistui - äänitietoja ei tallennettu",
         "permission_denied": "Mikrofonin käyttöoikeus evätty",
         "unsupported": "Äänen tallennus ei ole tuettu tässä selaimessa.",
+        "https_required": "Äänen tallennus edellyttää HTTPS-yhteyttä. Avaa tämä tutkimus uudelleen suojatulla HTTPS-osoitteella.",
         "permission_revoked": "Mikrofonin käyttöoikeus menetetty - tallennus pysäytetty",
         "refresh_failed": "Ääntä ei voitu päivittää. Tallennuksesi on yhä tallennettu.",
         "refreshing": "Päivitetään ääntä...",

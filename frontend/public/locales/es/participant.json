@@ -355,6 +355,7 @@
         "invalid_recording": "Error de grabación - no se capturaron datos de audio",
         "permission_denied": "Permiso de micrófono denegado",
         "unsupported": "La grabación de audio no está disponible en este navegador.",
+        "https_required": "La grabación de audio requiere HTTPS. Vuelva a abrir este estudio mediante una dirección HTTPS segura.",
         "permission_revoked": "Acceso al micrófono perdido - grabación detenida",
         "refresh_failed": "No se pudo actualizar el audio. Su grabación sigue guardada.",
         "refreshing": "Actualizando audio...",

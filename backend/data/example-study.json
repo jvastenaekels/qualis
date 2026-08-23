@@ -3,7 +3,7 @@
   "translations": {
     "en": {
       "title": "Bioeconomy Futures",
-      "description": "A synthetic demo Q-study on competing futures for the European bioeconomy. It is inspired by the JRC foresight scenarios for the EU bioeconomy in 2050 (Fritsche et al., 2021) and by the debates that surround them: biomass scarcity and cascading use, bioenergy versus durable materials, industrial scale versus agroecology, growth versus ecological limits, justice and value capture, governance and green promises. 25 statements, bell-shaped forced distribution from -4 to +4.",
+      "description": "This demonstration explores different perspectives on the future of the European bioeconomy.",
       "subtitle": "Scarcity, scale, justice, and the promises of a bio-based transition",
       "objective": "Explore the competing viewpoints people hold on how Europe's bioeconomy should be steered: what counts as sustainable, who should decide, who carries the costs, and how open the future should stay.",
       "instructions": "This study asks you to express your personal viewpoint through a sorting process. There are no right or wrong answers; the goal is to compare different ways of imagining the future of the European bioeconomy.",
@@ -14,7 +14,7 @@
     },
     "fr": {
       "title": "Futurs de la bioéconomie",
-      "description": "Une étude Q synthétique de démonstration sur les futurs concurrents de la bioéconomie européenne. Elle s'inspire des scénarios prospectifs du JRC pour la bioéconomie de l'UE à l'horizon 2050 (Fritsche et al., 2021) et des débats qui les entourent : rareté de la biomasse et usage en cascade, bioénergie contre matériaux durables, échelle industrielle contre agroécologie, croissance contre limites écologiques, justice et captation de la valeur, gouvernance et promesses vertes. 25 énoncés, distribution forcée en cloche de -4 à +4.",
+      "description": "Cette démonstration explore différentes perspectives sur l'avenir de la bioéconomie européenne.",
       "subtitle": "Rareté, échelle, justice et promesses d'une transition biosourcée",
       "objective": "Explorer les points de vue concurrents sur la manière d'orienter la bioéconomie européenne : ce qui compte comme durable, qui doit décider, qui en porte les coûts, et à quel point l'avenir doit rester ouvert.",
       "instructions": "Cette étude vous invite à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; l'objectif est de comparer différentes manières d'imaginer l'avenir de la bioéconomie européenne.",
