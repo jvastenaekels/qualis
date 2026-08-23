@@ -164,7 +164,7 @@ orjson==3.11.9
     # via qualis-backend
 packageurl-python==0.17.6
     # via cyclonedx-python-lib
-packaging==26.2
+packaging==26.3
     # via
     #   deptry
     #   gunicorn
