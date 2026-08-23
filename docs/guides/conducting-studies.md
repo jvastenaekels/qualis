@@ -46,7 +46,7 @@ The setting is reversible until activation. To switch modes on an active study, 
 Memos are short markdown notes attached to a study (or a concourse) and surfaced via the toolbar drawer on the study Design page and the Concourse Detail page (not on the study's other admin pages). Three suggested categories:
 
 - **Methodology memos** — rationale for the CoI, the distribution mode, the rough-sort toggle, the language(s) supported. Write these as you design, while the choices are still in front of you. They answer the reviewer questions you will get later ("why forced?", "why N=12?") and stop your future self from second-guessing what you already decided.
-- **Analysis memos** — notes on factor decisions during the refinement workflow: how many factors you retained, which manual flagging overrides you applied, why you dropped or split a particular factor. See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) once that tutorial lands.
+- **Analysis memos** — notes on factor decisions during the refinement workflow: how many factors you retained, which manual flagging overrides you applied, why you dropped or split a particular factor. See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) for a guided example.
 - **General memos** — recruitment observations, team coordination, anything else worth tracking.
 
 Threaded comments under each memo support `@mentions` of project members; mentioned users see an unread badge on the toolbar icon until they open the drawer. Memos are included in the Research Package export, so the analytic trail travels with the data.
@@ -68,4 +68,4 @@ Studies move through Draft → Active → Paused → Closed → Archived. The co
 
 ## Where data lives
 
-Submissions persist as soon as a participant clicks Submit. Each submission gets a confirmation code shown to the participant. To retrieve the data, see the [Data Export guide](data-export.md). For the database schema (only relevant when running custom SQL on a self-hosted instance), see [`../explanation/architecture.md#database-schema`](../explanation/architecture.md#database-schema).
+Submissions persist as soon as a participant clicks Submit. Each submission gets a confirmation code shown to the participant. To retrieve the data, see the [Data Export guide](data-export.md). For the database schema (only relevant when running custom SQL on a self-hosted instance), see the [Data Model reference](../reference/data-model.md).

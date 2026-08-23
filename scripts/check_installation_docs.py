@@ -296,6 +296,23 @@ def check_no_raw_database_url_logging() -> list[str]:
     return errors
 
 
+def check_diataxis_indexes() -> list[str]:
+    """Ensure every public Diátaxis page is discoverable from its section index."""
+    errors: list[str] = []
+    for section in ("tutorials", "guides", "reference", "explanation"):
+        section_dir = ROOT / "docs" / section
+        index = _read(f"docs/{section}/README.md")
+        for page in sorted(section_dir.rglob("*.md")):
+            if page == section_dir / "README.md":
+                continue
+            relative = page.relative_to(section_dir).as_posix()
+            if f"({relative})" not in index:
+                errors.append(
+                    f"docs/{section}/README.md does not link to {relative!r}"
+                )
+    return errors
+
+
 def main() -> int:
     errors = [
         *check_frontend_lock_version(),
@@ -307,6 +324,7 @@ def main() -> int:
         *check_production_bootstrap_docs(),
         *check_tutorial_ui_labels(),
         *check_no_raw_database_url_logging(),
+        *check_diataxis_indexes(),
     ]
     if errors:
         for error in errors:
