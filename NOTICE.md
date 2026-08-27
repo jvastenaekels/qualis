@@ -20,7 +20,7 @@ here and modifications are stated.
   works; Qualis distributes them under AGPL-3.0 via the GPL-3 upgrade path
   permitted by GPL-2+.
 
-The following functions in `backend/app/services/analysis_service.py` are
+The following functions in `src/backend/app/services/analysis_service.py` are
 derivative works of qmethod source:
 
 | Qualis function (Python) | Source (qmethod, R) | Original author | Translation |

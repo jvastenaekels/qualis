@@ -11,7 +11,7 @@
 # was produced with qmethod 1.8.4.
 #
 # Two solutions are frozen so the offline guard
-# (backend/tests/integration/test_lipset_validation.py) can benchmark more of
+# (src/backend/tests/integration/test_lipset_validation.py) can benchmark more of
 # Qualis' engine than rotated loadings alone:
 #   * PCA / varimax / auto-flag  (the default, modal configuration), plus
 #     z-scores, factor arrays, and per-factor reliability / SE / eigenvalue;

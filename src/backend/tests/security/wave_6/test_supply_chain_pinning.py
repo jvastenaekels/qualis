@@ -21,7 +21,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[5]
 
 # First-party owners that may stay version-tagged.
 _FIRST_PARTY_OWNERS = {"actions", "github"}
@@ -75,7 +75,7 @@ def test_pyproject_pins_wave1_cve_floors() -> None:
     Prevents accidental downgrade of pygments / python-dotenv / requests
     below the CVE-fix versions if a transitive constraint loosens.
     """
-    pyproject = (REPO_ROOT / "backend" / "pyproject.toml").read_text()
+    pyproject = (REPO_ROOT / "src" / "backend" / "pyproject.toml").read_text()
 
     expected = {
         "pygments": "2.20.0",
@@ -94,7 +94,7 @@ def test_pyproject_pins_wave1_cve_floors() -> None:
 
 def test_backend_dockerfile_runs_as_non_root() -> None:
     """backend/Dockerfile drops root before CMD (F-02-006)."""
-    dockerfile = (REPO_ROOT / "backend" / "Dockerfile").read_text()
+    dockerfile = (REPO_ROOT / "src" / "backend" / "Dockerfile").read_text()
     # Order matters: USER must precede CMD; we only assert presence here
     # since the file is short and human-reviewable.
     assert re.search(
@@ -116,7 +116,7 @@ def test_nginx_validates_host_header() -> None:
     build arg; absence of the directive means the operator hasn't
     enabled the guard.
     """
-    nginx_conf = (REPO_ROOT / "frontend" / "nginx.conf").read_text()
+    nginx_conf = (REPO_ROOT / "src" / "frontend" / "nginx.conf").read_text()
     assert re.search(
         r"if\s*\(\s*\$host\s*!~", nginx_conf
     ), "frontend/nginx.conf must include a `$host` allowlist guard (F-02-007)"

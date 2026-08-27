@@ -50,8 +50,8 @@ erDiagram
 
 ## Source locations
 
-- SQLAlchemy models: `backend/app/models/`
-- Pydantic request/response schemas: `backend/app/schemas/`
-- Alembic migrations: `backend/alembic/versions/`
+- SQLAlchemy models: `src/backend/app/models/`
+- Pydantic request/response schemas: `src/backend/app/schemas/`
+- Alembic migrations: `src/backend/alembic/versions/`
 - Study import/export shape: [Study Configuration Format](study-configuration-format.md)
 - Personal-data inventory: [GDPR memo for self-hosters](gdpr-self-hosters.md)

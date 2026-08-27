@@ -7,7 +7,7 @@
 import { useTranslation } from 'react-i18next';
 
 const REPO_URL = 'https://github.com/jvastenaekels/qualis';
-const LICENSE_URL = 'https://github.com/jvastenaekels/qualis/blob/main/LICENSE';
+const LICENSE_URL = 'https://github.com/jvastenaekels/qualis/blob/main/LICENSE.txt';
 
 export const Footer = () => {
     const { t } = useTranslation();

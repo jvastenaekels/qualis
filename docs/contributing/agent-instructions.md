@@ -12,21 +12,21 @@
 ## Architecture Overview
 
 ### Backend (Python/FastAPI)
-- **Entry:** [backend/app/main.py](../../backend/app/main.py) — FastAPI app with middleware, exception handlers, CORS.
-- **Models:** [backend/app/models/](../../backend/app/models/) — SQLAlchemy async models (Projects, Studies, Participants, Submissions); per-subdomain modules re-exported via the package `__init__.py`.
-- **Schemas:** [backend/app/schemas/](../../backend/app/schemas/) — Pydantic validation schemas; all HTTP I/O uses these.
-- **Services:** [backend/app/services/](../../backend/app/services/) — Business logic layer (study_service, export_service, recruitment_service).
-- **Routers:** [backend/app/routers/](../../backend/app/routers/) — HTTP endpoint definitions; delegate to services.
+- **Entry:** [src/backend/app/main.py](../../src/backend/app/main.py) — FastAPI app with middleware, exception handlers, CORS.
+- **Models:** [src/backend/app/models/](../../src/backend/app/models/) — SQLAlchemy async models (Projects, Studies, Participants, Submissions); per-subdomain modules re-exported via the package `__init__.py`.
+- **Schemas:** [src/backend/app/schemas/](../../src/backend/app/schemas/) — Pydantic validation schemas; all HTTP I/O uses these.
+- **Services:** [src/backend/app/services/](../../src/backend/app/services/) — Business logic layer (study_service, export_service, recruitment_service).
+- **Routers:** [src/backend/app/routers/](../../src/backend/app/routers/) — HTTP endpoint definitions; delegate to services.
 - **Database:** PostgreSQL with Alembic migrations. Run `make db-reset` (which calls `python init_db.py --reset`) to drop and recreate the local schema; plain `python init_db.py` only applies migrations and seeds.
 
 **Three-tier architecture:** Routers → Services → Models. Import-linter enforces this.
 
 ### Frontend (React/TypeScript)
-- **Pages:** [src/pages/](../../frontend/src/pages/) — Public study interface (Landing, Consent, Pre-Sort, Rough Sort, Fine Sort, Post-Sort, Study Status). Submission has no dedicated page; it is handled inside PostSortPage via the `useSubmitStudy` hook.
-- **Admin:** [src/components/admin/dashboard/](../../frontend/src/components/admin/dashboard/) — Research dashboard (studies, participants, analytics, exports).
-- **Stores:** [src/store/](../../frontend/src/store/) — Zustand atomic stores (useConfigStore, useSessionStore, useResponseStore, useUIStore).
-- **Hooks:** [src/hooks/](../../frontend/src/hooks/) — Custom logic extraction (useGridCalculations, useFineSortDrag, useSubmitStudy, etc.).
-- **API:** [src/api/generated.ts](../../frontend/src/api/generated.ts) — Auto-generated Orval client; never fetch directly.
+- **Pages:** [src/pages/](../../src/frontend/src/pages/) — Public study interface (Landing, Consent, Pre-Sort, Rough Sort, Fine Sort, Post-Sort, Study Status). Submission has no dedicated page; it is handled inside PostSortPage via the `useSubmitStudy` hook.
+- **Admin:** [src/components/admin/dashboard/](../../src/frontend/src/components/admin/dashboard/) — Research dashboard (studies, participants, analytics, exports).
+- **Stores:** [src/store/](../../src/frontend/src/store/) — Zustand atomic stores (useConfigStore, useSessionStore, useResponseStore, useUIStore).
+- **Hooks:** [src/hooks/](../../src/frontend/src/hooks/) — Custom logic extraction (useGridCalculations, useFineSortDrag, useSubmitStudy, etc.).
+- **API:** [src/api/generated.ts](../../src/frontend/src/api/generated.ts) — Auto-generated Orval client; never fetch directly.
 - **Styling:** Tailwind utility-first CSS; mobile-first design with `md:` and `lg:` breakpoints.
 
 ## Q-Methodology Domain Knowledge
@@ -48,20 +48,20 @@ make db-reset
 make migration-new
 # Migrations run on deploy via the Procfile postdeploy phase (scripts/migrate.py);
 # app startup only validates the schema, it does not migrate. To apply them manually:
-cd backend && uv run python scripts/migrate.py
+cd src/backend && uv run python scripts/migrate.py
 ```
 
 ### 2. Backend Feature Workflow (Architect-Builder Pattern)
-1. **Define the Type:** Update [backend/app/schemas/](../../backend/app/schemas/) with Pydantic models; avoid `Any` except for deliberately open-ended JSON-column payloads (e.g. `presort_config`/`postsort_config`/`draft_responses`), which are exempt from `disallow_any_explicit` per CLAUDE.md.
-2. **Define the Endpoint:** Add router in [backend/app/routers/](../../backend/app/routers/) or [backend/app/routers/admin/](../../backend/app/routers/admin/).
-3. **Write the Trap (Failing Test):** [backend/tests/integration/](../../backend/tests/integration/) or [backend/tests/unit/](../../backend/tests/unit/).
-4. **Implement Logic:** [backend/app/services/](../../backend/app/services/) using SQLAlchemy models.
-5. **Export API:** `make generate-api` to regenerate [frontend/src/api/generated.ts](../../frontend/src/api/generated.ts).
+1. **Define the Type:** Update [src/backend/app/schemas/](../../src/backend/app/schemas/) with Pydantic models; avoid `Any` except for deliberately open-ended JSON-column payloads (e.g. `presort_config`/`postsort_config`/`draft_responses`), which are exempt from `disallow_any_explicit` per CLAUDE.md.
+2. **Define the Endpoint:** Add router in [src/backend/app/routers/](../../src/backend/app/routers/) or [src/backend/app/routers/admin/](../../src/backend/app/routers/admin/).
+3. **Write the Trap (Failing Test):** [src/backend/tests/integration/](../../src/backend/tests/integration/) or [src/backend/tests/unit/](../../src/backend/tests/unit/).
+4. **Implement Logic:** [src/backend/app/services/](../../src/backend/app/services/) using SQLAlchemy models.
+5. **Export API:** `make generate-api` to regenerate [src/frontend/src/api/generated.ts](../../src/frontend/src/api/generated.ts).
 
 ### 3. Frontend Feature Workflow
-1. **Check Generated Types:** Inspect [src/api/model/](../../frontend/src/api/model/) for backend types.
+1. **Check Generated Types:** Inspect [src/api/model/](../../src/frontend/src/api/model/) for backend types.
 2. **Define Component Type:** Explicit props interface in component file.
-3. **Write Test:** Vitest unit test (`.test.tsx`) or integration test in [src/integration/](../../frontend/src/integration/).
+3. **Write Test:** Vitest unit test (`.test.tsx`) or integration test in [src/integration/](../../src/frontend/src/integration/).
 4. **Implement:** Use generated `use[Query/Mutation]` hooks; never `fetch()` directly.
 5. **Mobile-First:** Tailwind mobile first; touch targets ≥44×44px; animations non-blocking.
 
@@ -71,7 +71,7 @@ cd backend && uv run python scripts/migrate.py
 make generate-api
 
 # Verify frontend API is in sync:
-make check-api  # Fails if frontend/src/api/generated.ts is out of date
+make check-api  # Fails if src/frontend/src/api/generated.ts is out of date
 ```
 
 ### 5. Quality Assurance (CI Pipeline)
@@ -99,18 +99,18 @@ make e2e         # playwright (study + admin flows)
 ### Backend Patterns
 - **Sentence Case:** Log messages and error descriptions use sentence case (e.g., "User not found in database", not "USER_NOT_FOUND").
 - **Service Layer:** All business logic lives in services; routers only map HTTP request→service call→response.
-- **Exception Handling:** Raise HTTPException with specific status codes; [app/middleware/errors.py](../../backend/app/middleware/errors.py) catches and logs all exceptions.
-- **Database Sessions:** Use dependency injection (`get_db()` in [app/dependencies.py](../../backend/app/dependencies.py)) for async session management.
+- **Exception Handling:** Raise HTTPException with specific status codes; [app/middleware/errors.py](../../src/backend/app/middleware/errors.py) catches and logs all exceptions.
+- **Database Sessions:** Use dependency injection (`get_db()` in [app/dependencies.py](../../src/backend/app/dependencies.py)) for async session management.
 
 ### Frontend Patterns
 - **State Management:** Zustand atomic stores (not Redux); each store is independent. Avoid cross-store dependencies.
-- **Generated API:** All API calls via `useMutation()` or `useQuery()` from [src/api/generated.ts](../../frontend/src/api/generated.ts); generated by `orval`.
+- **Generated API:** All API calls via `useMutation()` or `useQuery()` from [src/api/generated.ts](../../src/frontend/src/api/generated.ts); generated by `orval`.
 - **Component Testing:** Use `testing-library` for user interactions; avoid testing implementation details.
 - **Drag-and-Drop:** [dnd-kit](https://docs.dndkit.com/) primitives for sort interactions; custom hooks for physics (useFineSortDrag, useGridCalculations).
 
 ### Internationalization (i18n)
-- **Supported:** see `SUPPORTED_LANGUAGES` in [frontend/src/constants/languages.ts](../../frontend/src/constants/languages.ts) (currently en, fr, fi, de, es, it, nl, pt, pl).
-- **Static UI:** i18next labels in [public/locales/](../../frontend/public/locales/).
+- **Supported:** see `SUPPORTED_LANGUAGES` in [src/frontend/src/constants/languages.ts](../../src/frontend/src/constants/languages.ts) (currently en, fr, fi, de, es, it, nl, pt, pl).
+- **Static UI:** i18next labels in [public/locales/](../../src/frontend/public/locales/).
 - **Dynamic Content:** Study titles, instructions, statements fetched from backend; localized per participant.
 - **Validation:** `npm run i18n-check` enforces strict key parity for the participant namespace (mismatches fail CI); the admin namespace is best-effort (warnings only, missing admin.json tolerated via the English fallback).
 
@@ -122,8 +122,8 @@ make e2e         # playwright (study + admin flows)
 | [prompting-strategy.md](prompting-strategy.md) | Templates for agent workflows (architect-builder, mobile-first, etc.). |
 | [../explanation/architecture.md](../explanation/architecture.md) | High-level system design and data flows. |
 | [openapi.json](../../openapi.json) | Auto-generated API spec; source of truth for frontend. |
-| [backend/requirements.txt](../../backend/requirements.txt) | Python dependencies (FastAPI, SQLAlchemy, Pydantic, bcrypt, PyJWT). |
-| [frontend/package.json](../../frontend/package.json) | JavaScript dependencies (React 19, Zustand, dnd-kit, Tailwind, Vitest, Playwright). |
+| [src/backend/requirements.txt](../../src/backend/requirements.txt) | Python dependencies (FastAPI, SQLAlchemy, Pydantic, bcrypt, PyJWT). |
+| [src/frontend/package.json](../../src/frontend/package.json) | JavaScript dependencies (React 19, Zustand, dnd-kit, Tailwind, Vitest, Playwright). |
 | [Makefile](../../Makefile) | All build/test commands. |
 
 ## Common Pitfalls to Avoid

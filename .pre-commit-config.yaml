@@ -10,7 +10,7 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
       - id: check-json
-        exclude: ^frontend/tsconfig.*\.json$
+        exclude: ^src/frontend/tsconfig.*\.json$
 
   # -------------------------
   # BACKEND (Python/FastAPI)
@@ -21,18 +21,18 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^backend/
+        files: ^src/backend/
       - id: ruff-format
-        files: ^backend/
+        files: ^src/backend/
 
   # Mypy : Static Type Checking
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.13.0
     hooks:
       - id: mypy
-        files: ^backend/
+        files: ^src/backend/
         args:
-          ["--config-file=backend/pyproject.toml", "--ignore-missing-imports"]
+          ["--config-file=src/backend/pyproject.toml", "--ignore-missing-imports"]
         additional_dependencies:
           [
             types-requests,
@@ -51,26 +51,26 @@ repos:
       # Radon : Complexity
       - id: radon-cc
         name: Radon (Complexity)
-        entry: bash -c 'cd backend && uv run radon cc app -a -nb --min B'
+        entry: bash -c 'cd src/backend && uv run radon cc app -a -nb --min B'
         language: system
-        files: ^backend/
+        files: ^src/backend/
         pass_filenames: false
         types: [python]
 
       # Deptry : Dependency Hygiene
       - id: deptry
         name: Deptry (Check Dependencies)
-        entry: bash -c 'cd backend && uv run deptry app'
+        entry: bash -c 'cd src/backend && uv run deptry app'
         language: system
-        files: ^backend/pyproject.toml|backend/.*\.py$
+        files: ^src/backend/pyproject.toml|src/backend/.*\.py$
         pass_filenames: false
 
       # Bandit : Security SAST
       - id: bandit
         name: Bandit (Security)
-        entry: bash -c 'cd backend && uv run bandit -r app -ll'
+        entry: bash -c 'cd src/backend && uv run bandit -r app -ll'
         language: system
-        files: ^backend/
+        files: ^src/backend/
         pass_filenames: false
 
   # -------------------------
@@ -81,23 +81,23 @@ repos:
       # TypeScript Check
       - id: frontend-typecheck
         name: Frontend Typecheck (TSC)
-        entry: bash -c 'cd frontend && npm run type-check'
+        entry: bash -c 'cd src/frontend && npm run type-check'
         language: system
-        files: ^frontend/.*\.(ts|tsx)$
+        files: ^src/frontend/.*\.(ts|tsx)$
         pass_filenames: false
 
       # Linting & Formatting (Biome)
       - id: frontend-biome
         name: Frontend Lint & Format (Biome)
-        entry: bash -c 'cd frontend && npm run lint'
+        entry: bash -c 'cd src/frontend && npm run lint'
         language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx|json|css)$
+        files: ^src/frontend/.*\.(ts|tsx|js|jsx|json|css)$
         pass_filenames: false
 
       # Architecture/Dead Code
       - id: frontend-knip
         name: Frontend Dead Code (Knip)
-        entry: bash -c 'cd frontend && npm run lint:deadcode'
+        entry: bash -c 'cd src/frontend && npm run lint:deadcode'
         language: system
-        files: ^frontend/
+        files: ^src/frontend/
         pass_filenames: false

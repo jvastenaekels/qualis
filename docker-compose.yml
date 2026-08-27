@@ -84,7 +84,7 @@ services:
       "
 
   backend:
-    build: ./backend
+    build: ./src/backend
     environment:
       DATABASE_URL: postgresql+asyncpg://qualis:qualis@db:5432/qualis
       SECRET_KEY: docker-dev-secret-change-in-production
@@ -119,7 +119,7 @@ services:
         condition: service_completed_successfully
     healthcheck:
       # Use the baked venv directly; a bare `uv run` here would also trigger a
-      # dev re-sync on the first probe (see backend/Dockerfile CMD).
+      # dev re-sync on the first probe (see src/backend/Dockerfile CMD).
       test:
         [
           "CMD-SHELL",
@@ -140,7 +140,7 @@ services:
       start_period: 120s
 
   frontend:
-    build: ./frontend
+    build: ./src/frontend
     environment:
       QUALIS_ALLOWED_HOST_PATTERN: "${QUALIS_ALLOWED_HOST_PATTERN:-^(qualis[.]example[.]org|localhost|127[.]0[.]0[.]1)$$}"
     ports:

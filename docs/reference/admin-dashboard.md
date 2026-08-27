@@ -191,7 +191,7 @@ Diagnostic block surfaced at the top of the Analysis page. Source: `POST /api/ad
 
 ### Compare
 
-When two analysis runs exist, the Compare bar aligns them via Tucker φ congruence (computed client-side; see `frontend/src/utils/tuckerPhi.ts`).
+When two analysis runs exist, the Compare bar aligns them via Tucker φ congruence (computed client-side; see `src/frontend/src/utils/tuckerPhi.ts`).
 
 - **φ matrix**: pairwise congruence between factors of the two runs.
 - **Aligned arrays**: factors of the second run reordered + sign-flipped to maximise congruence with the first.

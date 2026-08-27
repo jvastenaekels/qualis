@@ -5,20 +5,20 @@ administrative/participant API for Qualis.
 
 ## Start here
 
-- [Development workflow](../docs/contributing/development.md) — prerequisites,
+- [Development workflow](../../docs/contributing/development.md) — prerequisites,
   database setup, migrations, bootstrap, and local servers.
-- [Backend guidelines](../docs/contributing/backend-guidelines.md) — package
+- [Backend guidelines](../../docs/contributing/backend-guidelines.md) — package
   boundaries, service/repository responsibilities, typing, and error handling.
-- [Testing guide](../docs/contributing/testing.md#backend-tests-pytest) — test
+- [Testing guide](../../docs/contributing/testing.md#backend-tests-pytest) — test
   structure and commands.
-- [API reference](../docs/reference/api.md) — endpoints, authentication, payloads,
+- [API reference](../../docs/reference/api.md) — endpoints, authentication, payloads,
   errors, and rate limits.
-- [Architecture explanation](../docs/explanation/architecture.md) — system context,
+- [Architecture explanation](../../docs/explanation/architecture.md) — system context,
   state, permissions, and lifecycle rationale.
 
 ## Common commands
 
-Run these from `backend/`:
+Run these from `src/backend/`:
 
 ```bash
 uv sync --frozen

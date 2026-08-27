@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build: ./backend
+    build: ./src/backend
     environment:
       DATABASE_URL: postgresql+asyncpg://qualis:${QUALIS_DB_PASSWORD:?Set QUALIS_DB_PASSWORD in .env.production}@db:5432/qualis
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env.production}
@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build: ./src/frontend
     environment:
       QUALIS_ALLOWED_HOST_PATTERN: ${QUALIS_ALLOWED_HOST_PATTERN:?Set QUALIS_ALLOWED_HOST_PATTERN in .env.production}
     ports:

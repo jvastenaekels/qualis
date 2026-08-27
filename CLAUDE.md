@@ -11,13 +11,13 @@ Open-source platform for conducting Q-methodology research. Monorepo with a Fast
 ## Project Structure
 
 ```
-backend/        # FastAPI app
+src/backend/        # FastAPI app
   app/          # Application code (models, schemas, services, routers)
     models/     # Per-subdomain package (Phase 5D): base.py, user.py, project.py,
                 #   study.py, participant.py, recruitment.py, concourse.py, analysis.py
                 #   __init__.py re-exports all names for back-compat
   tests/        # Unit + integration tests (pytest)
-frontend/       # React SPA
+src/frontend/       # React SPA
   src/           # Components, pages, hooks, store, api
   public/locales/  # i18n translation files (one dir per locale; see `SUPPORTED_LANGUAGES`)
 ```
@@ -54,7 +54,7 @@ make migration-new    # Create a new Alembic migration
 
 ### Strict-typed Python modules
 
-The following backend modules are under `mypy --strict` (see `[[tool.mypy.overrides]]` in `backend/pyproject.toml`). When you add a new utility/leaf module, opt into the same bar by adding it to the overrides list:
+The following backend modules are under `mypy --strict` (see `[[tool.mypy.overrides]]` in `src/backend/pyproject.toml`). When you add a new utility/leaf module, opt into the same bar by adding it to the overrides list:
 
 **Full strict (disallow_any_explicit + disallow_untyped_defs + warn_return_any + strict_equality):**
 - `app.utils.security`, `app.utils.audit`, `app.resume_codes`
@@ -113,9 +113,9 @@ Inside a strict module: every function declares its return type, no implicit `An
 
 ### Internationalization
 - All user-facing strings must use `useTranslation()` / `t()` with a key and English fallback: `t('key', 'Fallback')`
-- Supported locales: see `SUPPORTED_LANGUAGES` in `frontend/src/constants/languages.ts` (canonical source). Each entry has a `hasAdmin` flag — when false, admin chrome falls back to English via i18next's `fallbackLng`.
-- Locale files: `frontend/public/locales/<lang>/{participant,admin}.json`. **Participant strict** parity (mandatory), **admin best-effort** (warning-only). Policy enforced by `frontend/scripts/check_i18n.py`.
-- Adding a new locale: write `frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `frontend/scripts/i18n/translation-runbook.md`. Cross-consistency tests catch missing `SUPPORTED_I18N_LANGUAGES` entries and `setupTests.ts` mock drift automatically.
+- Supported locales: see `SUPPORTED_LANGUAGES` in `src/frontend/src/constants/languages.ts` (canonical source). Each entry has a `hasAdmin` flag — when false, admin chrome falls back to English via i18next's `fallbackLng`.
+- Locale files: `src/frontend/public/locales/<lang>/{participant,admin}.json`. **Participant strict** parity (mandatory), **admin best-effort** (warning-only). Policy enforced by `src/frontend/scripts/check_i18n.py`.
+- Adding a new locale: write `src/frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `src/frontend/scripts/i18n/translation-runbook.md`. Cross-consistency tests catch missing `SUPPORTED_I18N_LANGUAGES` entries and `setupTests.ts` mock drift automatically.
 - Run `npm run i18n-check` to verify key parity. `npm run check-interpolations` verifies per-key `{{var}}` parity.
 
 ### Testing
@@ -147,7 +147,7 @@ Inside a strict module: every function declares its return type, no implicit `An
   → `rename_researcher_to_member_and_owner_uniqueness`
   → `add_pending_email_column` → `add_last_login_at`
   → `remove_email_otp_2fa_channel`
-- Run `alembic history` (in `backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
+- Run `alembic history` (in `src/backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
 - PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
 
 ### API Changes
@@ -157,7 +157,7 @@ Inside a strict module: every function declares its return type, no implicit `An
 ### Hook-driven components (Phase 5 item G)
 
 Pages and complex components delegate state-and-effect logic to a hook in
-`frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value
+`src/frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value
 and renders JSX from it.
 
 **Why:** logic becomes unit-testable without rendering; LLM can reason about logic
@@ -234,7 +234,7 @@ That name is propagated to three places, all in `participant.json`:
 | the page's own `<h1>` key | `presort.title`, `post.title`, … |
 
 Plus a fourth place, which is not i18n and **wins over the stepper's key**:
-`DEFAULT_PROCESS_STEPS` in `backend/app/services/study_defaults.py` seeds each study's
+`DEFAULT_PROCESS_STEPS` in `src/backend/app/services/study_defaults.py` seeds each study's
 `process_steps[].title` at creation, and `StudyLayout.tsx:565-571` prefers that value
 when it exists. So the i18n stepper label is only the fallback for a study without
 `process_steps`, and a name changed in `participant.json` alone will not show. Change

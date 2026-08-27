@@ -1,3 +1,6 @@
+# NOTE: each fingerprint is <commit>:<path>:<rule>:<line>, and the path is the
+# path AS IT WAS IN THAT COMMIT. The src/ move (dc2bbce1) does not change them;
+# rewriting them to src/... breaks the match and the findings resurface.
 # Sample AWS credentials in published documentation and audit reports.
 # The flagged access-key value is AWS's canonical sample shown in their own
 # documentation; it is not a real credential and carries no access rights.
@@ -20,7 +23,7 @@
 # examples. Values (123e4567-e89b-12d3-a456-426614174000 and the -099 variant)
 # are the IETF-published illustrative UUIDs; they identify no real resource.
 # The eadf28c4-... value is a hardcoded fake session token in an integration
-# test fixture (backend/tests/integration/), not a real credential.
+# test fixture (now src/backend/tests/integration/), not a real credential.
 45ecb8a0ab256df71c948d2bfc40e805951091f9:docs/reference/api.md:generic-api-key:71
 66d6657ab549eb4842b1bb057982188a11e53e39:backend/tests/integration/test_api_participants.py:generic-api-key:17
 66d6657ab549eb4842b1bb057982188a11e53e39:backend/tests/integration/test_api_participants.py:generic-api-key:51

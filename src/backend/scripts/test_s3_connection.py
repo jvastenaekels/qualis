@@ -227,7 +227,7 @@ async def test_s3_connection():
     print("✅ La configuration S3/Cellar est correcte et fonctionnelle.")
     print()
     print("Prochaines étapes:")
-    print("  1. Lancez le backend: cd backend && uvicorn app.main:app --reload")
+    print("  1. Lancez le backend: cd src/backend && uvicorn app.main:app --reload")
     print("  2. Testez l'API audio: pytest tests/integration/test_audio.py -v")
     print("  3. Configurez une étude avec audio activé dans l'admin")
     print("  4. Testez l'enregistrement audio comme participant")

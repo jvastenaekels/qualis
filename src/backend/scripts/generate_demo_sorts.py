@@ -25,7 +25,7 @@ fourth): F1 is bipolar — the industrial voice (A) at one pole, the justice voi
 (C). This is deliberate: it shows that designed groups need not map one-to-one
 onto extracted factors, and that bipolar factors are real.
 
-Run:  uv run python scripts/generate_demo_sorts.py   (from the backend/ dir)
+Run:  uv run python scripts/generate_demo_sorts.py   (from the src/backend/ dir)
 """
 
 import json

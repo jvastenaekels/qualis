@@ -1,11 +1,11 @@
 # Frontend Components
 
-Reference for the React component tree under `frontend/src/components/`. Two parts:
+Reference for the React component tree under `src/frontend/src/components/`. Two parts:
 
 1. [Sorting primitives](#sorting-primitives) — full prop tables for the components that drive the participant Q-sort experience (and are reused in admin read-only views).
 2. [Component index](#component-index) — every other component, by category, with file path and one-line purpose. Use it to locate the right file before reading source.
 
-For pages (one per route), see `frontend/src/pages/`. For the convention that splits page state/effects into a colocated `useFooPage` hook, see [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md).
+For pages (one per route), see `src/frontend/src/pages/`. For the convention that splits page state/effects into a colocated `useFooPage` hook, see [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md).
 
 ---
 
@@ -157,7 +157,7 @@ Fixed zone displaying a magnified view of the currently hovered or active card w
 
 ## Component index
 
-Sorted alphabetically within each category. Paths are relative to `frontend/src/components/`.
+Sorted alphabetically within each category. Paths are relative to `src/frontend/src/components/`.
 
 ### Layout & error boundaries
 
@@ -272,7 +272,7 @@ Sorted alphabetically within each category. Paths are relative to `frontend/src/
 
 ### UI primitives (`ui/`)
 
-Shadcn UI wrappers around Radix primitives. Used throughout the app for consistent styling. Source: `frontend/src/components/ui/`.
+Shadcn UI wrappers around Radix primitives. Used throughout the app for consistent styling. Source: `src/frontend/src/components/ui/`.
 
 `accordion`, `alert`, `alert-dialog`, `badge`, `breadcrumb`, `button`, `card`, `checkbox`, `dialog`, `dropdown-menu`, `form`, `input`, `label`, `progress`, `radio-group`, `select`, `separator`, `sheet`, `sidebar`, `skeleton`, `switch`, `table`, `tabs`, `textarea`, `tooltip`.
 
@@ -280,7 +280,7 @@ Shadcn UI wrappers around Radix primitives. Used throughout the app for consiste
 
 ## Hooks
 
-The page-level state-and-effect logic for complex pages is extracted into colocated hooks in `frontend/src/hooks/<area>/use<Name>.ts`. See [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md) for the boundary rules.
+The page-level state-and-effect logic for complex pages is extracted into colocated hooks in `src/frontend/src/hooks/<area>/use<Name>.ts`. See [`../contributing/frontend-guidelines.md`](../contributing/frontend-guidelines.md) for the boundary rules.
 
 A few component-level hooks are reused:
 

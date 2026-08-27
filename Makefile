@@ -22,7 +22,7 @@ $(TTYCOL); printf '  %-40s' "checking $(1)"; if curl -fsS "$(2)" >/dev/null 2>&1
 endef
 
 # Toolchain versions CI exercises. Keep in sync with .python-version, .nvmrc,
-# backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
+# src/backend/Dockerfile, docker-compose.yml and .github/workflows/ci.yml.
 PYTHON_VERSION := 3.14
 NODE_MAJOR := 26
 POSTGRES_MAJOR := 18
@@ -81,17 +81,17 @@ db-check:
 	psql "$$url" -c 'select current_user, current_database()' || exit 1
 
 install: preflight
-	cd backend && uv sync
-	cd frontend && npm ci
+	cd src/backend && uv sync
+	cd src/frontend && npm ci
 
 run-backend:
-	cd backend && uv run uvicorn app.main:app --reload
+	cd src/backend && uv run uvicorn app.main:app --reload
 
 run-frontend:
-	cd frontend && npm run dev
+	cd src/frontend && npm run dev
 
 seed:
-	cd backend && uv run python seed.py data/example-study.json
+	cd src/backend && uv run python seed.py data/example-study.json
 
 # COMPOSE_BAKE delegates the build to buildx bake, which builds the backend and
 # frontend images in parallel instead of one after the other (ignored by Compose
@@ -143,11 +143,11 @@ demo-down:
 	docker compose down
 
 migrate:
-	cd backend && uv run python scripts/migrate.py
+	cd src/backend && uv run python scripts/migrate.py
 
 migration-new:
 	@read -p "Enter migration name: " name; \
-	cd backend && uv run alembic revision --autogenerate -m "$$name"
+	cd src/backend && uv run alembic revision --autogenerate -m "$$name"
 
 # ENVIRONMENT=production, and not by accident: main.py mounts the /api/test/*
 # router whenever ENVIRONMENT is "test" or "development", and the README tells
@@ -156,36 +156,36 @@ migration-new:
 # Passed as a command-line variable so it beats the `-include .env` at the top
 # of this file, which would otherwise win over a plain environment variable.
 generate-api:
-	cd backend && ENVIRONMENT=production uv run python ../export_openapi.py
-	cd frontend && npm run generate:api
+	cd src/backend && ENVIRONMENT=production uv run python ../export_openapi.py
+	cd src/frontend && npm run generate:api
 
 check-api: generate-api
 	@echo "Checking if API client is up to date..."
-	git diff --exit-code frontend/src/api/generated.ts frontend/openapi.json
+	git diff --exit-code src/frontend/src/api/generated.ts src/frontend/openapi.json
 
 check-requirements:
 	@echo "Checking uv.lock is in sync with pyproject.toml..."
-	cd backend && uv lock --check
+	cd src/backend && uv lock --check
 	@echo "Checking requirements.txt matches uv.lock..."
-	cd backend && uv export --no-hashes --format requirements-txt --output-file requirements.txt
-	git diff --exit-code backend/requirements.txt
+	cd src/backend && uv export --no-hashes --format requirements-txt --output-file requirements.txt
+	git diff --exit-code src/backend/requirements.txt
 
 # -------------------------
 # Quality & Verification
 # -------------------------
 
 lint:
-	cd backend && uv run ruff check app/
-	cd backend && uv run ruff format --check app/
-	cd frontend && npm run lint
+	cd src/backend && uv run ruff check app/
+	cd src/backend && uv run ruff format --check app/
+	cd src/frontend && npm run lint
 
 check:
-	cd backend && uv run mypy app/
-	cd backend && uv run bandit -r app/ -ll
-	cd backend && uv run radon cc app/ -a -nb --min B
-	cd backend && uv run deptry app/
-	cd backend && uv run vulture app/ vulture_whitelist.py --min-confidence 60
-	cd backend && uv run pip-audit \
+	cd src/backend && uv run mypy app/
+	cd src/backend && uv run bandit -r app/ -ll
+	cd src/backend && uv run radon cc app/ -a -nb --min B
+	cd src/backend && uv run deptry app/
+	cd src/backend && uv run vulture app/ vulture_whitelist.py --min-confidence 60
+	cd src/backend && uv run pip-audit \
 		--ignore-vuln CVE-2026-4539 \
 		--ignore-vuln CVE-2026-28684 \
 		--ignore-vuln CVE-2026-25645
@@ -193,29 +193,29 @@ check:
 	# CVE-2026-28684 (python-dotenv): transitive via pydantic-settings, symlink attack requires write access to .env
 	# CVE-2026-25645 (requests): transitive via boto3, extract_zipped_paths() not called by Qualis
 	# See SECURITY.md for the deliberate-acceptance evaluation.
-	cd backend && uv run python -m app.schema_validation
-	python3 backend/scripts/check_relationships.py
+	cd src/backend && uv run python -m app.schema_validation
+	python3 src/backend/scripts/check_relationships.py
 	python3 scripts/check_installation_docs.py
 	$(MAKE) check-requirements
 	$(MAKE) check-api
-	cd frontend && npm run type-check
-	cd frontend && npm run i18n-check
-	cd frontend && npm run check-interpolations
-	cd frontend && npm run check-orphan-keys
-	cd frontend && npm run lint:a11y
+	cd src/frontend && npm run type-check
+	cd src/frontend && npm run i18n-check
+	cd src/frontend && npm run check-interpolations
+	cd src/frontend && npm run check-orphan-keys
+	cd src/frontend && npm run lint:a11y
 
 test:
-	cd backend && uv run pytest tests/
-	cd frontend && npm run test -- --run --coverage
+	cd src/backend && uv run pytest tests/
+	cd src/frontend && npm run test -- --run --coverage
 
 test-property:
-	cd backend && uv run pytest tests/property/ -v --hypothesis-show-statistics
+	cd src/backend && uv run pytest tests/property/ -v --hypothesis-show-statistics
 
 e2e:
-	cd frontend && ENVIRONMENT=test npm run e2e
+	cd src/frontend && ENVIRONMENT=test npm run e2e
 
 build:
-	cd frontend && npm run build
+	cd src/frontend && npm run build
 
 ci: lint check test build
 	@echo "\n--- Fast CI checks passed locally! (Skipped E2E) ---"
@@ -226,17 +226,17 @@ ci: lint check test build
 # Run this between every change. Use `make ci` before pushing.
 .PHONY: ci-fast
 ci-fast:
-	cd backend && uv run ruff check app/
-	cd backend && uv run ruff format --check app/
-	cd frontend && npm run lint
-	cd backend && uv run mypy app/
-	cd frontend && npm run type-check
-	cd backend && uv run pytest tests/unit/ -q
-	cd frontend && npm run test -- --run
+	cd src/backend && uv run ruff check app/
+	cd src/backend && uv run ruff format --check app/
+	cd src/frontend && npm run lint
+	cd src/backend && uv run mypy app/
+	cd src/frontend && npm run type-check
+	cd src/backend && uv run pytest tests/unit/ -q
+	cd src/frontend && npm run test -- --run
 	@echo "\n--- ci-fast OK — run \`make ci\` before push. ---"
 
 db-reset:
-	cd backend && uv run python init_db.py --reset
+	cd src/backend && uv run python init_db.py --reset
 
 ci-full: ci db-reset e2e
 	@echo "\n--- All CI (Full) checks passed locally! ---"
@@ -251,10 +251,10 @@ cleanup:
 	@find . -type d -name ".ruff_cache" -exec rm -rf {} +
 	@find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	@find . -type d -name ".vulture_cache" -exec rm -rf {} +
-	@rm -rf backend/.coverage
-	@rm -rf backend/htmlcov
-	@rm -rf frontend/dist
-	@rm -rf frontend/coverage
-	@rm -rf frontend/playwright-report
-	@rm -rf frontend/test-results
+	@rm -rf src/backend/.coverage
+	@rm -rf src/backend/htmlcov
+	@rm -rf src/frontend/dist
+	@rm -rf src/frontend/coverage
+	@rm -rf src/frontend/playwright-report
+	@rm -rf src/frontend/test-results
 	@echo "Cleanup complete."

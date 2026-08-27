@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { Footer } from './Footer';
 
 const REPO_URL = 'https://github.com/jvastenaekels/qualis';
-const LICENSE_URL = 'https://github.com/jvastenaekels/qualis/blob/main/LICENSE';
+const LICENSE_URL = 'https://github.com/jvastenaekels/qualis/blob/main/LICENSE.txt';
 
 describe('Footer', () => {
     it('renders the "Powered by Qualis" attribution link to the repo', () => {
