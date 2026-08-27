@@ -178,15 +178,6 @@
     "interview_consent_enabled": false,
     "newsletter_consent_enabled": false,
     "questions": {
-      "q_rationale": {
-        "type": "textarea",
-        "label": {
-          "en": "Briefly explain why you placed the statements at the two extremes (+4 and -4).",
-          "fr": "Expliquez brièvement pourquoi vous avez placé les énoncés aux deux extrêmes (+4 et -4)."
-        },
-        "required": true,
-        "rows": 4
-      },
       "q_perspective": {
         "type": "select",
         "label": {

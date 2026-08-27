@@ -25,7 +25,7 @@ jobs:
       - name: Link Checker (Lychee)
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          args: --verbose --no-progress --config ./lychee.toml './docs/**/*.md' './README.md'
+          args: --verbose --no-progress --config ./lychee.toml './docs/**/*.md' './README.md' './backend/README.md' './frontend/README.md'
           fail: true
       - name: Installation docs coherence
         # Asserts the README/Makefile/compose demo path stays internally

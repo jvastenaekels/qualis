@@ -200,27 +200,12 @@ when needed; audio also requires S3-compatible object storage.
 
 ---
 
-## Required environment variables
+## Configuration checklist
 
-The minimum set for any production deployment. The two `QUALIS_*` rows apply to
-the Docker path only, where `docker-compose.production.yml` declares them with
-`${VAR:?}` — Compose refuses to start if either is unset.
-
-| Variable | Required | Notes |
-| -------- | :------: | ----- |
-| `DATABASE_URL` | yes | `postgresql+asyncpg://user:pass@host:5432/db`. |
-| `SECRET_KEY` | yes | JWT signing key. Generate with `openssl rand -hex 32`. |
-| `IP_HASH_SALT` | yes | Salt for participant IP hashing. Generate the same way. |
-| `ALLOWED_ORIGINS` | yes | Comma-separated origin allow-list for CORS. No wildcards. |
-| `ENVIRONMENT` | yes | Set to `production`; the test routes (`/api/test/*`) are wired only for `development` / `test`. |
-| `FRONTEND_URL` | yes | Public HTTPS origin, used in account and invitation links. |
-| `ADMIN_EMAIL` | first deploy | Email of the initial owner created when the database is empty. |
-| `ADMIN_PASSWORD` | first deploy | Unique initial password. Demo/template values are rejected in production. |
-| `TRUSTED_PROXIES` | behind a proxy | Set to `*` on Scalingo; use explicit proxy IPs on infrastructure you control. |
-| `QUALIS_DB_PASSWORD` | Docker only | Password for the bundled Postgres service. `docker-compose.production.yml` refuses to start without it. |
-| `QUALIS_ALLOWED_HOST_PATTERN` | Docker only | Regex of hosts the backend will answer for. Also mandatory — use `[.]` for literal dots. |
-
-For the full set (audio, S3, SMTP, Sentry, rate-limiting), see [`../reference/configuration.md#environment--app-settings`](../reference/configuration.md#environment--app-settings).
+Before deploying, complete the environment-specific values in the
+[Configuration reference](../reference/configuration.md#environment--app-settings).
+The production Compose path additionally validates every required value in
+`.env.production` before it starts containers.
 
 ---
 
@@ -326,12 +311,11 @@ scalingo --app qualis run -- bash -c "python backend/init_db.py --reset && env A
 
 ---
 
-## Health checks
+## Verify the deployment
 
-| Endpoint | Purpose |
-| -------- | ------- |
-| `GET /` | Verifies the frontend is being served. |
-| `GET /health` | Backend liveness probe; returns `{"status": "ok"}`. |
+Open `/` to verify the frontend, then request `/health` and confirm it returns
+`{"status": "ok"}`. The stable endpoint contract is listed in the
+[Operations reference](../reference/operations.md#health-endpoints).
 
 ---
 
@@ -341,37 +325,7 @@ Scalingo provisions SSL certificates automatically. For Docker / VPS deployments
 
 ---
 
-## Runtime behaviour reference
-
-The following sections document runtime defaults for operators who need to size or tune a deployment. They are reference material, not setup steps.
-
-### Rate limiting
-
-Qualis uses SlowAPI in three modes:
-
-| Mode | When active | Storage |
-| ---- | ----------- | ------- |
-| Disabled | Test environment | None. |
-| Redis | `REDIS_URL` is set | Redis (production with multiple workers). |
-| In-memory | Default | Local process memory. |
-
-For multi-process deployments, configure `REDIS_URL` to share rate-limit counters across workers.
-
-### Database connection pool
-
-Pool sizes are tuned per environment:
-
-| Setting | Production | Development |
-| ------- | ---------- | ----------- |
-| `pool_size` | 3 | 1 |
-| `max_overflow` | 2 | 1 |
-| Pool pre-ping | enabled | enabled |
-| Statement timeout | 30 s | 30 s |
-| Idle TX timeout | 60 s | 60 s |
-
-The production sizing (3 + 2 = 5 connections) is designed to fit Scalingo's starter PostgreSQL plans (5–10 slots).
-
-### Upgrading PostgreSQL
+## Upgrading PostgreSQL
 
 `docker-compose.production.yml` moved from `postgres:16-alpine` to
 `postgres:18-alpine`. **This is not a drop-in swap for an existing deployment.**
@@ -411,32 +365,12 @@ deleting anything. If you would rather not migrate right now, pinning
 `image: postgres:16-alpine` and restoring the `/var/lib/postgresql/data` mount
 point keeps the previous behaviour — the application code supports both.
 
-### Startup validation
-
-On startup the backend checks for required tables (`projects`, `users`, `studies`, `participants`, …) and critical columns. If something is missing, it logs a warning with the remediation step (typically `alembic upgrade head`) and continues — it does not fail closed.
-
-### SMTP fallback
-
-When `SMTP_HOST` is unset, invitation emails are logged to stdout instead of being sent. The invitation URL appears in the application logs and in the dashboard.
-
----
-
 ## Email transport (auth flows)
 
-Email-driven auth flows (sign-up verification, password reset, 2FA self-serve disable) degrade gracefully when SMTP is not configured — sign-ups create immediately-active accounts and none of the email-gate checks block login. Configure the following variables when enabling email auth in production:
-
-| Variable | Default | Notes |
-| -------- | ------- | ----- |
-| `SMTP_HOST` | — | Required to send any email. Unset = mock-log mode. |
-| `SMTP_PORT` | `587` | Standard submission port with STARTTLS. |
-| `SMTP_USER` | — | SMTP credentials username. |
-| `SMTP_PASSWORD` | — | SMTP credentials password. |
-| `EMAILS_FROM_EMAIL` | — | Sender address shown to recipients. Required for a valid From header. |
-| `EMAILS_FROM_NAME` | — | Display name for the sender. |
-| `EMAIL_VERIFICATION_REQUIRED` | `true` | Enforce email verification on sign-up when SMTP is active. Set to `false` only to test the unverified-account UX with SMTP configured. |
-| `EMAIL_VERIFY_TOKEN_EXPIRE_HOURS` | `24` | Validity window for the sign-up verification link. |
-| `PASSWORD_RESET_TOKEN_EXPIRE_HOURS` | `1` | Validity window for the password-reset link. |
-| `TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES` | `15` | Validity window for the 2FA self-serve disable link. |
+Email-driven auth flows degrade gracefully when SMTP is absent. Configure the
+SMTP and token-expiry values from the
+[Configuration reference](../reference/configuration.md#email-smtp), then use
+the procedure below to schedule consumed-token cleanup.
 
 **Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.
 

@@ -16,8 +16,11 @@ For the page-by-page catalog of the admin UI, see [`../reference/admin-dashboard
 
 | Guide | Description |
 |-------|-------------|
-| [Deployment](deployment.md) | Deploy to Scalingo, Render, or Docker; environment variables and health checks |
+| [Deployment](deployment.md) | Deploy to supported Scalingo or production Docker environments |
 | [S3 Setup](s3-setup.md) | Configure S3-compatible storage for audio recordings |
+| [Running without S3](running-without-s3.md) | Operate without object storage and understand the degraded audio behavior |
+| [Running without SMTP](running-without-smtp.md) | Operate without email and recover administrative access safely |
+| [GDPR Operations](gdpr-operations.md) | Prepare studies and handle rights, retention, and incident tasks |
 
 ## For Contributors
 

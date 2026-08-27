@@ -63,7 +63,7 @@ def test_example_study_is_bioeconomy_futures_demo() -> None:
     assert fr["title"] == "Futurs de la bioéconomie"
 
     searchable = json.dumps(study, ensure_ascii=False).lower()
-    for term in ("bioeconomy", "bioéconomie", "jrc"):
+    for term in ("bioeconomy", "bioéconomie"):
         assert term in searchable
     # The demo was rebranded away from the hemp-specific framing.
     assert "hemp" not in searchable

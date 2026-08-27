@@ -34,10 +34,11 @@ Practical guides for accomplishing specific goals.
 
 | Guide | Description |
 |-------|-------------|
-| [Deployment](guides/deployment.md) | Deploy to Scalingo, Render, or Docker |
+| [Deployment](guides/deployment.md) | Deploy to supported Scalingo or production Docker environments |
 | [S3 Setup](guides/s3-setup.md) | Configure S3-compatible storage for audio recordings |
 | [Running without S3](guides/running-without-s3.md) | What still works with no object storage, and what degrades |
 | [Running without SMTP](guides/running-without-smtp.md) | What still works with no mail server, and what degrades |
+| [GDPR Operations](guides/gdpr-operations.md) | Prepare studies and handle rights, retention, and incident tasks |
 
 ### For Contributors
 
@@ -59,9 +60,14 @@ Dry, accurate technical descriptions of the system.
 | [Configuration Options](reference/configuration.md) | Study fields and application environment variables |
 | [Admin Dashboard](reference/admin-dashboard.md) | Page-by-page catalog of the admin UI |
 | [Feature Reference](reference/features.md) | Complete feature catalogue by area — participant experience, design, concourse, analysis, export, privacy |
+| [Operations Reference](reference/operations.md) | Health endpoints and stable runtime behavior for operators |
+| [Data Model](reference/data-model.md) | Persistent entities, relationships, and integrity constraints |
+| [Technology Stack](reference/technology-stack.md) | Runtime technologies and responsive-interface mechanisms |
 | [Frontend Components](reference/components.md) | Sorting primitives + component index |
 | [Study Configuration Format](reference/study-configuration-format.md) | JSON import/export format specification |
-| [GDPR Memo for Self-Hosters](reference/gdpr-self-hosters.md) | Controls the software provides, for the operator's own DPIA and DPA |
+| [GDPR for Self-Hosters](reference/gdpr-self-hosters.md) | Entry point for responsibilities, procedures, controls, and templates |
+| [GDPR Controls](reference/gdpr-controls.md) | Exhaustive data inventory, lifecycle behavior, safeguards, and article mappings |
+| [Record-of-Processing Template](reference/templates/record-of-processing.md) | Reusable Article 30 starting template |
 
 ---
 
@@ -74,6 +80,7 @@ Background knowledge and architectural context.
 | [Architecture Overview](explanation/architecture.md) | System design, state management, database schema, RBAC, data lifecycle |
 | [Q-Methodology](explanation/q-methodology.md) | Theory and concepts for researchers |
 | [Mobile UX Decisions](explanation/design-decisions/mobile-ux.md) | Mobile UI strategy and design rationale |
+| [GDPR Responsibility Model](explanation/gdpr-responsibility-model.md) | Self-hosting responsibilities and trust boundaries |
 
 ---
 

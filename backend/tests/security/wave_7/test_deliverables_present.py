@@ -2,8 +2,7 @@
 their expected sections.
 
 The detailed audit dossiers are kept outside this repository; this guards the
-two public-facing security documents that remain: SECURITY.md and the GDPR
-memo for self-hosters.
+public-facing security policy and the Diátaxis-separated GDPR documentation.
 """
 
 from __future__ import annotations
@@ -13,16 +12,36 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3].parent
 
 DELIVERABLES = {
-    "gdpr_memo": (
+    "gdpr_landing": (
         "docs/reference/gdpr-self-hosters.md",
         [
-            "Roles",
+            "GDPR responsibility model",
+            "GDPR operations guide",
+            "GDPR controls reference",
+            "Record-of-processing template",
+        ],
+    ),
+    "gdpr_controls": (
+        "docs/reference/gdpr-controls.md",
+        [
             "Personal-data inventory",
             "Lawful-basis",
             "Subject-rights",
             "Art. 32",
             "Art. 30",
         ],
+    ),
+    "gdpr_explanation": (
+        "docs/explanation/gdpr-responsibility-model.md",
+        ["Roles", "Trust boundaries", "Data lifecycle"],
+    ),
+    "gdpr_guide": (
+        "docs/guides/gdpr-operations.md",
+        ["Prepare a study", "Handle a participant request", "suspected breach"],
+    ),
+    "gdpr_template": (
+        "docs/reference/templates/record-of-processing.md",
+        ["Controller and contacts", "Processing", "Security and governance measures"],
     ),
     "security_md": (
         "SECURITY.md",

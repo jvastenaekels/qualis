@@ -2,6 +2,22 @@
 
 To maintain consistency and professionalism across Qualis documentation, please follow these guidelines.
 
+## Diátaxis document types
+
+Choose one primary reader need before writing:
+
+| Type | Reader need | Writing rule |
+| ---- | ----------- | ------------ |
+| Tutorial | Learn by completing a guided path | Control the sequence, state prerequisites, and end with a visible result. |
+| How-to guide | Complete a specific task | Start from a goal, use executable steps, and link to reference for exhaustive facts. |
+| Reference | Look up exact information | Organize for scanning; state types, defaults, constraints, and behavior without teaching a journey. |
+| Explanation | Understand why the system or method has its shape | Develop context, rationale, trade-offs, and relationships without becoming a procedure. |
+
+Do not combine two document types merely because they concern the same feature. Link
+between them instead. Contributor policies and workflows may remain under
+`docs/contributing/`, but each page should still identify whether it primarily teaches,
+guides, specifies, or explains.
+
 ## Markdown Conventions
 
 - **Headers**: Use ATX-style headers (`#`, `##`, etc.). Ensure there is a space after the `#`.
