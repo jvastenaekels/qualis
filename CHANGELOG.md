@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.6](https://github.com/jvastenaekels/qualis/compare/v0.7.5...v0.7.6) (2026-08-27)
+
+
+### Bug fixes
+
+* **demo:** drop the post-sort question the extremes step already asks ([#369](https://github.com/jvastenaekels/qualis/issues/369)) ([d445862](https://github.com/jvastenaekels/qualis/commit/d445862e9235b96827d4930d7063d83b69d42759))
+
+
+### Refactor
+
+* move source under src/ for SoftwareX repository compliance ([#371](https://github.com/jvastenaekels/qualis/issues/371)) ([0fe2303](https://github.com/jvastenaekels/qualis/commit/0fe230302a984fdeac0665c7df290475e331c9ca))
+
 ## [0.7.5](https://github.com/jvastenaekels/qualis/compare/v0.7.4...v0.7.5) (2026-08-23)
 
 
