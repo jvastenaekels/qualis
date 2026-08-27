@@ -285,13 +285,13 @@ Use `--` to separate Scalingo CLI flags from the command arguments.
 ### Apply migrations
 
 ```bash
-scalingo --app qualis run -- python backend/scripts/migrate.py
+scalingo --app qualis run -- python src/backend/scripts/migrate.py
 ```
 
 ### Seed a study
 
 ```bash
-scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json
+scalingo --app qualis run -- env API_BASE_URL=http://internal python src/backend/seed.py src/backend/data/example-study.json
 ```
 
 ### Database reinitialisation
@@ -300,13 +300,13 @@ scalingo --app qualis run -- env API_BASE_URL=http://internal python backend/see
 > Permanently deletes all data. Use only during initial setup or in a throwaway prototyping environment, before any real data exists.
 
 ```bash
-scalingo --app qualis run -- python backend/init_db.py --reset
+scalingo --app qualis run -- python src/backend/init_db.py --reset
 ```
 
 To wipe and reseed in one step:
 
 ```bash
-scalingo --app qualis run -- bash -c "python backend/init_db.py --reset && env API_BASE_URL=http://internal python backend/seed.py backend/data/example-study.json"
+scalingo --app qualis run -- bash -c "python src/backend/init_db.py --reset && env API_BASE_URL=http://internal python src/backend/seed.py src/backend/data/example-study.json"
 ```
 
 ---
@@ -372,7 +372,7 @@ SMTP and token-expiry values from the
 [Configuration reference](../reference/configuration.md#email-smtp), then use
 the procedure below to schedule consumed-token cleanup.
 
-**Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.
+**Cron cleanup (F-03-003):** consumed email tokens (2FA-disable JTIs, sign-up verification JTIs, password-reset JTIs, email-change JTIs) accumulate in the `consumed_email_tokens` table. The script `src/backend/scripts/cleanup_consumed_email_tokens.py` deletes rows older than 7 days and is safe to run while the app is live.
 
 > [!IMPORTANT]
 > This cleanup is **operator-side**. The application does not auto-schedule it. On Scalingo, configure the [Scalingo Scheduler addon](https://doc.scalingo.com/platform/app/task-scheduling/scalingo-scheduler) (free) with a daily cron entry. Other platforms: add the equivalent system cron / scheduled-task entry.
@@ -391,7 +391,7 @@ scalingo --app qualis addons-add scheduler scheduler-sandbox
 {
   "jobs": [
     {
-      "command": "0 4 * * * cd backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py",
+      "command": "0 4 * * * cd src/backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py",
       "size": "S"
     }
   ]
@@ -403,7 +403,7 @@ Deploy normally. The job runs daily at 04:00 UTC and prints `deleted=<n>` to the
 ### Manual one-off run
 
 ```bash
-scalingo --app qualis run -- bash -c "cd backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py"
+scalingo --app qualis run -- bash -c "cd src/backend && uv --project . run python scripts/cleanup_consumed_email_tokens.py"
 ```
 
 Without the cron, the table will grow proportionally to the rate of consumed email tokens (negligible risk for low-traffic deployments; meaningful storage drift over months at production scale).

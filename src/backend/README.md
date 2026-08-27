@@ -18,7 +18,7 @@ administrative/participant API for Qualis.
 
 ## Common commands
 
-Run these from `backend/`:
+Run these from `src/backend/`:
 
 ```bash
 uv sync --frozen

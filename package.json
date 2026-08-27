@@ -3,7 +3,7 @@
   "version": "0.7.1",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install --include=dev && npm run build",
+    "build": "cd src/frontend && npm install --include=dev && npm run build",
     "postinstall": "echo 'Postinstall root skipping'"
   },
   "engines": {

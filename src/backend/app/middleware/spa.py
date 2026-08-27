@@ -17,8 +17,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 _BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )  # backend/
-_ROOT_DIR = os.path.dirname(_BASE_DIR)  # project root
-FRONTEND_DIST = os.path.join(_ROOT_DIR, "frontend", "dist")
+_SRC_DIR = os.path.dirname(_BASE_DIR)  # src/
+_ROOT_DIR = os.path.dirname(_SRC_DIR)  # project root
+FRONTEND_DIST = os.path.join(_SRC_DIR, "frontend", "dist")
 DOCS_DIR = os.path.join(_ROOT_DIR, "docs")
 
 _CACHEABLE_EXTENSIONS = (

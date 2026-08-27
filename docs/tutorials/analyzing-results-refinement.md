@@ -45,7 +45,7 @@ Once you have a candidate solution, ask whether a small change in the analysis w
 2. **Different flagging** — re-run with manual flagging that excludes one or two borderline cases. Stable factors are robust to flagging choices.
 3. **Different N** — if you have collected more responses since your initial run, re-run on the larger N.
 
-The Compare panel aligns two analysis runs via Tucker φ congruence (computed in the browser; see `frontend/src/utils/tuckerPhi.ts`). The panel itself flags an **ambiguous match** (amber) only when |φ| < 0.85. As a stricter manual reading convention:
+The Compare panel aligns two analysis runs via Tucker φ congruence (computed in the browser; see `src/frontend/src/utils/tuckerPhi.ts`). The panel itself flags an **ambiguous match** (amber) only when |φ| < 0.85. As a stricter manual reading convention:
 
 - **φ ≥ 0.95** — factors are essentially identical.
 - **0.90 ≤ φ < 0.95** — equivalent, with minor differences in loadings.

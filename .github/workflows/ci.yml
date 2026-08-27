@@ -2,7 +2,7 @@
 #   * First-party actions (actions/*, github/*) may stay version-tagged.
 #   * Third-party actions are pinned by 40-char commit SHA with the tag in a
 #     trailing comment for human review.
-# Regression test: backend/tests/security/wave_6/test_supply_chain_pinning.py.
+# Regression test: src/backend/tests/security/wave_6/test_supply_chain_pinning.py.
 name: Qualis CI
 
 on:
@@ -25,7 +25,7 @@ jobs:
       - name: Link Checker (Lychee)
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          args: --verbose --no-progress --config ./lychee.toml './docs/**/*.md' './README.md' './backend/README.md' './frontend/README.md'
+          args: --verbose --no-progress --config ./lychee.toml './docs/**/*.md' './README.md' './src/backend/README.md' './src/frontend/README.md'
           fail: true
       - name: Installation docs coherence
         # Asserts the README/Makefile/compose demo path stays internally
@@ -46,41 +46,41 @@ jobs:
           python-version: "3.14"
           enable-cache: true
       - name: Install dependencies
-        run: cd backend && uv sync
+        run: cd src/backend && uv sync
       - name: Lint & Format (Ruff)
         run: |
-          cd backend
+          cd src/backend
           uv run ruff check app
           uv run ruff format --check app
       - name: Type Check (Mypy)
-        run: cd backend && uv run mypy app
+        run: cd src/backend && uv run mypy app
       - name: Security SAST (Bandit)
-        run: cd backend && uv run bandit -r app -ll
+        run: cd src/backend && uv run bandit -r app -ll
       - name: Security SCA (Pip Audit)
         # Ignore list mirrors backend Makefile; rationale in SECURITY.md.
         run: |
-          cd backend && uv run pip-audit \
+          cd src/backend && uv run pip-audit \
             --ignore-vuln GHSA-wj6h-64fc-37mp \
             --ignore-vuln CVE-2026-3219 \
             --ignore-vuln CVE-2026-4539 \
             --ignore-vuln CVE-2026-28684 \
             --ignore-vuln CVE-2026-25645
       - name: Complexity (Radon)
-        run: cd backend && uv run radon cc app -a -nb --min B
+        run: cd src/backend && uv run radon cc app -a -nb --min B
       - name: Architecture (Import Linter)
-        run: cd backend && uv run lint-imports
+        run: cd src/backend && uv run lint-imports
       - name: Dependency Hygiene (Deptry)
-        run: cd backend && uv run deptry app
+        run: cd src/backend && uv run deptry app
       - name: Dead Code (Vulture)
-        run: cd backend && uv run vulture app vulture_whitelist.py --min-confidence 60
+        run: cd src/backend && uv run vulture app vulture_whitelist.py --min-confidence 60
       - name: Dependency Sync (requirements.txt ↔ uv.lock)
-        # backend/requirements.txt is a generated `uv export` of uv.lock that the
+        # src/backend/requirements.txt is a generated `uv export` of uv.lock that the
         # Scalingo buildpack installs with pip. Dependabot edits it directly; a lone
         # transitive bump can desync the pin set (e.g. pydantic-core vs pydantic),
         # breaking the buildpack install while CI stays green. Assert the lock matches
         # pyproject and the export matches the lock.
         run: |
-          cd backend
+          cd src/backend
           uv lock --check
           uv export --no-hashes --format requirements-txt --output-file requirements.txt
           git diff --exit-code requirements.txt
@@ -112,13 +112,13 @@ jobs:
           python-version: "3.14"
           enable-cache: true
       - name: Install dependencies
-        run: cd backend && uv sync
+        run: cd src/backend && uv sync
       - name: Unit Tests (Pytest)
         # -n auto disabled in CI: parallel workers race on CREATE TYPE for
         # the same enum (UniqueViolationError on pg_type_typname_nsp_index).
         # Local dev still uses -n auto via Makefile; the safety margin in CI
         # is not worth the wall-clock saving.
-        run: cd backend && uv run pytest tests
+        run: cd src/backend && uv run pytest tests
 
   docker-stack:
     name: Docker Images & Compose Stack
@@ -170,7 +170,7 @@ jobs:
         run: make demo-smoke
 
       - name: Assert nginx compresses and caches assets
-        # Regression guard for frontend/nginx.conf: the upstream image ships
+        # Regression guard for src/frontend/nginx.conf: the upstream image ships
         # gzip off, and a hashed asset served without a long max-age costs a
         # revalidation round-trip on every page load.
         run: |
@@ -302,7 +302,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: src/frontend
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node.js
@@ -310,7 +310,7 @@ jobs:
         with:
           node-version: "26"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Lint & Format (Biome)
@@ -382,7 +382,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: src/frontend
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node.js
@@ -390,7 +390,7 @@ jobs:
         with:
           node-version: "26"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Unit Tests (Vitest)
@@ -428,7 +428,7 @@ jobs:
         with:
           node-version: "26"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
 
       - name: Install uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -440,16 +440,16 @@ jobs:
         env:
           UV_NO_PROGRESS: "1"
         run: |
-          cd backend
+          cd src/backend
           uv sync -v
           uv run -v python init_db.py --reset
 
       - name: Install frontend dependencies
-        run: cd frontend && npm ci
+        run: cd src/frontend && npm ci
 
       - name: Get installed Playwright version
         id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(node -e 'console.log(require("./frontend/package-lock.json").packages["node_modules/@playwright/test"].version)')" >> $GITHUB_ENV
+        run: echo "PLAYWRIGHT_VERSION=$(node -e 'console.log(require("./src/frontend/package-lock.json").packages["node_modules/@playwright/test"].version)')" >> $GITHUB_ENV
 
       - name: Cache Playwright binaries
         uses: actions/cache@v6
@@ -460,14 +460,14 @@ jobs:
           key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: Install Playwright browsers
-        run: cd frontend && npx playwright install --with-deps
+        run: cd src/frontend && npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Install Playwright OS dependencies
-        run: cd frontend && npx playwright install-deps
+        run: cd src/frontend && npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run Study E2E tests
-        run: cd frontend && npm run test:e2e:study
+        run: cd src/frontend && npm run test:e2e:study
         env:
           CI: true
           API_BASE_URL: http://127.0.0.1:8000
@@ -477,7 +477,7 @@ jobs:
         if: always()
         with:
           name: playwright-report-study
-          path: frontend/playwright-report/
+          path: src/frontend/playwright-report/
           retention-days: 7
 
   e2e-admin:
@@ -512,7 +512,7 @@ jobs:
         with:
           node-version: "26"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
 
       - name: Install uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -524,16 +524,16 @@ jobs:
         env:
           UV_NO_PROGRESS: "1"
         run: |
-          cd backend
+          cd src/backend
           uv sync -v
           uv run -v python init_db.py --reset
 
       - name: Install frontend dependencies
-        run: cd frontend && npm ci
+        run: cd src/frontend && npm ci
 
       - name: Get installed Playwright version
         id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(node -e 'console.log(require("./frontend/package-lock.json").packages["node_modules/@playwright/test"].version)')" >> $GITHUB_ENV
+        run: echo "PLAYWRIGHT_VERSION=$(node -e 'console.log(require("./src/frontend/package-lock.json").packages["node_modules/@playwright/test"].version)')" >> $GITHUB_ENV
 
       - name: Cache Playwright binaries
         uses: actions/cache@v6
@@ -544,14 +544,14 @@ jobs:
           key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: Install Playwright browsers
-        run: cd frontend && npx playwright install --with-deps
+        run: cd src/frontend && npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Install Playwright OS dependencies
-        run: cd frontend && npx playwright install-deps
+        run: cd src/frontend && npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run Admin E2E tests
-        run: cd frontend && npm run test:e2e:admin
+        run: cd src/frontend && npm run test:e2e:admin
         env:
           CI: true
           API_BASE_URL: http://127.0.0.1:8000
@@ -561,5 +561,5 @@ jobs:
         if: always()
         with:
           name: playwright-report-admin
-          path: frontend/playwright-report/
+          path: src/frontend/playwright-report/
           retention-days: 7

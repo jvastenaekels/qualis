@@ -76,7 +76,7 @@ Participant arrives → consent → drafts in-flight → submission → research
 ### 2.3 Critical edges the operator must understand
 
 1. **Hashed-IP edge.** Raw IP → SHA-256(salt+IP) at the service-layer entry
-   point (`backend/app/services/submission_service.py:53` via `hash_ip()`).
+   point (`src/backend/app/services/submission_service.py:53` via `hash_ip()`).
    *Caveat:* Uvicorn's access-log line precedes the hash and contains the raw
    IP. See operator obligation §6.4.
 2. **Free-text edge.** `card_comment`, `presort_answers`, `postsort_answers`,
@@ -104,7 +104,7 @@ arrived → consented → submitting → submitted ──┬──► discarded 
 ```
 
 `erased` is reachable only via study-level CASCADE
-(`backend/app/models/participant.py:42`, ON DELETE CASCADE on `study_id`) or
+(`src/backend/app/models/participant.py:42`, ON DELETE CASCADE on `study_id`) or
 via `DELETE /api/admin/studies/{slug}/participants` while the study is in
 `draft` state. Per-row hard-delete is intentionally not exposed; Qualis
 treats anonymisation as the legal Art. 17 endpoint per Recital 26 (F-05-009).
@@ -144,7 +144,7 @@ either derived (e.g. `random_seed`) or non-identifying analytical metadata.
 | TOTP secret (when enabled) | `users.totp_secret` | Contract | Until 2FA disabled |
 | `pending_email` (during email-change flow) | `users.pending_email` | Contract (F-03-011) | Cleared on confirm/cancel |
 | `password_changed_at` | `users.password_changed_at` | Compliance (Art. 32 access-token revocation, F-03-010) | Lifetime of account |
-| Consumed email-link JTIs (denylist) | `consumed_email_tokens` | Compliance (F-03-001) | 7 days; cleanup script `backend/scripts/cleanup_consumed_email_tokens.py` (F-03-003 — operator schedules) |
+| Consumed email-link JTIs (denylist) | `consumed_email_tokens` | Compliance (F-03-001) | 7 days; cleanup script `src/backend/scripts/cleanup_consumed_email_tokens.py` (F-03-003 — operator schedules) |
 
 ### 3.3 Logs (separate retention regime)
 
@@ -200,7 +200,7 @@ Today there is no participant-facing self-export. Operator path:
 3. Identify the participant row (resume code, recruitment email, or session token).
 4. Use the admin per-participant export endpoint:
    `GET /api/admin/studies/{slug}/participants/{id}/export/json`
-   (`backend/app/routers/admin/exports.py:237-289`) — admin auth required.
+   (`src/backend/app/routers/admin/exports.py:237-289`) — admin auth required.
    Available formats: JSON (the canonical machine-readable form for Art. 15
    portability), CSV.
 5. Send the exported document to the participant. Strip researcher annotations
@@ -225,11 +225,11 @@ should refuse this class with reasoning. **Rectifiable** items: email on
 
 Qualis offers two paths; both call the same service
 (`StudyDataService.anonymise_participant`,
-`backend/app/services/study_data_service.py:73-160`):
+`src/backend/app/services/study_data_service.py:73-160`):
 
 - **Participant self-service:**
   `DELETE /api/study/{slug}/personal-data?session_token=…`
-  (`backend/app/routers/participants.py:286-352`).
+  (`src/backend/app/routers/participants.py:286-352`).
   Bound to the participant's `session_token`; the participant exercises this
   via the `EraseMyDataDialog` control on the post-sort feedback page (no admin
   involvement). A submitted participant who follows a resume link is redirected
@@ -237,7 +237,7 @@ Qualis offers two paths; both call the same service
   `mode=participant_self` (F-05-008).
 - **Admin-mediated:**
   `DELETE /api/admin/studies/{slug}/participants/{participant_id}/personal-data`
-  (`backend/app/routers/admin/studies_participants.py:179-225`).
+  (`src/backend/app/routers/admin/studies_participants.py:179-225`).
   For requests received via the DPO inbox.
 
 Both paths null PII (`ip_address`, `user_agent`, `confirmation_code`,
@@ -248,7 +248,7 @@ data per GDPR Recital 26 (F-05-009).
 
 **Bulk variant** (post follow-up phase):
 `POST /api/admin/studies/{slug}/anonymise-bulk` body `{submitted_before: ISO}`
-(`backend/app/routers/admin/lifecycle.py:253-316`). Audit row mode
+(`src/backend/app/routers/admin/lifecycle.py:253-316`). Audit row mode
 `bulk_anonymise`.
 
 **What full row-deletion is NOT.** Qualis does not expose per-row
@@ -338,7 +338,7 @@ operator's job.** Recommended workflow:
 Eight per-deployment actions Qualis cannot do for you:
 
 1. **Set `IP_HASH_SALT`.** Production refuses to start without it
-   (`backend/app/utils/crypto.py:19-22`). Use a long random value; **do not
+   (`src/backend/app/utils/crypto.py:19-22`). Use a long random value; **do not
    rotate** — rotation orphans every existing hash and silently breaks
    duplicate-detection.
 2. **Configure log-sink IP redaction.** Uvicorn access logs contain raw
@@ -368,15 +368,15 @@ Eight per-deployment actions Qualis cannot do for you:
    periodic job that lists `audio/<prefix>/...` keys and deletes any whose
    prefix does not appear in `audio_recordings.s3_key`. Cadence: monthly is
    reasonable; the bucket is small (≤100 MB per study by default,
-   `backend/app/routers/audio.py:91`). F-05-005 is documented as
+   `src/backend/app/routers/audio.py:91`). F-05-005 is documented as
    operator-side.
 6. **Schedule `cleanup_consumed_email_tokens.py`** (F-03-003). The script
-   exists at `backend/scripts/cleanup_consumed_email_tokens.py` and deletes
+   exists at `src/backend/scripts/cleanup_consumed_email_tokens.py` and deletes
    `consumed_email_tokens` rows older than 7 days. On Scalingo, use the
    Scheduler addon with a daily 04:00 UTC entry; on other platforms use
    your equivalent cron.
 7. **Schedule the abandoned-draft sweeper** (Wave 4b backlog) once shipped.
-   The intended script (`backend/scripts/cleanup_abandoned_sessions.py`)
+   The intended script (`src/backend/scripts/cleanup_abandoned_sessions.py`)
    removes participants with `status='started' AND submitted_at IS NULL AND
    last_step_reached_at < now() - SESSION_TTL_DAYS`. Until shipped, the
    consent-text promise on partial-data retention depends on operator
@@ -411,7 +411,7 @@ practices".
 | **Pseudonymisation** | Art. 32(1)(a) | IP hashed at write (SHA-256 + salt, F-03-surface, `submission_service.py:53`); UA hashed at write (F-05-002); audio S3 prefix hashed (F-05-004). | Set `IP_HASH_SALT` (long random). Do not rotate. |
 | **Encryption at rest** | Art. 32(1)(a) | None at app layer. | Configure encrypted DB volume (Scalingo: managed; AWS: EBS encryption; on-prem: LUKS). Configure S3 bucket-level SSE. |
 | **Encryption in transit** | Art. 32(1)(a) | HTTPS everywhere; HSTS via `SecurityHeadersMiddleware`; TLS to SMTP via `_send_or_log`. | Terminate TLS at edge proxy with valid cert; enforce HSTS preload list. |
-| **Confidentiality** | Art. 32(1)(b) | `require_project_role` + `check_*_permission` (`backend/app/dependencies.py:170-293`); 95-case IDOR harness (F-04-001) as CI regression guard; log-scrub regex `(token\|otp\|code)` IGNORECASE on `uvicorn.access`, `app.middleware.errors`, `app.routers.logs` (F-03-013); `lint_logger_urls.py` AST gate prevents new leaks. | Per-deployment access policy; rotate researcher 2FA; offboard departing staff (delete `User` row or set `is_superuser=False`). |
+| **Confidentiality** | Art. 32(1)(b) | `require_project_role` + `check_*_permission` (`src/backend/app/dependencies.py:170-293`); 95-case IDOR harness (F-04-001) as CI regression guard; log-scrub regex `(token\|otp\|code)` IGNORECASE on `uvicorn.access`, `app.middleware.errors`, `app.routers.logs` (F-03-013); `lint_logger_urls.py` AST gate prevents new leaks. | Per-deployment access policy; rotate researcher 2FA; offboard departing staff (delete `User` row or set `is_superuser=False`). |
 | **Integrity** | Art. 32(1)(b) | Access-token revocation on password change (`iat` claim + `password_changed_at`, F-03-010); email-change dual-confirmation (F-03-011); CSP `script-src 'self'`; DOMPurify on user-submitted HTML; `frame-ancestors 'none'`. | Trust the password-change flow; do not weaken CSP. |
 | **Availability** | Art. 32(1)(b) | Application-level rate limits (slowapi) bound DoS at credential-grade endpoints (F-06-001); per-study `max_storage_mb` quota; per-file `AUDIO_MAX_FILE_SIZE_MB` cap. | Backup strategy (DB dumps, S3 versioning); capacity planning; CDN/edge protection. (Operator infra; out of audit scope.) |
 | **Resilience** | Art. 32(1)(b) | Stateless backend; idempotent submit (F-06-006); fail-open S3 anonymisation (legal erasure not blocked by infra outage). | Multi-replica deployment; failover plan. |
@@ -770,8 +770,8 @@ Each section traces back to the audit material that produced it:
 | §2 Data flows | `05-consent-anonymisation.md` §"Data lifecycle map"; `08-threat-model.md` §3. |
 | §3 Personal-data inventory | `05-consent-anonymisation.md` §"GDPR-memo material" (a). |
 | §4 Lawful-basis menu | New (this memo); cites Member-State law. |
-| §5 Subject-rights playbook | `05-consent-anonymisation.md` Findings F-05-001, F-05-007, F-05-008, F-05-009; `backend/app/routers/admin/exports.py:237-289`; `backend/app/routers/participants.py:286-352`; `backend/app/routers/admin/lifecycle.py:253-316`. |
-| §6 Retention / anonymisation | `05-consent-anonymisation.md` §"GDPR-memo material" (b)+(c); `99-action-backlog.md` Wave 4 (F-05-001/002/003/004/005/008/010); `backend/app/services/study_data_service.py:73-160`. |
+| §5 Subject-rights playbook | `05-consent-anonymisation.md` Findings F-05-001, F-05-007, F-05-008, F-05-009; `src/backend/app/routers/admin/exports.py:237-289`; `src/backend/app/routers/participants.py:286-352`; `src/backend/app/routers/admin/lifecycle.py:253-316`. |
+| §6 Retention / anonymisation | `05-consent-anonymisation.md` §"GDPR-memo material" (b)+(c); `99-action-backlog.md` Wave 4 (F-05-001/002/003/004/005/008/010); `src/backend/app/services/study_data_service.py:73-160`. |
 | §7 Art. 32 checklist | `08-threat-model.md`; `SECURITY.md`; `07-supply-chain.md` Wave 6 deliverables; cumulative findings in `99-action-backlog.md`. |
 | §8 Breach notification | `SECURITY.md` "Reporting a vulnerability"; `08-threat-model.md` §4 STRIDE per boundary; F-05-008 lifecycle audit. |
 | §9 DPIA inputs | `08-threat-model.md` §5 Top-10 ranked risks. |

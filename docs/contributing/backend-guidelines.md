@@ -36,7 +36,7 @@ graph TD
 ## 2. Directory Structure
 
 ```text
-backend/app/
+src/backend/app/
 ├── core/           # Config (config.py); security lives in utils/, exceptions in app/exceptions.py
 ├── middleware/     # Global middleware (error handling, security headers, SPA, log scrubbing)
 ├── routers/        # HTTP endpoints (admin/, auth.py, etc.)
@@ -52,7 +52,7 @@ The `models/__init__.py` and `schemas/__init__.py` re-export every public name, 
 
 ## 3. Strict typing
 
-Most modules in `app/` are under `mypy --strict` via `[[tool.mypy.overrides]]` in `backend/pyproject.toml`. New utility/leaf modules should opt into the same bar by adding themselves to the overrides list. See the "Strict-typed Python modules" section in [`CLAUDE.md`](../../CLAUDE.md) for the canonical list and the conventions for using `# type: ignore[explicit-any]` at JSON boundaries.
+Most modules in `app/` are under `mypy --strict` via `[[tool.mypy.overrides]]` in `src/backend/pyproject.toml`. New utility/leaf modules should opt into the same bar by adding themselves to the overrides list. See the "Strict-typed Python modules" section in [`CLAUDE.md`](../../CLAUDE.md) for the canonical list and the conventions for using `# type: ignore[explicit-any]` at JSON boundaries.
 
 ## 3.1 JWT families and claim isolation
 

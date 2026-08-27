@@ -44,7 +44,7 @@ make ci-full
 ### Directory Structure
 
 ```
-frontend/src/
+src/frontend/src/
 ├── pages/                  # Page components
 │   └── __tests__/          # (Optional) specific unit tests
 ├── components/             # Reusable components
@@ -61,7 +61,7 @@ frontend/src/
 ### Running Frontend Tests Manually
 
 ```bash
-cd frontend
+cd src/frontend
 
 # Run all tests
 npm test
@@ -126,21 +126,21 @@ make e2e
 Or manually (set `ENVIRONMENT=test`):
 
 ```bash
-cd frontend
+cd src/frontend
 ENVIRONMENT=test npm run e2e
 ```
 
 **Debug Mode:**
 
 ```bash
-cd frontend
+cd src/frontend
 ENVIRONMENT=test npm run e2e:debug
 ```
 
 ### E2E Structure
 
 ```
-frontend/e2e/
+src/frontend/e2e/
 ├── fixtures/
 │   ├── db-setup.ts         # Database setup/teardown & Auth helpers
 │   ├── test-data.ts        # Data builders (Studies, Participants)
@@ -187,13 +187,13 @@ test.describe("Study Flow", () => {
 ```bash
 make test
 # OR
-cd backend && uv run pytest tests/
+cd src/backend && uv run pytest tests/
 ```
 
 ### Structure
 
 ```
-backend/tests/
+src/backend/tests/
 ├── conftest.py             # Global fixtures (DB session, async client)
 ├── test_admin_projects.py  # API Endpoint tests
 ├── test_error_handling.py  # Error-handling tests

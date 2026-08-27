@@ -21,12 +21,12 @@ classical centroid method the engine advertises.
 | `qmethod_reference.json` | Frozen reference (schema 2): PCA **and** centroid solutions — loadings, auto-flags, z-scores, factor arrays; PCA also reliability/SE/eigenvalue. From `qmethod` 1.8.4. |
 | `qmethod_reference.R` | Regenerates the reference from `qmethod` itself (chain-of-custody). Requires `qmethod` + `jsonlite`. |
 | `compare.py` | Runs Qualis' analysis via the **live API**, aligns factors, asserts loadings + partition. Pure stdlib, **no R needed**. |
-| `backend/tests/integration/test_lipset_validation.py` | The full oracle enforced **offline in CI** — calls the analysis pipeline directly, no Docker/API. |
+| `src/backend/tests/integration/test_lipset_validation.py` | The full oracle enforced **offline in CI** — calls the analysis pipeline directly, no Docker/API. |
 
 ## Continuous enforcement (CI)
 
 The equivalence is **regression-guarded on every commit**:
-`backend/tests/integration/test_lipset_validation.py` runs in the standard
+`src/backend/tests/integration/test_lipset_validation.py` runs in the standard
 `pytest tests` job (`make ci` / GitHub Actions) and, **offline**, calls
 `run_analysis()` on the committed Q-sort matrix and compares to the frozen
 `qmethod_reference.json`. For **both** PCA and centroid it asserts rotated

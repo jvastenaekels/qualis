@@ -87,7 +87,7 @@ def _refers_to_sensitive_attr(node: ast.AST) -> bool:
 
 def _check_file(path: Path, repo_root: Path) -> list[str]:
     """Return a list of human-readable violations found in `path`."""
-    rel = path.relative_to(repo_root / "backend" / "app").as_posix()
+    rel = path.relative_to(repo_root / "src" / "backend" / "app").as_posix()
     if rel in _ALLOWED_FILES:
         return []
 
@@ -118,8 +118,8 @@ def _check_file(path: Path, repo_root: Path) -> list[str]:
 
 
 def main() -> int:
-    repo_root = Path(__file__).resolve().parents[2]
-    app_dir = repo_root / "backend" / "app"
+    repo_root = Path(__file__).resolve().parents[3]
+    app_dir = repo_root / "src" / "backend" / "app"
     if not app_dir.is_dir():
         print(f"error: {app_dir} not found", file=sys.stderr)
         return 2

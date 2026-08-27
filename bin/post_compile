@@ -2,7 +2,7 @@
 set -e
 
 echo "--> Installing Frontend Dependencies"
-cd frontend
+cd src/frontend
 npm ci
 
 echo "--> Building Frontend"

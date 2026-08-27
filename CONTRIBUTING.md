@@ -35,7 +35,7 @@ Before opening a PR, verify:
 
 - [ ] `make ci` passes locally (lint + type-check + tests + build)
 - [ ] New or changed user-facing strings use `useTranslation()` / `t()` and exist in all three locales (`en`, `fr`, `fi`)
-- [ ] If you changed backend schemas/routes, you ran `make generate-api` and committed the regenerated `frontend/src/api/generated.ts`
+- [ ] If you changed backend schemas/routes, you ran `make generate-api` and committed the regenerated `src/frontend/src/api/generated.ts`
 - [ ] If you added a database column, you generated and reviewed an Alembic migration (`make migration-new`)
 - [ ] Tests cover the new behaviour (Vitest for frontend, pytest for backend)
 - [ ] Commit messages follow the existing style (lowercase scope, imperative present tense; see `git log` for examples)

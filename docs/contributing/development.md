@@ -34,8 +34,8 @@ The repository is a monorepo:
 
 ```
 qualis/
-  backend/        # FastAPI application (Python)
-  frontend/       # React SPA (TypeScript)
+  src/backend/        # FastAPI application (Python)
+  src/frontend/       # React SPA (TypeScript)
   docs/           # Documentation
   Makefile        # Common commands
 ```
@@ -46,7 +46,7 @@ qualis/
 make install
 ```
 
-This runs `cd backend && uv sync` (Python deps into `backend/.venv/`) and `cd frontend && npm ci`. If `uv` is not installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+This runs `cd src/backend && uv sync` (Python deps into `src/backend/.venv/`) and `cd src/frontend && npm ci`. If `uv` is not installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
 ### Set up the database
 
@@ -104,7 +104,7 @@ Applies the Alembic chain to the empty database.
 Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`, then:
 
 ```bash
-cd backend && uv run python init_db.py && cd ..
+cd src/backend && uv run python init_db.py && cd ..
 ```
 
 ### Run the dev servers
@@ -123,17 +123,17 @@ Verify: <http://localhost:8000/docs> (Swagger) and <http://localhost:5173>. Log 
 Keep the backend running, then use a third terminal:
 
 ```bash
-cd backend && uv run python seed.py data/example-study.json && cd ..
+cd src/backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
 After seeding, walk the participant flow at
 <http://localhost:5173/study/bioeconomy-futures>. To load the full demo (study
 design, curated concourse, and 18 synthetic Q-sorts), run `uv run python
-seed_demo.py` from `backend/` instead.
+seed_demo.py` from `src/backend/` instead.
 
 ### Verify the dev loop
 
-Edit a visible string in `frontend/src/components/admin/AdminDashboard.tsx`, save, watch the browser update via HMR. Revert.
+Edit a visible string in `src/frontend/src/components/admin/AdminDashboard.tsx`, save, watch the browser update via HMR. Revert.
 
 ---
 
@@ -168,15 +168,15 @@ pre-commit run --all-files
 Any change to backend routes or Pydantic schemas requires a client regeneration:
 
 1. Run `make generate-api`.
-2. Commit the updated `frontend/src/api/generated.ts`.
+2. Commit the updated `src/frontend/src/api/generated.ts`.
 3. CI runs `make check-api` and fails if the client is out of sync.
 
 ## Architecture checks
 
 Two architecture fitness functions run in CI ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)), not via `make check`:
 
-- **Backend** — `import-linter` (`uv run lint-imports`) enforces `routers` → `services` → `schemas` → `models`. Config: `[tool.importlinter]` in `backend/pyproject.toml`.
-- **Frontend** — `dependency-cruiser` (`npm run lint:architecture`) rejects circular dependencies and orphan files. Config: `frontend/.dependency-cruiser.cjs`.
+- **Backend** — `import-linter` (`uv run lint-imports`) enforces `routers` → `services` → `schemas` → `models`. Config: `[tool.importlinter]` in `src/backend/pyproject.toml`.
+- **Frontend** — `dependency-cruiser` (`npm run lint:architecture`) rejects circular dependencies and orphan files. Config: `src/frontend/.dependency-cruiser.cjs`.
 
 ## Database maintenance
 
@@ -185,9 +185,9 @@ Two architecture fitness functions run in CI ([`.github/workflows/ci.yml`](../..
 | `make migrate` | Apply pending Alembic migrations (`alembic upgrade head`). |
 | `make migration-new` | Generate a new revision after editing models. **Always review** — auto-generation against an out-of-sync DB will include unrelated tables. |
 | `make db-reset` | Drop and recreate all tables. **Destroys local data.** |
-| `cd backend && uv run python seed.py data/example-study.json` | Update or create a study from a JSON definition. Backend must be running. |
-| `cd backend && uv run python seed_demo.py` | Seed the full Bioeconomy Futures demo: study, curated concourse, and 18 synthetic pre-/post-sort Q-sorts (audio comments included when object storage is configured; skipped otherwise). Idempotent. Backend must be running. |
-| `cd backend && uv run --with edge-tts python scripts/generate_demo_audio.py` | Regenerate the synthetic spoken audio clips in `data/audio/` (needs network; `edge-tts` is not a runtime dependency). Re-run only to refresh the committed clips. |
+| `cd src/backend && uv run python seed.py data/example-study.json` | Update or create a study from a JSON definition. Backend must be running. |
+| `cd src/backend && uv run python seed_demo.py` | Seed the full Bioeconomy Futures demo: study, curated concourse, and 18 synthetic pre-/post-sort Q-sorts (audio comments included when object storage is configured; skipped otherwise). Idempotent. Backend must be running. |
+| `cd src/backend && uv run --with edge-tts python scripts/generate_demo_audio.py` | Regenerate the synthetic spoken audio clips in `data/audio/` (needs network; `edge-tts` is not a runtime dependency). Re-run only to refresh the committed clips. |
 
 For the migration chain and conventions, see the "Database Migrations" section in [`CLAUDE.md`](../../CLAUDE.md).
 
@@ -225,7 +225,7 @@ For the migration chain and conventions, see the "Database Migrations" section i
 | ------- | --- |
 | "Database connection refused" | Verify PostgreSQL is running and `DATABASE_URL` in `.env` is correct. |
 | "Module not found" (Python) | Use the venv via `uv run …` rather than the system Python. |
-| Frontend build errors after `git pull` | `cd frontend && rm -rf node_modules && npm install`. |
+| Frontend build errors after `git pull` | `cd src/frontend && rm -rf node_modules && npm install`. |
 | Migration errors | `make db-reset` (destroys local data) and re-run `make migrate`. |
 
 ## Releases
@@ -249,8 +249,8 @@ A 1.0.0 cut is a manual decision (release-please can be triggered with a `Releas
 
 The version lives in four places; release-please updates all of them in the release PR:
 
-- `backend/pyproject.toml` (`[project] version`)
-- `frontend/package.json` (`version`)
+- `src/backend/pyproject.toml` (`[project] version`)
+- `src/frontend/package.json` (`version`)
 - `CITATION.cff` (`version` field, marked with `# x-release-please-version`)
 - `.release-please-manifest.json`
 

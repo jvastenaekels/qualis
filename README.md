@@ -214,7 +214,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 
 ## Local development setup
 
-Use this path when you want hot reload, local tests, or direct backend/frontend development.
+Use this path when you want hot reload, local tests, or direct src/backend/frontend development.
 
 ### Prerequisites
 
@@ -262,19 +262,19 @@ make install
 make migrate
 
 # 6. Initialize the database (creates an admin user from ADMIN_EMAIL/PASSWORD)
-cd backend && uv run python init_db.py && cd ..
+cd src/backend && uv run python init_db.py && cd ..
 
 # 7. Run the app (two terminals)
 make run-backend     # Terminal 1: FastAPI on :8000
 make run-frontend    # Terminal 2: Vite dev server on :5173
 
 # 8. Optional: seed an example study after the backend is running
-cd backend && uv run python seed.py data/example-study.json && cd ..
+cd src/backend && uv run python seed.py data/example-study.json && cd ..
 ```
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
 
-If you seeded the example study, you can also visit `http://localhost:5173/study/bioeconomy-futures` to walk the participant flow. (For the full demo — concourse plus filled Q-sorts — run `uv run python seed_demo.py` from `backend/` instead, with the backend running.)
+If you seeded the example study, you can also visit `http://localhost:5173/study/bioeconomy-futures` to walk the participant flow. (For the full demo — concourse plus filled Q-sorts — run `uv run python seed_demo.py` from `src/backend/` instead, with the backend running.)
 
 ### Local-setup troubleshooting
 
@@ -381,7 +381,7 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 **Methodological inspiration:** Qualis aims to be useful across Q-methodology traditions — from classical Brown-school analysis to more interpretive and reflexive orientations. The platform's design is informed in particular by readings of Stephenson (1953), Brown (1980), McKeown & Thomas (1988/2013), Watts & Stenner (2012), and, on the reflexive and participant-voice side, Stainton Rogers (1997), Stenner (2011), and Sneegas (2020). These works are inspirations rather than endorsements; the responsibility for any given design choice rests with Qualis.
 
-**Open-source dependencies:** Qualis builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
+**Open-source dependencies:** Qualis builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `src/backend/pyproject.toml` and `src/frontend/package.json` for the full list.
 
 ---
 

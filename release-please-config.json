@@ -22,22 +22,22 @@
       "extra-files": [
         {
           "type": "toml",
-          "path": "backend/pyproject.toml",
+          "path": "src/backend/pyproject.toml",
           "jsonpath": "$.project.version"
         },
         {
           "type": "json",
-          "path": "frontend/package.json",
+          "path": "src/frontend/package.json",
           "jsonpath": "$.version"
         },
         {
           "type": "json",
-          "path": "frontend/package-lock.json",
+          "path": "src/frontend/package-lock.json",
           "jsonpath": "$.version"
         },
         {
           "type": "json",
-          "path": "frontend/package-lock.json",
+          "path": "src/frontend/package-lock.json",
           "jsonpath": "$.packages[''].version"
         },
         "CITATION.cff"

@@ -50,9 +50,9 @@ import pytest
 from app.services.analysis_service import run_analysis
 
 # Repo root from backend/tests/integration/<this file>.
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 REFERENCE_PATH = REPO_ROOT / "validation" / "lipset" / "qmethod_reference.json"
-SORTS_PATH = REPO_ROOT / "backend" / "data" / "lipset-democracy.sorts.json"
+SORTS_PATH = REPO_ROOT / "src" / "backend" / "data" / "lipset-democracy.sorts.json"
 
 N_FACTORS = 3
 

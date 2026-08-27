@@ -66,13 +66,13 @@ jobs:
           python-version: "3.14"
           enable-cache: true
       - name: Install dependencies
-        run: cd backend && uv sync
+        run: cd src/backend && uv sync
       - name: Run pip-audit
         # Ignore list mirrors backend Makefile and ci.yml backend-lint;
         # rationale documented in SECURITY.md. Each --ignore-vuln has a
         # paired tracking entry in the audit backlog.
         run: |
-          cd backend && uv run pip-audit \
+          cd src/backend && uv run pip-audit \
             --ignore-vuln GHSA-wj6h-64fc-37mp \
             --ignore-vuln CVE-2026-3219 \
             --ignore-vuln CVE-2026-4539 \
@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: src/frontend
     steps:
       - uses: actions/checkout@v7
       - name: Setup Node.js
@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: "26"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: src/frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Run npm audit (high/critical only)
@@ -179,7 +179,7 @@ jobs:
         # --error: exit non-zero on any finding (semgrep's own "error"
         # severity is high+). The OWASP Top Ten ruleset is the spec
         # default; tighter rulesets can be added in a follow-up.
-        run: semgrep --config p/owasp-top-ten --error backend/app frontend/src
+        run: semgrep --config p/owasp-top-ten --error src/backend/app src/frontend/src
 
   logger-url-lint:
     name: Logger-URL lint (request.url scrubber bypass)
@@ -192,4 +192,4 @@ jobs:
           python-version: "3.14"
       - name: Run lint script
         # Pure stdlib AST walk; no install needed beyond Python.
-        run: python backend/scripts/lint_logger_urls.py
+        run: python src/backend/scripts/lint_logger_urls.py

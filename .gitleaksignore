@@ -20,15 +20,15 @@
 # examples. Values (123e4567-e89b-12d3-a456-426614174000 and the -099 variant)
 # are the IETF-published illustrative UUIDs; they identify no real resource.
 # The eadf28c4-... value is a hardcoded fake session token in an integration
-# test fixture (backend/tests/integration/), not a real credential.
+# test fixture (src/backend/tests/integration/), not a real credential.
 45ecb8a0ab256df71c948d2bfc40e805951091f9:docs/reference/api.md:generic-api-key:71
-66d6657ab549eb4842b1bb057982188a11e53e39:backend/tests/integration/test_api_participants.py:generic-api-key:17
-66d6657ab549eb4842b1bb057982188a11e53e39:backend/tests/integration/test_api_participants.py:generic-api-key:51
-66d6657ab549eb4842b1bb057982188a11e53e39:backend/tests/integration/test_api_participants.py:generic-api-key:87
-94927bd1bed07c04ba4a4cd0f9751d603a9e036b:backend/tests/integration/test_consent_flow.py:generic-api-key:32
-e1b309997a92fa5e3d67547bdf5e3ebc42d11ff7:backend/tests/integration/test_consent_flow.py:generic-api-key:32
-864fb6e5b2034bef7784c1df0cf15f567af2f247:backend/tests/integration/test_study_lifecycle.py:generic-api-key:37
-06c9d0aa4110c21466715de97e455c88bd3b2a43:frontend/src/layouts/AdminLayout.helpers.test.ts:generic-api-key:64
+66d6657ab549eb4842b1bb057982188a11e53e39:src/backend/tests/integration/test_api_participants.py:generic-api-key:17
+66d6657ab549eb4842b1bb057982188a11e53e39:src/backend/tests/integration/test_api_participants.py:generic-api-key:51
+66d6657ab549eb4842b1bb057982188a11e53e39:src/backend/tests/integration/test_api_participants.py:generic-api-key:87
+94927bd1bed07c04ba4a4cd0f9751d603a9e036b:src/backend/tests/integration/test_consent_flow.py:generic-api-key:32
+e1b309997a92fa5e3d67547bdf5e3ebc42d11ff7:src/backend/tests/integration/test_consent_flow.py:generic-api-key:32
+864fb6e5b2034bef7784c1df0cf15f567af2f247:src/backend/tests/integration/test_study_lifecycle.py:generic-api-key:37
+06c9d0aa4110c21466715de97e455c88bd3b2a43:src/frontend/src/layouts/AdminLayout.helpers.test.ts:generic-api-key:64
 
 # Audit-waves false positives (generic-api-key). Both are benign:
 #  - audio.py:353 binds the recording's S3 object key to a local variable
@@ -38,10 +38,10 @@ e1b309997a92fa5e3d67547bdf5e3ebc42d11ff7:backend/tests/integration/test_consent_
 # (Prose only here — quoting the flagged line verbatim would re-trip the rule
 # on this very file.) Fingerprints cover the squash-merge and branch commits,
 # plus the earlier ignore-file commits whose comment quoted the line.
-f0b3fdeb01383e097ee397522bc49c08f4fa9037:backend/app/routers/audio.py:generic-api-key:353
-652b668ba508dd1229b318b193a47c99895105ec:backend/app/routers/audio.py:generic-api-key:353
-884c849100fb3f05176b4d1e31a87702616fc110:backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
-f24b53762abfb2f3952a5538aa8809f206ad3498:backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
+f0b3fdeb01383e097ee397522bc49c08f4fa9037:src/backend/app/routers/audio.py:generic-api-key:353
+652b668ba508dd1229b318b193a47c99895105ec:src/backend/app/routers/audio.py:generic-api-key:353
+884c849100fb3f05176b4d1e31a87702616fc110:src/backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
+f24b53762abfb2f3952a5538aa8809f206ad3498:src/backend/tests/integration/test_api_error_hygiene.py:generic-api-key:59
 070c67d0cadf553d87abce8b43bf6b6b3c059ca2:.gitleaksignore:generic-api-key:34
 323f1cada0cc7cf0adc9621e3804b8b731ea65bc:.gitleaksignore:generic-api-key:34
 
@@ -49,4 +49,4 @@ f24b53762abfb2f3952a5538aa8809f206ad3498:backend/tests/integration/test_api_erro
 # The timestamp reads as a high-entropy token to the generic-api-key rule. These
 # are test fixtures deliberately shaped like the keys real studies produce — the
 # whole point of the cases they appear in.
-77258e669aea9b6eb7cb0bdd15cfd9219388d9b3:frontend/src/components/admin/analysis/FactorVoicesPanel.test.tsx:generic-api-key:566
+77258e669aea9b6eb7cb0bdd15cfd9219388d9b3:src/frontend/src/components/admin/analysis/FactorVoicesPanel.test.tsx:generic-api-key:566

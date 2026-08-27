@@ -3,11 +3,11 @@
 # Closes the Wave 6 spec item: "Dependabot / Renovate config presence."
 #
 # Three ecosystems:
-#   * pip — reads backend/pyproject.toml. Qualis uses `uv` not pip
+#   * pip — reads src/backend/pyproject.toml. Qualis uses `uv` not pip
 #     directly; Dependabot's pip ecosystem still parses pyproject.toml
 #     for direct dependencies and proposes minor / patch upgrades.
 #     Lockfile (uv.lock) is regenerated locally during PR review.
-#   * npm — frontend/package-lock.json is the source of truth.
+#   * npm — src/frontend/package-lock.json is the source of truth.
 #   * github-actions — pinning policy keeps third-party actions on
 #     SHAs (see ci.yml header); Dependabot proposes SHA + comment-tag
 #     updates as the upstream releases new versions.
@@ -16,7 +16,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/backend"
+    directory: "/src/backend"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
@@ -38,7 +38,7 @@ updates:
       - dependency-name: "pydantic-core"
 
   - package-ecosystem: "npm"
-    directory: "/frontend"
+    directory: "/src/frontend"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
@@ -89,7 +89,7 @@ updates:
       # gates depend on. dependency-cruiser 17.4.3 silently cruises 0 modules
       # under TS 7 (contract passes while checking nothing); 18.1.0 declines
       # TS ≥ 7 outright. knip 5.88 crashes. The full analysis lives in
-      # frontend/tsconfig.app.json and commit 5f967361 (PR #297 hit exactly
+      # src/frontend/tsconfig.app.json and commit 5f967361 (PR #297 hit exactly
       # this). Lift when dependency-cruiser ships TS 7 support and knip 6
       # (oxc-based) lands.
       - dependency-name: "typescript"

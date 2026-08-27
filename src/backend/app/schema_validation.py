@@ -95,7 +95,7 @@ async def validate_schema() -> None:
                 error_msg.append("\nMissing tables:")
                 for table in missing_tables:
                     error_msg.append(f"  - {table}")
-                error_msg.append("\n→ Run: python backend/init_db.py")
+                error_msg.append("\n→ Run: python src/backend/init_db.py")
 
             missing_columns = [
                 item[1] for item in issues if item[0] == "missing_column"
@@ -104,7 +104,7 @@ async def validate_schema() -> None:
                 error_msg.append("\nMissing columns:")
                 for col in missing_columns:
                     error_msg.append(f"  - {col}")
-                error_msg.append("\n→ Run: python backend/scripts/migrate.py")
+                error_msg.append("\n→ Run: python src/backend/scripts/migrate.py")
 
             # raise SchemaValidationError("\n".join(error_msg))
             logger.warning("\n".join(error_msg))

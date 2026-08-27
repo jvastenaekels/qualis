@@ -27,15 +27,15 @@ _Do not ask the agent to do everything at once. Split it into two phases._
 >
 > **Task:**
 >
-> 1.  Define the strict Pydantic models in `backend/app/schemas/<subdomain>.py`. No `Any` types allowed.
-> 2.  Define the API endpoint signature in `backend/app/routers/`.
-> 3.  **Crucial:** Write a failing integration test in `backend/tests/integration/` that strictly asserts the business rule. The test must fail because the logic is not implemented yet.
+> 1.  Define the strict Pydantic models in `src/backend/app/schemas/<subdomain>.py`. No `Any` types allowed.
+> 2.  Define the API endpoint signature in `src/backend/app/routers/`.
+> 3.  **Crucial:** Write a failing integration test in `src/backend/tests/integration/` that strictly asserts the business rule. The test must fail because the logic is not implemented yet.
 >
 > **STOP. Do NOT implement the service logic yet.** Just provide the Types and the Test."
 
 **Phase 2: The Builder (Implementation)**
 
-> "The test is correctly failing (Red state). Now, implement the business logic in `backend/app/services/` to satisfy the Pydantic contract and make the integration test pass (Green state).
+> "The test is correctly failing (Red state). Now, implement the business logic in `src/backend/app/services/` to satisfy the Pydantic contract and make the integration test pass (Green state).
 >
 > **Constraints:**
 >
@@ -73,7 +73,7 @@ _Use this for the researcher interface where data correctness is paramount._
 >
 > **Protocol:**
 >
-> 1.  **Schema Match:** Check `frontend/src/api/model` to ensure we have the correct types from the backend.
+> 1.  **Schema Match:** Check `src/frontend/src/api/model` to ensure we have the correct types from the backend.
 > 2.  **Mocking:** Create a mock data object that strictly adheres to the API type.
 > 3.  **The Trap (Test):** Write a test using `testing-library` that:
 >     - Renders the component with the mock data.
@@ -90,7 +90,7 @@ _Use this when the backend is done and you need to connect the UI._
 >
 > **Task:**
 >
-> 1.  Run the generator command (simulated) to acknowledge the new hooks in `frontend/src/api/generated.ts`.
+> 1.  Run the generator command (simulated) to acknowledge the new hooks in `src/frontend/src/api/generated.ts`.
 > 2.  Refactor **[Component Name]** to replace the local mock data with the `use[Feature]Query` hook.
 > 3.  **Crucial:** Implement proper error handling. If the API returns 4xx/5xx, the UI must show a user-friendly `Alert` component, not crash.
 > 4.  Update the integration test to mock the network response (MSW) rather than component props."

@@ -84,7 +84,7 @@ def check_models_file(file_path: Path) -> int:
 
 
 if __name__ == "__main__":
-    models_dir = Path("backend/app/models")
+    models_dir = Path("src/backend/app/models")
     if not models_dir.is_dir():
         print(f"Error: {models_dir} not found.")
         sys.exit(1)

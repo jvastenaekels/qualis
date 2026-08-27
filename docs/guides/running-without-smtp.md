@@ -45,7 +45,7 @@ known authenticator), use the interactive script — it authenticates as
 that admin and creates the new user through the Admin API:
 
 ```bash
-cd backend && uv run python scripts/create_user.py
+cd src/backend && uv run python scripts/create_user.py
 ```
 
 It prompts for the existing admin's email and password, then the new
@@ -57,7 +57,7 @@ authenticate, so create the superuser directly against the database from
 the backend environment:
 
 ```bash
-cd backend && uv run python - <<'PY'
+cd src/backend && uv run python - <<'PY'
 import asyncio
 from app.database import SessionLocal
 from app.models import User

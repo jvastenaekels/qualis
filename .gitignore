@@ -11,7 +11,7 @@ yarn-error.log*
 
 # Database
 *.db
-backend/backups/
+src/backend/backups/
 
 *.sqlite3
 .env
@@ -37,9 +37,9 @@ playwright-report/
 blob-report/
 
 # Explicit Coverage Artifacts
-backend/.coverage
-backend/htmlcov/
-frontend/coverage/
+src/backend/.coverage
+src/backend/htmlcov/
+src/frontend/coverage/
 .coverage
 *coverage*.txt
 

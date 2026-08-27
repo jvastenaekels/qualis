@@ -66,7 +66,7 @@ These are not a guarantee of security but document the design choices reviewers 
 - **Security-scans CI gate**. `.github/workflows/security-scans.yml` runs gitleaks, pip-audit, npm-audit, semgrep (OWASP Top Ten), and a custom `request.url`-in-loggers lint on every PR. Third-party GitHub Actions are SHA-pinned. Dependabot ships weekly Python / npm / GHA updates.
 - **Dockerfile + nginx hardening** (F-02-006/007). Backend runs as non-root `app` user; nginx rejects unexpected `Host` headers (default allowlist; operator can extend via `NGINX_HOST_ALLOWLIST` build arg).
 - **Direct dependency floors** (Wave 6 from 2026-05-03 audit). pygments, python-dotenv, requests pinned in `pyproject.toml` to their CVE-fix versions to prevent transitive-constraint drift.
-- **Cross-tenant access regression suite** (F-04-001). 95-case IDOR harness (`backend/tests/security/wave_3/test_admin_idor_harness.py`) tests every admin endpoint for cross-project access denial; runs on every PR via `make ci`.
+- **Cross-tenant access regression suite** (F-04-001). 95-case IDOR harness (`src/backend/tests/security/wave_3/test_admin_idor_harness.py`) tests every admin endpoint for cross-project access denial; runs on every PR via `make ci`.
 
 ## Audit history
 

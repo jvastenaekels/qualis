@@ -6,9 +6,9 @@ import os
 # Add backend to path
 ROOT_DIR = os.getcwd()
 if os.path.basename(ROOT_DIR) == 'backend':
-    ROOT_DIR = os.path.dirname(ROOT_DIR)
+    ROOT_DIR = os.path.dirname(os.path.dirname(ROOT_DIR))
 
-backend_dir = os.path.join(ROOT_DIR, 'backend')
+backend_dir = os.path.join(ROOT_DIR, 'src', 'backend')
 sys.path.append(backend_dir)
 os.chdir(backend_dir)
 
@@ -59,7 +59,7 @@ def main():
         f.write('\n')
 
     # Write to frontend openapi.json
-    frontend_path = os.path.join(ROOT_DIR, 'frontend', 'openapi.json')
+    frontend_path = os.path.join(ROOT_DIR, 'src', 'frontend', 'openapi.json')
     with open(frontend_path, 'w') as f:
         json.dump(schema, f, indent=2)
         f.write('\n')

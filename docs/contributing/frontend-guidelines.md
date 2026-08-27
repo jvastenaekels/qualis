@@ -6,7 +6,7 @@ Stack: **React 19** + **TypeScript strict** + **Tailwind CSS** + **Zustand** + *
 
 ## 1. Hook-driven pages
 
-Pages and complex components delegate state-and-effect logic to a colocated hook in `frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value and renders JSX.
+Pages and complex components delegate state-and-effect logic to a colocated hook in `src/frontend/src/hooks/<area>/use<Name>.ts`. The component receives the hook's return value and renders JSX.
 
 **Boundary:**
 
@@ -32,10 +32,10 @@ const { t } = useTranslation();
 return <button>{t('study.activate', 'Activate Study')}</button>;
 ```
 
-- Supported locales: see `SUPPORTED_LANGUAGES` in `frontend/src/constants/languages.ts`. Each entry carries a `hasAdmin` flag controlling whether the locale appears in the admin sidebar selector.
-- Translation files live under `frontend/public/locales/<lang>/`, split into `participant.json` (participant flow + public chrome — **strict parity**, mandatory) and `admin.json` (admin + auth — **best-effort**, may be partial or absent; missing keys fall back to English via i18next's `fallbackLng`).
+- Supported locales: see `SUPPORTED_LANGUAGES` in `src/frontend/src/constants/languages.ts`. Each entry carries a `hasAdmin` flag controlling whether the locale appears in the admin sidebar selector.
+- Translation files live under `src/frontend/public/locales/<lang>/`, split into `participant.json` (participant flow + public chrome — **strict parity**, mandatory) and `admin.json` (admin + auth — **best-effort**, may be partial or absent; missing keys fall back to English via i18next's `fallbackLng`).
 - Adding a key: add it to `en/<namespace>.json` first, then mirror it to every other locale's same namespace. `npm run i18n-check` and `npm run check-interpolations` verify key and placeholder parity; CI runs both.
-- Adding a new locale: write `frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `frontend/scripts/i18n/translation-runbook.md`. Update `SUPPORTED_LANGUAGES`, `SUPPORTED_I18N_LANGUAGES` (in `frontend/src/i18n.ts`), and the mocked allowlist in `frontend/src/setupTests.ts` in lock-step — the cross-consistency invariant test in `languages.test.ts` will catch drift.
+- Adding a new locale: write `src/frontend/scripts/i18n/glossaries/<code>.yaml` first, then follow `src/frontend/scripts/i18n/translation-runbook.md`. Update `SUPPORTED_LANGUAGES`, `SUPPORTED_I18N_LANGUAGES` (in `src/frontend/src/i18n.ts`), and the mocked allowlist in `src/frontend/src/setupTests.ts` in lock-step — the cross-consistency invariant test in `languages.test.ts` will catch drift.
 
 ## 3. Generated API client
 
@@ -44,7 +44,7 @@ The frontend never hand-writes `fetch` or `axios` calls. Use the Orval-generated
 1. Update the backend Pydantic schema or router.
 2. Run `make generate-api`.
 3. Use the regenerated hook (e.g. `useGetStudyApiAdminStudiesSlugGet`, named from the full operationId).
-4. Commit the regenerated `frontend/src/api/generated.ts`.
+4. Commit the regenerated `src/frontend/src/api/generated.ts`.
 
 CI runs `make check-api` and fails if the committed client is out of sync with the backend.
 

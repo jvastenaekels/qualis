@@ -160,7 +160,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(SlowAPIMiddleware)
 
 # CORS configuration — origin list is sourced from Settings.ALLOWED_ORIGINS
-# (see backend/app/core/config.py and .env.example).
+# (see src/backend/app/core/config.py and .env.example).
 # Allow-list of headers replaces the wildcard (audit F-01-007). Cookies/origin
 # are still supported via allow_credentials=True.
 app.add_middleware(

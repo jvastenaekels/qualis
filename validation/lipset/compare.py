@@ -13,7 +13,7 @@ No R is required: the reference is the committed
 ``qmethod_reference.json`` (regenerate it with ``qmethod_reference.R``).
 
 This script is the **live-API twin** of
-``backend/tests/integration/test_lipset_validation.py``, which enforces the
+``src/backend/tests/integration/test_lipset_validation.py``, which enforces the
 same ``1e-4`` bound and factor partition **offline in CI** (calling the
 pipeline directly, no Docker/API). Keep ``LOADING_TOL`` below in lockstep with
 that test. Use this script to confirm the numbers also survive the full
@@ -70,7 +70,7 @@ def main() -> int:
     ref = json.load(open(os.path.join(HERE, "qmethod_reference.json")))
     # Submission order == sorts JSON key order == participant db_id order.
     sorts_path = os.path.join(
-        HERE, "..", "..", "backend", "data", "lipset-democracy.sorts.json"
+        HERE, "..", "..", "src", "backend", "data", "lipset-democracy.sorts.json"
     )
     submission_order = list(json.load(open(sorts_path)).keys())
 

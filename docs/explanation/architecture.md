@@ -140,7 +140,7 @@ Qualis uses a two-tier RBAC system to balance global maintenance and fine-graine
 ### 1. Global Hierarchy
 
 - **Superuser**: a small, named set of platform operators. Holds exactly three platform-level powers, none of which bypass project tenancy:
-  - **User administration** — list all accounts with audit fields (`last_login_at`, `password_changed_at`, `email_verified_at`), deactivate, delete, promote/demote (promotion requires the target to have 2FA enabled), force a password reset, and reset 2FA. Exposed at the superuser-only page `/app/users` (frontend) and the `/api/admin/users` endpoints (`GET`, `PATCH /{id}`, `POST /{id}/force-password-reset`, `POST /{id}/reset-totp`, `DELETE /{id}`); guard rails live in `backend/app/services/admin_user_service.py`. There is no admin "create user" endpoint — onboarding is via `/register` + invitations.
+  - **User administration** — list all accounts with audit fields (`last_login_at`, `password_changed_at`, `email_verified_at`), deactivate, delete, promote/demote (promotion requires the target to have 2FA enabled), force a password reset, and reset 2FA. Exposed at the superuser-only page `/app/users` (frontend) and the `/api/admin/users` endpoints (`GET`, `PATCH /{id}`, `POST /{id}/force-password-reset`, `POST /{id}/reset-totp`, `DELETE /{id}`); guard rails live in `src/backend/app/services/admin_user_service.py`. There is no admin "create user" endpoint — onboarding is via `/register` + invitations.
   - **Hard-delete an archived study** — a last resort beyond the project-owner ladder; the study must be `ARCHIVED` first.
   - **Quota bypass** — exempt from `MAX_MEMBERS_PER_PROJECT` and `MAX_PROJECTS_AS_OWNER`.
 

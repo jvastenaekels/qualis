@@ -24,8 +24,8 @@ def _read(path: str) -> str:
 
 
 def check_frontend_lock_version() -> list[str]:
-    package = json.loads(_read("frontend/package.json"))
-    lock = json.loads(_read("frontend/package-lock.json"))
+    package = json.loads(_read("src/frontend/package.json"))
+    lock = json.loads(_read("src/frontend/package-lock.json"))
     errors: list[str] = []
 
     package_version = package["version"]
@@ -34,13 +34,13 @@ def check_frontend_lock_version() -> list[str]:
 
     if lock_version != package_version:
         errors.append(
-            f"frontend/package-lock.json version {lock_version!r} does not match "
-            f"frontend/package.json {package_version!r}"
+            f"src/frontend/package-lock.json version {lock_version!r} does not match "
+            f"src/frontend/package.json {package_version!r}"
         )
     if root_lock_version != package_version:
         errors.append(
-            f"frontend/package-lock.json packages[''].version {root_lock_version!r} "
-            f"does not match frontend/package.json {package_version!r}"
+            f"src/frontend/package-lock.json packages[''].version {root_lock_version!r} "
+            f"does not match src/frontend/package.json {package_version!r}"
         )
 
     return errors
@@ -118,7 +118,7 @@ def check_demo_make_targets() -> list[str]:
     makefile = _read("Makefile")
     compose = _read("docker-compose.yml")
     example_env = _read(".env.example")
-    backend_dockerfile = _read("backend/Dockerfile")
+    backend_dockerfile = _read("src/backend/Dockerfile")
     errors: list[str] = []
 
     # demo-up builds/pulls (retried) then starts with a health-wait as a
@@ -154,7 +154,7 @@ def check_demo_make_targets() -> list[str]:
 
     if "DEBIAN_FRONTEND=noninteractive" not in backend_dockerfile:
         errors.append(
-            "backend/Dockerfile lets debconf emit interactive frontend warnings"
+            "src/backend/Dockerfile lets debconf emit interactive frontend warnings"
         )
 
     for script in ("seed_demo.py", "seed_lipset.py"):
@@ -283,15 +283,15 @@ def check_tutorial_ui_labels() -> list[str]:
 
 
 def check_no_raw_database_url_logging() -> list[str]:
-    source = _read("backend/app/main.py")
+    source = _read("src/backend/app/main.py")
     errors: list[str] = []
     if "settings.DATABASE_URL" in source:
         errors.append(
-            "backend/app/main.py still references settings.DATABASE_URL directly"
+            "src/backend/app/main.py still references settings.DATABASE_URL directly"
         )
     if "DATABASE_URL is" in source:
         errors.append(
-            "backend/app/main.py still contains the raw DATABASE_URL log message"
+            "src/backend/app/main.py still contains the raw DATABASE_URL log message"
         )
     return errors
 
