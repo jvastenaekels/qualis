@@ -67,7 +67,7 @@ For security issues: please email the maintainer (see `CITATION.cff`) rather tha
 
 ## License and contributor agreement
 
-By contributing to Qualis you agree that your contribution will be released under the [GNU Affero General Public License v3.0](LICENSE), the same license as the rest of the project.
+By contributing to Qualis you agree that your contribution will be released under the [GNU Affero General Public License v3.0](LICENSE.txt), the same license as the rest of the project.
 
 There is no separate CLA. Your `git commit --author` line is the record of your contribution.
 
