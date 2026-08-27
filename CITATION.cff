@@ -11,7 +11,7 @@ abstract: >-
   transparency of analytical choices and integration of post-sort
   participant voice.
 version: "0.7.5" # x-release-please-version
-date-released: "2026-06-12" # matches the v0.7.1 tag date; update on each release
+date-released: "2026-08-24" # matches the v0.7.5 tag date; update on each release
 doi: "10.5281/zenodo.19985835"
 identifiers:
   - type: doi
@@ -20,12 +20,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.20199750"
     description: "Zenodo archive of Qualis v0.6.7"
-  # TODO (0.7.1 release): once the GitHub release triggers the Zenodo
-  # archive for v0.7.1, replace the placeholder DOI below with the real version DOI
-  # and point the manuscript C3/S3 capsule link at it.
-  #   - type: doi
-  #     value: "10.5281/zenodo.XXXXXXXX"
-  #     description: "Zenodo archive of Qualis v0.7.1"
+  - type: doi
+    value: "10.5281/zenodo.22072911"
+    description: "Zenodo archive of Qualis v0.7.5"
 url: "https://github.com/jvastenaekels/qualis"
 repository-code: "https://github.com/jvastenaekels/qualis"
 license: "AGPL-3.0-or-later"
@@ -34,7 +31,7 @@ authors:
     given-names: "Julien"
     email: "julien.vastenaekels@univ-reims.fr"
     affiliation: "Université de Reims Champagne-Ardenne"
-    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0000-0001-6658-3024"
   - family-names: "Dedinger"
     given-names: "Clémence"
     email: "clemence.dedinger@univ-reims.fr"
