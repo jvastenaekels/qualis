@@ -135,66 +135,7 @@ def pearson(d1, d2):
     return cov / (vx * vy) if vx and vy else 0.0
 
 
-# ---- Rationale / comment templates (worldview-level, EN + FR, 2 variants) ----
-
-RATIONALE = {
-    "A": {
-        "en": [
-            "I put the statements about scale, biotechnology and substitution at the top because that is where real climate impact comes from — good intentions only matter once they reach industrial volume. At the bottom I rejected the idea that we must simply consume less; the bioeconomy's whole promise is that we can keep growing while replacing fossil inputs.",
-            "My +4 cards are the ones saying that clear standards, scale and bio-based substitution drive the transition. My -4 is the claim that growth and ecological limits are incompatible — I think that framing is defeatist and ignores what efficiency and technology can deliver.",
-        ],
-        "fr": [
-            "J'ai placé en haut les énoncés sur l'échelle, la biotechnologie et la substitution, car c'est là que se joue le véritable effet climatique — les bonnes intentions ne comptent qu'une fois passées à l'échelle industrielle. En bas, j'ai rejeté l'idée qu'il faudrait simplement consommer moins ; toute la promesse de la bioéconomie est de pouvoir continuer à croître en remplaçant les intrants fossiles.",
-            "Mes cartes +4 sont celles qui disent que des normes claires, l'échelle et la substitution biosourcée portent la transition. Mon -4 est l'idée que croissance et limites écologiques seraient incompatibles — un cadrage défaitiste qui ignore ce que l'efficacité et la technologie peuvent apporter.",
-        ],
-    },
-    "B": {
-        "en": [
-            "At the top I placed the statements about ecological limits and reducing consumption, because substitution and recycling cannot outrun absolute demand — that is the heart of it for me. At the bottom I rejected the claim that there is plenty of sustainable biomass and that green growth keeps us within limits; the evidence on the land sink and imports says otherwise.",
-            "My most-agree cards are the ones challenging the 'green growth' story and insisting we burn far too much biomass for energy. My most-disagree are the abundance and growth-within-limits claims — I read those as wishful thinking that defers the hard question.",
-        ],
-        "fr": [
-            "J'ai placé en haut les énoncés sur les limites écologiques et la réduction de la consommation, car la substitution et le recyclage ne peuvent pas dépasser la demande absolue — c'est l'essentiel pour moi. En bas, j'ai rejeté l'idée qu'il y aurait abondance de biomasse durable et que la croissance verte nous maintiendrait dans les limites ; les données sur le puits de carbone et les importations disent le contraire.",
-            "Mes cartes « tout à fait d'accord » contestent le récit de la « croissance verte » et rappellent qu'on brûle bien trop de biomasse pour l'énergie. Mes cartes « pas du tout d'accord » sont les promesses d'abondance et de croissance dans les limites — j'y vois un vœu pieux qui repousse la vraie question.",
-        ],
-    },
-    "C": {
-        "en": [
-            "I ranked agroecology, democratic control and keeping the future open at the very top — for me the bioeconomy has to be rooted in territories and in food sovereignty, not designed in a boardroom. At the bottom I put the idea that the future belongs to large biorefineries and engineered organisms; that path crowds out the small producers who should be at the centre.",
-            "My +4 cards say that decisions should be democratic and that an agroecological base is realistic, not niche. My -4 cards are the ones celebrating industrial scale and biotechnology as the main road — I think that locks us into exactly the model we should be questioning.",
-        ],
-        "fr": [
-            "J'ai classé tout en haut l'agroécologie, le contrôle démocratique et le maintien d'un avenir ouvert — pour moi, la bioéconomie doit être ancrée dans les territoires et dans la souveraineté alimentaire, et non conçue dans un conseil d'administration. En bas, j'ai mis l'idée que l'avenir appartiendrait aux grandes bioraffineries et aux organismes modifiés ; cette voie évince les petits producteurs qui devraient être au centre.",
-            "Mes cartes +4 disent que les décisions doivent être démocratiques et qu'une base agroécologique est réaliste, pas marginale. Mes cartes -4 célèbrent l'échelle industrielle et la biotechnologie comme voie principale — j'y vois un verrouillage dans le modèle même qu'il faudrait questionner.",
-        ],
-    },
-    "D": {
-        "en": [
-            "What I agree with most are the statements about who carries the costs and who captures the value — the transition pushes its burden onto the Global South, and that is not incidental. At the bottom I rejected the rosy official framing: the idea that the latest strategy is a genuine turning point, and the claim that the benefits will simply be spread around. To me that mostly absorbs criticism while the extractive logic continues.",
-            "My top cards foreground justice: displacement and who really captures the value. My most-disagree cards are the reassuring ones — that the new strategy is a real reorientation, or that a well-run transition will share its benefits broadly. I read both as ways to delay structural change.",
-        ],
-        "fr": [
-            "Ce avec quoi je suis le plus d'accord, ce sont les énoncés sur qui porte les coûts et qui capte la valeur — la transition reporte son fardeau sur le Sud global, et ce n'est pas accidentel. En bas, j'ai rejeté le cadrage rassurant officiel : l'idée que la dernière stratégie serait un véritable tournant, et celle que les bénéfices seraient simplement partagés. Pour moi, cela absorbe surtout la critique pendant que la logique extractive se poursuit.",
-            "Mes cartes du haut mettent la justice au premier plan : le déplacement des coûts et la captation de la valeur. Mes cartes « pas du tout d'accord » sont les plus rassurantes — l'idée que la nouvelle stratégie serait une vraie réorientation, ou qu'une transition bien menée partagerait largement ses bénéfices. J'y vois deux manières de repousser le changement structurel.",
-        ],
-    },
-    "M_BC": {
-        "en": [
-            "I find myself agreeing both with the ecological-limits people and with the territorial, agroecological camp — less consumption, more democracy, and a future kept open. My sort sits between those two, so my extremes are about limits and local control rather than any single doctrine.",
-        ],
-        "fr": [
-            "Je me retrouve à la fois chez les tenants des limites écologiques et chez le camp territorial et agroécologique — consommer moins, plus de démocratie, et un avenir maintenu ouvert. Mon tri se situe entre les deux, donc mes extrêmes portent sur les limites et le contrôle local plus que sur une doctrine unique.",
-        ],
-    },
-    "M_CD": {
-        "en": [
-            "For me the local and the justice questions go together: who decides and who pays. I care both about keeping production territorial and democratic and about not dumping the costs on the Global South, so my strong cards are spread across those two concerns rather than one clear camp.",
-        ],
-        "fr": [
-            "Pour moi, la question locale et la question de justice vont ensemble : qui décide et qui paie. Je tiens à la fois à une production territoriale et démocratique et à ne pas reporter les coûts sur le Sud global, donc mes cartes fortes se répartissent entre ces deux préoccupations plutôt que dans un camp unique.",
-        ],
-    },
-}
+# ---- Card-comment templates (worldview-level, EN + FR) ----
 
 TOP_CARD_COMMENT = {
     "A": {
@@ -272,21 +213,11 @@ def profile_vec_and_key(profile):
     return stance_vec(profile), profile
 
 
-def rationale_for(profile, lang, idx):
-    """Pick a rationale variant for a profile, cycling by participant index."""
-    if isinstance(profile, tuple):
-        variants = RATIONALE["M_" + profile[1] + profile[2]][lang]
-    else:
-        variants = RATIONALE[profile][lang]
-    return variants[idx % len(variants)]
-
-
 def build():
     """Build the sorts, validate, print diagnostics, and write the JSON file."""
     out = {}
     score_dicts = {}
     profile_of = {}
-    per_profile_counter = {}
 
     for n, row in enumerate(ROSTER):
         pid, profile, lang, persp, sector, fam, conf, top_comment, gc_key = row
@@ -295,9 +226,6 @@ def build():
         scores = ranking_to_scores(ranking)
         score_dicts[pid] = scores
         profile_of[pid] = pkey
-
-        idx = per_profile_counter.get(pkey, 0)
-        per_profile_counter[pkey] = idx + 1
 
         top_code = next(c for c, s in scores.items() if s == 4)
         card_comments = {}
@@ -313,7 +241,6 @@ def build():
             "qsort": {c: scores[c] for c in CODES},
             "card_comments": card_comments,
             "postsort": {
-                "q_rationale": rationale_for(profile, lang, idx),
                 "q_perspective": persp,
                 "q_confidence": conf,
             },
