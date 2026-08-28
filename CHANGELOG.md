@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.7](https://github.com/jvastenaekels/qualis/compare/v0.7.6...v0.7.7) (2026-08-28)
+
+
+### Documentation
+
+* attach the corresponding author's ORCID to the Zenodo metadata ([be203f0](https://github.com/jvastenaekels/qualis/commit/be203f0068bfb3a19fbcf16b7d8beeb69130b2fb))
+
 ## [0.7.6](https://github.com/jvastenaekels/qualis/compare/v0.7.5...v0.7.6) (2026-08-27)
 
 
