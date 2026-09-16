@@ -3,7 +3,6 @@
 import logging
 from contextlib import asynccontextmanager
 
-import sentry_sdk
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,25 +55,6 @@ install_access_log_scrub()
 # Sentinel value for unset secrets in dev — production startup checks compare
 # against this constant to detect missing env vars. Not a credential.
 _INSECURE_DEFAULT_SENTINEL = "CHANGEME-insecure-dev-only"
-
-# Sentry — initialised here (before app construction) so the SDK captures
-# import-time and startup errors. No-op when SENTRY_DSN is not configured.
-if settings.SENTRY_DSN:
-    sentry_sdk.init(
-        dsn=settings.SENTRY_DSN,
-        environment=settings.ENVIRONMENT,
-        traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
-        # GDPR: do not send participant emails / IPs to Sentry by default.
-        # Operators can opt in per Sentry project if their privacy policy allows.
-        send_default_pii=False,
-    )
-    logger.info(
-        "Sentry initialised (environment=%s, traces_sample_rate=%s)",
-        settings.ENVIRONMENT,
-        settings.SENTRY_TRACES_SAMPLE_RATE,
-    )
-else:
-    logger.info("Sentry DSN not configured — error reporting disabled")
 
 
 @asynccontextmanager
