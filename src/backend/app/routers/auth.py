@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -218,6 +218,7 @@ def _build_anti_enum_register_response(
 @limiter.limit("5/minute")
 async def register_user(
     request: Request,
+    background_tasks: BackgroundTasks,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
 ) -> UserCreateResponse:
@@ -297,7 +298,11 @@ async def register_user(
             password_changed_at=existing.password_changed_at,
         )
         reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
-        send_register_already_registered(email_to=existing.email, reset_url=reset_url)
+        background_tasks.add_task(
+            send_register_already_registered,
+            email_to=existing.email,
+            reset_url=reset_url,
+        )
         return _build_anti_enum_register_response(
             user_in.email, requires_email_verification=needs_verification_step
         )
@@ -375,8 +380,10 @@ async def register_user(
                 password_changed_at=existing_after.password_changed_at,
             )
             reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
-            send_register_already_registered(
-                email_to=existing_after.email, reset_url=reset_url
+            background_tasks.add_task(
+                send_register_already_registered,
+                email_to=existing_after.email,
+                reset_url=reset_url,
             )
         return _build_anti_enum_register_response(
             user_in.email, requires_email_verification=needs_verification_step
@@ -398,7 +405,9 @@ async def register_user(
             expires_delta=timedelta(hours=24),
         )
         verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-        send_email_verification(email_to=new_user.email, verify_url=verify_url)
+        background_tasks.add_task(
+            send_email_verification, email_to=new_user.email, verify_url=verify_url
+        )
 
     # F-06-007: return the same generic shape used by the duplicate-email
     # path — the new user's id/full_name are not in the response body so
@@ -637,6 +646,7 @@ async def verify_email(
 @limiter.limit("3/hour", key_func=email_hash_key_func_sync)
 async def resend_verification(
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: EmailRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
@@ -654,9 +664,10 @@ async def resend_verification(
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
-    # F-03-006: Constant-time padding on BOTH branches. Token signing +
-    # email logging on the success branch are negligible compared to
-    # the bcrypt cost, so a single bcrypt call equalises wall-clock.
+    # F-03-006: Constant-time padding on BOTH branches. Token signing is
+    # negligible next to the bcrypt cost; the e-mail itself is handed to
+    # a background task so the SMTP round-trip happens after the response
+    # is written and cannot widen the known arm (wave 7).
     get_password_hash("anti-enum-padding")
 
     if user is not None and user.email_verified_at is None:
@@ -666,7 +677,7 @@ async def resend_verification(
             expires_delta=timedelta(hours=settings.EMAIL_VERIFY_TOKEN_EXPIRE_HOURS),
         )
         verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-        send_email_verification(user.email, verify_url)
+        background_tasks.add_task(send_email_verification, user.email, verify_url)
 
     return AckResponse(status="ok")
 
@@ -676,6 +687,7 @@ async def resend_verification(
 @limiter.limit("3/hour", key_func=email_hash_key_func_sync)
 async def password_reset_request(
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: EmailRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
@@ -695,7 +707,9 @@ async def password_reset_request(
     # (anti-enum padding) and the known path (where no real bcrypt is
     # needed — JWT signing is cheap) take comparable time. Without this
     # equalisation, an attacker could distinguish the two by timing the
-    # response (known is much faster than unknown).
+    # response (known is much faster than unknown). The e-mail send is a
+    # background task for the same reason: an inline SMTP round-trip on
+    # the known arm only would reopen the channel (wave 7).
     get_password_hash("anti-enum-padding")
 
     if user is not None:
@@ -706,7 +720,7 @@ async def password_reset_request(
             password_changed_at=user.password_changed_at,
         )
         url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
-        send_password_reset(user.email, url)
+        background_tasks.add_task(send_password_reset, user.email, url)
 
     return AckResponse(status="ok")
 
@@ -850,6 +864,7 @@ async def email_change_cancel(
 @limiter.limit("3/hour", key_func=email_hash_key_func_sync)
 async def twofa_disable_request(
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: EmailRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
@@ -867,9 +882,9 @@ async def twofa_disable_request(
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
-    # F-03-007: Constant-time padding on BOTH branches. Token signing +
-    # email logging on the success branch are negligible compared to
-    # the bcrypt cost, so a single bcrypt call equalises wall-clock.
+    # F-03-007: Constant-time padding on BOTH branches. Token signing is
+    # negligible next to the bcrypt cost; the e-mail send runs as a
+    # background task after the response (wave 7).
     get_password_hash("anti-enum-padding")
 
     if user is not None and user.is_totp_enabled:
@@ -881,7 +896,7 @@ async def twofa_disable_request(
             ),
         )
         url = f"{settings.FRONTEND_URL}/2fa/disable?token={token}"
-        send_twofa_disable_link(user.email, url)
+        background_tasks.add_task(send_twofa_disable_link, user.email, url)
 
     return AckResponse(status="ok")
 
@@ -889,6 +904,7 @@ async def twofa_disable_request(
 @router.post("/2fa/disable/confirm", response_model=AckResponse)
 async def twofa_disable_confirm(
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: EmailTokenSubmit,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
@@ -929,7 +945,9 @@ async def twofa_disable_confirm(
 
     when = datetime.now(timezone.utc).isoformat()
     ip = request.client.host if request.client else None
-    send_twofa_disabled_notification(user.email, when=when, ip_hint=ip)
+    background_tasks.add_task(
+        send_twofa_disabled_notification, user.email, when=when, ip_hint=ip
+    )
 
     log_admin_action(
         actor_user_id=user.id,

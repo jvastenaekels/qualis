@@ -39,6 +39,7 @@ permanent platform lockout). T6/T7/T8 endpoint wrappers MUST honour this.
 
 from __future__ import annotations
 
+import asyncio
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -155,7 +156,9 @@ async def force_password_reset(*, db: AsyncSession, target: User) -> None:
     )
     url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
     await db.commit()
-    send_password_reset(target.email, url)
+    # Synchronous SMTP; run it off the event loop. Still awaited, so a
+    # dispatch failure surfaces to the operator as before.
+    await asyncio.to_thread(send_password_reset, target.email, url)
 
 
 def mint_password_reset_link(*, target: User) -> tuple[str, datetime]:
