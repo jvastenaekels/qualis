@@ -141,6 +141,22 @@ function handle429(url: string): void {
     });
 }
 
+/**
+ * A 409 whose body carries `details.server_state` is the study save's
+ * optimistic lock answering with the current server row. The caller
+ * (useStudyPersistence.applyConflict) merges it three-way and reports the
+ * outcome itself; a generic "Conflict" error toast first would contradict
+ * the "synced" info that follows.
+ */
+function isMergeableConflict(details: unknown): boolean {
+    return (
+        typeof details === 'object' &&
+        details !== null &&
+        'server_state' in details &&
+        (details as { server_state?: unknown }).server_state != null
+    );
+}
+
 /** Side effects (toasts, redirect, bug-report) for error responses. */
 function handleErrorStatus(
     status: number,
@@ -148,11 +164,13 @@ function handleErrorStatus(
     url: string,
     errorText: string,
     parsedMessage: string,
-    parsedCode: string | undefined
+    parsedCode: string | undefined,
+    details: unknown
 ): void {
     if (status === 401) handle401(method, url);
     else if (status === 403) handle403(method, url, parsedMessage, parsedCode);
-    else if (status === 409) handle409(method, url, parsedMessage, parsedCode);
+    else if (status === 409 && !isMergeableConflict(details))
+        handle409(method, url, parsedMessage, parsedCode);
     else if (status === 429) handle429(url);
     if (status >= 500) {
         reportBug(`Server Error ${status} at ${url}: ${errorText}`, { endpoint: url, status });
@@ -168,7 +186,7 @@ async function processResponse<T>(response: Response, method: string, url: strin
     if (!response.ok) {
         const errorText = await response.text();
         const { message, code, details } = parseErrorBody(errorText);
-        handleErrorStatus(response.status, method, url, errorText, message, code);
+        handleErrorStatus(response.status, method, url, errorText, message, code, details);
         throw new ApiError(response.status, message, code, details);
     }
     if (response.status === 204) {
