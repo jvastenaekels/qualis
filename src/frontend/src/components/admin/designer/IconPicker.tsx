@@ -1,44 +1,6 @@
-import {
-    User,
-    Zap,
-    Scale,
-    MessageSquareText,
-    ClipboardList,
-    CheckCircle,
-    Flag,
-    Info,
-    HelpCircle,
-    FileText,
-    LayoutGrid,
-    Rocket,
-    Target,
-    Brain,
-    Lightbulb,
-    ListChecks,
-} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-
-const ICONS = {
-    User,
-    Zap,
-    Scale,
-    MessageSquareText,
-    ClipboardList,
-    CheckCircle,
-    Flag,
-    Info,
-    HelpCircle,
-    FileText,
-    LayoutGrid,
-    Rocket,
-    Target,
-    Brain,
-    Lightbulb,
-    ListChecks,
-};
-
-type IconName = keyof typeof ICONS;
+import { PICKER_ICONS as ICONS, type PickerIconName as IconName } from '@/constants/stepIcons';
 
 /**
  * Fallback text for each icon's translated name — `name` from `ICONS` is a

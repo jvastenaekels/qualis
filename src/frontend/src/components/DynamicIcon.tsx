@@ -1,19 +1,24 @@
-import * as LucideIcons from 'lucide-react';
+/*
+ * Qualis - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import type { LucideProps } from 'lucide-react';
+import { resolveStepIcon } from '../constants/stepIcons';
 
 interface DynamicIconProps extends LucideProps {
     name: string;
 }
 
+/**
+ * Renders a study step icon by its stored name, falling back to the help
+ * icon for a name the registry does not know. Resolution goes through
+ * `STEP_ICONS` (named imports) rather than a namespace import of
+ * `lucide-react`, which would put the entire icon set in the participant
+ * entry chunk.
+ */
 export const DynamicIcon = ({ name, ...props }: DynamicIconProps) => {
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic icon lookup
-    const IconComponent = (LucideIcons as any)[name] || LucideIcons.HelpCircle;
-
-    // The previous explicit check `if (!IconComponent)` is now implicitly handled by `|| LucideIcons.HelpCircle`
-    // So, the following block can be removed or adjusted based on desired behavior.
-    // If `name` is not found, `IconComponent` will be `LucideIcons.HelpCircle`.
-    // The original code had an explicit check and returned early.
-    // The new line makes `IconComponent` always a valid component.
-
+    const IconComponent = resolveStepIcon(name);
     return <IconComponent {...props} />;
 };

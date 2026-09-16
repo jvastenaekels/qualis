@@ -1,4 +1,3 @@
-import type React from 'react';
 import { useEffect, useMemo } from 'react';
 import {
     DndContext,
@@ -34,8 +33,8 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
 import { IconPicker } from './IconPicker';
 import type { ProcessStep } from '@/api/model';
-import * as LucideIcons from 'lucide-react';
 import { RotateCcw } from 'lucide-react';
+import { resolveStepIcon } from '@/constants/stepIcons';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 interface ProcessStepItemProps {
     id: string;
@@ -57,11 +56,9 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
         transition,
     };
 
-    // Dynamically get the icon component
-    const IconComponent =
-        (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[
-            step.icon
-        ] ?? LucideIcons.HelpCircle;
+    // Resolve through the finite registry, never a namespace import of
+    // lucide-react (that would ship every icon in a shared chunk).
+    const IconComponent = resolveStepIcon(step.icon);
 
     return (
         <div
