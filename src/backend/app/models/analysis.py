@@ -9,6 +9,7 @@ from .base import (
     Base,
     DateTime,
     ForeignKey,
+    Integer,
     JSON,
     Mapped,
     SmallInteger,
@@ -86,9 +87,9 @@ class AnalysisRun(Base):
     # resampled with replacement. `bootstrap_iterations` records B (None = not
     # run); `bootstrap_result` stores SE/CI per (statement, factor) plus the
     # convergence metadata. Stored as JSON for audit-trail traceability.
-    bootstrap_iterations: Mapped[int | None] = mapped_column(
-        SmallInteger, nullable=True
-    )
+    # Integer, not SmallInteger: migration 4ef41a295cbb created the column
+    # as INTEGER and the model must describe what production runs.
+    bootstrap_iterations: Mapped[int | None] = mapped_column(Integer, nullable=True)
     bootstrap_result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
     # Full result payload (the AnalysisResult Pydantic model serialized).

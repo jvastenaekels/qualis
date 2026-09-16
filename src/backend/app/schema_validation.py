@@ -1,116 +1,77 @@
 """Startup schema validation.
 
-This module provides validation that ensures the database schema
-matches the application models before the app starts serving requests.
+Compares the live database against every table and column the models
+declare, so a deploy whose migrations did not run (or ran partially) is
+named in the log before the first request fails on it.
 
-Provides helpful error messages when schema is out of sync.
+Two callers, two policies:
+
+* the application lifespan calls ``validate_schema()`` and continues on
+  failure — a boot loop on a managed platform is worse than a loud log
+  line, and the CI test ``test_migrations_match_models`` is the gate that
+  keeps models and migrations from drifting in the first place;
+* ``make check`` runs this module as a script with ``strict=True`` and
+  exits non-zero on any issue.
+
+Before wave 7 the check covered 9 tables of 23 from a hard-coded list and
+logged "validation passed" unconditionally.
 """
 
 import logging
 import sys
-from typing import List, Tuple
 
 from sqlalchemy import Connection, inspect
+from sqlalchemy.ext.asyncio import AsyncEngine
 
-from app.database import engine
+import app.models  # noqa: F401  — registers every mapper on Base.metadata
+from app.database import Base, engine as default_engine
 
 logger = logging.getLogger(__name__)
 
 
 class SchemaValidationError(Exception):
-    """Raised when database schema doesn't match expected structure."""
-
-    pass
+    """Raised in strict mode when the database lacks a modelled table or column."""
 
 
-async def validate_schema() -> None:
-    """Validate that the database schema matches our models.
+def _collect_issues(connection: Connection) -> list[str]:
+    inspector = inspect(connection)
+    existing_tables = set(inspector.get_table_names())
+    issues: list[str] = []
+    for table in Base.metadata.sorted_tables:
+        if table.name not in existing_tables:
+            issues.append(f"missing table {table.name}")
+            continue
+        existing_columns = {c["name"] for c in inspector.get_columns(table.name)}
+        for column in table.columns:
+            if column.name not in existing_columns:
+                issues.append(f"missing column {table.name}.{column.name}")
+    return issues
 
-    Raises:
-        SchemaValidationError: If schema is invalid with helpful message
+
+async def validate_schema(
+    engine: AsyncEngine | None = None, *, strict: bool = False
+) -> list[str]:
+    """Return the list of modelled tables and columns the database lacks.
+
+    Logs at ERROR with the remediation when the list is non-empty, and
+    raises ``SchemaValidationError`` on top of that when ``strict``.
     """
-    async with engine.connect() as conn:
-        issues: List[Tuple[str, str]] = []
+    target = engine or default_engine
+    async with target.connect() as conn:
+        issues = await conn.run_sync(_collect_issues)
 
-        def _check(connection: Connection) -> None:
-            inspector = inspect(connection)
-            tables = inspector.get_table_names()
+    if issues:
+        lines = ["Database schema is out of sync with the application models:"]
+        lines += [f"  - {issue}" for issue in issues]
+        lines.append("→ Run the migrations: python src/backend/scripts/migrate.py")
+        message = "\n".join(lines)
+        logger.error(message)
+        if strict:
+            raise SchemaValidationError(message)
+        return issues
 
-            # Check required tables
-            required_tables = [
-                "projects",
-                "project_members",
-                "studies",
-                # "study_collaborators", # Removed
-                "study_translations",
-                "statements",
-                "statement_translations",
-                "participants",
-                "qsort_entries",
-                "users",
-            ]
-
-            for table in required_tables:
-                if table not in tables:
-                    issues.append(("missing_table", table))
-
-            # Check critical columns
-            if "studies" in tables:
-                study_columns = {c["name"] for c in inspector.get_columns("studies")}
-                for col in [
-                    "randomize_statement_order",
-                    "show_statement_codes",
-                    "project_id",
-                ]:
-                    if col not in study_columns:
-                        issues.append(("missing_column", f"studies.{col}"))
-
-            if "participants" in tables:
-                participant_columns = {
-                    c["name"] for c in inspector.get_columns("participants")
-                }
-                if "random_seed" not in participant_columns:
-                    issues.append(("missing_column", "participants.random_seed"))
-
-            if "study_translations" in tables:
-                trans_columns = {
-                    c["name"] for c in inspector.get_columns("study_translations")
-                }
-                if "ui_labels" not in trans_columns:
-                    issues.append(("missing_column", "study_translations.ui_labels"))
-                if "step_help" not in trans_columns:
-                    issues.append(("missing_column", "study_translations.step_help"))
-                if "methodology_tips" not in trans_columns:
-                    issues.append(
-                        ("missing_column", "study_translations.methodology_tips")
-                    )
-
-        await conn.run_sync(_check)
-
-        if issues:
-            error_msg = ["Database schema validation failed:"]
-
-            missing_tables = [item[1] for item in issues if item[0] == "missing_table"]
-            if missing_tables:
-                error_msg.append("\nMissing tables:")
-                for table in missing_tables:
-                    error_msg.append(f"  - {table}")
-                error_msg.append("\n→ Run: python src/backend/init_db.py")
-
-            missing_columns = [
-                item[1] for item in issues if item[0] == "missing_column"
-            ]
-            if missing_columns:
-                error_msg.append("\nMissing columns:")
-                for col in missing_columns:
-                    error_msg.append(f"  - {col}")
-                error_msg.append("\n→ Run: python src/backend/scripts/migrate.py")
-
-            # raise SchemaValidationError("\n".join(error_msg))
-            logger.warning("\n".join(error_msg))
-            logger.warning("Continuing startup despite schema validation errors...")
-
-        logger.info("✓ Database schema validation passed")
+    logger.info("✓ Database schema validation passed")
+    return issues
 
 
 if __name__ == "__main__":
@@ -118,10 +79,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
     try:
-        asyncio.run(validate_schema())
+        asyncio.run(validate_schema(strict=True))
     except Exception as e:
-        # We need to set up basic logging if not already done, just in case
-        if not logging.getLogger().handlers:
-            logging.basicConfig(level=logging.INFO)
         logging.getLogger(__name__).error(e)
         sys.exit(1)

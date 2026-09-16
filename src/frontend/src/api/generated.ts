@@ -15262,6 +15262,9 @@ export const useParticipantSelfErasePersonalDataApiStudySlugPersonalDataDelete =
 
 /**
  * Receives logging/error data from the frontend.
+ *
+ * Anonymous by design (the error boundary fires for participants too),
+ * so it is rate-limited per IP like every other unauthenticated write.
  * @summary Report Log
  */
 export const reportLogApiLogsPost = (logEntry: LogEntry, signal?: AbortSignal) => {

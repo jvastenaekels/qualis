@@ -12,11 +12,15 @@ which this filter rewrites in the access-log line.
 
 Scope of redaction:
 
-* Sensitive query keys ``token``, ``otp``, ``code`` (case-insensitive).
-  ``token`` covers email-verify / password-reset / 2FA-disable /
-  email-change consume URLs; ``otp`` and ``code`` cover any 2FA-email
-  verification path that happens to surface the code in a query string
-  (defence-in-depth — the code is normally POSTed in the body).
+* Sensitive query keys ``token``, ``otp``, ``code``, ``session_token``,
+  ``link_token``, ``password`` (case-insensitive). ``token`` covers
+  email-verify / password-reset / 2FA-disable / email-change consume
+  URLs; ``otp`` and ``code`` cover any 2FA-email verification path that
+  happens to surface the code in a query string; ``session_token`` is
+  the participant bearer that ``/api/study/{slug}``, the draft / erasure
+  DELETEs and the audio routes take as a query parameter, ``link_token``
+  the recruitment-link bearer and ``password`` the study unlock secret
+  (wave 7 — these three were logged raw before).
 
 Scope of attachment:
 
@@ -26,9 +30,12 @@ Scope of attachment:
   / IntegrityError / ServiceError lines (lines 95, 153, 182). Without
   this filter, a 5xx during a token-link consume would log the raw
   token in the application-error pipeline.
-* ``app.routers.logs`` — the ``frontend_error`` logger that records
-  client-side error reports; their context payloads may include URLs
-  with sensitive query params.
+* ``frontend_error`` — the logger ``app.routers.logs`` writes client-side
+  error reports to; message, stack and URL fields may include URLs with
+  sensitive query params. (Wave 7: the list said ``app.routers.logs``,
+  the module's import path, but a filter only sees records emitted by
+  the logger it is attached to, and no logger by that name ever emitted
+  one. The wave-2 test asserted the attachment, not the effect.)
 
 Other application loggers do not currently emit URLs with sensitive
 params; if a future contributor adds one, ``install_access_log_scrub``
@@ -44,7 +51,10 @@ import re
 # stopping at the next ``&`` or end-of-string. The first capture group
 # preserves the separator (``?`` or ``&``); the second preserves the
 # original key casing in the redacted output.
-_TOKEN_RE = re.compile(r"([?&])(token|otp|code)=[^&]*", re.IGNORECASE)
+_TOKEN_RE = re.compile(
+    r"([?&])(session_token|link_token|token|otp|code|password)=[^&]*",
+    re.IGNORECASE,
+)
 
 # Loggers that may emit URLs containing sensitive query params. Keep
 # this list narrow: every entry must have an audited reason. See module
@@ -52,7 +62,7 @@ _TOKEN_RE = re.compile(r"([?&])(token|otp|code)=[^&]*", re.IGNORECASE)
 _TARGET_LOGGER_NAMES: tuple[str, ...] = (
     "uvicorn.access",
     "app.middleware.errors",
-    "app.routers.logs",
+    "frontend_error",
 )
 
 

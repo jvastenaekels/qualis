@@ -4,6 +4,8 @@
 
 """Project and ProjectMember models."""
 
+from sqlalchemy import Index, text
+
 from .base import (
     Base,
     DateTime,
@@ -53,6 +55,17 @@ class ProjectMember(Base):
     """Association model for project members with roles."""
 
     __tablename__ = "project_members"
+
+    # One owner per project, enforced at the database (migration
+    # cb2c7f6f0cfe). Declared here so create_all and autogenerate see it.
+    __table_args__ = (
+        Index(
+            "project_members_one_owner_per_project",
+            "project_id",
+            unique=True,
+            postgresql_where=text("role = 'owner'"),
+        ),
+    )
 
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True

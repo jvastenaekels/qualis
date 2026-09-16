@@ -37,6 +37,8 @@ request than the one the user remembers is a no-op for them.
 
 from __future__ import annotations
 
+import asyncio
+
 from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -84,7 +86,13 @@ async def initiate_email_change(db: AsyncSession, user: User, new_email: str) ->
     confirm_url = f"{settings.FRONTEND_URL}/email-change/confirm?token={confirm_token}"
     cancel_url = f"{settings.FRONTEND_URL}/email-change/cancel?token={cancel_token}"
 
-    send_email_change_confirmation(email_to=new_email, confirm_url=confirm_url)
-    send_email_change_notification(
-        email_to=user.email, new_email=new_email, cancel_url=cancel_url
+    # Synchronous SMTP; run both sends off the event loop.
+    await asyncio.to_thread(
+        send_email_change_confirmation, email_to=new_email, confirm_url=confirm_url
+    )
+    await asyncio.to_thread(
+        send_email_change_notification,
+        email_to=user.email,
+        new_email=new_email,
+        cancel_url=cancel_url,
     )

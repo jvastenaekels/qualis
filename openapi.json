@@ -6747,7 +6747,7 @@
           "logs"
         ],
         "summary": "Report Log",
-        "description": "Receives logging/error data from the frontend.",
+        "description": "Receives logging/error data from the frontend.\n\nAnonymous by design (the error boundary fires for participants too),\nso it is rate-limited per IP like every other unauthenticated write.",
         "operationId": "report_log_api_logs_post",
         "requestBody": {
           "content": {

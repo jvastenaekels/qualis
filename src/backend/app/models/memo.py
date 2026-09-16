@@ -4,6 +4,8 @@
 
 """Memo entries and threaded comments. Polymorphic on (parent_type, parent_id)."""
 
+from sqlalchemy import Index
+
 from .base import (
     Base,
     Boolean,
@@ -27,7 +29,15 @@ class MemoEntry(Base):
 
     __tablename__ = "memo_entries"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    # Indexes mirror migration db2ad904b167: one composite index per table,
+    # no separate ix_*_id (the primary key already is one).
+    __table_args__ = (
+        Index(
+            "ix_memo_entries_parent_position", "parent_type", "parent_id", "position"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
     parent_type: Mapped[MemoParentType] = mapped_column(
         SAEnum(MemoParentType), nullable=False
     )
@@ -61,9 +71,13 @@ class MemoComment(Base):
 
     __tablename__ = "memo_comments"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    __table_args__ = (
+        Index("ix_memo_comments_entry_created", "entry_id", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
     entry_id: Mapped[int] = mapped_column(
-        ForeignKey("memo_entries.id", ondelete="CASCADE"), index=True
+        ForeignKey("memo_entries.id", ondelete="CASCADE")
     )
     user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True

@@ -106,8 +106,15 @@ class TestStudyRBAC:
         ws = await project_factory(owner=owner)
         study = await study_factory(project=ws, owner=owner)
 
-        test_user = await user_factory()
-        await project_member_factory(ws, test_user, role)
+        if role == ProjectRole.owner:
+            # A project has exactly one owner — the partial unique index
+            # project_members_one_owner_per_project (cb2c7f6f0cfe) rejects a
+            # second one, now that the model declares it and create_all
+            # builds it. Exercise the owner the factory already made.
+            test_user = owner
+        else:
+            test_user = await user_factory()
+            await project_member_factory(ws, test_user, role)
         headers = auth_token_factory(test_user)
 
         # GET
