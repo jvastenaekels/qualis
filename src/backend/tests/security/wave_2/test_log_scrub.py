@@ -141,14 +141,17 @@ def test_install_attaches_to_application_loggers() -> None:
     """The scrubber attaches to the application loggers that emit URLs.
 
     ``app.middleware.errors`` formats ``request.url`` directly into its
-    error lines (lines 95, 153, 182). ``app.routers.logs`` writes
-    frontend-error context which may include path-with-query strings.
-    Both must carry the filter so a 5xx during a token-link consume
-    cannot leak the raw token through the application-error pipeline.
+    error lines (lines 95, 153, 182). ``frontend_error`` is the logger
+    ``app.routers.logs`` writes client error reports to, which may
+    include path-with-query strings. Both must carry the filter so a
+    5xx during a token-link consume cannot leak the raw token through
+    the application-error pipeline. (The behavioural check — a record
+    actually comes out scrubbed — lives in wave 7,
+    ``test_frontend_log_ingestion.py``.)
     """
     install_access_log_scrub()
 
-    for name in ("app.middleware.errors", "app.routers.logs"):
+    for name in ("app.middleware.errors", "frontend_error"):
         target = logging.getLogger(name)
         assert any(isinstance(f, TokenLogScrubFilter) for f in target.filters), (
             f"TokenLogScrubFilter not attached to {name!r}"
