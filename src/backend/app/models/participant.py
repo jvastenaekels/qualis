@@ -4,6 +4,8 @@
 
 """Participant, QSortEntry, and AudioRecording models."""
 
+from sqlalchemy import Index
+
 from .base import (
     Any,
     Base,
@@ -36,6 +38,12 @@ class Participant(Base):
     """SQLAlchemy model for study participants."""
 
     __tablename__ = "participants"
+
+    # (study_id, status): Study.participant_count and the lifecycle counters
+    # filter one study's participants by status. status alone has three
+    # values and would not be worth indexing; the composite lets PostgreSQL
+    # answer both counts from the index.
+    __table_args__ = (Index("ix_participants_study_status", "study_id", "status"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     study_id: Mapped[int] = mapped_column(

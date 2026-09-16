@@ -70,8 +70,11 @@ class ProjectMember(Base):
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True
     )
+    # Indexed on its own: the composite primary key (project_id, user_id)
+    # cannot serve "which projects is this user a member of", which the
+    # researcher hub runs on every load.
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, index=True
     )
     role: Mapped[ProjectRole] = mapped_column(
         SAEnum(ProjectRole), default=ProjectRole.viewer

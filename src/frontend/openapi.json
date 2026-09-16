@@ -967,7 +967,7 @@
           "admin-studies"
         ],
         "summary": "Delete Study",
-        "description": "Delete a study (Superuser only, and must be Archived).",
+        "description": "Delete a study: superuser, project owner, and the study archived.",
         "operationId": "delete_study_api_admin_studies__slug__delete",
         "security": [
           {

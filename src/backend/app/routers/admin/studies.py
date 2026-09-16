@@ -16,6 +16,7 @@ from app.database import get_db
 from app.dependencies import (
     PaginationParams,
     check_study_permission,
+    check_superuser,
     get_current_user,
     get_current_project,
     require_project_role,
@@ -290,16 +291,14 @@ async def reset_study_participants(
 async def delete_study(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.owner)),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_superuser),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    """Delete a study (Superuser only, and must be Archived)."""
-    if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only system administrators can delete studies.",
-        )
-
+    """Delete a study: superuser, project owner, and the study archived."""
+    # Both dependencies apply — check_study_permission loads the study and
+    # requires project ownership (a superuser outside the project gets the
+    # same 404 as anyone else); check_superuser names the second condition
+    # in the signature instead of a check buried in the body.
     if study.state != StudyState.archived:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
