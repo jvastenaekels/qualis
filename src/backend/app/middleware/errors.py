@@ -76,9 +76,20 @@ async def validation_exception_handler(
     from fastapi.encoders import jsonable_encoder
 
     exc = cast(RequestValidationError, exc)
-    details = jsonable_encoder(exc.errors())
-    logger.error(f"Validation Error: {details}")
-    # Simplify the details slightly if needed, or pass as is
+    # Pydantic v2 puts the submitted value under ``input`` (and sometimes
+    # inside ``ctx``); a password one character too short would otherwise
+    # be echoed to the client and written to the log. Keep what the
+    # frontend renders — where, what, which rule — and nothing the user
+    # typed. A 422 is the client's mistake, not an incident: WARNING.
+    details = jsonable_encoder(
+        [
+            {k: v for k, v in err.items() if k in ("loc", "msg", "type")}
+            for err in exc.errors()
+        ]
+    )
+    logger.warning(
+        "Validation error on %s %s: %s", request.method, request.url.path, details
+    )
     return create_error_response(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         code="validation_error",
@@ -97,12 +108,15 @@ async def sqlalchemy_exception_handler(
     )
 
     if isinstance(exc, IntegrityError):
-        # Handle unique constraint violations
+        # Unique-constraint violation. The driver message names the
+        # constraint, the column and the conflicting value ("Key
+        # (email)=(x@y) already exists"); it is in the log line above,
+        # never in the response, or any path that does not catch the
+        # error locally becomes an enumeration oracle.
         return create_error_response(
             status_code=status.HTTP_409_CONFLICT,
             code="conflict",
             message="A conflict occurred (e.g. unique constraint violation).",
-            details=str(exc.orig) if exc.orig else str(exc),
         )
 
     # Convert generic DB errors to 500
