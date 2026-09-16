@@ -56,12 +56,6 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
-    # Error reporting (optional). Leave SENTRY_DSN empty to disable.
-    # When set, errors are reported to Sentry tagged with ENVIRONMENT.
-    SENTRY_DSN: str | None = None
-    # 0 = no perf traces; raise to ~0.1 in prod once Sentry is wired.
-    SENTRY_TRACES_SAMPLE_RATE: float = 0.0
-
     # Rate-limiter trust model for X-Forwarded-For (audit F-01-004).
     # The header is honoured only when the immediate TCP peer matches one
     # of these values. Empty (default) = use the direct client IP, ignore

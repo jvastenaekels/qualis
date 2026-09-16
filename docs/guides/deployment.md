@@ -194,7 +194,7 @@ can be the only public entry point.
    Do not add `--volumes`: the `qualis-pgdata` volume contains the database.
    Back up that volume or PostgreSQL on a schedule before collecting real data.
 
-This baseline does not enable audio uploads, SMTP, or Redis. Add their variables
+This baseline does not enable audio uploads or SMTP. Add their variables
 from the [Configuration reference](../reference/configuration.md#environment--app-settings)
 when needed; audio also requires S3-compatible object storage.
 

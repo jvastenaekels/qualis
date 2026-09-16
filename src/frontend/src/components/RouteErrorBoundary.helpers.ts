@@ -1,15 +1,6 @@
 import { isRouteErrorResponse } from 'react-router-dom';
 import { ApiError } from '../api/client';
 
-/**
- * Whether Sentry should capture this route error. 4xx route errors (404, etc.)
- * are expected user-facing flows; only 5xx and unknown errors warrant a report.
- */
-export function shouldCaptureRouteError(error: unknown): boolean {
-    if (!isRouteErrorResponse(error)) return true;
-    return error.status >= 500;
-}
-
 /** Classification used by RouteErrorBoundary to render the right page. */
 export type RouteErrorClassification =
     | { kind: 'route-response'; status: number; message: string }

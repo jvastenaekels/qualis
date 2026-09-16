@@ -1,29 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { ApiError } from '../api/client';
-import {
-    classifyRouteError,
-    shouldCaptureRouteError,
-    shouldThrottleChunkReload,
-} from './RouteErrorBoundary.helpers';
+import { classifyRouteError, shouldThrottleChunkReload } from './RouteErrorBoundary.helpers';
 
 const noStorage = () => null;
-
-describe('shouldCaptureRouteError', () => {
-    it('captures non-route errors', () => {
-        expect(shouldCaptureRouteError(new Error('boom'))).toBe(true);
-        expect(shouldCaptureRouteError('boom')).toBe(true);
-    });
-
-    it('does NOT capture 4xx route responses (404 etc.)', () => {
-        const r404 = { status: 404, statusText: 'Not Found', data: null, internal: false };
-        expect(shouldCaptureRouteError(r404)).toBe(false);
-    });
-
-    it('captures 5xx route responses', () => {
-        const r500 = { status: 500, statusText: 'Server Error', data: null, internal: false };
-        expect(shouldCaptureRouteError(r500)).toBe(true);
-    });
-});
 
 describe('classifyRouteError', () => {
     it('detects route-response (non-ApiError) and extracts status + message', () => {

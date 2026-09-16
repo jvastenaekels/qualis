@@ -49,7 +49,7 @@ These are not a guarantee of security but document the design choices reviewers 
 - **Participant IPs.** Hashed with a configurable salt (`IP_HASH_SALT`) before any storage.
 - **GDPR Art. 17 erasure.** Both participant self-service (session-token-bound) and admin-mediated. Bulk anonymisation with cutoff date for retention enforcement. Audit-trail logging.
 - **Audit trail.** `app.audit` logger emits structured entries for security-relevant admin mutations (user CRUD, role change, project-member management, study state transitions, study delete, bulk anonymisation).
-- **Error reporting.** Optional Sentry integration (`SENTRY_DSN`) with `send_default_pii=False`.
+- **Error reporting.** Unhandled exceptions stay in the operator's own logs; browser errors are posted to the backend's `/api/logs`. No third-party telemetry SDK is a dependency (guarded by `tests/security/wave_7/test_no_third_party_telemetry.py`).
 - **Security headers.** CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy via custom middleware.
 - **Self-hosted by design.** Operators choose their data residency; no third-party SaaS in the request path.
 - **Access-token revocation on password change** (F-03-010, 2026-05-03 audit). JWT tokens carry `iat`; `get_current_user` rejects tokens issued before `user.password_changed_at` advances. The `change_password` self-serve flow bumps `password_changed_at` so all in-flight tokens for that user are immediately invalidated.

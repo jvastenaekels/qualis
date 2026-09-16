@@ -419,7 +419,7 @@ practices".
 | **Container hardening** | Art. 32(1)(b) | Backend `Dockerfile` runs as non-root `app` user (F-02-006); nginx host-allowlist (F-02-007). | Container-host kernel patching; rootless runtime if available. |
 | **Supply chain** | Art. 32(1)(b) | GitHub Actions third-party SHA-pinned (Wave 6); direct-pin floors for CVE-fixed transitives (`pygments`, `python-dotenv`, `requests`); pip-audit + npm-audit gates. | Review Dependabot PRs weekly; subscribe to GitHub security advisories. |
 | **Audit logging** | Art. 32(1)(b), Art. 5(2) accountability | `app.audit` structured rows for every state-mutating admin path; lifecycle audit (F-05-008) covers anonymise / erase / discard / bulk_anonymise / participant self-erase. | Route `app.audit` to tamper-evident sink (file-with-rotation-and-hash or SIEM). |
-| **Breach detection** | Art. 32(1)(b), Art. 33 | Optional Sentry integration (`SENTRY_DSN`) with `send_default_pii=False`; structured exception logs. | Monitor logs; subscribe to Sentry alerts; have a 24/7 contact path. |
+| **Breach detection** | Art. 32(1)(b), Art. 33 | Structured exception logs (`app.middleware.errors`); browser errors posted to `/api/logs`; no third-party telemetry SDK. | Monitor logs; have a 24/7 contact path. |
 | **Access control** | Art. 32(4) | Role-based access (`ProjectMember.role`); owner-immutable on PATCH (F-04-001 §B_VALID_HEADER); DB-level partial-unique index `project_members_one_owner_per_project`. | Set `MAX_MEMBERS_PER_PROJECT` if your deployment requires; review role assignments quarterly. |
 
 **14 control areas** map to specific Qualis features citing **20 finding IDs**
@@ -439,7 +439,6 @@ not at the incident occurrence (Art. 33(1)).
 - Monitor `app.audit` for unexpected mutations (mass anonymise that you did
   not run; role changes on accounts that should not be touched).
 - Monitor `app.middleware.errors` 5xx spikes.
-- Monitor Sentry (if configured) for unhandled exceptions.
 - Subscribe to GitHub security advisories on `pyjwt`, `bcrypt`, `fastapi`,
   `sqlalchemy`, `dompurify`, `exceljs`.
 - Subscribe to Qualis maintainer security advisories (release notes / RSS).
@@ -693,7 +692,6 @@ outside the EU/EEA or outside an adequacy-decision territory.
 | **Hosting** | Scalingo region (Paris / Osaka) | Paris (`region=osc-fr1`). |
 | **S3 / object storage** | Cellar region; AWS S3 region | Cellar `eu-fr1`; AWS `eu-west-3` (Paris) or `eu-central-1` (Frankfurt). |
 | **SMTP** | Provider + region | Institutional MX in operator's country, or EU-region SES (`eu-west-1`). |
-| **Sentry (optional)** | Sentry-EU vs Sentry-US | `https://sentry.io/regions/eu/`. |
 | **CDN (if used)** | Provider region | Cloudflare EU-data-localisation; or a CDN with Article 49 derogations. |
 
 ### 11.2 Transfer mechanism if non-EU is unavoidable

@@ -4,7 +4,6 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import * as Sentry from '@sentry/react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
 
@@ -33,9 +32,6 @@ class ErrorBoundary extends Component<Props, State> {
 
     public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
-
-        // Forward to Sentry when a DSN is configured (no-op otherwise).
-        Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
 
         // Auto-report to backend
         // We import dynamically or rely on the imported module if accessible to avoid cycles,

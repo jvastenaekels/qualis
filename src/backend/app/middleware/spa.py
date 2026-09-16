@@ -74,9 +74,14 @@ def mount_spa(app: FastAPI) -> None:
                 status_code=404, detail="API endpoint not found"
             )
 
-        # 2. Serve known static files from the dist root
-        file_path = os.path.join(FRONTEND_DIST, full_path)
-        if full_path and os.path.isfile(file_path):
+        # 2. Serve known static files from the dist root. Starlette decodes
+        # percent-escapes before populating `full_path`, so `..%2f` arrives
+        # as a real parent reference; confine the resolved path to dist/
+        # before touching the filesystem (security wave 7).
+        dist_root = os.path.realpath(FRONTEND_DIST)
+        file_path = os.path.realpath(os.path.join(dist_root, full_path))
+        inside_dist = os.path.commonpath([dist_root, file_path]) == dist_root
+        if full_path and inside_dist and os.path.isfile(file_path):
             if full_path.endswith(_CACHEABLE_EXTENSIONS):
                 return FileResponse(
                     file_path,

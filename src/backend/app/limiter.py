@@ -8,7 +8,6 @@ from starlette.requests import Request
 
 from app.core.config import settings
 
-redis_url = os.getenv("REDIS_URL")
 is_testing = os.getenv("TESTING", "").lower() == "true"
 
 
@@ -128,12 +127,18 @@ def email_hash_key_func_sync(request: Request) -> str:
     return "email:" + hashlib.sha256(email.encode("utf-8")).hexdigest()[:32]
 
 
-if is_testing:
-    # Disable rate limiting during tests
-    limiter = Limiter(key_func=_get_real_ip, enabled=False)
-elif redis_url:
-    # Use Redis as storage if available (standard for Scalingo/Cloud)
-    limiter = Limiter(key_func=_get_real_ip, storage_uri=redis_url)
-else:
-    # Fallback to in-memory for local development
-    limiter = Limiter(key_func=_get_real_ip)
+def build_limiter(testing: bool) -> Limiter:
+    """Two modes only: disabled under the test suite, per-process
+    in-memory counters otherwise.
+
+    Counters are not shared between gunicorn workers, so with N workers
+    each per-IP limit is effectively multiplied by N. A Redis-backed mode
+    used to be advertised but never booted (the client was not a
+    dependency); it was removed in wave 7 rather than adding a service.
+    """
+    if testing:
+        return Limiter(key_func=_get_real_ip, enabled=False)
+    return Limiter(key_func=_get_real_ip)
+
+
+limiter = build_limiter(is_testing)

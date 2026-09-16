@@ -329,7 +329,7 @@ Limits in production are set per-endpoint via `@limiter.limit(...)`. Endpoints w
 | `POST /api/register` | 5/min |
 | `POST /api/admin/studies/{slug}/anonymise-bulk` | 5/min |
 
-Rate limiting is disabled in the test suite. In production with Redis configured (`REDIS_URL`), counters are shared across workers; otherwise an in-memory store is used per process.
+Rate limiting is disabled in the test suite. Counters live in memory, per process: with several gunicorn workers each limit above is effectively multiplied by the worker count.
 
 ---
 

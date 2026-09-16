@@ -54,6 +54,17 @@ jobs:
           uv run ruff format --check app
       - name: Type Check (Mypy)
         run: cd src/backend && uv run mypy app
+      - name: API Contract (OpenAPI matches the app)
+        # The frontend job's `check:api` regenerates the client from the
+        # committed openapi.json, so on its own it cannot notice a route or
+        # schema changed in the backend without `make generate-api`. Export
+        # the spec from the app here and fail on any drift. ENVIRONMENT is
+        # forced to production so the /api/test/* routes never leak into the
+        # spec, and DATABASE_URL is unset because the export never connects.
+        run: |
+          cd src/backend
+          env -u DATABASE_URL ENVIRONMENT=production uv run python ../../export_openapi.py
+          git diff --exit-code ../../openapi.json ../frontend/openapi.json
       - name: Security SAST (Bandit)
         run: cd src/backend && uv run bandit -r app -ll
       - name: Security SCA (Pip Audit)

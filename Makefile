@@ -156,7 +156,7 @@ migration-new:
 # Passed as a command-line variable so it beats the `-include .env` at the top
 # of this file, which would otherwise win over a plain environment variable.
 generate-api:
-	cd src/backend && ENVIRONMENT=production uv run python ../export_openapi.py
+	cd src/backend && ENVIRONMENT=production uv run python ../../export_openapi.py
 	cd src/frontend && npm run generate:api
 
 check-api: generate-api

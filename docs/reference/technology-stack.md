@@ -23,7 +23,6 @@
 | Pydantic | Input and output validation |
 | PostgreSQL | Primary persistent database |
 | S3-compatible storage | Optional audio objects |
-| Redis | Optional shared rate-limit counters |
 
 ## Responsive-interface mechanisms
 

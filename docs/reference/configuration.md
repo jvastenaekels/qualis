@@ -178,13 +178,6 @@ All settings are read from the `Settings` Pydantic class in `src/backend/app/cor
 | `ALLOWED_ORIGINS` | string (CSV) | localhost dev ports | Comma-separated list of allowed origins. Production must override. |
 | `TRUSTED_PROXIES` | string (CSV) | empty | Reverse-proxy IPs trusted for `X-Forwarded-For`. Empty = use direct peer IP only. |
 
-### Observability
-
-| ENV_VAR | Type | Default | Description |
-| ------- | ---- | ------- | ----------- |
-| `SENTRY_DSN` | string \| optional | `None` | Server-side Sentry DSN. PII sending is hardcoded off. |
-| `SENTRY_TRACES_SAMPLE_RATE` | float | `0.0` | Performance trace sampling rate (0–1). |
-
 ### Email (SMTP)
 
 If `SMTP_HOST` is unset, the backend falls back to logging invitation URLs instead of sending email.
@@ -225,12 +218,3 @@ These are read by the `init_db.py` and `script_utils.py` helpers, not by the Pyd
 | ------- | ---- | ------- | ----------- |
 | `ADMIN_EMAIL` | string | `admin@example.com` | Initial admin account email. |
 | `ADMIN_PASSWORD` | string | `admin123` | Initial admin password. Override before any production bootstrap. |
-
-### Frontend build-time (Vite)
-
-Read at build time by Vite, not by the backend.
-
-| ENV_VAR | Type | Default | Description |
-| ------- | ---- | ------- | ----------- |
-| `VITE_SENTRY_DSN` | string \| optional | empty | Browser-side Sentry DSN, baked into the bundle. |
-| `VITE_ENVIRONMENT` | string \| optional | falls back to Vite `MODE` | Environment tag used by the browser Sentry init. |

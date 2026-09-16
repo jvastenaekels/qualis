@@ -4,11 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import * as Sentry from '@sentry/react';
 import { useRouteError } from 'react-router-dom';
 import ErrorPage from '../pages/ErrorPage';
 import { ApiError } from '../api/client';
-import { classifyRouteError, shouldCaptureRouteError } from './RouteErrorBoundary.helpers';
+import { classifyRouteError } from './RouteErrorBoundary.helpers';
 import { recoverFromChunkError } from '../lib/chunkReload';
 
 /**
@@ -21,15 +20,6 @@ const RouteErrorBoundary = () => {
     const error = useRouteError();
 
     console.error('Route error caught:', error);
-
-    // Forward to Sentry when a DSN is configured (no-op otherwise).
-    if (shouldCaptureRouteError(error)) {
-        if (error instanceof Error) {
-            Sentry.captureException(error);
-        } else if (!(error instanceof ApiError)) {
-            Sentry.captureMessage(`Route error: ${String(error)}`, 'error');
-        }
-    }
 
     const classification = classifyRouteError(
         error,
