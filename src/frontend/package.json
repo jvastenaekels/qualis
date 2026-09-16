@@ -117,7 +117,7 @@
         "knip": "^5.77.4",
         "madge": "^8.0.0",
         "msw": "^2.12.4",
-        "orval": "^7.17.2",
+        "orval": "^8.33.0",
         "postcss": "^8.4.35",
         "tailwindcss": "^3.4.1",
         "typescript": "^6.0.3",
@@ -126,7 +126,7 @@
     },
     "overrides": {
         "@stoplight/spectral-functions": "1.10.2",
-        "js-yaml": "4.3.1",
+        "js-yaml": "4.3.2",
         "minimatch@3.1.5": {
             "brace-expansion": "1.1.18"
         },
