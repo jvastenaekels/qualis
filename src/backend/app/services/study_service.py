@@ -217,12 +217,14 @@ class StudyService:
                     "Switch it back to draft first."
                 )
 
-        # Optimistic locking
+        # Optimistic locking. Opt-in: a client that sends no last_updated_at
+        # gets last-write-wins. A client that does send it is told when the
+        # row moved underneath it, in every state — draft included, since
+        # draft is where two researchers actually edit the same
+        # configuration. The router attaches the current server state to
+        # the 409 so the designer can merge instead of overwrite.
         if study_update.last_updated_at and study.updated_at:
-            if (
-                study.updated_at > study_update.last_updated_at
-                and study.state != StudyState.draft
-            ):
+            if study.updated_at > study_update.last_updated_at:
                 raise ConflictError("Study has been modified by another user.")
 
         try:

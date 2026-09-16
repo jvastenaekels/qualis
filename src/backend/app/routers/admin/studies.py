@@ -8,11 +8,14 @@ import logging
 from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import lazyload, selectinload
 
 from app.database import get_db
+from app.exceptions import ConflictError
+from app.middleware.errors import create_error_response
 from app.dependencies import (
     PaginationParams,
     check_study_permission,
@@ -169,7 +172,7 @@ async def update_study(
     study_update: StudyUpdate,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-) -> Study:
+) -> Study | JSONResponse:
     """Update study configuration (draft only)."""
     # Re-load study with all relationships needed for the update
     stmt = (
@@ -191,7 +194,21 @@ async def update_study(
     for s in study_loaded.statements:
         _ = s.translations
 
-    return await StudyService.update_study(db, study_loaded, study_update)
+    try:
+        return await StudyService.update_study(db, study_loaded, study_update)
+    except ConflictError as exc:
+        # Stale last_updated_at. Nothing was written (the check precedes
+        # every mutation), so study_loaded still is the server state; hand
+        # it to the client under details.server_state — the shape the
+        # designer's three-way merge (useStudyPersistence.applyConflict)
+        # has expected all along.
+        server_state = StudyRead.model_validate(study_loaded).model_dump(mode="json")
+        return create_error_response(
+            status_code=status.HTTP_409_CONFLICT,
+            code="conflict",
+            message=exc.message,
+            details={"server_state": server_state},
+        )
 
 
 @router.post("/{slug}/validate", response_model=list[str])
