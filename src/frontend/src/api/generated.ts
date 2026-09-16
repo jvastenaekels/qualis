@@ -2423,7 +2423,7 @@ export const useUpdateStudyApiAdminStudiesSlugPatch = <
 };
 
 /**
- * Delete a study (Superuser only, and must be Archived).
+ * Delete a study: superuser, project owner, and the study archived.
  * @summary Delete Study
  */
 export const deleteStudyApiAdminStudiesSlugDelete = (slug: string, signal?: AbortSignal) => {

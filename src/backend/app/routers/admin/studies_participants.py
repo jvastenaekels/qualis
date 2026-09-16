@@ -12,7 +12,12 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import func
 
 from app.database import get_db
-from app.dependencies import PaginationParams, check_study_permission, get_current_user
+from app.dependencies import (
+    PaginationParams,
+    check_study_permission,
+    get_current_user,
+    project_roles_satisfying,
+)
 from app.limiter import limiter
 from app.models import (
     Participant,
@@ -21,7 +26,6 @@ from app.models import (
     StudyState,
     User,
     ProjectMember,
-    ProjectRole,
 )
 from app.schemas import ParticipantDetailRead, ParticipantDiscardUpdate, ParticipantRead
 from app.schemas.common import PaginatedResponse
@@ -75,7 +79,7 @@ async def get_participant(
         .where(
             Participant.id == participant_id,
             ProjectMember.user_id == current_user.id,
-            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.member]),
+            ProjectMember.role.in_(project_roles_satisfying(StudyRole.editor)),
         )
         .options(
             selectinload(Participant.qsort_entries),
@@ -128,7 +132,7 @@ async def discard_participant(
         .where(
             Participant.id == participant_id,
             ProjectMember.user_id == current_user.id,
-            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.member]),
+            ProjectMember.role.in_(project_roles_satisfying(StudyRole.editor)),
         )
     )
     result = await db.execute(stmt)

@@ -180,6 +180,53 @@ def study_role_satisfies_via_project(
     return STUDY_ROLE_HIERARCHY[effective] >= STUDY_ROLE_HIERARCHY[required]
 
 
+def project_roles_satisfying(required: StudyRole) -> list[ProjectRole]:
+    """Project roles whose effective study role ranks at or above ``required``.
+
+    For query filters (``ProjectMember.role.in_(...)``) that used to spell
+    out ``[owner, member]`` by hand; derived from the same tables the
+    dependency factories use, so a new role needs one edit, not a hunt.
+    """
+    return [
+        role
+        for role in PROJECT_ROLE_HIERARCHY
+        if study_role_satisfies_via_project(role, required)
+    ]
+
+
+async def assert_project_role(
+    db: AsyncSession,
+    project_id: int,
+    user: User,
+    required: ProjectRole,
+) -> ProjectMember:
+    """Imperative form of ``check_project_permission`` for handlers that
+    reach the project through a resource id rather than a slug (the memo
+    routes) or that must branch on ownership before choosing the rank.
+
+    Same contract as the dependency: 404 when the user is not a member at
+    all (no existence oracle), 403 when the rank is insufficient.
+    """
+    row = (
+        await db.execute(
+            select(ProjectMember).where(
+                ProjectMember.project_id == project_id,
+                ProjectMember.user_id == user.id,
+            )
+        )
+    ).scalar_one_or_none()
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project access denied"
+        )
+    if not project_role_satisfies(row.role, required):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Insufficient permissions. Required: {required.value}",
+        )
+    return row
+
+
 async def check_superuser(
     current_user: User = Depends(get_current_user),
 ) -> User:

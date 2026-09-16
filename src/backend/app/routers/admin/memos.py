@@ -18,9 +18,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.dependencies import (
+    assert_project_role,
     get_current_user,
     get_db,
-    project_role_satisfies,
 )
 from app.limiter import limiter
 from app.models import (
@@ -29,7 +29,6 @@ from app.models import (
     MemoEntry,
     MemoParentType,
     Project,
-    ProjectMember,
     ProjectRole,
     Study,
     User,
@@ -80,30 +79,6 @@ async def _resolve_entry_parent(
     return entry, s.project_id
 
 
-async def _check_member(
-    db: AsyncSession,
-    project_id: int,
-    user: User,
-    required: ProjectRole,
-) -> None:
-    """Verify the user is a project member at >= required role."""
-    row = (
-        await db.execute(
-            select(ProjectMember).where(
-                ProjectMember.project_id == project_id,
-                ProjectMember.user_id == user.id,
-            )
-        )
-    ).scalar_one_or_none()
-    if row is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project access denied")
-    if not project_role_satisfies(row.role, required):
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            detail=f"Insufficient permissions. Required: {required.value}",
-        )
-
-
 async def _reload_entry(db: AsyncSession, entry_id: int) -> MemoEntryRead:
     """Reload an entry with comments selectinload-ed and serialise."""
     stmt = (
@@ -130,7 +105,7 @@ async def get_concourse_memo(
     c = await db.get(Concourse, cid)
     if c is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
-    await _check_member(db, c.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, c.project_id, user, ProjectRole.viewer)
     return await MemoService.get_memo(
         db, parent_type=MemoParentType.concourse, parent_id=cid
     )
@@ -148,7 +123,7 @@ async def get_study_memo(
     s = await db.get(Study, sid)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
-    await _check_member(db, s.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, s.project_id, user, ProjectRole.viewer)
     return await MemoService.get_memo(
         db, parent_type=MemoParentType.study, parent_id=sid
     )
@@ -169,7 +144,7 @@ async def export_concourse_memo(
     c = await db.get(Concourse, cid)
     if c is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
-    await _check_member(db, c.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, c.project_id, user, ProjectRole.viewer)
     md = await MemoService.render_markdown(
         db,
         parent_type=MemoParentType.concourse,
@@ -193,7 +168,7 @@ async def export_study_memo(
     s = await db.get(Study, sid)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
-    await _check_member(db, s.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, s.project_id, user, ProjectRole.viewer)
     md = await MemoService.render_markdown(
         db,
         parent_type=MemoParentType.study,
@@ -218,7 +193,7 @@ async def get_concourse_memo_unread(
     c = await db.get(Concourse, cid)
     if c is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
-    await _check_member(db, c.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, c.project_id, user, ProjectRole.viewer)
     try:
         since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
     except ValueError:
@@ -245,7 +220,7 @@ async def get_study_memo_unread(
     s = await db.get(Study, sid)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
-    await _check_member(db, s.project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, s.project_id, user, ProjectRole.viewer)
     try:
         since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
     except ValueError:
@@ -289,7 +264,7 @@ async def create_concourse_entry(
     c = await db.get(Concourse, cid)
     if c is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
-    await _check_member(db, c.project_id, user, ProjectRole.member)
+    await assert_project_role(db, c.project_id, user, ProjectRole.member)
     e = await MemoService.add_entry(
         db,
         parent_type=MemoParentType.concourse,
@@ -318,7 +293,7 @@ async def create_study_entry(
     s = await db.get(Study, sid)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
-    await _check_member(db, s.project_id, user, ProjectRole.member)
+    await assert_project_role(db, s.project_id, user, ProjectRole.member)
     e = await MemoService.add_entry(
         db,
         parent_type=MemoParentType.study,
@@ -341,7 +316,7 @@ async def update_entry(
     user: User = Depends(get_current_user),
 ) -> MemoEntryRead:
     _, project_id = await _resolve_entry_parent(db, eid)
-    await _check_member(db, project_id, user, ProjectRole.member)
+    await assert_project_role(db, project_id, user, ProjectRole.member)
     await MemoService.update_entry(
         db,
         entry_id=eid,
@@ -362,7 +337,7 @@ async def delete_entry(
     user: User = Depends(get_current_user),
 ) -> None:
     _, project_id = await _resolve_entry_parent(db, eid)
-    await _check_member(db, project_id, user, ProjectRole.member)
+    await assert_project_role(db, project_id, user, ProjectRole.member)
     await MemoService.delete_entry(db, entry_id=eid)
 
 
@@ -383,7 +358,7 @@ async def post_comment(
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
     entry, project_id = await _resolve_entry_parent(db, eid)
-    await _check_member(db, project_id, user, ProjectRole.viewer)
+    await assert_project_role(db, project_id, user, ProjectRole.viewer)
     await MemoService.validate_mentions(
         db, project_id=project_id, user_ids=payload.mentions
     )
@@ -418,9 +393,9 @@ async def update_comment(
     c = await MemoService.get_comment(db, comment_id=cid)
     _, project_id = await _resolve_entry_parent(db, c.entry_id)
     if c.user_id != user.id:
-        await _check_member(db, project_id, user, ProjectRole.owner)  # moderation
+        await assert_project_role(db, project_id, user, ProjectRole.owner)  # moderation
     else:
-        await _check_member(db, project_id, user, ProjectRole.viewer)
+        await assert_project_role(db, project_id, user, ProjectRole.viewer)
     updated = await MemoService.update_comment(db, comment_id=cid, body=payload.body)
     return MemoCommentRead.model_validate(updated, from_attributes=True)
 
@@ -439,9 +414,9 @@ async def delete_comment(
     c = await MemoService.get_comment(db, comment_id=cid)
     _, project_id = await _resolve_entry_parent(db, c.entry_id)
     if c.user_id != user.id:
-        await _check_member(db, project_id, user, ProjectRole.owner)
+        await assert_project_role(db, project_id, user, ProjectRole.owner)
     else:
-        await _check_member(db, project_id, user, ProjectRole.viewer)
+        await assert_project_role(db, project_id, user, ProjectRole.viewer)
     soft = await MemoService.soft_delete_comment(db, comment_id=cid)
     return MemoCommentRead.model_validate(soft, from_attributes=True)
 
@@ -458,9 +433,9 @@ async def resolve_comment(
     entry, project_id = await _resolve_entry_parent(db, c.entry_id)
     is_entry_author = entry.created_by == user.id
     if not is_entry_author:
-        await _check_member(db, project_id, user, ProjectRole.owner)
+        await assert_project_role(db, project_id, user, ProjectRole.owner)
     else:
-        await _check_member(db, project_id, user, ProjectRole.member)
+        await assert_project_role(db, project_id, user, ProjectRole.member)
     resolved = await MemoService.resolve_comment(db, comment_id=cid, user_id=user.id)
     return MemoCommentRead.model_validate(resolved, from_attributes=True)
 
@@ -477,9 +452,9 @@ async def unresolve_comment(
     entry, project_id = await _resolve_entry_parent(db, c.entry_id)
     is_entry_author = entry.created_by == user.id
     if not is_entry_author:
-        await _check_member(db, project_id, user, ProjectRole.owner)
+        await assert_project_role(db, project_id, user, ProjectRole.owner)
     else:
-        await _check_member(db, project_id, user, ProjectRole.member)
+        await assert_project_role(db, project_id, user, ProjectRole.member)
     unresolved = await MemoService.unresolve_comment(db, comment_id=cid)
     return MemoCommentRead.model_validate(unresolved, from_attributes=True)
 
