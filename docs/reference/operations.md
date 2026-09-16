@@ -16,10 +16,12 @@ canonical environment-variable list, see the [Configuration reference](configura
 | Mode | When active | Storage |
 | ---- | ----------- | ------- |
 | Disabled | Test environment | None |
-| Redis | `REDIS_URL` is set | Shared Redis counters |
 | In-memory | Default | Counters local to each process |
 
-Multi-process deployments require `REDIS_URL` for shared rate-limit counters.
+Counters are not shared between processes. The `Procfile` runs gunicorn
+with two workers, so every per-IP limit listed in the API reference is
+effectively doubled on Scalingo. Run a single worker if the exact
+thresholds matter more than throughput.
 
 ## Database connection pool
 
