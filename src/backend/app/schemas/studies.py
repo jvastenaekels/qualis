@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models import DistributionMode, StudyState
 
@@ -182,13 +182,40 @@ class BrandingBase(BaseModel):
 # Study Schemas
 
 
+class PresortConfig(BaseModel):
+    """Pre-sort questionnaire: an on/off switch and a keyed field map.
+
+    ``fields`` entries are open-ended JSON (type, label, options, …; the
+    canonical list of field types is ``PreSortFieldSchema`` in the
+    frontend). Unknown top-level keys are kept.
+
+    Before the ``enabled`` switch existed the column held the field map
+    itself. That flat form is lifted into the wrapped one here, on every
+    write path, and migration ``normalise_presort_config_shape`` rewrote
+    the stored rows with the same rule — so readers take ``fields`` and
+    never sniff.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    enabled: bool = True
+    fields: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_flat_field_map(cls, value: Any) -> Any:
+        if isinstance(value, dict) and "enabled" not in value and "fields" not in value:
+            return {"enabled": True, "fields": value}
+        return value
+
+
 class StudyBase(BaseModel):
     """Base schema for studies."""
 
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
     state: StudyState = StudyState.draft
     grid_config: list[GridColumn]
-    presort_config: dict[str, Any]
+    presort_config: PresortConfig
     postsort_config: dict[str, Any]
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
@@ -221,7 +248,7 @@ class StudyUpdate(BaseModel):
     slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
     state: StudyState | None = None
     grid_config: list[GridColumn] | None = None
-    presort_config: dict[str, Any] | None = None
+    presort_config: PresortConfig | None = None
     postsort_config: dict[str, Any] | None = None
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)

@@ -52,24 +52,29 @@ Boolean. When true (default), participants go through a 3-pile triage (agree / n
 
 ### `presort_config`
 
-Demographic / pre-sort fields. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, `email`, `text_audio` (free text with an optional voice recording), and `rating` (a labelled numeric scale) field types. The canonical list of valid types is `PreSortFieldSchema` in `src/frontend/src/schemas/study.ts`. Definitions are open-ended JSON; the wire shape is not enforced at the schema level beyond validity.
+Demographic / pre-sort questionnaire: an `enabled` switch and a `fields` map keyed by field id. Field types: `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, `email`, `text_audio` (free text with an optional voice recording), and `rating` (a labelled numeric scale). The canonical list of valid types is `PreSortFieldSchema` in `src/frontend/src/schemas/study.ts`. Field definitions are open-ended JSON.
+
+Older exports may carry the field map directly, without the `enabled` / `fields` wrapper; the API lifts that form into the wrapped one on import and on every write, so the stored shape is always the one below.
 
 ```json
 {
-  "age": {
-    "type": "number",
-    "label": { "en": "Age", "fr": "Âge" },
-    "required": true,
-    "min": 18
-  },
-  "gender": {
-    "type": "select",
-    "options": [
-      { "value": "Male",   "label": { "en": "Male",   "fr": "Homme" } },
-      { "value": "Female", "label": { "en": "Female", "fr": "Femme" } }
-    ],
-    "label": { "en": "Gender", "fr": "Genre" },
-    "required": true
+  "enabled": true,
+  "fields": {
+    "age": {
+      "type": "number",
+      "label": { "en": "Age", "fr": "Âge" },
+      "required": true,
+      "min": 18
+    },
+    "gender": {
+      "type": "select",
+      "options": [
+        { "value": "Male",   "label": { "en": "Male",   "fr": "Homme" } },
+        { "value": "Female", "label": { "en": "Female", "fr": "Femme" } }
+      ],
+      "label": { "en": "Gender", "fr": "Genre" },
+      "required": true
+    }
   }
 }
 ```

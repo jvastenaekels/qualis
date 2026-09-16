@@ -425,3 +425,10 @@ reject_capacity_on_public
 # own code, so vulture cannot see them.
 media_type
 render
+
+# --- app/schemas/studies.py (PresortConfig, wave 7 shape normalisation) ---
+# `enabled` is a Pydantic field read through model_dump() / the JSON column;
+# `_lift_flat_field_map` is a @model_validator(mode="before") the framework
+# invokes on every validation. Neither has a direct call site.
+enabled
+_lift_flat_field_map

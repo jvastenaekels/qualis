@@ -209,6 +209,8 @@ export * from './partnerLogoUrl';
 export * from './passwordChange';
 export * from './passwordConfirm';
 export * from './passwordResetConfirm';
+export * from './presortConfig';
+export * from './presortConfigFields';
 export * from './previewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams';
 export * from './previewRangeRequest';
 export * from './previewRangeRequestExtraction';

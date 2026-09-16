@@ -96,7 +96,7 @@ class StudyService:
                 project_id=project_id,
                 state=StudyState.draft,
                 grid_config=[col.model_dump() for col in study_in.grid_config],
-                presort_config=study_in.presort_config,
+                presort_config=study_in.presort_config.model_dump(),
                 postsort_config=study_in.postsort_config,
                 default_language=study_in.default_language
                 or (
@@ -731,13 +731,8 @@ class StudyService:
         study language. Legacy string labels count as English-only."""
 
         def fields_of(config: dict[str, Any], section: str) -> dict[str, Any]:
-            if section == "presort":
-                if "fields" in config:
-                    return config["fields"]  # type: ignore[no-any-return]
-                if "enabled" not in config:
-                    return config
-                return {}
-            return config.get("questions", {})  # type: ignore[no-any-return]
+            key = "fields" if section == "presort" else "questions"
+            return config.get(key, {})  # type: ignore[no-any-return]
 
         def label_in_lang(label: Any, lang: str) -> Any:
             if isinstance(label, dict):

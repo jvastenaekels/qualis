@@ -16191,7 +16191,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
@@ -16435,7 +16438,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 score: faker.number.int({ min: -10, max: 10 }),
                 capacity: faker.number.int(),
             })),
-            presort_config: {},
+            presort_config: {
+                enabled: faker.datatype.boolean(),
+                fields: faker.helpers.arrayElement([{}, undefined]),
+            },
             postsort_config: {},
             branding: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
@@ -16636,7 +16642,10 @@ export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetRespons
                 score: faker.number.int({ min: -10, max: 10 }),
                 capacity: faker.number.int(),
             })),
-            presort_config: {},
+            presort_config: {
+                enabled: faker.datatype.boolean(),
+                fields: faker.helpers.arrayElement([{}, undefined]),
+            },
             postsort_config: {},
             branding: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
@@ -16827,7 +16836,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
@@ -17065,7 +17077,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
@@ -17306,7 +17321,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
@@ -17544,7 +17562,10 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
@@ -17808,7 +17829,10 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             score: faker.number.int({ min: -10, max: 10 }),
             capacity: faker.number.int(),
         })),
-        presort_config: {},
+        presort_config: {
+            enabled: faker.datatype.boolean(),
+            fields: faker.helpers.arrayElement([{}, undefined]),
+        },
         postsort_config: {},
         branding: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
@@ -18050,7 +18074,10 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => ({ score: faker.number.int({ min: -10, max: 10 }), capacity: faker.number.int() })
     ),
-    presort_config: {},
+    presort_config: {
+        enabled: faker.datatype.boolean(),
+        fields: faker.helpers.arrayElement([{}, undefined]),
+    },
     postsort_config: {},
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([

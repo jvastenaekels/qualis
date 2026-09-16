@@ -64,8 +64,11 @@ class TestExports:
 
         # Update presort_config to ensure columns clearly exist
         study.presort_config = {
-            "age": {"type": "number", "label": {"en": "Age"}, "required": True},
-            "gender": {"type": "select", "options": [], "label": {"en": "Gender"}},
+            "enabled": True,
+            "fields": {
+                "age": {"type": "number", "label": {"en": "Age"}, "required": True},
+                "gender": {"type": "select", "options": [], "label": {"en": "Gender"}},
+            },
         }
         study.postsort_config = {
             "comment": {"type": "text", "label": {"en": "Comment"}}
@@ -156,14 +159,17 @@ class TestExports:
         ws = await project_factory(owner=test_user)
         study = await study_factory(project=ws, owner=test_user)
         study.presort_config = {
-            "gender": {
-                "type": "select",
-                "label": "Gender",
-                "options": [
-                    {"id": "m", "label": "Male"},
-                    {"id": "f", "label": "Female"},
-                ],
-            }
+            "enabled": True,
+            "fields": {
+                "gender": {
+                    "type": "select",
+                    "label": "Gender",
+                    "options": [
+                        {"id": "m", "label": "Male"},
+                        {"id": "f", "label": "Female"},
+                    ],
+                }
+            },
         }
         db.add(study)
         await db.commit()
@@ -458,12 +464,15 @@ class TestExports:
 
         # Add presort config with 3 questions
         study.presort_config = {
-            "age": {"type": "number", "label": {"en": "Age"}, "required": True},
-            "gender": {"type": "select", "options": [], "label": {"en": "Gender"}},
-            "education": {
-                "type": "select",
-                "options": [],
-                "label": {"en": "Education"},
+            "enabled": True,
+            "fields": {
+                "age": {"type": "number", "label": {"en": "Age"}, "required": True},
+                "gender": {"type": "select", "options": [], "label": {"en": "Gender"}},
+                "education": {
+                    "type": "select",
+                    "options": [],
+                    "label": {"en": "Education"},
+                },
             },
         }
         db.add(study)
@@ -509,9 +518,9 @@ class TestExports:
 
             # Verify dynamic column offset calculation
             # Should be: 10 fixed metadata + 3 presort = 13
-            assert (
-                "n_meta <- 13" in r_script
-            ), "Column offset should be 13 (10 fixed + 3 presort)"
+            assert "n_meta <- 13" in r_script, (
+                "Column offset should be 13 (10 fixed + 3 presort)"
+            )
 
             # Verify it extracts only score columns (every 5th)
             assert "seq(n_meta + 1, n_meta + (n_items * 5), by = 5)" in r_script

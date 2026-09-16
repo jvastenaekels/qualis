@@ -54,11 +54,14 @@ class TestImportCycle:
 
         # Presort/Postsort
         presort = {
-            "age": {
-                "type": "number",
-                "label": {"en": "Age", "fr": "Age"},
-                "required": True,
-            }
+            "enabled": True,
+            "fields": {
+                "age": {
+                    "type": "number",
+                    "label": {"en": "Age", "fr": "Age"},
+                    "required": True,
+                }
+            },
         }
         postsort = {
             "comment": {"type": "text", "label": {"en": "Comment", "fr": "Commentaire"}}
@@ -261,9 +264,9 @@ class TestImportCycle:
                 val_clone = getattr(clone_t, field)
                 # JSON fields might need careful comparison (lists vs tuples etc)
                 # Pydantic/SQLAlchemy should handle dicts as dicts.
-                assert (
-                    val_clone == val_src
-                ), f"Mismatch in {field} for {lang}: {val_clone} != {val_src}"
+                assert val_clone == val_src, (
+                    f"Mismatch in {field} for {lang}: {val_clone} != {val_src}"
+                )
 
         # Statements
         assert len(cloned.statements) == len(source_study.statements)

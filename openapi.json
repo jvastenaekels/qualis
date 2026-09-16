@@ -10270,6 +10270,24 @@
         "title": "PasswordResetConfirm",
         "description": "Schema for confirming a password reset via email-link JWT."
       },
+      "PresortConfig": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "fields": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Fields"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "PresortConfig",
+        "description": "Pre-sort questionnaire: an on/off switch and a keyed field map.\n\n``fields`` entries are open-ended JSON (type, label, options, \u2026; the\ncanonical list of field types is ``PreSortFieldSchema`` in the\nfrontend). Unknown top-level keys are kept.\n\nBefore the ``enabled`` switch existed the column held the field map\nitself. That flat form is lifted into the wrapped one here, on every\nwrite path, and migration ``normalise_presort_config_shape`` rewrote\nthe stored rows with the same rule \u2014 so readers take ``fields`` and\nnever sniff."
+      },
       "PreviewRangeRequest": {
         "properties": {
           "n_factors_range": {
@@ -11425,9 +11443,7 @@
             "title": "Grid Config"
           },
           "presort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Presort Config"
+            "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
             "additionalProperties": true,
@@ -11636,9 +11652,7 @@
             "title": "Grid Config"
           },
           "presort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Presort Config"
+            "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
             "additionalProperties": true,
@@ -11811,9 +11825,7 @@
             "title": "Grid Config"
           },
           "presort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Presort Config"
+            "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
             "additionalProperties": true,
@@ -12380,14 +12392,12 @@
           "presort_config": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/PresortConfig"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Presort Config"
+            ]
           },
           "postsort_config": {
             "anyOf": [
