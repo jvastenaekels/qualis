@@ -54,8 +54,11 @@ class Study(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
+    # Indexed: every study-level permission check joins studies → projects on
+    # this column, and the project dashboard filters on it (PostgreSQL does
+    # not index foreign keys on its own).
     project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
     state: Mapped[StudyState] = mapped_column(
         SAEnum(StudyState), default=StudyState.draft
