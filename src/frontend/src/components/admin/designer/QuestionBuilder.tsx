@@ -48,7 +48,12 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
-import { postsortConfig } from '@/utils/studyConfig';
+import {
+    isPresortEnabled,
+    normalisePresortConfig,
+    postsortConfig,
+    presortFields,
+} from '@/utils/studyConfig';
 import { toast } from 'sonner';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import { copyMultilangField, copyOptions } from './QuestionBuilder.helpers';
@@ -65,12 +70,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-/** Local write-cast type for the legacy/new presort_config union during mutations. */
-type PresortWritable = {
-    enabled?: boolean;
-    fields?: Record<string, unknown>;
-} & { [k: string]: unknown };
 
 type QuestionType =
     | 'text'
@@ -1010,25 +1009,16 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
     if (!draft) return null;
 
-    // For pre-sort, the config IS the question map (legacy) or has .fields (new)
-    const getQuestionsMap = () => {
+    const getQuestionsMap = (): Record<string, QuestionConfig> => {
         if (type === 'pre') {
-            const config = draft.presort_config || {};
-            if ('fields' in config) return (config.fields as Record<string, QuestionConfig>) || {};
-            // Legacy support for un-normalized state
-            if (!('enabled' in config)) return config as Record<string, QuestionConfig>;
-            return {};
+            return presortFields(draft) as unknown as Record<string, QuestionConfig>;
         }
         return (
             (postsortConfig(draft)?.questions as Record<string, QuestionConfig> | undefined) ?? {}
         );
     };
 
-    const isPresortEnabled =
-        type !== 'pre' ||
-        !draft.presort_config ||
-        !('enabled' in draft.presort_config) ||
-        draft.presort_config.enabled;
+    const presortOn = type !== 'pre' || isPresortEnabled(draft);
 
     const questions = Object.entries(getQuestionsMap()).map(([key, value]) => ({
         id: key,
@@ -1037,22 +1027,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
 
     const handlePresortToggle = (checked: boolean) => {
         updateDraft((d) => {
-            const currentConfig = (d.presort_config ?? {}) as PresortWritable;
-
-            // If currently legacy (no enabled flag), migrate to new structure
-            let newConfig: PresortWritable;
-            if (!('enabled' in currentConfig)) {
-                newConfig = {
-                    enabled: checked,
-                    fields: currentConfig as Record<string, unknown>,
-                };
-            } else {
-                newConfig = {
-                    ...currentConfig,
-                    enabled: checked,
-                };
-            }
-            d.presort_config = newConfig;
+            d.presort_config = { ...normalisePresortConfig(d.presort_config), enabled: checked };
         });
     };
 
@@ -1070,20 +1045,12 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                 newQuestionsMap[id] = rest;
             });
 
-            // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — handleDragEnd over presort_config legacy/new union; branches mirror the data shape (legacy: bare record vs new: { enabled, questions }), each closes over the reconstructed map and the type discriminator
             updateDraft((d) => {
                 if (type === 'pre') {
-                    // Maintain enabled state if present
-                    const currentConfig = (d.presort_config ?? {}) as PresortWritable;
-                    if ('enabled' in currentConfig) {
-                        d.presort_config = {
-                            ...currentConfig,
-                            fields: newQuestionsMap,
-                        };
-                    } else {
-                        // Legacy
-                        d.presort_config = newQuestionsMap;
-                    }
+                    d.presort_config = {
+                        ...normalisePresortConfig(d.presort_config),
+                        fields: newQuestionsMap,
+                    };
                 } else {
                     if (!d.postsort_config) d.postsort_config = {};
                     (
@@ -1145,25 +1112,13 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                     : undefined,
         };
 
-        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — addQuestion mutates legacy/new presort_config union; branches mirror the data shape and auto-migrate legacy → new on first add
         updateDraft((d) => {
             if (type === 'pre') {
-                if (!d.presort_config) d.presort_config = {};
-                const pc = d.presort_config as PresortWritable;
-
-                // Ensure structure
-                if (!('enabled' in pc)) {
-                    // Migrate to new structure if adding to legacy
-                    d.presort_config = {
-                        enabled: true,
-                        fields: { ...pc, [id]: newQuestion },
-                    };
-                } else {
-                    if (!pc.fields) pc.fields = {};
-                    pc.fields[id] = newQuestion;
-                    // Auto-enable if adding? Maybe not force it but usually yes.
-                    pc.enabled = true;
-                }
+                const pc = normalisePresortConfig(d.presort_config);
+                pc.fields[id] = newQuestion;
+                // Adding a question switches the step on.
+                pc.enabled = true;
+                d.presort_config = pc;
             } else {
                 if (!d.postsort_config) d.postsort_config = {};
                 const ps = d.postsort_config as { questions?: Record<string, QuestionConfig> };
@@ -1192,7 +1147,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                         <Switch
                             id="presort-toggle"
                             data-testid="presort-toggle"
-                            checked={!!isPresortEnabled}
+                            checked={presortOn}
                             onCheckedChange={handlePresortToggle}
                             disabled={readOnly || structureLocked}
                         />
@@ -1201,7 +1156,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
             )}
 
             {/* Only show builder and questions if enabled (for pre-sort) or if it's post-sort */}
-            {(type !== 'pre' || !!isPresortEnabled) && (
+            {presortOn && (
                 <>
                     <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
                         {!readOnly && !structureLocked && (
@@ -1331,21 +1286,13 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                                 []
                                             }
                                             onUpdate={(data: QuestionConfig) => {
-                                                // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — inline onUpdate over legacy/new presort_config union; closes over q.id + type, not extractable cleanly without duplicating the branch surface
                                                 updateDraft((d) => {
                                                     if (type === 'pre') {
-                                                        // Handle both legacy and new structure
-                                                        const pc = d.presort_config as
-                                                            | PresortWritable
-                                                            | null
-                                                            | undefined;
-                                                        if (pc && 'enabled' in pc) {
-                                                            if (!pc.fields) pc.fields = {};
-                                                            pc.fields[q.id] = data;
-                                                        } else if (pc) {
-                                                            // Legacy structure
-                                                            pc[q.id] = data;
-                                                        }
+                                                        const pc = normalisePresortConfig(
+                                                            d.presort_config
+                                                        );
+                                                        pc.fields[q.id] = data;
+                                                        d.presort_config = pc;
                                                     } else {
                                                         const ps = d.postsort_config as {
                                                             questions?: Record<
@@ -1358,22 +1305,13 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                                 });
                                             }}
                                             onDelete={() => {
-                                                // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: P5 — inline onDelete over legacy/new presort_config union; mirrors the onUpdate branch above (same constraint: closes over q.id + type)
                                                 updateDraft((d) => {
                                                     if (type === 'pre') {
-                                                        // Handle both legacy and new structure
-                                                        const pc = d.presort_config as
-                                                            | PresortWritable
-                                                            | null
-                                                            | undefined;
-                                                        if (pc && 'enabled' in pc) {
-                                                            if (pc.fields) {
-                                                                delete pc.fields[q.id];
-                                                            }
-                                                        } else if (pc) {
-                                                            // Legacy structure
-                                                            delete pc[q.id];
-                                                        }
+                                                        const pc = normalisePresortConfig(
+                                                            d.presort_config
+                                                        );
+                                                        delete pc.fields[q.id];
+                                                        d.presort_config = pc;
                                                     } else {
                                                         const ps = d.postsort_config as {
                                                             questions?: Record<

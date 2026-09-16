@@ -6,7 +6,7 @@ import type {
     StudyTranslationCreate,
 } from '@/api/model';
 import type { PreSortField, PreSortFieldOption } from '@/schemas/study';
-import { presortFields, postsortConfig } from '@/utils/studyConfig';
+import { normalisePresortConfig, presortFields, postsortConfig } from '@/utils/studyConfig';
 import { produce } from 'immer';
 
 /**
@@ -68,7 +68,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
         slug: study.slug,
         state: study.state,
         grid_config: study.grid_config,
-        presort_config: study.presort_config,
+        presort_config: normalisePresortConfig(study.presort_config),
         postsort_config: study.postsort_config,
         default_language: study.default_language,
         show_statement_codes: study.show_statement_codes,
@@ -225,15 +225,8 @@ function normalizeStudyData(draft: StudyUpdate) {
 
     // --- Normalize Pre-Sort ---
     if (draft.presort_config) {
-        // If it's a legacy structure (no 'enabled' flag), migrate it
-        if (!('enabled' in draft.presort_config)) {
-            draft.presort_config = {
-                enabled: true,
-                fields: draft.presort_config as Record<string, PreSortField>,
-            };
-        }
-        const fields = presortFields(draft);
-        normalizeQuestionMap(fields, availableLanguages, defaultLang);
+        draft.presort_config = normalisePresortConfig(draft.presort_config);
+        normalizeQuestionMap(presortFields(draft), availableLanguages, defaultLang);
     }
 
     // --- Normalize Post-Sort ---

@@ -1,3 +1,4 @@
+import type { PresortConfig } from '@/api/model';
 import type { PreSortField, PostsortConfig, ProcessStep } from '@/schemas/study';
 
 /**
@@ -11,13 +12,37 @@ type PresortLike = {
     presort_config?: { enabled?: boolean } | Record<string, unknown> | null;
 };
 
-export const isPresortEnabled = (config: PresortLike | null | undefined): boolean => {
-    if (!config?.presort_config) return true;
-    if ('enabled' in config.presort_config) {
-        return (config.presort_config as { enabled?: boolean }).enabled !== false;
+/**
+ * The canonical pre-sort config: `{ enabled, fields, ...rest }`.
+ *
+ * The backend guarantees this shape on every read since migration
+ * `normalise_presort_config_shape` (and `PresortConfig`'s validator on every
+ * write). The frontend still meets the older flat field map in two places a
+ * migration cannot reach — a designer draft or a participant config cached
+ * in the browser before that deploy — so this is the ONE function that
+ * knows the flat form. Everything else reads through `presortFields` /
+ * `isPresortEnabled` and writes through the object this returns.
+ *
+ * Always returns a fresh object (callers mutate it inside `updateDraft`).
+ */
+export function normalisePresortConfig(raw: unknown): PresortConfig & {
+    enabled: boolean;
+    fields: Record<string, unknown>;
+} {
+    if (!raw || typeof raw !== 'object') return { enabled: true, fields: {} };
+    const obj = raw as Record<string, unknown>;
+    if ('enabled' in obj || 'fields' in obj) {
+        return {
+            ...obj,
+            enabled: obj.enabled !== false,
+            fields: (obj.fields as Record<string, unknown> | undefined) ?? {},
+        };
     }
-    return true;
-};
+    return { enabled: true, fields: obj };
+}
+
+export const isPresortEnabled = (config: PresortLike | null | undefined): boolean =>
+    normalisePresortConfig(config?.presort_config).enabled;
 
 /**
  * Whether the study has the rough-sort step (3-pile triage) enabled.
@@ -48,25 +73,9 @@ type ConfigLike =
     | null
     | undefined;
 
-/**
- * Field map regardless of legacy (flat record) vs new ({enabled, fields}).
- *
- * The new wrapper shape is identified by the presence of EITHER `enabled` OR
- * `fields` — in that case only the explicit `fields` map are fields (a config
- * with `enabled` but no `fields` has zero presort fields → `{}`). Only a
- * config carrying NEITHER key is a genuine legacy flat field-map. This matches
- * the pre-accessor behaviour (`presort_config.fields`, undefined → no fields);
- * returning the wrapper object itself would leak the boolean `enabled` into
- * the field map (regression: normalizeQuestion(true) → "Cannot create
- * property 'label' on boolean 'true'").
- */
+/** The pre-sort field map, whatever shape the config arrived in. */
 export function presortFields(config: ConfigLike): Record<string, PreSortField> {
-    const pc = config?.presort_config;
-    if (!pc || typeof pc !== 'object') return {};
-    if ('fields' in pc || 'enabled' in pc) {
-        return (pc as { fields?: Record<string, PreSortField> }).fields ?? {};
-    }
-    return pc as Record<string, PreSortField>;
+    return normalisePresortConfig(config?.presort_config).fields as Record<string, PreSortField>;
 }
 
 export function postsortConfig(config: ConfigLike): PostsortConfig | undefined {

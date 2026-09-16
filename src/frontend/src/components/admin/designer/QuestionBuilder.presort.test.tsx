@@ -7,7 +7,7 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 
 // Mock removed
 
-describe('QuestionBuilder - Presort Config Migration', () => {
+describe('QuestionBuilder - presort config shape', () => {
     // biome-ignore lint/suspicious/noExplicitAny: weak typing for test utility
     const renderBuilder = (initialStateOverrides: any = {}) => {
         const mergedDraft = {
@@ -26,7 +26,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         });
     };
 
-    it('handles legacy presort_config structure (flat object)', async () => {
+    it('tolerates a flat field map cached from before the shape normalisation', async () => {
         const legacyDraft = {
             presort_config: {
                 q1: { type: 'text', label: 'Legacy Name', required: true },
@@ -39,7 +39,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         expect(await screen.findByText('Legacy Name')).toBeInTheDocument();
     });
 
-    it('handles new presort_config structure with enabled flag', async () => {
+    it('renders the canonical {enabled, fields} shape', async () => {
         const newDraft = {
             presort_config: {
                 enabled: true,
@@ -72,7 +72,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         expect(screen.getByText('Enable pre-sort survey')).toBeInTheDocument();
     });
 
-    it('migrates from legacy to new structure when toggling presort', async () => {
+    it('lifts a flat draft into the canonical shape on the first write', async () => {
         const user = userEvent.setup();
         const legacyDraft = {
             translations: [{ language_code: 'en' }],
