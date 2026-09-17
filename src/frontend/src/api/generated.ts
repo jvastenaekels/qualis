@@ -16195,7 +16195,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -16442,7 +16442,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 enabled: faker.datatype.boolean(),
                 fields: faker.helpers.arrayElement([{}, undefined]),
             },
-            postsort_config: {},
+            postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
             branding: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     {
@@ -16646,7 +16646,7 @@ export const getListStudiesAcrossProjectsApiAdminStudiesAcrossProjectsGetRespons
                 enabled: faker.datatype.boolean(),
                 fields: faker.helpers.arrayElement([{}, undefined]),
             },
-            postsort_config: {},
+            postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
             branding: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     {
@@ -16840,7 +16840,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -17081,7 +17081,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -17325,7 +17325,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -17566,7 +17566,7 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {
@@ -17833,7 +17833,7 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             enabled: faker.datatype.boolean(),
             fields: faker.helpers.arrayElement([{}, undefined]),
         },
-        postsort_config: {},
+        postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
         branding: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 {
@@ -18078,7 +18078,7 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
         enabled: faker.datatype.boolean(),
         fields: faker.helpers.arrayElement([{}, undefined]),
     },
-    postsort_config: {},
+    postsort_config: { questions: faker.helpers.arrayElement([{}, undefined]) },
     branding: faker.helpers.arrayElement([
         faker.helpers.arrayElement([
             {

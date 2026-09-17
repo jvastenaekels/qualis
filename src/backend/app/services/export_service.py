@@ -98,12 +98,7 @@ class ExportService:
         # 1. Resolve Configs
         presort_fields = (study.presort_config or {}).get("fields", {})
 
-        postsort_fields = {}
-        if study.postsort_config:
-            if "questions" in study.postsort_config:
-                postsort_fields = study.postsort_config.get("questions", {})
-            elif "extreme_columns" not in study.postsort_config:
-                postsort_fields = study.postsort_config
+        postsort_fields = (study.postsort_config or {}).get("questions", {})
 
         # 2. Header Construction
         sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
@@ -481,12 +476,7 @@ class ExportService:
         for section, config in configs:
             fields: dict[str, Any] = {}  # type: ignore[explicit-any]
             # presort/postsort config schemas are open-ended (wave 4 territory).
-            if section == "PRESORT":
-                fields = config.get("fields", {})
-            else:
-                fields = (
-                    config.get("questions", {}) if "questions" in config else config
-                )
+            fields = config.get("fields" if section == "PRESORT" else "questions", {})
 
             if fields:
                 lines.append(f"\n--- {section} ---")
