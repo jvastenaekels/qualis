@@ -6,13 +6,12 @@ import logging
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, user_by_email
 from app.models import User
 from app.utils.security import (
     EmailTokenPayload,
@@ -110,9 +109,7 @@ async def login_for_access_token(
     3. If all checks pass, issue a Bearer access token.
     """
     # 1. Fetch user
-    query = select(User).where(User.email == form_data.username)
-    result = await db.execute(query)
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, form_data.username)
 
     # 2. Authenticate — branch must take comparable wall-clock on both
     # arms, otherwise a /token caller can enumerate registered emails
@@ -284,8 +281,7 @@ async def register_user(
     # 2. Check if user already exists. The duplicate-email arm follows
     #    the F-06-007 "always-200, send-email" path; it returns the
     #    same response shape and status as the fresh arm.
-    existing_query = select(User).where(User.email == user_in.email)
-    existing = (await db.execute(existing_query)).scalar_one_or_none()
+    existing = await user_by_email(db, user_in.email)
     if existing is not None:
         # Out-of-band notify the registered address with a recovery link.
         # The "pwa" claim mirrors the password-reset-request shape so the
@@ -369,7 +365,7 @@ async def register_user(
         # the exception detail (could carry the email).
         await db.rollback()
         logger.info("register: race-condition duplicate folded into anti-enum path")
-        existing_after = (await db.execute(existing_query)).scalar_one_or_none()
+        existing_after = await user_by_email(db, user_in.email)
         if existing_after is not None:
             reset_token = create_email_token(
                 email=existing_after.email,
@@ -622,8 +618,7 @@ async def verify_email(
     """
     claims = _decode_email_token_or_400(payload.token, "email_verify")
 
-    result = await db.execute(select(User).where(User.email == claims["sub"]))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, claims["sub"])
     if user is None:
         # Anti-enum: respond 200, do nothing
         return AckResponse(status="ok")
@@ -661,8 +656,7 @@ async def resend_verification(
     known-unverified path returned ~7 ms while the unknown path took
     ~540 ms — a clear enumeration signal.
     """
-    result = await db.execute(select(User).where(User.email == payload.email))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, payload.email)
 
     # F-03-006: Constant-time padding on BOTH branches. Token signing is
     # negligible next to the bcrypt cost; the e-mail itself is handed to
@@ -700,8 +694,7 @@ async def password_reset_request(
     to the user's current password_changed_at, so a token issued before
     the password was last rotated is rejected.
     """
-    result = await db.execute(select(User).where(User.email == payload.email))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, payload.email)
 
     # Constant-time: run one bcrypt on BOTH paths so the unknown path
     # (anti-enum padding) and the known path (where no real bcrypt is
@@ -737,8 +730,7 @@ async def password_reset_confirm(
     """
     claims = _decode_email_token_or_400(payload.token, "password_reset")
 
-    result = await db.execute(select(User).where(User.email == claims["sub"]))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, claims["sub"])
     if user is None:
         raise HTTPException(status_code=400, detail="invalid_token")
 
@@ -789,8 +781,7 @@ async def email_change_confirm(
     """
     claims = _decode_email_token_or_400(payload.token, "email_change_confirm")
 
-    result = await db.execute(select(User).where(User.email == claims["sub"]))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, claims["sub"])
     if user is None:
         raise HTTPException(status_code=400, detail="invalid_token")
 
@@ -839,8 +830,7 @@ async def email_change_cancel(
     """
     claims = _decode_email_token_or_400(payload.token, "email_change_cancel")
 
-    result = await db.execute(select(User).where(User.email == claims["sub"]))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, claims["sub"])
     if user is None:
         # Anti-enum: respond 200, do nothing. The token bound itself to
         # an email at issue time; if no user matches, the change request
@@ -879,8 +869,7 @@ async def twofa_disable_request(
     branch, so a known-with-2FA email returned ~5 ms while an unknown
     email took ~600 ms — leaking which addresses had 2FA enabled.
     """
-    result = await db.execute(select(User).where(User.email == payload.email))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, payload.email)
 
     # F-03-007: Constant-time padding on BOTH branches. Token signing is
     # negligible next to the bcrypt cost; the e-mail send runs as a
@@ -931,8 +920,7 @@ async def twofa_disable_confirm(
         raise HTTPException(status_code=409, detail="token_already_consumed")
 
     # User lookup happens AFTER consume so the jti is burned regardless.
-    result = await db.execute(select(User).where(User.email == claims["sub"]))
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, claims["sub"])
     if user is None:
         # Persist the consumed jti even for unknown users (anti-enum).
         await db.commit()

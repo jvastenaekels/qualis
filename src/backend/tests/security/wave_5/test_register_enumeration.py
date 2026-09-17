@@ -215,20 +215,23 @@ class TestImplementationContract:
         from app.routers.auth import register_user
 
         source = inspect.getsource(register_user)
-        # We expect: get_password_hash(...) call BEFORE the existence query.
+        # We expect: get_password_hash(...) call BEFORE the existence lookup
+        # (user_by_email, which is the SELECT on users.email since the
+        # auth dedup; the lookup itself is guarded in test_user_by_email).
         hash_idx = source.find("get_password_hash(user_in.password)")
-        select_idx = source.find("select(User).where(User.email")
+        select_idx = source.find("user_by_email(db, user_in.email)")
         assert hash_idx > 0, (
             "register_user must hash the password (get_password_hash). "
             "Source:\n" + source[:1000]
         )
         assert select_idx > 0, (
-            "register_user must SELECT on users.email. Source:\n" + source[:1000]
+            "register_user must look the e-mail up via user_by_email. "
+            "Source:\n" + source[:1000]
         )
         assert hash_idx < select_idx, (
-            "register_user must call get_password_hash BEFORE the SELECT "
-            "on users.email so duplicate/fresh arms have equal bcrypt "
-            "cost (anti-timing). hash_idx=%d, select_idx=%d" % (hash_idx, select_idx)
+            "register_user must call get_password_hash BEFORE the existence "
+            "lookup so duplicate/fresh arms have equal bcrypt cost "
+            "(anti-timing). hash_idx=%d, select_idx=%d" % (hash_idx, select_idx)
         )
 
     def test_register_no_hardcoded_400_409_on_duplicate(self) -> None:
