@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { AdminService } from '@/api/admin';
+import { downloadBlob } from '@/utils/downloadBlob';
 
 /**
  * Import handler for study configuration JSON files.
@@ -112,14 +113,10 @@ export function useExportConfig(studySlug: string) {
             const blob = new Blob([JSON.stringify(response, null, 2)], {
                 type: 'application/json',
             });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${studySlug}_config_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            downloadBlob(
+                blob,
+                `${studySlug}_config_${new Date().toISOString().split('T')[0]}.json`
+            );
 
             toast.success(t('admin.export.config_success', 'Configuration exported successfully'));
         } catch (error: unknown) {

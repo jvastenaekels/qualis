@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
+import { downloadUrl } from '@/utils/downloadBlob';
 
 interface RecruitmentModuleProps {
     slug: string;
@@ -36,12 +37,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
         const canvas = document.getElementById('study-qr-code') as HTMLCanvasElement;
         if (canvas) {
             const pngUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-            const downloadLink = document.createElement('a');
-            downloadLink.href = pngUrl;
-            downloadLink.download = `qr-code-${slug}.png`;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            downloadUrl(pngUrl, `qr-code-${slug}.png`);
         }
     };
 
