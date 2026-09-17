@@ -963,23 +963,28 @@ class TestBuildSortMatrixEdgeCases:
         assert matrix.shape[1] == 7
 
 
-class TestRouterHelperNaN:
-    """Tests for _build_z_scores_list NaN → None replacement."""
+class TestStatementPayloadNaN:
+    """NaN → None replacement now lives in analysis_run_service.statement_payload
+    (it was the router-private _build_z_scores_list before the extraction)."""
+
+    STMT = {"id": 1, "code": "S1", "translations": []}
 
     def test_nan_replaced_with_none(self):
         """NaN z-scores should be replaced with None for JSON serialization."""
-        from app.routers.admin.analysis import _build_z_scores_list
+        from app.services.analysis_run_service import statement_payload
 
         z_scores = np.array([[1.5, np.nan], [0.5, -0.3]])
-        result = _build_z_scores_list(z_scores, s_idx=0, n_factors=2)
-        assert result == [1.5, None]
+        arrays = np.zeros((2, 2), dtype=np.int64)
+        result = statement_payload(self.STMT, 0, z_scores, arrays, 2, "en")
+        assert result["z_scores"] == [1.5, None]
 
     def test_finite_values_preserved(self):
         """Finite z-scores should pass through unchanged."""
-        from app.routers.admin.analysis import _build_z_scores_list
+        from app.services.analysis_run_service import statement_payload
 
         z_scores = np.array([[1.23, -0.45]])
-        result = _build_z_scores_list(z_scores, s_idx=0, n_factors=2)
+        arrays = np.zeros((1, 2), dtype=np.int64)
+        result = statement_payload(self.STMT, 0, z_scores, arrays, 2, "en")["z_scores"]
         assert result[0] == pytest.approx(1.23)
         assert result[1] == pytest.approx(-0.45)
 

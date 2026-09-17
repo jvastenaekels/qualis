@@ -4,7 +4,6 @@ import asyncio
 import logging
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from numpy.typing import NDArray
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -30,69 +29,27 @@ from ...schemas import (
     AnalysisRunPatch,
     AnalysisRunRead,
     AnalysisRunSummary,
-    BootstrapResult,
-    BootstrapStatementStability,
     EigenvalueResult,
-    FactorCharacteristic,
     ParticipantAudioRecording,
     ParticipantCardComment,
-    ParticipantLoading,
     PreviewRangeRequest,
     PreviewRangeResponse,
     PreviewRangeRow,
-    StatementClassification,
-    StatementScore,
 )
+from ...services import analysis_run_service
+from ...services.analysis_run_service import AnalysisInputError
 from ...services.analysis_service import (
-    apply_manual_flags,
-    build_sort_matrix,
-    compute_bootstrap_stability,
     compute_eigenvalues,
     compute_parallel_analysis_n,
     compute_preview_range,
     compute_velicer_map_n,
     correlation_matrix,
-    run_analysis,
 )
 from ...services.storage_service import storage_service
-from ...types.wire import SortDataDump, StatementDumpRecord
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Admin Analysis"])
-
-
-def _get_statement_text(stmt: StatementDumpRecord, lang: str = "en") -> str:
-    """Get statement text for the preferred language, fallback to first available."""
-    for t in stmt["translations"]:
-        if t["lang"] == lang:
-            return t["text"]
-    translations = stmt["translations"]
-    return translations[0]["text"] if translations else stmt["code"]
-
-
-def _build_z_scores_list(
-    z_scores: NDArray[np.float64], s_idx: int, n_factors: int
-) -> list[float | None]:
-    """Extract z-scores for a statement, replacing NaN with None."""
-    return [
-        float(z_scores[s_idx, f]) if not np.isnan(z_scores[s_idx, f]) else None
-        for f in range(n_factors)
-    ]
-
-
-def _build_factor_arrays_list(
-    factor_arrays: NDArray[np.int64], s_idx: int, n_factors: int
-) -> list[int]:
-    """Extract factor array values for a statement."""
-    return [int(factor_arrays[s_idx, f]) for f in range(n_factors)]
-
-
-async def _get_analysis_dump(db: AsyncSession, study_id: int) -> SortDataDump:
-    """Get a lightweight study dump for analysis (no audio/presigned URLs)."""
-    from ...services.study_data_service import StudyDataService
-
-    return await StudyDataService.get_study_sort_data(db, study_id)
 
 
 @router.get("/{slug}/analysis/eigenvalues")
@@ -103,12 +60,10 @@ async def get_eigenvalues(
     db: AsyncSession = Depends(get_db),
 ) -> EigenvalueResult:
     """Compute eigenvalues for the scree plot (before running full analysis)."""
-    dump = await _get_analysis_dump(db, study.id)
-
     try:
-        dataset, _participants, _statements = build_sort_matrix(dump)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        dataset = (await analysis_run_service.load_dataset(db, study.id))["matrix"]
+    except AnalysisInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
     try:
         cor = correlation_matrix(dataset)
@@ -150,269 +105,12 @@ async def run_factor_analysis(
     is unchanged for backward compatibility; the persisted run is retrievable
     via the list / get endpoints below.
     """
-    dump = await _get_analysis_dump(db, study.id)
-
     try:
-        dataset, valid_participants, statements = build_sort_matrix(dump)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    n_statements, n_participants = dataset.shape
-
-    if body.n_factors > n_participants:
-        raise HTTPException(
-            status_code=400,
-            detail=f"n_factors ({body.n_factors}) cannot exceed the number of valid participants ({n_participants})",
+        return await analysis_run_service.run_and_persist(
+            db, study, body, ran_by_user_id=current_user.id
         )
-    if body.n_factors > n_statements:
-        raise HTTPException(
-            status_code=400,
-            detail=f"n_factors ({body.n_factors}) cannot exceed the number of statements ({n_statements})",
-        )
-
-    # Validate manual flagging request
-    if body.flagging == "manual" and not body.manual_flags:
-        raise HTTPException(
-            status_code=400,
-            detail="manual_flags is required when flagging='manual'",
-        )
-
-    # Build manual flags matrix if needed
-    manual_flags_matrix = None
-    if body.flagging == "manual" and body.manual_flags:
-        participant_db_ids = [p["db_id"] for p in valid_participants]
-        try:
-            manual_flags_matrix = apply_manual_flags(
-                n_participants, body.n_factors, body.manual_flags, participant_db_ids
-            )
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-
-    # Extract grid_config for the forced distribution
-    grid_config = dump.get("study", {}).get("grid_config")
-    distribution_mode = dump.get("study", {}).get("distribution_mode", "forced")
-
-    # Convert ManualRotation Pydantic models to plain dicts for the service.
-    # The service stays decoupled from Pydantic; the schema-level cross-field
-    # validator (rotation='judgmental' ⇒ non-empty manual_rotations) has
-    # already run by the time we get here.
-    manual_rotations_payload: list[dict[str, object]] | None = (
-        [r.model_dump() for r in body.manual_rotations]
-        if body.manual_rotations
-        else None
-    )
-
-    try:
-        result = await asyncio.to_thread(
-            run_analysis,
-            dataset=dataset,
-            n_factors=body.n_factors,
-            extraction=body.extraction,
-            rotation=body.rotation,
-            flagging=body.flagging,
-            manual_flags_matrix=manual_flags_matrix,
-            manual_rotations=manual_rotations_payload,
-            grid_config=grid_config,
-            distribution_mode=distribution_mode,
-        )
-    except (ValueError, np.linalg.LinAlgError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    # Determine study language for statement text
-    study_lang = study.default_language or "en"
-
-    # Build participant loadings (report ALL flagged factors, not just first)
-    participants_out: list[ParticipantLoading] = []
-    for i, p in enumerate(valid_participants):
-        flag_row = result["flags"][i]
-        flagged_factors = [f + 1 for f in range(body.n_factors) if flag_row[f]]
-
-        participants_out.append(
-            ParticipantLoading(
-                db_id=p["db_id"],
-                label=p["id"],
-                loadings=[float(v) for v in result["rotated_loadings"][i]],
-                flagged_factors=flagged_factors,
-            )
-        )
-
-    # Build statement scores
-    z_scores = result["z_scores"]
-    factor_arrays = result["factor_arrays"]
-    n_factors = body.n_factors
-
-    statement_scores: list[StatementScore] = []
-    for s_idx, stmt in enumerate(statements):
-        statement_scores.append(
-            StatementScore(
-                statement_id=stmt["id"],
-                code=stmt["code"],
-                text=_get_statement_text(stmt, study_lang),
-                z_scores=_build_z_scores_list(z_scores, s_idx, n_factors),
-                factor_arrays=_build_factor_arrays_list(
-                    factor_arrays, s_idx, n_factors
-                ),
-            )
-        )
-
-    # Build distinguishing statements
-    distinguishing_out: list[StatementClassification] = []
-    for d in result["distinguishing"]:
-        s_idx = d["statement_idx"]
-        stmt = statements[s_idx]
-        distinguishing_out.append(
-            StatementClassification(
-                statement_id=stmt["id"],
-                code=stmt["code"],
-                text=_get_statement_text(stmt, study_lang),
-                z_scores=_build_z_scores_list(z_scores, s_idx, n_factors),
-                factor_arrays=_build_factor_arrays_list(
-                    factor_arrays, s_idx, n_factors
-                ),
-                significance=d["significance"],
-            )
-        )
-
-    # Build consensus statements
-    consensus_out: list[StatementClassification] = []
-    for c in result["consensus"]:
-        s_idx = c["statement_idx"]
-        stmt = statements[s_idx]
-        consensus_out.append(
-            StatementClassification(
-                statement_id=stmt["id"],
-                code=stmt["code"],
-                text=_get_statement_text(stmt, study_lang),
-                z_scores=_build_z_scores_list(z_scores, s_idx, n_factors),
-                factor_arrays=_build_factor_arrays_list(
-                    factor_arrays, s_idx, n_factors
-                ),
-                significance=c["significance"],
-            )
-        )
-
-    # Optional: bootstrap stability (Zabala & Pascual 2016).
-    # Run AFTER the regular analysis so a fast-feedback failure of the
-    # main pipeline isn't masked by the long bootstrap loop. If the
-    # bootstrap itself fails we still return the regular result — the
-    # bootstrap is purely additive.
-    bootstrap_payload: BootstrapResult | None = None
-    if body.bootstrap_iterations is not None:
-        try:
-            bootstrap_raw = await asyncio.to_thread(
-                compute_bootstrap_stability,
-                dataset,
-                body.bootstrap_iterations,
-                n_factors=body.n_factors,
-                extraction=body.extraction,
-                rotation=body.rotation,
-                manual_rotations=manual_rotations_payload,
-                grid_config=grid_config,
-                distribution_mode=distribution_mode,
-            )
-            # Translate row-indices in `statements` to real statement ids.
-            stability_out: list[BootstrapStatementStability] = []
-            for entry in bootstrap_raw["statements"]:
-                idx = entry["statement_idx"]
-                if idx < 0 or idx >= len(statements):
-                    continue
-                stability_out.append(
-                    BootstrapStatementStability(
-                        statement_id=statements[idx]["id"],
-                        factor=entry["factor"],
-                        z_mean=entry["z_mean"],
-                        z_se=entry["z_se"],
-                        ci_lower=entry["ci_lower"],
-                        ci_upper=entry["ci_upper"],
-                    )
-                )
-            bootstrap_payload = BootstrapResult(
-                n_iterations=bootstrap_raw["n_iterations"],
-                n_converged=bootstrap_raw["n_converged"],
-                statements=stability_out,
-                factor_mean_se=bootstrap_raw["factor_mean_se"],
-            )
-        except (ValueError, np.linalg.LinAlgError) as e:
-            # Non-fatal: log and continue. The regular result is still returned
-            # without bootstrap data — but record the attempt in the persisted
-            # warnings so a failed bootstrap is distinguishable from one that was
-            # never requested (audit G3).
-            logger.warning(
-                "Bootstrap failed for study=%s: %s — returning result without bootstrap.",
-                study.slug,
-                e,
-            )
-            result["warnings"].append(
-                f"Bootstrap stability ({body.bootstrap_iterations} iterations) "
-                f"could not be computed and was skipped: {e}"
-            )
-
-    analysis_result = AnalysisResult(
-        n_participants=result["n_participants"],
-        n_statements=result["n_statements"],
-        n_factors=result["n_factors"],
-        extraction=result["extraction"],
-        rotation=result["rotation"],
-        eigenvalues=result["eigenvalues"],
-        total_variance_explained=result["total_variance_explained"],
-        loadings=[[float(v) for v in row] for row in result["unrotated_loadings"]],
-        rotated_loadings=[
-            [float(v) for v in row] for row in result["rotated_loadings"]
-        ],
-        flags=[[bool(v) for v in row] for row in result["flags"]],
-        participants=participants_out,
-        statement_scores=statement_scores,
-        distinguishing=distinguishing_out,
-        consensus=consensus_out,
-        factor_characteristics=[
-            FactorCharacteristic(**c) for c in result["factor_characteristics"]
-        ],
-        correlation_matrix=[
-            [float(v) for v in row] for row in result["factor_correlation"]
-        ],
-        manual_rotations=list(body.manual_rotations) if body.manual_rotations else [],
-        bootstrap=bootstrap_payload,
-        warnings=result["warnings"],
-    )
-
-    # Persist the run as part of the audit trail. We persist on the success
-    # path only; failed analyses do not create runs (the user already saw
-    # the error and can retry with different parameters).
-    run = AnalysisRun(
-        study_id=study.id,
-        ran_by_user_id=current_user.id,
-        extraction_method=body.extraction,
-        n_factors=body.n_factors,
-        rotation_method=body.rotation,
-        flagging_mode=body.flagging,
-        notes=None,
-        factor_notes={},
-        manual_rotations=manual_rotations_payload,
-        # Persist the REQUESTED iteration count unconditionally so an attempted-
-        # but-failed bootstrap (count set, result null) is distinguishable from
-        # one never requested (both null) — audit G3. bootstrap_result stays
-        # guarded (null when the bootstrap failed or was not requested).
-        bootstrap_iterations=body.bootstrap_iterations,
-        bootstrap_result=bootstrap_payload.model_dump(mode="json")
-        if bootstrap_payload is not None
-        else None,
-        result=analysis_result.model_dump(mode="json"),
-    )
-    db.add(run)
-    await db.commit()
-    logger.info(
-        "AnalysisRun persisted: study=%s run_id=%s by user_id=%s "
-        "(extraction=%s, rotation=%s, n_factors=%d, flagging=%s)",
-        study.slug,
-        run.id,
-        current_user.id,
-        body.extraction,
-        body.rotation,
-        body.n_factors,
-        body.flagging,
-    )
-
-    return analysis_result
+    except AnalysisInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.post("/{slug}/analysis/preview-range")
@@ -443,15 +141,15 @@ async def preview_range(
             "(judgmental rotation is path-dependent; commit a real run to inspect).",
         )
 
-    dump = await _get_analysis_dump(db, study.id)
     try:
-        # Re-run inside compute_preview_range; we call it here to get the
-        # post-filter column count for honest k-range validation. Cheap
-        # (pure NumPy, sub-millisecond on typical data).
-        matrix, _participants, _statements = build_sort_matrix(dump)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    n_valid_participants = matrix.shape[1]
+        # Built again inside compute_preview_range; loaded here for the
+        # post-filter column count so the k-range validation is honest.
+        # Cheap (pure NumPy, sub-millisecond on typical data).
+        data = await analysis_run_service.load_dataset(db, study.id)
+    except AnalysisInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    dump = data["dump"]
+    n_valid_participants = data["matrix"].shape[1]
     max_k = min(8, max(n_valid_participants - 1, 1))
     bad = [k for k in body.n_factors_range if k < 2 or k > max_k]
     if bad:

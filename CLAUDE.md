@@ -63,11 +63,15 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.concourse_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.recruitment_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.analysis_service` — wave 3b: AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry TypedDicts; wave 4: build_sort_matrix now typed SortDataDump|StudyDump → list[SortParticipantRecord], list[StatementDumpRecord]
+- `app.services.analysis_run_service` — service layer for the analysis run (load / validate / run / map / persist), extracted from the 277-line run_factor_analysis handler; Dataset and StatementPayload TypedDicts, no Any
 - `app.services.study_defaults` — wave 3b post-mortem: TranslationDefaults TypedDict replaces dict[str, Any]
 - `app.services.study_data_service` — wave 3b post-mortem: StudyDump, SortDataDump, StudyStats TypedDicts
 - `app.services.export_service` — wave 3b post-mortem: _AudioMapEntry TypedDict; presort/postsort config helpers keep dict[str, Any] (type: ignore[explicit-any], open-ended schema)
 - `app.types.wire`, `app.types` — new package: shared TypedDict wire shapes (Clusters 2-4)
 - `app.routers.audio` — wave 4 batch 1: 3 return types added
+- `app.services.participant_session_service` — service layer for a participant's session (progress, draft, withdraw, resume, self-erase), extracted from routers/participants.py; the router itself is promoted to full strict now that the StudyService proxy cast is gone
+- `app.routers.participants` — full strict since the participant session service; consent calls SubmissionService.record_consent directly (typed), no cast
+- `app.services.audio_service` — service layer for participant audio (rules as pure functions, replace-safe storage dance), extracted from the 184-line upload handler; one explicit-any ignore on the open-ended study JSON
 - `app.routers.admin.recruitment` — wave 4 batch 1: List[T] → list[T], 3 return types
 - `app.routers.admin.users` — wave 4 batch 1: cast(PaginatedResponse[UserRead], …) aligns mypy with FastAPI serialisation
 - `app.routers.admin.analysis` — wave 4 batch 2: _get_analysis_dump returns SortDataDump; _get_statement_text typed StatementDumpRecord; typing.Any removed entirely
@@ -87,7 +91,6 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.invitations` — wave 4 batch 1: InvitationAccept Pydantic model; get_db import corrected
 - `app.routers.test` — wave 4 batch 1: 4 Pydantic model classes; 6 return types added
 - `app.routers.admin.studies_participants` — wave 4 batch 3: cast(PaginatedResponse[ParticipantRead]) + None x3
-- `app.routers.participants` — wave 4 batch 3: cast(ConsentResponse, …) for the StudyService.record_consent proxy result
 - `app.routers.submissions` — wave 4 batch 3: dict[str, Any] x2 for service-derived submission/study payloads
 - `app.routers.auth` — wave 4 batch 3: 8 return types; no casts needed (utils/security is fully strict)
 - `app.routers.admin.studies` — wave 4 batch 3: list[StaleStatementEntry] from concourse_service TypedDict
@@ -96,7 +99,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.projects` — wave 4 batch 3: PaginatedResponse[ProjectWithRole|ProjectMemberRead] casts
 - `app.routers.admin.studies_import_export` — wave 4 batch 3: ValidationResult/StudyImportResponse + JSONResponse for export
 - `app.services.submission_service` — services round batch 1: 3 dict[str, Any] payloads at JSON boundary
-- `app.services.study_service` — services round batch 2: 8 backward-compat *args/**kwargs proxy methods kept as Any → Any (deliberate; narrowing requires duplicating each proxy with the underlying signature)
+- `app.services.study_service` — services round batch 2: backward-compat *args/**kwargs proxy methods kept as Any → Any (record_consent's last production caller now calls SubmissionService directly) (deliberate; narrowing requires duplicating each proxy with the underlying signature)
 - `app.routers.admin.memos` — phase 5 memo subsystem
 - `app.schemas.memos` — phase 5 memo subsystem (Pydantic BaseModel)
 - `app.services.email_token_consume_service` — v0.6.0 auth email flows: single-use JTI denylist (no Any at ORM boundary)
@@ -104,7 +107,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 - `app.services.email_change_service` — F-03-011 dual-confirmation flow: park pending_email + dispatch confirm/cancel tokens (no Any)
 
-Total: 68 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
+Total: 71 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
 Previous milestone: 67 (after F-03-011). Added 1 in admin-users feature (admin_user_service).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.

@@ -53,7 +53,7 @@ class TestAudioStorageGuard:
         # Error-envelope house convention: the string lands in ["message"].
         assert r.json()["message"] == "audio_storage_unavailable"
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_unaffected_when_s3_configured(
         self, mock_magic, client, monkeypatch
     ):
