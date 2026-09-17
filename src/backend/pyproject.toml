@@ -226,6 +226,7 @@ strict_equality = true
 #     because the config schema is open-ended (wave 4 territory).
 module = [
     "app.services.analysis_service",
+    "app.services.analysis_run_service",
     "app.services.study_defaults",
     "app.services.study_data_service",
     "app.services.export_service",

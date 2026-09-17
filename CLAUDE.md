@@ -63,6 +63,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.concourse_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.recruitment_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 - `app.services.analysis_service` — wave 3b: AnalysisRunResult, FactorCharacteristicDict, StatementClassEntry TypedDicts; wave 4: build_sort_matrix now typed SortDataDump|StudyDump → list[SortParticipantRecord], list[StatementDumpRecord]
+- `app.services.analysis_run_service` — service layer for the analysis run (load / validate / run / map / persist), extracted from the 277-line run_factor_analysis handler; Dataset and StatementPayload TypedDicts, no Any
 - `app.services.study_defaults` — wave 3b post-mortem: TranslationDefaults TypedDict replaces dict[str, Any]
 - `app.services.study_data_service` — wave 3b post-mortem: StudyDump, SortDataDump, StudyStats TypedDicts
 - `app.services.export_service` — wave 3b post-mortem: _AudioMapEntry TypedDict; presort/postsort config helpers keep dict[str, Any] (type: ignore[explicit-any], open-ended schema)
@@ -104,7 +105,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 - `app.services.email_change_service` — F-03-011 dual-confirmation flow: park pending_email + dispatch confirm/cancel tokens (no Any)
 
-Total: 68 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
+Total: 69 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
 Previous milestone: 67 (after F-03-011). Added 1 in admin-users feature (admin_user_service).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.

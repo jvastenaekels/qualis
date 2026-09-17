@@ -435,3 +435,8 @@ _lift_flat_field_map
 
 # --- app/schemas/studies.py (PostsortConfig, same pattern as PresortConfig) ---
 _lift_flat_question_map
+
+# --- app/schemas/analysis.py (AnalysisResult.statement_scores) ---
+# Pydantic field set by keyword in analysis_run_service.build_result and read
+# by the frontend; vulture used to see a same-named local in the router.
+statement_scores
