@@ -1,17 +1,22 @@
-"""API router for participant actions."""
+# Qualis - Open-source platform for conducting Q-methodology research
+# Copyright (C) 2025 Julien Vastenekels
+# Licensed under the GNU Affero General Public License v3.0 or later.
 
-import re
-from datetime import datetime, timezone
-from typing import cast
+"""Participant session endpoints, mounted under ``/api/study/{slug}``.
+
+Every rule lives in ``app.services.participant_session_service``; each
+handler reads the request, calls the service, and turns a
+``SessionRejected`` into the HTTPException the route always answered with.
+The consent step goes to ``SubmissionService`` directly.
+"""
+
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.limiter import limiter, resume_code_key_func_sync
-from app.models import Participant, ParticipantStatus, Study, StudyState
 from app.schemas import (
     ConsentInput,
     ConsentResponse,
@@ -20,14 +25,13 @@ from app.schemas import (
     ResumeResponse,
 )
 from app.schemas.responses import AckResponse
-from app.services.study_service import StudyService
-from app.utils.study_flow import InvalidStepTransition, validate_step_transition
-
-_UUID_RE = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
-)
+from app.services import participant_session_service as sessions
+from app.services.participant_session_service import SessionRejected
+from app.services.submission_service import SubmissionService
 
 router = APIRouter()
+
+_SLUG = Path(..., title="Study Slug", description="The distinct slug of the study")
 
 
 @router.post("/consent", response_model=ConsentResponse)
@@ -35,29 +39,31 @@ router = APIRouter()
 async def record_consent(
     data: ConsentInput,
     request: Request,
-    slug: str = Path(
-        ..., title="Study Slug", description="The distinct slug of the study"
-    ),
+    slug: str = _SLUG,
     db: AsyncSession = Depends(get_db),
 ) -> ConsentResponse:
-    """Records participant consent with timestamp and version."""
+    """Records participant consent with timestamp and version.
+
+    The study is the one in the URL. The body still carries ``study_slug``
+    for older clients; a value that disagrees with the path is a client
+    bug and is refused rather than silently recorded on another study.
+    """
+    if data.study_slug != slug:
+        raise HTTPException(
+            status_code=400,
+            detail="study_slug in the body does not match the study in the URL",
+        )
     client_ip = request.client.host if request.client else "unknown"
-    user_agent = request.headers.get("user-agent")
-    # StudyService.record_consent is a *args/**kwargs proxy to
-    # SubmissionService.record_consent; cast aligns mypy with the actual
-    # ConsentResponse it returns until the proxy is typed (Phase 3 services wave).
-    return cast(
-        ConsentResponse,
-        await StudyService.record_consent(
-            db,
-            study_slug=data.study_slug,
-            session_token=data.session_token,
-            language_code=data.language_code,
-            consent_hash=data.consent_hash,
-            ip_address=client_ip,
-            user_agent=user_agent,
-        ),
+    result = await SubmissionService.record_consent(
+        db,
+        study_slug=slug,
+        session_token=data.session_token,
+        language_code=data.language_code,
+        consent_hash=data.consent_hash,
+        ip_address=client_ip,
+        user_agent=request.headers.get("user-agent"),
     )
+    return ConsentResponse.model_validate(result)
 
 
 @router.patch("/progress", response_model=AckResponse)
@@ -65,43 +71,14 @@ async def record_consent(
 async def update_progress(
     data: ProgressUpdate,
     request: Request,
-    slug: str = Path(
-        ..., title="Study Slug", description="The distinct slug of the study"
-    ),
+    slug: str = _SLUG,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
     """Records the participant's current step (fire-and-forget from frontend)."""
-    result = await db.execute(
-        select(Participant, Study)
-        .join(Study, Participant.study_id == Study.id)
-        .where(Participant.session_token == data.session_token, Study.slug == slug)
-        .with_for_update(of=Participant)
-    )
-    row = result.one_or_none()
-
-    if not row:
-        raise HTTPException(status_code=404, detail="Participant not found")
-
-    participant, study = row.tuple()
-
-    # Only advance forward (never regress)
-    if (
-        participant.last_step_reached is None
-        or data.step > participant.last_step_reached
-    ):
-        try:
-            validate_step_transition(
-                current_step=participant.last_step_reached or 1,
-                target_step=data.step,
-                rough_sort_enabled=study.rough_sort_enabled,
-            )
-        except InvalidStepTransition as exc:
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-        participant.last_step_reached = data.step
-        participant.last_step_reached_at = datetime.now(timezone.utc)
-        await db.commit()
-
+    try:
+        await sessions.update_progress(db, slug, data.session_token, data.step)
+    except SessionRejected as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
     return AckResponse(status="ok")
 
 
@@ -110,42 +87,14 @@ async def update_progress(
 async def save_draft(
     data: DraftSaveInput,
     request: Request,
-    slug: str = Path(
-        ..., title="Study Slug", description="The distinct slug of the study"
-    ),
+    slug: str = _SLUG,
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
     """Saves participant draft responses (fire-and-forget from frontend)."""
-    result = await db.execute(
-        select(Participant, Study)
-        .join(Study, Participant.study_id == Study.id)
-        .where(Participant.session_token == data.session_token, Study.slug == slug)
-        .with_for_update()
-    )
-    row = result.one_or_none()
-
-    if not row:
-        raise HTTPException(status_code=404, detail="Participant not found")
-
-    participant, study = row.tuple()
-
-    if participant.status != ParticipantStatus.started:
-        raise HTTPException(status_code=410, detail="Session is no longer active")
-
-    if study.state != StudyState.active:
-        raise HTTPException(
-            status_code=403, detail="Study is not currently accepting responses"
-        )
-
-    # When rough sort is disabled for this study, silently drop any stale
-    # `rough` slice from the incoming draft (defensive against legacy clients).
-    incoming = dict(data.draft_responses)
-    if not study.rough_sort_enabled:
-        incoming.pop("rough", None)
-
-    participant.draft_responses = incoming
-    await db.commit()
-
+    try:
+        await sessions.save_draft(db, slug, data.session_token, data.draft_responses)
+    except SessionRejected as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
     return AckResponse(status="ok")
 
 
@@ -154,68 +103,22 @@ async def save_draft(
 async def withdraw_draft(
     request: Request,
     session_token: UUID,
-    slug: str = Path(
-        ..., title="Study Slug", description="The distinct slug of the study"
-    ),
+    slug: str = _SLUG,
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Participant-initiated withdrawal of in-flight draft responses.
 
     Honours the consent-text promise that "If you withdraw before
-    finalizing your sort, no partial data will be retained" by clearing
-    the participant's ``draft_responses`` JSON column on demand. This is
-    the lightweight counterpart to the GDPR Art. 17 self-erase route
-    (``DELETE /personal-data``): drafts are pre-submission scratch state,
-    not permanent research data, so a fast self-serve "I want to start
-    over" path is appropriate.
-
-    Authentication: the ``session_token`` query parameter is the bearer
-    of the right — only someone in possession of the original token
-    issued at consent can clear that participant's draft. Same model as
-    the resume flow.
-
-    Scope: only ``draft_responses`` is cleared. The ``last_step_reached``
-    counter is reset to 1 so the resume flow brings the participant back
-    to the start of the Q-sort (consent step is already past). All other
-    PII columns (hashed IP, UA, consent_hash, presort_answers,
-    postsort_answers) are untouched — operators who require full
-    pre-submission erasure should call the Art. 17 ``DELETE
-    /personal-data`` route instead, which is also rate-limited and
-    idempotent.
-
-    Idempotent: repeated calls return 204; a participant whose draft is
-    already empty / already submitted is a no-op (only the
-    ``draft_responses`` column is rewritten, never row-deleted).
+    finalizing your sort, no partial data will be retained": clears
+    ``draft_responses`` and resets progress to the start of the Q-sort.
+    The ``session_token`` query parameter is the bearer of the right, as
+    in the resume flow. Only the draft is cleared — full pre-submission
+    erasure is the Art. 17 ``DELETE /personal-data`` route. Idempotent.
     """
-    result = await db.execute(
-        select(Participant)
-        .join(Study, Participant.study_id == Study.id)
-        .where(
-            Participant.session_token == session_token,
-            Study.slug == slug,
-        )
-        .with_for_update()
-    )
-    participant = result.scalar_one_or_none()
-
-    if participant is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Session not found",
-        )
-
-    # No-op if the participant already submitted: keep the row intact;
-    # the consent-text promise applies pre-submission only.
-    if participant.status == ParticipantStatus.completed:
-        return None
-
-    participant.draft_responses = None
-    # Reset progress so a subsequent resume returns the participant to
-    # the start of the Q-sort (still post-consent — consent stays).
-    participant.last_step_reached = 1
-    participant.last_step_reached_at = datetime.now(timezone.utc)
-    await db.commit()
-    return None
+    try:
+        await sessions.withdraw_draft(db, slug, session_token)
+    except SessionRejected as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
 
 
 @router.get("/resume/{code}", response_model=ResumeResponse)
@@ -223,64 +126,25 @@ async def withdraw_draft(
 @limiter.limit("10/hour", key_func=resume_code_key_func_sync)
 async def resume_session(
     request: Request,
-    slug: str = Path(
-        ..., title="Study Slug", description="The distinct slug of the study"
-    ),
+    slug: str = _SLUG,
     code: str = Path(
         ...,
         title="Resume Code",
         description="Memorable resume code or legacy UUID",
         max_length=60,
-        pattern=r"^[a-zA-Z0-9-]+$",  # allows uppercase input; normalized to lower in handler
+        pattern=r"^[a-zA-Z0-9-]+$",  # uppercase accepted; the service lowercases
     ),
     db: AsyncSession = Depends(get_db),
 ) -> ResumeResponse:
-    """Returns participant session data for resuming on another device."""
-    # Normalize to lowercase (codes are always lowercase; prevents 404 from
-    # mobile keyboards that auto-capitalize the first letter).
-    code = code.lower()
+    """Returns participant session data for resuming on another device.
 
-    # Build query: try resume_code first, fall back to session_token for legacy UUIDs
-    if _UUID_RE.match(code):
-        result = await db.execute(
-            select(Participant, Study)
-            .join(Study, Participant.study_id == Study.id)
-            .where(Participant.session_token == UUID(code), Study.slug == slug)
-        )
-    else:
-        result = await db.execute(
-            select(Participant, Study)
-            .join(Study, Participant.study_id == Study.id)
-            .where(Participant.resume_code == code, Study.slug == slug)
-        )
-    row = result.one_or_none()
-
-    if not row:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    participant, study = row.tuple()
-
-    if participant.status == ParticipantStatus.completed:
-        # 410 rather than 404: UX benefit of telling users they finished
-        # outweighs the minor enumeration oracle risk (codes are rate-limited).
-        raise HTTPException(status_code=410, detail="Session already completed")
-
-    if participant.is_expired:
-        raise HTTPException(status_code=410, detail="Session has expired")
-
-    if study.state != StudyState.active:
-        raise HTTPException(
-            status_code=403,
-            detail="Study is not currently accepting responses",
-        )
-
-    return ResumeResponse(
-        session_token=str(participant.session_token),
-        language=participant.language_used,
-        last_step_reached=participant.last_step_reached or 1,
-        draft_responses=participant.draft_responses or {},
-        resume_code=participant.resume_code or "",
-    )
+    The lookup is scoped to the study in the URL, so a resume code never
+    resolves across studies (wave 3; guarded on the service query).
+    """
+    try:
+        return await sessions.resume(db, slug, code)
+    except SessionRejected as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
 
 
 @router.delete("/personal-data", status_code=status.HTTP_204_NO_CONTENT)
@@ -293,60 +157,15 @@ async def participant_self_erase_personal_data(
 ) -> None:
     """Participant-initiated GDPR Art. 17 erasure of their own personal data.
 
-    Authentication: the session_token query parameter is the bearer of
-    the right — only someone in possession of the original token issued
-    when the participant started the Q-sort can trigger erasure for
-    that participant. This is the same model used by the resume flow.
-
-    What is erased: ip_address, user_agent, confirmation_code,
-    resume_code, consent_hash, draft_responses, presort_answers,
-    postsort_answers, all audio recordings (biometric data). The
-    session_token is rotated (the original token can never re-access).
-
-    What is preserved: the Q-sort entries themselves (statement
-    rankings) — these are anonymous research data after the PII removal
-    and represent the participant's contribution to the research.
-    Participants who want a hard delete (including the rankings) should
-    contact the researcher directly per the consent text shown at study
-    start.
-
-    Idempotent: repeated calls return 204 (already-anonymised
-    participants are no-ops).
+    The ``session_token`` query parameter is the bearer of the right. What
+    is erased: ip_address, user_agent, confirmation_code, resume_code,
+    consent_hash, draft_responses, presort_answers, postsort_answers and
+    all audio recordings; the token is rotated. What is preserved: the
+    Q-sort entries, anonymous research data after PII removal. Participants
+    who want a hard delete should contact the researcher as the consent
+    text says. Idempotent and audited.
     """
-    from app.services.study_data_service import StudyDataService
-    from app.utils.audit import log_admin_action
-
-    stmt = (
-        select(Participant)
-        .join(Study)
-        .where(
-            Participant.session_token == session_token,
-            Study.slug == slug,
-        )
-    )
-    participant = (await db.execute(stmt)).scalar_one_or_none()
-    if participant is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Session not found",
-        )
-
-    was_already_anonymised = participant.anonymised_at is not None
-    participant_id = participant.id
-    study_id = participant.study_id
-    await StudyDataService.anonymise_participant(db, participant)
-    # F-05-008: participant self-erase must also leave an audit trail.
-    # The participant is the actor; there is no admin user to attribute,
-    # so actor_user_id=None and the action carries the "self_erase" mode
-    # so an investigator can distinguish it from admin-mediated erasure.
-    log_admin_action(
-        actor_user_id=None,
-        action="erase_personal_data",
-        resource="participant",
-        resource_id=participant_id,
-        study_slug=slug,
-        study_id=study_id,
-        already_anonymised=was_already_anonymised,
-        mode="participant_self",
-    )
-    return None
+    try:
+        await sessions.self_erase(db, slug, session_token)
+    except SessionRejected as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)

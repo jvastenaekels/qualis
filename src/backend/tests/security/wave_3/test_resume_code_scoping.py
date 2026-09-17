@@ -117,11 +117,14 @@ class TestResumeCodeScoping:
         that drops the study filter."""
         import inspect
 
-        from app.routers.participants import resume_session
+        # The query moved from the route handler into the session service
+        # (wave 7); the guard follows it and reads the real query, not a
+        # docstring.
+        from app.services.participant_session_service import session_for_resume
 
-        source = inspect.getsource(resume_session)
+        source = inspect.getsource(session_for_resume)
         assert "Study.slug == slug" in source, (
-            "resume_session handler must filter on Study.slug == slug; "
+            "session_for_resume must filter on Study.slug == slug; "
             "without it, resume codes become a global enumeration oracle. "
             "Source preview:\n" + source[:500]
         )

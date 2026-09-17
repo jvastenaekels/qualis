@@ -265,6 +265,8 @@ strict_equality = true
 module = [
     "app.routers.audio",
     "app.services.audio_service",
+    "app.services.participant_session_service",
+    "app.routers.participants",
     "app.routers.admin.recruitment",
     "app.routers.admin.users",
     "app.routers.config",
@@ -294,10 +296,6 @@ module = [
     # studies_participants: 6 missing return types added; cast(PaginatedResponse[ParticipantRead], ...)
     #   pattern from admin/users.py wave 4 batch 1.
     "app.routers.admin.studies_participants",
-    # participants: 5 return types added (ConsentResponse, ResumeResponse, dict[str,str] x2, None).
-    #   Calls into untyped StudyService.record_consent proxy stay clean under the relaxed tier
-    #   (disallow_untyped_calls is not enabled here).
-    "app.routers.participants",
     # submissions: 3 return types (dict[str,Any] x2 for service-derived payloads, dict[str,str]).
     #   typing.Any is structurally required: get_study returns whatever
     #   StudyService.get_resolved_study_config produces (open-ended study config dict).
