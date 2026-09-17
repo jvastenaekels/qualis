@@ -42,6 +42,7 @@ import type {
     MemoTemplate,
 } from '@/api/model';
 import { bumpLastSeen, getLastSeen } from '@/components/admin/memo/memoLastSeen';
+import { downloadBlob } from '@/utils/downloadBlob';
 
 export interface ProjectMemberLite {
     user_id: number;
@@ -148,14 +149,7 @@ export function useMemoSection({
                 parentType === 'concourse'
                     ? await AdminService.exportConcourseMemo(parentId)
                     : await AdminService.exportStudyMemo(parentId);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `memo_${parentType}_${parentId}.md`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
+            downloadBlob(blob, `memo_${parentType}_${parentId}.md`);
             toast.success(t('admin.export.success', 'Export successful'));
         } catch {
             toast.error(t('admin.export.error', 'Export failed. Try again.'));

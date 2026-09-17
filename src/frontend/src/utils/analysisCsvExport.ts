@@ -11,6 +11,7 @@
  * React state. No state, no React, just data → string / data → side-effect.
  */
 
+export { downloadBlob } from './downloadBlob';
 import type { AnalysisResult } from '@/api/model';
 
 function csvField(value: string | number | null): string {
@@ -22,23 +23,6 @@ function csvField(value: string | number | null): string {
 
 function csvRow(fields: (string | number | null)[]): string {
     return fields.map(csvField).join(',');
-}
-
-/**
- * Trigger a browser download of a Blob with the given filename.
- *
- * Side-effecting: creates an <a>, clicks it, then revokes the object URL.
- * Kept here because it's the only consumer alongside the CSV builders.
- */
-export function downloadBlob(blob: Blob, filename: string): void {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
 }
 
 /**

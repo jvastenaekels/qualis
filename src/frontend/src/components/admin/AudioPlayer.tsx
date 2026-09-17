@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Download, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { downloadUrl } from '@/utils/downloadBlob';
 
 interface AudioPlayerProps {
     url: string;
@@ -83,10 +84,7 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
     };
 
     const handleDownload = () => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
+        downloadUrl(url, fileName);
     };
 
     const formatTime = (seconds: number): string => {

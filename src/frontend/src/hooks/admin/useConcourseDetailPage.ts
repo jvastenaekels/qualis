@@ -61,6 +61,7 @@ import { parseApiErrorSync } from '@/lib/error-utils';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import { usePermission } from '@/hooks/usePermission';
 import { SUPPORTED_LANGUAGES } from '@/constants/languages';
+import { downloadBlob } from '@/utils/downloadBlob';
 
 // ────────────────────────────────────────────────────────────────
 // Pure helpers (exported for unit tests)
@@ -764,12 +765,10 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
 
         const csv = [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n');
         const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${project?.title?.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() ?? 'project'}_concourse.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
+        downloadBlob(
+            blob,
+            `${project?.title?.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() ?? 'project'}_concourse.csv`
+        );
     }, [concourse, filteredItems, statusLabel, project?.title]);
 
     return {

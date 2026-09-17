@@ -58,6 +58,7 @@ import {
     FILTERABLE_STEP_KEYS,
     PAGE_SIZE,
 } from '@/components/admin/dashboard/InteractiveDataView.columns';
+import { downloadBlob } from '@/utils/downloadBlob';
 
 export interface UseInteractiveDataViewParams {
     slug: string;
@@ -322,17 +323,6 @@ export function useInteractiveDataView({
         [t]
     );
 
-    const downloadBlob = useCallback((blob: Blob, filename: string) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    }, []);
-
     const exportNewsletterList = useCallback(() => {
         runExport(async () => {
             const escapeCsv = (v: string) => `"${v.replace(/"/g, '""')}"`;
@@ -343,7 +333,7 @@ export function useInteractiveDataView({
             const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
             downloadBlob(blob, `${slug}_newsletter_emails.csv`);
         });
-    }, [liveParticipants, slug, downloadBlob, runExport]);
+    }, [liveParticipants, slug, runExport]);
 
     const showLanguageColumn = data.study.translations.length > 1;
 

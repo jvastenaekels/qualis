@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdminService } from '@/api/admin';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { downloadBlob } from '@/utils/downloadBlob';
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import GridSort from '@/components/GridSort';
 import SortableCard from '@/components/SortableCard';
@@ -99,14 +100,7 @@ export function ParticipantDetailContent({
                 participant.db_id as number
             );
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${studySlug}_participant_${participant.db_id}.json`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            downloadBlob(blob, `${studySlug}_participant_${participant.db_id}.json`);
             toast.success(t('admin.export.success', 'Export successful'));
         } catch (err) {
             console.error(err);
@@ -128,14 +122,7 @@ export function ParticipantDetailContent({
                 studySlug,
                 participant.db_id as number
             );
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${studySlug}_participant_${participant.db_id}_audio.zip`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            downloadBlob(blob, `${studySlug}_participant_${participant.db_id}_audio.zip`);
             toast.success(t('admin.export.success', 'Export successful'));
         } catch (err) {
             console.error(err);
