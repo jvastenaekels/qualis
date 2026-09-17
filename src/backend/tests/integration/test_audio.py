@@ -35,7 +35,7 @@ def _configure_s3_for_audio_tests(monkeypatch):
 @pytest.fixture
 def mock_storage_service():
     """Mock the StorageService for testing without real S3."""
-    with patch("app.routers.audio.storage_service") as mock:
+    with patch("app.services.audio_service.storage_service") as mock:
         # Mock upload_audio
         mock.upload_audio = AsyncMock(
             return_value={
@@ -103,7 +103,7 @@ async def participant_token(
 class TestAudioUpload:
     """Tests for audio upload endpoint."""
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_audio_success(
         self,
         mock_magic,
@@ -145,7 +145,7 @@ class TestAudioUpload:
         assert recording.question_key == "card_123"
         assert recording.duration_seconds == 45.5
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_audio_participant_not_found(
         self, mock_magic, client: AsyncClient, mock_storage_service
     ):
@@ -163,7 +163,7 @@ class TestAudioUpload:
         assert response.status_code == 404
         assert "not found" in response.json()["message"].lower()
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_audio_disabled_study(
         self,
         mock_magic,
@@ -201,7 +201,7 @@ class TestAudioUpload:
         assert response.status_code == 403
         assert "not enabled" in response.json()["message"].lower()
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_replaces_existing_recording(
         self,
         mock_magic,
@@ -248,7 +248,7 @@ class TestAudioUpload:
         assert len(all_recordings) == 1
         assert all_recordings[0].s3_key == "audio/test-study/test-token/123_card_1.webm"
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_successful_reupload_deletes_old_object_after_commit(
         self,
         mock_magic,
@@ -296,7 +296,7 @@ class TestAudioUpload:
         assert len(all_recordings) == 1
         assert all_recordings[0].s3_key == "audio/test-study/test-token/123_card_1.webm"
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_failed_reupload_preserves_existing_recording(
         self,
         mock_magic,
@@ -365,7 +365,7 @@ class TestAudioUpload:
         assert survivor is not None
         assert survivor.s3_key == "old-key"
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_after_submission_fails(
         self,
         mock_magic,
@@ -398,7 +398,7 @@ class TestAudioUpload:
 class TestAudioValidation:
     """Tests for audio file validation."""
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_invalid_mime_type(
         self,
         mock_magic,
@@ -432,7 +432,7 @@ class TestAudioValidation:
         assert response.status_code == 400
         assert "question_key" in response.json()["message"].lower()
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_rejects_empty_file(
         self,
         mock_magic,
@@ -451,7 +451,7 @@ class TestAudioValidation:
         assert "empty" in response.json()["message"].lower()
 
     @pytest.mark.parametrize("bad_duration", ["0", "0.0", "-1", "-5.5"])
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_rejects_non_positive_duration(
         self,
         mock_magic,
@@ -475,7 +475,7 @@ class TestAudioValidation:
         assert response.status_code == 400
         assert "duration" in response.json()["message"].lower()
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_upload_file_too_large(
         self,
         mock_magic,

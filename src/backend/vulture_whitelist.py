@@ -440,3 +440,8 @@ _lift_flat_question_map
 # Pydantic field set by keyword in analysis_run_service.build_result and read
 # by the frontend; vulture used to see a same-named local in the router.
 statement_scores
+
+# --- app/schemas/studies.py (PostsortConfig.questions) ---
+# Pydantic field read through model_dump() / the JSON column; the audio
+# router's same-named local vanished with the audio service extraction.
+questions

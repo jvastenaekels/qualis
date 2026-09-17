@@ -264,6 +264,7 @@ strict_equality = true
 #             dependencies.py Callable → Callable[..., Coroutine[Any, Any, T]], redundant cast removed.
 module = [
     "app.routers.audio",
+    "app.services.audio_service",
     "app.routers.admin.recruitment",
     "app.routers.admin.users",
     "app.routers.config",

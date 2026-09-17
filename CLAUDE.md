@@ -69,6 +69,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.export_service` — wave 3b post-mortem: _AudioMapEntry TypedDict; presort/postsort config helpers keep dict[str, Any] (type: ignore[explicit-any], open-ended schema)
 - `app.types.wire`, `app.types` — new package: shared TypedDict wire shapes (Clusters 2-4)
 - `app.routers.audio` — wave 4 batch 1: 3 return types added
+- `app.services.audio_service` — service layer for participant audio (rules as pure functions, replace-safe storage dance), extracted from the 184-line upload handler; one explicit-any ignore on the open-ended study JSON
 - `app.routers.admin.recruitment` — wave 4 batch 1: List[T] → list[T], 3 return types
 - `app.routers.admin.users` — wave 4 batch 1: cast(PaginatedResponse[UserRead], …) aligns mypy with FastAPI serialisation
 - `app.routers.admin.analysis` — wave 4 batch 2: _get_analysis_dump returns SortDataDump; _get_statement_text typed StatementDumpRecord; typing.Any removed entirely
@@ -105,7 +106,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 - `app.services.email_change_service` — F-03-011 dual-confirmation flow: park pending_email + dispatch confirm/cancel tokens (no Any)
 
-Total: 69 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
+Total: 70 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
 Previous milestone: 67 (after F-03-011). Added 1 in admin-users feature (admin_user_service).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.

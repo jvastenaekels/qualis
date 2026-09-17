@@ -52,7 +52,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models import Participant, Study, StudyState
-from app.routers.audio import upload_audio, validate_audio_file
+from app.services.audio_service import (
+    sniff_mime,
+    store_recording,
+    upload,
+    validate_duration,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +86,7 @@ def _configure_s3_for_audio_tests(monkeypatch):
 @pytest.fixture
 def mock_storage_service():
     """Mock storage_service so we can read back the content_type passed in."""
-    with patch("app.routers.audio.storage_service") as mock:
+    with patch("app.services.audio_service.storage_service") as mock:
         mock.upload_audio = AsyncMock(
             return_value={
                 "s3_bucket": "test-bucket",
@@ -144,7 +149,7 @@ class TestDurationDefault:
     the cap must fall back to settings.AUDIO_MAX_DURATION_SECONDS (300s
     by default), not the prior hard-coded 600s."""
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_default_uses_settings_value(
         self,
         mock_magic,
@@ -176,7 +181,7 @@ class TestDurationDefault:
             f"rejected; got {r.status_code} body={r.text!r}"
         )
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_per_study_override_still_wins(
         self,
         mock_magic,
@@ -215,7 +220,7 @@ class TestSniffedMimeAuthoritative:
     """The S3 Content-Type must come from magic.from_buffer (the bytes),
     not from the client's multipart header."""
 
-    @patch("app.routers.audio.magic.from_buffer")
+    @patch("app.services.audio_service.magic.from_buffer")
     async def test_storage_uses_sniffed_mime(
         self,
         mock_magic,
@@ -255,49 +260,35 @@ class TestSniffedMimeAuthoritative:
 
 
 class TestImplementationContract:
-    """Static guards on the validation/handler boundary."""
+    """Static guards on the validation/storage boundary.
 
-    def test_validate_returns_sniffed_mime(self) -> None:
-        sig = inspect.signature(validate_audio_file)
-        return_annotation = sig.return_annotation
-        # Return must be ``str`` (not ``None``) so the handler can
-        # thread the sniffed value through to storage.
-        assert return_annotation is str, (
-            "validate_audio_file must return the sniffed MIME (str). "
-            f"Current return annotation: {return_annotation!r}"
-        )
+    The rules moved from the route handler into app.services.audio_service;
+    the guards follow them. What they protect is unchanged: the MIME type
+    stored with the object is the sniffed one, and the duration cap
+    defaults to settings, never to a literal.
+    """
 
-    def test_handler_uses_sniffed_value(self) -> None:
-        source = inspect.getsource(upload_audio)
-        # The handler must capture the sniffed return value and use it
-        # as the storage content_type.
-        assert "sniffed_mime" in source, (
-            "upload_audio must capture validate_audio_file's return value "
-            "as `sniffed_mime` and pass it to storage_service.upload_audio "
-            "as content_type. Source preview:\n" + source[:800]
-        )
-        # And must NOT default content_type back to file.content_type
-        # in the storage path. (We allow "file.content_type" in
-        # comments / unrelated branches but the upload call site must
-        # use sniffed_mime.)
-        assert (
-            "content_type=content_type" in source
-            or "content_type=sniffed_mime" in source
-        ), (
-            "upload_audio must call storage_service.upload_audio with "
-            "content_type derived from sniffed_mime. Source preview:\n" + source[:1200]
+    def test_sniff_returns_the_mime(self) -> None:
+        sig = inspect.signature(sniff_mime)
+        assert sig.return_annotation in ("str", str), (
+            "sniff_mime must return the sniffed MIME (str). "
+            f"Current return annotation: {sig.return_annotation!r}"
         )
 
-    def test_handler_uses_settings_for_duration_default(self) -> None:
-        source = inspect.getsource(upload_audio)
-        assert "AUDIO_MAX_DURATION_SECONDS" in source, (
-            "upload_audio must default the duration cap to "
-            "settings.AUDIO_MAX_DURATION_SECONDS, not a hard-coded value "
-            "(F-06-005a). Source preview:\n" + source[:800]
-        )
-        # No hard-coded 600s default any more.
+    def test_upload_threads_the_sniffed_value_into_storage(self) -> None:
+        # upload() names the sniffed value and hands it to store_recording,
+        # which passes it to storage as content_type — never a client header.
+        assert "sniffed_mime = sniff_mime(content)" in inspect.getsource(upload)
+        store_src = inspect.getsource(store_recording)
+        assert "content_type=sniffed_mime" in store_src, store_src[:800]
+        assert "file.content_type" not in store_src
+
+    def test_duration_default_comes_from_settings(self) -> None:
+        source = inspect.getsource(validate_duration)
+        assert "AUDIO_MAX_DURATION_SECONDS" in source, source
         assert ", 600)" not in source, (
-            "upload_audio must not hard-code 600s as the duration "
-            "default — settings.AUDIO_MAX_DURATION_SECONDS is the "
-            "source of truth. Source preview:\n" + source[:800]
+            "validate_duration must not hard-code 600s as the duration "
+            "default (F-06-005a)."
         )
+
+
