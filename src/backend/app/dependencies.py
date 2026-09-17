@@ -23,9 +23,20 @@ from app.utils.security import decode_access_token
 
 if TYPE_CHECKING:
     from app.models import Project
-from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
+
+
+async def user_by_email(db: AsyncSession, email: str) -> User | None:
+    """The user behind an e-mail address, or None.
+
+    The one lookup every auth path uses — login, register, the token
+    consume endpoints, the bearer-token dependency below. Exact match on
+    the stored address; case folding or a soft-delete filter would go here
+    and nowhere else.
+    """
+    result = await db.execute(select(User).where(User.email == email))
+    return result.scalar_one_or_none()
 
 
 async def get_current_user(
@@ -54,13 +65,10 @@ async def get_current_user(
         if sub is None:
             raise credentials_exception
         email: str = cast(str, sub)
-        token_data = TokenData(email=email)
     except InvalidTokenError:
         raise credentials_exception
 
-    query = select(User).where(User.email == token_data.email)
-    result = await db.execute(query)
-    user = result.scalar_one_or_none()
+    user = await user_by_email(db, email)
 
     if user is None:
         raise credentials_exception
