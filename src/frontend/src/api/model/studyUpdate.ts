@@ -7,11 +7,11 @@
 import type { BrandingBase } from './brandingBase';
 import type { DistributionMode } from './distributionMode';
 import type { GridColumn } from './gridColumn';
+import type { PostsortConfig } from './postsortConfig';
 import type { PresortConfig } from './presortConfig';
 import type { StatementUpdate } from './statementUpdate';
 import type { StudyState } from './studyState';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
-import type { StudyUpdatePostsortConfig } from './studyUpdatePostsortConfig';
 
 /**
  * Schema for updating a study.
@@ -21,7 +21,7 @@ export interface StudyUpdate {
     state?: StudyState | null;
     grid_config?: GridColumn[] | null;
     presort_config?: PresortConfig | null;
-    postsort_config?: StudyUpdatePostsortConfig;
+    postsort_config?: PostsortConfig | null;
     branding?: BrandingBase | null;
     default_language?: string | null;
     show_statement_codes?: boolean | null;

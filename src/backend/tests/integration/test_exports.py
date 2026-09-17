@@ -71,7 +71,7 @@ class TestExports:
             },
         }
         study.postsort_config = {
-            "comment": {"type": "text", "label": {"en": "Comment"}}
+            "questions": {"comment": {"type": "text", "label": {"en": "Comment"}}}
         }
         db.add(study)
         await db.commit()

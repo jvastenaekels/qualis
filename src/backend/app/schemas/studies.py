@@ -209,6 +209,37 @@ class PresortConfig(BaseModel):
         return value
 
 
+class PostsortConfig(BaseModel):
+    """Post-sort step: settings at the root, questions under ``questions``.
+
+    Settings are open-ended (``extreme_columns``, ``prompts``, ``audio``,
+    consent switches, …) and kept as extra keys. The oldest studies stored
+    the question map at the root; that flat form is lifted here on every
+    write and was rewritten in stored rows by migration
+    ``normalise_postsort_config_shape``. The test is structural — every
+    value a dict with a ``type`` — because the settings keys are open-ended
+    and a settings-only config (the create dialog writes
+    ``{"email": {...}, "consent": {...}}``) must not be mistaken for
+    questions, which the export's old "no extreme_columns" rule did.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    questions: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_flat_question_map(cls, value: Any) -> Any:
+        if not isinstance(value, dict) or "questions" in value:
+            return value
+        is_flat_question_map = bool(value) and all(
+            isinstance(v, dict) and "type" in v for v in value.values()
+        )
+        if is_flat_question_map:
+            return {"questions": value}
+        return {**value, "questions": {}}
+
+
 class StudyBase(BaseModel):
     """Base schema for studies."""
 
@@ -216,7 +247,7 @@ class StudyBase(BaseModel):
     state: StudyState = StudyState.draft
     grid_config: list[GridColumn]
     presort_config: PresortConfig
-    postsort_config: dict[str, Any]
+    postsort_config: PostsortConfig
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
@@ -249,7 +280,7 @@ class StudyUpdate(BaseModel):
     state: StudyState | None = None
     grid_config: list[GridColumn] | None = None
     presort_config: PresortConfig | None = None
-    postsort_config: dict[str, Any] | None = None
+    postsort_config: PostsortConfig | None = None
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None

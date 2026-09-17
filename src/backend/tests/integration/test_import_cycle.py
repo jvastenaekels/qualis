@@ -64,7 +64,12 @@ class TestImportCycle:
             },
         }
         postsort = {
-            "comment": {"type": "text", "label": {"en": "Comment", "fr": "Commentaire"}}
+            "questions": {
+                "comment": {
+                    "type": "text",
+                    "label": {"en": "Comment", "fr": "Commentaire"},
+                }
+            }
         }
 
         source_study = Study(

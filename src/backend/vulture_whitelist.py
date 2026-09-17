@@ -432,3 +432,6 @@ render
 # invokes on every validation. Neither has a direct call site.
 enabled
 _lift_flat_field_map
+
+# --- app/schemas/studies.py (PostsortConfig, same pattern as PresortConfig) ---
+_lift_flat_question_map

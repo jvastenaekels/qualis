@@ -10270,6 +10270,19 @@
         "title": "PasswordResetConfirm",
         "description": "Schema for confirming a password reset via email-link JWT."
       },
+      "PostsortConfig": {
+        "properties": {
+          "questions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Questions"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "PostsortConfig",
+        "description": "Post-sort step: settings at the root, questions under ``questions``.\n\nSettings are open-ended (``extreme_columns``, ``prompts``, ``audio``,\nconsent switches, \u2026) and kept as extra keys. The oldest studies stored\nthe question map at the root; that flat form is lifted here on every\nwrite and was rewritten in stored rows by migration\n``normalise_postsort_config_shape``. The test is structural \u2014 every\nvalue a dict with a ``type`` \u2014 because the settings keys are open-ended\nand a settings-only config (the create dialog writes\n``{\"email\": {...}, \"consent\": {...}}``) must not be mistaken for\nquestions, which the export's old \"no extreme_columns\" rule did."
+      },
       "PresortConfig": {
         "properties": {
           "enabled": {
@@ -11446,9 +11459,7 @@
             "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Postsort Config"
+            "$ref": "#/components/schemas/PostsortConfig"
           },
           "branding": {
             "anyOf": [
@@ -11655,9 +11666,7 @@
             "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Postsort Config"
+            "$ref": "#/components/schemas/PostsortConfig"
           },
           "branding": {
             "anyOf": [
@@ -11828,9 +11837,7 @@
             "$ref": "#/components/schemas/PresortConfig"
           },
           "postsort_config": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Postsort Config"
+            "$ref": "#/components/schemas/PostsortConfig"
           },
           "branding": {
             "anyOf": [
@@ -12402,14 +12409,12 @@
           "postsort_config": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/PostsortConfig"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Postsort Config"
+            ]
           },
           "branding": {
             "anyOf": [

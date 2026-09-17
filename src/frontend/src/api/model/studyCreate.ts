@@ -7,9 +7,9 @@
 import type { BrandingBase } from './brandingBase';
 import type { DistributionMode } from './distributionMode';
 import type { GridColumn } from './gridColumn';
+import type { PostsortConfig } from './postsortConfig';
 import type { PresortConfig } from './presortConfig';
 import type { StatementCreate } from './statementCreate';
-import type { StudyCreatePostsortConfig } from './studyCreatePostsortConfig';
 import type { StudyState } from './studyState';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
 
@@ -26,7 +26,7 @@ export interface StudyCreate {
     state?: StudyState;
     grid_config: GridColumn[];
     presort_config: PresortConfig;
-    postsort_config: StudyCreatePostsortConfig;
+    postsort_config: PostsortConfig;
     branding?: BrandingBase | null;
     default_language?: string | null;
     show_statement_codes?: boolean;

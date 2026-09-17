@@ -7,11 +7,11 @@
 import type { BrandingBase } from './brandingBase';
 import type { DistributionMode } from './distributionMode';
 import type { GridColumn } from './gridColumn';
+import type { PostsortConfig } from './postsortConfig';
 import type { PresortConfig } from './presortConfig';
 import type { ProjectBrief } from './projectBrief';
 import type { RecruitmentLinkRead } from './recruitmentLinkRead';
 import type { StatementRead } from './statementRead';
-import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
 import type { StudyState } from './studyState';
 import type { StudyTranslationRead } from './studyTranslationRead';
 
@@ -28,7 +28,7 @@ export interface StudyRead {
     state?: StudyState;
     grid_config: GridColumn[];
     presort_config: PresortConfig;
-    postsort_config: StudyReadPostsortConfig;
+    postsort_config: PostsortConfig;
     branding?: BrandingBase | null;
     default_language?: string | null;
     show_statement_codes?: boolean;

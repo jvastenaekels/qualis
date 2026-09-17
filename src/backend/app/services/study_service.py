@@ -97,7 +97,7 @@ class StudyService:
                 state=StudyState.draft,
                 grid_config=[col.model_dump() for col in study_in.grid_config],
                 presort_config=study_in.presort_config.model_dump(),
-                postsort_config=study_in.postsort_config,
+                postsort_config=study_in.postsort_config.model_dump(),
                 default_language=study_in.default_language
                 or (
                     study_in.translations[0].language_code
