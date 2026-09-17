@@ -96,12 +96,7 @@ class ExportService:
             return str(value)
 
         # 1. Resolve Configs
-        presort_fields = {}
-        if study.presort_config:
-            if "fields" in study.presort_config:
-                presort_fields = study.presort_config.get("fields", {})
-            elif "enabled" not in study.presort_config:
-                presort_fields = study.presort_config
+        presort_fields = (study.presort_config or {}).get("fields", {})
 
         postsort_fields = {}
         if study.postsort_config:
@@ -487,7 +482,7 @@ class ExportService:
             fields: dict[str, Any] = {}  # type: ignore[explicit-any]
             # presort/postsort config schemas are open-ended (wave 4 territory).
             if section == "PRESORT":
-                fields = config.get("fields", {}) if "fields" in config else config
+                fields = config.get("fields", {})
             else:
                 fields = (
                     config.get("questions", {}) if "questions" in config else config
@@ -644,14 +639,7 @@ class ExportService:
     def _generate_r_script(study: Study) -> str:
         """Generates a dynamic R script for qmethod package."""
         # Calculate actual metadata column count
-        presort_config = study.presort_config or {}
-        if "fields" in presort_config:
-            presort_fields = presort_config.get("fields", {})
-        elif "enabled" not in presort_config:
-            presort_fields = presort_config
-        else:
-            presort_fields = {}
-        n_presort = len(presort_fields)
+        n_presort = len((study.presort_config or {}).get("fields", {}))
         n_fixed_meta = 10  # Participant_UID through Discard_Reason
         n_meta = n_fixed_meta + n_presort
         n_items = len(study.statements)

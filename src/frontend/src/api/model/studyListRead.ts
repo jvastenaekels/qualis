@@ -7,9 +7,9 @@
 import type { BrandingBase } from './brandingBase';
 import type { DistributionMode } from './distributionMode';
 import type { GridColumn } from './gridColumn';
+import type { PresortConfig } from './presortConfig';
 import type { ProjectBrief } from './projectBrief';
 import type { StudyListReadPostsortConfig } from './studyListReadPostsortConfig';
-import type { StudyListReadPresortConfig } from './studyListReadPresortConfig';
 import type { StudyState } from './studyState';
 import type { StudyTranslationRead } from './studyTranslationRead';
 
@@ -32,7 +32,7 @@ export interface StudyListRead {
     slug: string;
     state?: StudyState;
     grid_config: GridColumn[];
-    presort_config: StudyListReadPresortConfig;
+    presort_config: PresortConfig;
     postsort_config: StudyListReadPostsortConfig;
     branding?: BrandingBase | null;
     default_language?: string | null;

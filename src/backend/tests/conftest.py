@@ -24,7 +24,12 @@ from sqlalchemy.engine import make_url
 
 # Set testing environment variable BEFORE app modules are imported
 os.environ["TESTING"] = "true"
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncConnection,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import selectinload
 
 from app.database import Base, get_db
@@ -103,7 +108,9 @@ async def _maintenance_exec(sql: str) -> None:
     CREATE/DROP DATABASE cannot run inside a transaction, hence the
     AUTOCOMMIT isolation level and a dedicated short-lived engine.
     """
-    engine = create_async_engine(_MAINTENANCE_DATABASE_URL, isolation_level="AUTOCOMMIT")
+    engine = create_async_engine(
+        _MAINTENANCE_DATABASE_URL, isolation_level="AUTOCOMMIT"
+    )
     try:
         async with engine.connect() as conn:
             await conn.execute(text(sql))
@@ -122,10 +129,14 @@ def _isolated_test_database():
     if _ISOLATED_DB_NAME is None:
         yield
         return
-    asyncio.run(_maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)'))
+    asyncio.run(
+        _maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)')
+    )
     asyncio.run(_maintenance_exec(f'CREATE DATABASE "{_ISOLATED_DB_NAME}"'))
     yield
-    asyncio.run(_maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)'))
+    asyncio.run(
+        _maintenance_exec(f'DROP DATABASE IF EXISTS "{_ISOLATED_DB_NAME}" WITH (FORCE)')
+    )
 
 
 @pytest_asyncio.fixture
@@ -267,12 +278,15 @@ async def seed_study(db, test_user, test_project):
         state=StudyState.draft,  # Use draft for update tests
         grid_config=grid_config,
         presort_config={
-            "age": {"type": "number", "label": {"en": "Age"}, "required": True},
-            "gender": {
-                "type": "select",
-                "options": [{"value": "M", "label": {"en": "Male"}}],
-                "label": {"en": "Gender"},
-                "required": False,
+            "enabled": True,
+            "fields": {
+                "age": {"type": "number", "label": {"en": "Age"}, "required": True},
+                "gender": {
+                    "type": "select",
+                    "options": [{"value": "M", "label": {"en": "Male"}}],
+                    "label": {"en": "Gender"},
+                    "required": False,
+                },
             },
         },
         postsort_config={
@@ -558,9 +572,7 @@ async def project_member_factory(db: AsyncSession):
     """Factory to add users as members of a project."""
     from app.models import ProjectMember, ProjectRole
 
-    async def _add_member(
-        project: Project, user: User, role: ProjectRole
-    ) -> None:
+    async def _add_member(project: Project, user: User, role: ProjectRole) -> None:
         member = ProjectMember(
             project_id=project.id,
             user_id=user.id,
@@ -609,7 +621,9 @@ async def seed_other_user_id(db: AsyncSession) -> int:
 
 
 @pytest_asyncio.fixture
-async def seed_concourse_id(db: AsyncSession, test_project: Project, test_user: User) -> int:
+async def seed_concourse_id(
+    db: AsyncSession, test_project: Project, test_user: User
+) -> int:
     """Return the int PK of a concourse owned by test_project."""
     from app.models import Concourse
 
@@ -689,7 +703,5 @@ async def auth_headers_for_viewer(
     db.add(member)
     await db.commit()
 
-    token = create_access_token(
-        subject=email, expires_delta=timedelta(minutes=30)
-    )
+    token = create_access_token(subject=email, expires_delta=timedelta(minutes=30))
     return {"Authorization": f"Bearer {token}"}

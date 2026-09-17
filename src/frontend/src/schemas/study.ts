@@ -104,13 +104,15 @@ export const StudyConfigSchema = z.object({
     pre_instruction: z.string().optional().nullable(),
 
     instructions: z.string(),
-    presort_config: z.union([
-        z.record(PreSortFieldSchema),
-        z.object({
+    // Canonical since migration normalise_presort_config_shape; a flat
+    // field map cached in the browser from before that deploy is lifted
+    // by `normalisePresortConfig` before anything reads it.
+    presort_config: z
+        .object({
             enabled: z.boolean(),
             fields: z.record(PreSortFieldSchema),
-        }),
-    ]),
+        })
+        .passthrough(),
     grid_config: z.array(GridConfigSchema).optional(),
     postsort_config: z
         .object({

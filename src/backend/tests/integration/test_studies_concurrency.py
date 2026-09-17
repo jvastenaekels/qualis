@@ -38,18 +38,33 @@ async def test_update_study_optimistic_locking(
     new_updated_at = updated_study["updated_at"]
     assert new_updated_at != last_updated_at
 
-    # 3. DRAFT BEHAVIOR: Allow overwrite (last write wins) for auto-save support
-    # In draft mode, optimistic locking is relaxed to prevent 409 loops during frequent auto-saves
+    # 3. User B saves with the timestamp from before A's write. The study is
+    #    a draft — the state in which two researchers actually edit the same
+    #    configuration — and the lock applies there too. The 409 carries the
+    #    server's current study so the designer can run its three-way merge
+    #    (useStudyPersistence.applyConflict) instead of overwriting A.
     conflict_response = await client.patch(
         f"/api/admin/studies/{seed_study.slug}",
         headers=auth_headers,
         json={"show_statement_codes": False, "last_updated_at": last_updated_at},
     )
 
-    # For DRAFT studies, this should succeed (last write wins)
-    assert conflict_response.status_code == status.HTTP_200_OK
-    # The update should have been applied (overwriting User A's change)
-    assert conflict_response.json()["show_statement_codes"] is False
+    assert conflict_response.status_code == status.HTTP_409_CONFLICT
+    body = conflict_response.json()
+    assert body["code"] == "conflict"
+    server_state = body["details"]["server_state"]
+    assert server_state["slug"] == seed_study.slug
+    assert server_state["show_statement_codes"] is True  # A's write, untouched
+    assert server_state["updated_at"] == new_updated_at
+
+    # 4. B retries with the server's timestamp (what the merge hands back).
+    retry = await client.patch(
+        f"/api/admin/studies/{seed_study.slug}",
+        headers=auth_headers,
+        json={"show_statement_codes": False, "last_updated_at": new_updated_at},
+    )
+    assert retry.status_code == status.HTTP_200_OK
+    assert retry.json()["show_statement_codes"] is False
 
 
 @pytest.mark.asyncio

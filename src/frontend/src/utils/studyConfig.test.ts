@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { presortFields, postsortConfig, processSteps } from './studyConfig';
+import { normalisePresortConfig, presortFields, postsortConfig, processSteps } from './studyConfig';
 
 describe('presortFields — legacy/new union collapse', () => {
     it('returns the field map for the legacy flat-record shape', () => {
@@ -63,5 +63,34 @@ describe('processSteps', () => {
         expect(processSteps({})).toEqual([]);
         expect(processSteps(null)).toEqual([]);
         expect(processSteps({ process_steps: null })).toEqual([]);
+    });
+});
+
+describe('normalisePresortConfig — the one place that knows the flat form', () => {
+    it('lifts a flat field map into {enabled: true, fields}', () => {
+        const flat = { age: { type: 'number', label: 'Age' } };
+        expect(normalisePresortConfig(flat)).toEqual({ enabled: true, fields: flat });
+    });
+
+    it('fills in the missing half of a partial wrapper', () => {
+        expect(normalisePresortConfig({ enabled: false })).toEqual({ enabled: false, fields: {} });
+        const fields = { q1: { type: 'text', label: 'Q' } };
+        expect(normalisePresortConfig({ fields })).toEqual({ enabled: true, fields });
+    });
+
+    it('returns an enabled empty config for null, undefined or {}', () => {
+        for (const raw of [null, undefined, {}]) {
+            expect(normalisePresortConfig(raw)).toEqual({ enabled: true, fields: {} });
+        }
+    });
+
+    it('keeps unknown top-level keys of the wrapped form', () => {
+        const raw = { enabled: true, fields: {}, intro: 'hi' };
+        expect(normalisePresortConfig(raw)).toEqual(raw);
+    });
+
+    it('never returns the input object itself (callers mutate the result)', () => {
+        const raw = { enabled: true, fields: {} };
+        expect(normalisePresortConfig(raw)).not.toBe(raw);
     });
 });

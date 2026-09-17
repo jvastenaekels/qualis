@@ -39,6 +39,7 @@ from app.models import (
     ProjectRole,
 )
 from app.schemas import StudyStatsRead
+from app.schemas.studies import PresortConfig
 from app.schemas.responses import StorageUsageResponse
 
 router = APIRouter()
@@ -582,7 +583,9 @@ async def import_study_config(
             project_id=project.id,
             state=StudyState.draft,
             grid_config=study_data.get("grid_config"),
-            presort_config=study_data.get("presort_config", {}),
+            presort_config=PresortConfig.model_validate(
+                study_data.get("presort_config", {})
+            ).model_dump(),
             postsort_config=study_data.get("postsort_config", {}),
             default_language=study_data.get("default_language", "en"),
             show_statement_codes=study_data.get("show_statement_codes", False),

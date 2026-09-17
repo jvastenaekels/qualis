@@ -287,3 +287,59 @@ describe('customInstance: 403 toast behaviour', () => {
         ).toBe(true);
     });
 });
+
+describe('customInstance: 409 toast behaviour', () => {
+    let toastSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+        toastSpy = vi.spyOn(toast, 'error').mockImplementation(() => 'id');
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        toastSpy.mockRestore();
+    });
+
+    it('toasts a plain 409 (duplicate slug, unique constraint)', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 409,
+                text: async () => '{"code":"conflict","message":"Slug already in use"}',
+            })
+        );
+        try {
+            await customInstance({ url: '/api/admin/studies', method: 'POST', data: {} });
+        } catch (_e) {
+            // Expected
+        }
+        expect(toastSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays silent on a 409 that carries server_state — the caller merges it', async () => {
+        // The study save's optimistic lock answers with the current server
+        // row; useStudyPersistence runs a three-way merge and reports the
+        // outcome itself. A generic "Conflict" error toast first would
+        // contradict the "synced" info toast that follows.
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 409,
+                text: async () =>
+                    '{"code":"conflict","message":"Study has been modified by another user.","details":{"server_state":{"slug":"s"}}}',
+            })
+        );
+        let caught: unknown;
+        try {
+            await customInstance({ url: '/api/admin/studies/s', method: 'PATCH', data: {} });
+        } catch (e) {
+            caught = e;
+        }
+        expect(toastSpy).not.toHaveBeenCalled();
+        expect((caught as { details?: { server_state?: unknown } }).details?.server_state).toEqual({
+            slug: 's',
+        });
+    });
+});

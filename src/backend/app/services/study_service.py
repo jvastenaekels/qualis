@@ -96,7 +96,7 @@ class StudyService:
                 project_id=project_id,
                 state=StudyState.draft,
                 grid_config=[col.model_dump() for col in study_in.grid_config],
-                presort_config=study_in.presort_config,
+                presort_config=study_in.presort_config.model_dump(),
                 postsort_config=study_in.postsort_config,
                 default_language=study_in.default_language
                 or (
@@ -217,12 +217,14 @@ class StudyService:
                     "Switch it back to draft first."
                 )
 
-        # Optimistic locking
+        # Optimistic locking. Opt-in: a client that sends no last_updated_at
+        # gets last-write-wins. A client that does send it is told when the
+        # row moved underneath it, in every state — draft included, since
+        # draft is where two researchers actually edit the same
+        # configuration. The router attaches the current server state to
+        # the 409 so the designer can merge instead of overwrite.
         if study_update.last_updated_at and study.updated_at:
-            if (
-                study.updated_at > study_update.last_updated_at
-                and study.state != StudyState.draft
-            ):
+            if study.updated_at > study_update.last_updated_at:
                 raise ConflictError("Study has been modified by another user.")
 
         try:
@@ -731,13 +733,8 @@ class StudyService:
         study language. Legacy string labels count as English-only."""
 
         def fields_of(config: dict[str, Any], section: str) -> dict[str, Any]:
-            if section == "presort":
-                if "fields" in config:
-                    return config["fields"]  # type: ignore[no-any-return]
-                if "enabled" not in config:
-                    return config
-                return {}
-            return config.get("questions", {})  # type: ignore[no-any-return]
+            key = "fields" if section == "presort" else "questions"
+            return config.get(key, {})  # type: ignore[no-any-return]
 
         def label_in_lang(label: Any, lang: str) -> Any:
             if isinstance(label, dict):
