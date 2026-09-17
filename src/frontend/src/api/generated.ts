@@ -14587,6 +14587,10 @@ export const useUnlockStudyApiStudySlugUnlockPost = <
 
 /**
  * Records participant consent with timestamp and version.
+ *
+ * The study is the one in the URL. The body still carries ``study_slug``
+ * for older clients; a value that disagrees with the path is a client
+ * bug and is refused rather than silently recorded on another study.
  * @summary Record Consent
  */
 export const recordConsentApiStudySlugConsentPost = (
@@ -14868,30 +14872,11 @@ export const useSaveDraftApiStudySlugSaveDraftPut = <
  * Participant-initiated withdrawal of in-flight draft responses.
  *
  * Honours the consent-text promise that "If you withdraw before
- * finalizing your sort, no partial data will be retained" by clearing
- * the participant's ``draft_responses`` JSON column on demand. This is
- * the lightweight counterpart to the GDPR Art. 17 self-erase route
- * (``DELETE /personal-data``): drafts are pre-submission scratch state,
- * not permanent research data, so a fast self-serve "I want to start
- * over" path is appropriate.
- *
- * Authentication: the ``session_token`` query parameter is the bearer
- * of the right — only someone in possession of the original token
- * issued at consent can clear that participant's draft. Same model as
- * the resume flow.
- *
- * Scope: only ``draft_responses`` is cleared. The ``last_step_reached``
- * counter is reset to 1 so the resume flow brings the participant back
- * to the start of the Q-sort (consent step is already past). All other
- * PII columns (hashed IP, UA, consent_hash, presort_answers,
- * postsort_answers) are untouched — operators who require full
- * pre-submission erasure should call the Art. 17 ``DELETE
- * /personal-data`` route instead, which is also rate-limited and
- * idempotent.
- *
- * Idempotent: repeated calls return 204; a participant whose draft is
- * already empty / already submitted is a no-op (only the
- * ``draft_responses`` column is rewritten, never row-deleted).
+ * finalizing your sort, no partial data will be retained": clears
+ * ``draft_responses`` and resets progress to the start of the Q-sort.
+ * The ``session_token`` query parameter is the bearer of the right, as
+ * in the resume flow. Only the draft is cleared — full pre-submission
+ * erasure is the Art. 17 ``DELETE /personal-data`` route. Idempotent.
  * @summary Withdraw Draft
  */
 export const withdrawDraftApiStudySlugDraftDelete = (
@@ -14985,6 +14970,9 @@ export const useWithdrawDraftApiStudySlugDraftDelete = <
 
 /**
  * Returns participant session data for resuming on another device.
+ *
+ * The lookup is scoped to the study in the URL, so a resume code never
+ * resolves across studies (wave 3; guarded on the service query).
  * @summary Resume Session
  */
 export const resumeSessionApiStudySlugResumeCodeGet = (
@@ -15145,25 +15133,13 @@ export function useResumeSessionApiStudySlugResumeCodeGet<
 /**
  * Participant-initiated GDPR Art. 17 erasure of their own personal data.
  *
- * Authentication: the session_token query parameter is the bearer of
- * the right — only someone in possession of the original token issued
- * when the participant started the Q-sort can trigger erasure for
- * that participant. This is the same model used by the resume flow.
- *
- * What is erased: ip_address, user_agent, confirmation_code,
- * resume_code, consent_hash, draft_responses, presort_answers,
- * postsort_answers, all audio recordings (biometric data). The
- * session_token is rotated (the original token can never re-access).
- *
- * What is preserved: the Q-sort entries themselves (statement
- * rankings) — these are anonymous research data after the PII removal
- * and represent the participant's contribution to the research.
- * Participants who want a hard delete (including the rankings) should
- * contact the researcher directly per the consent text shown at study
- * start.
- *
- * Idempotent: repeated calls return 204 (already-anonymised
- * participants are no-ops).
+ * The ``session_token`` query parameter is the bearer of the right. What
+ * is erased: ip_address, user_agent, confirmation_code, resume_code,
+ * consent_hash, draft_responses, presort_answers, postsort_answers and
+ * all audio recordings; the token is rotated. What is preserved: the
+ * Q-sort entries, anonymous research data after PII removal. Participants
+ * who want a hard delete should contact the researcher as the consent
+ * text says. Idempotent and audited.
  * @summary Participant Self Erase Personal Data
  */
 export const participantSelfErasePersonalDataApiStudySlugPersonalDataDelete = (
@@ -15459,19 +15435,13 @@ export function useGetPublicConfigApiConfigGet<
 }
 
 /**
- * Upload audio recording for a participant response.
+ * Upload an audio recording for a participant response.
  *
- * Args:
- *     file: Audio file (WebM or MP4/AAC)
- *     session_token: Participant session UUID
- *     question_key: Question identifier (e.g., "card_123", "missing_statement")
- *     duration_seconds: Optional recording duration
- *
- * Returns:
- *     AudioUploadResponse with recording metadata and presigned URL
- *
- * Raises:
- *     HTTPException: If validation fails, quota exceeded, or upload fails
+ * The file's MIME type is sniffed from its bytes by the service and is
+ * what gets stored; the client-supplied content type is never trusted
+ * (F-06-005). Rejections: 400 (format, duration, empty, after submission),
+ * 403 (study not active, audio not enabled), 404 (participant), 413
+ * (size), 507 (study storage quota).
  * @summary Upload Audio
  */
 export const uploadAudioApiAudioUploadPost = (
@@ -15571,21 +15541,7 @@ export const useUploadAudioApiAudioUploadPost = <TError = HTTPValidationError, T
 };
 
 /**
- * Delete an audio recording (before submission only).
- *
- * Args:
- *     recording_id: ID of the recording to delete
- *     session_token: Participant session token (query parameter)
- *
- * Args:
- *     recording_id: ID of recording to delete
- *     session_token: Participant session token for authorization
- *
- * Returns:
- *     Success message
- *
- * Raises:
- *     HTTPException: If not authorized or already submitted
+ * Delete an audio recording (before submission only; owner session only).
  * @summary Delete Audio Recording
  */
 export const deleteAudioRecordingApiAudioRecordingIdDelete = (
@@ -15678,17 +15634,7 @@ export const useDeleteAudioRecordingApiAudioRecordingIdDelete = <
 };
 
 /**
- * Get presigned URL for audio playback.
- *
- * Args:
- *     recording_id: ID of recording
- *     session_token: Participant session token for authorization
- *
- * Returns:
- *     AudioRecordingRead with presigned URL
- *
- * Raises:
- *     HTTPException: If not found or not authorized
+ * Presigned playback URL (valid one hour) for the owner session.
  * @summary Get Audio Url
  */
 export const getAudioUrlApiAudioRecordingIdUrlGet = (

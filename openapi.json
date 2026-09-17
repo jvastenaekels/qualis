@@ -6428,7 +6428,7 @@
           "participants"
         ],
         "summary": "Record Consent",
-        "description": "Records participant consent with timestamp and version.",
+        "description": "Records participant consent with timestamp and version.\n\nThe study is the one in the URL. The body still carries ``study_slug``\nfor older clients; a value that disagrees with the path is a client\nbug and is refused rather than silently recorded on another study.",
         "operationId": "record_consent_api_study__slug__consent_post",
         "parameters": [
           {
@@ -6593,7 +6593,7 @@
           "participants"
         ],
         "summary": "Withdraw Draft",
-        "description": "Participant-initiated withdrawal of in-flight draft responses.\n\nHonours the consent-text promise that \"If you withdraw before\nfinalizing your sort, no partial data will be retained\" by clearing\nthe participant's ``draft_responses`` JSON column on demand. This is\nthe lightweight counterpart to the GDPR Art. 17 self-erase route\n(``DELETE /personal-data``): drafts are pre-submission scratch state,\nnot permanent research data, so a fast self-serve \"I want to start\nover\" path is appropriate.\n\nAuthentication: the ``session_token`` query parameter is the bearer\nof the right \u2014 only someone in possession of the original token\nissued at consent can clear that participant's draft. Same model as\nthe resume flow.\n\nScope: only ``draft_responses`` is cleared. The ``last_step_reached``\ncounter is reset to 1 so the resume flow brings the participant back\nto the start of the Q-sort (consent step is already past). All other\nPII columns (hashed IP, UA, consent_hash, presort_answers,\npostsort_answers) are untouched \u2014 operators who require full\npre-submission erasure should call the Art. 17 ``DELETE\n/personal-data`` route instead, which is also rate-limited and\nidempotent.\n\nIdempotent: repeated calls return 204; a participant whose draft is\nalready empty / already submitted is a no-op (only the\n``draft_responses`` column is rewritten, never row-deleted).",
+        "description": "Participant-initiated withdrawal of in-flight draft responses.\n\nHonours the consent-text promise that \"If you withdraw before\nfinalizing your sort, no partial data will be retained\": clears\n``draft_responses`` and resets progress to the start of the Q-sort.\nThe ``session_token`` query parameter is the bearer of the right, as\nin the resume flow. Only the draft is cleared \u2014 full pre-submission\nerasure is the Art. 17 ``DELETE /personal-data`` route. Idempotent.",
         "operationId": "withdraw_draft_api_study__slug__draft_delete",
         "parameters": [
           {
@@ -6641,7 +6641,7 @@
           "participants"
         ],
         "summary": "Resume Session",
-        "description": "Returns participant session data for resuming on another device.",
+        "description": "Returns participant session data for resuming on another device.\n\nThe lookup is scoped to the study in the URL, so a resume code never\nresolves across studies (wave 3; guarded on the service query).",
         "operationId": "resume_session_api_study__slug__resume__code__get",
         "parameters": [
           {
@@ -6699,7 +6699,7 @@
           "participants"
         ],
         "summary": "Participant Self Erase Personal Data",
-        "description": "Participant-initiated GDPR Art. 17 erasure of their own personal data.\n\nAuthentication: the session_token query parameter is the bearer of\nthe right \u2014 only someone in possession of the original token issued\nwhen the participant started the Q-sort can trigger erasure for\nthat participant. This is the same model used by the resume flow.\n\nWhat is erased: ip_address, user_agent, confirmation_code,\nresume_code, consent_hash, draft_responses, presort_answers,\npostsort_answers, all audio recordings (biometric data). The\nsession_token is rotated (the original token can never re-access).\n\nWhat is preserved: the Q-sort entries themselves (statement\nrankings) \u2014 these are anonymous research data after the PII removal\nand represent the participant's contribution to the research.\nParticipants who want a hard delete (including the rankings) should\ncontact the researcher directly per the consent text shown at study\nstart.\n\nIdempotent: repeated calls return 204 (already-anonymised\nparticipants are no-ops).",
+        "description": "Participant-initiated GDPR Art. 17 erasure of their own personal data.\n\nThe ``session_token`` query parameter is the bearer of the right. What\nis erased: ip_address, user_agent, confirmation_code, resume_code,\nconsent_hash, draft_responses, presort_answers, postsort_answers and\nall audio recordings; the token is rotated. What is preserved: the\nQ-sort entries, anonymous research data after PII removal. Participants\nwho want a hard delete should contact the researcher as the consent\ntext says. Idempotent and audited.",
         "operationId": "participant_self_erase_personal_data_api_study__slug__personal_data_delete",
         "parameters": [
           {
@@ -6815,7 +6815,7 @@
           "audio"
         ],
         "summary": "Upload Audio",
-        "description": "Upload audio recording for a participant response.\n\nArgs:\n    file: Audio file (WebM or MP4/AAC)\n    session_token: Participant session UUID\n    question_key: Question identifier (e.g., \"card_123\", \"missing_statement\")\n    duration_seconds: Optional recording duration\n\nReturns:\n    AudioUploadResponse with recording metadata and presigned URL\n\nRaises:\n    HTTPException: If validation fails, quota exceeded, or upload fails",
+        "description": "Upload an audio recording for a participant response.\n\nThe file's MIME type is sniffed from its bytes by the service and is\nwhat gets stored; the client-supplied content type is never trusted\n(F-06-005). Rejections: 400 (format, duration, empty, after submission),\n403 (study not active, audio not enabled), 404 (participant), 413\n(size), 507 (study storage quota).",
         "operationId": "upload_audio_api_audio_upload_post",
         "requestBody": {
           "content": {
@@ -6857,7 +6857,7 @@
           "audio"
         ],
         "summary": "Delete Audio Recording",
-        "description": "Delete an audio recording (before submission only).\n\nArgs:\n    recording_id: ID of the recording to delete\n    session_token: Participant session token (query parameter)\n\nArgs:\n    recording_id: ID of recording to delete\n    session_token: Participant session token for authorization\n\nReturns:\n    Success message\n\nRaises:\n    HTTPException: If not authorized or already submitted",
+        "description": "Delete an audio recording (before submission only; owner session only).",
         "operationId": "delete_audio_recording_api_audio__recording_id__delete",
         "parameters": [
           {
@@ -6914,7 +6914,7 @@
           "audio"
         ],
         "summary": "Get Audio Url",
-        "description": "Get presigned URL for audio playback.\n\nArgs:\n    recording_id: ID of recording\n    session_token: Participant session token for authorization\n\nReturns:\n    AudioRecordingRead with presigned URL\n\nRaises:\n    HTTPException: If not found or not authorized",
+        "description": "Presigned playback URL (valid one hour) for the owner session.",
         "operationId": "get_audio_url_api_audio__recording_id__url_get",
         "parameters": [
           {
