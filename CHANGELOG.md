@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.8.0](https://github.com/jvastenaekels/qualis/compare/v0.7.6...v0.8.0) (2026-09-19)
+
+
+### Bug fixes
+
+* **ci:** pull MinIO from quay.io and clear the frontend audit via orval 8 ([#385](https://github.com/jvastenaekels/qualis/issues/385)) ([a888070](https://github.com/jvastenaekels/qualis/commit/a8880705c7c019d87e1940b6fb3f9cd9073e4db6))
+* close items 4–8 of the architecture diagnostic (log scrubber, error handlers, model/migration drift, e-mail timing, lucide barrel) ([#386](https://github.com/jvastenaekels/qualis/issues/386)) ([a9c5a86](https://github.com/jvastenaekels/qualis/commit/a9c5a8644a14125d3d8a45a7db780b4f5a58e19a))
+* close the three top findings of the architecture diagnostic; drop Sentry and the Redis limiter mode ([#384](https://github.com/jvastenaekels/qualis/issues/384)) ([f1700b1](https://github.com/jvastenaekels/qualis/commit/f1700b12234406f8a4a1be3076801f43000419d3))
+* one presort_config shape, and the optimistic lock finally reaches the designer's merge ([#388](https://github.com/jvastenaekels/qualis/issues/388)) ([2e85970](https://github.com/jvastenaekels/qualis/commit/2e85970541fb47f292a5902f584908f2170b3c51))
+
+
+### Refactor
+
+* **auth:** one lookup for the user behind an e-mail address ([#391](https://github.com/jvastenaekels/qualis/issues/391)) ([f0f2b65](https://github.com/jvastenaekels/qualis/commit/f0f2b65dcd1a79b98eec51f91a423eeabdab40d3))
+* **backend:** one shape for postsort_config, questions always under "questions" ([#389](https://github.com/jvastenaekels/qualis/issues/389)) ([c39f180](https://github.com/jvastenaekels/qualis/commit/c39f180b31dfc5d1a2a65fd61bf836204fa2d9ee))
+* **frontend:** one download helper instead of eight anchors ([#392](https://github.com/jvastenaekels/qualis/issues/392)) ([bd2edc3](https://github.com/jvastenaekels/qualis/commit/bd2edc390d7812e506a44b85833410747994b1b4))
+* index the hot foreign keys and unify the project-role check ([#387](https://github.com/jvastenaekels/qualis/issues/387)) ([508afa0](https://github.com/jvastenaekels/qualis/commit/508afa0eb4f406ab8544e5370240cfa0aa7238c7))
+* service layer for analysis runs, participant audio and participant sessions ([#390](https://github.com/jvastenaekels/qualis/issues/390)) ([60fa9a8](https://github.com/jvastenaekels/qualis/commit/60fa9a86a340501a6e5c1392de1c72d90fae442c))
+
+
+### Documentation
+
+* attach the corresponding author's ORCID to the Zenodo metadata ([be203f0](https://github.com/jvastenaekels/qualis/commit/be203f0068bfb3a19fbcf16b7d8beeb69130b2fb))
+* record the v0.7.6 Zenodo DOI and prepare the 0.8.0 release ([#393](https://github.com/jvastenaekels/qualis/issues/393)) ([d303d06](https://github.com/jvastenaekels/qualis/commit/d303d0690b8dd83ce85550e7eda1ad251a619012))
+
 ## [0.7.6](https://github.com/jvastenaekels/qualis/compare/v0.7.5...v0.7.6) (2026-08-27)
 
 
