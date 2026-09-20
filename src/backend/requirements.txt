@@ -4,7 +4,7 @@ aiofiles==25.1.0
     # via qualis-backend
 alembic==1.18.5
     # via qualis-backend
-annotated-doc==0.0.4
+annotated-doc==0.0.5
     # via
     #   fastapi
     #   typer
