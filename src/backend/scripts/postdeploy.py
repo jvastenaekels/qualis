@@ -48,7 +48,7 @@ def main():
 
     # 0. Safety Check
     db_url = os.getenv("DATABASE_URL", "")
-    if not db_url or "postgresql" not in db_url.lower():
+    if not db_url.startswith(("postgres://", "postgresql://", "postgresql+asyncpg://")):
         print(
             "[PostDeploy] CRITICAL: DATABASE_URL is missing or does not use PostgreSQL."
         )

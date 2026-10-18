@@ -55,10 +55,16 @@ TEST_PASSWORD = "testpassword"
 
 # Use PostgreSQL for testing.
 # Set TEST_DATABASE_URL in your .env file (project root) or environment.
-_BASE_TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/qualis_test",
+_BASE_TEST_DATABASE_URL = os.environ.setdefault(
+    "_QUALIS_BASE_TEST_DATABASE_URL",
+    os.getenv(
+        "TEST_DATABASE_URL",
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/qualis_test",
+    ),
 )
+# xdist workers inherit the controller's environment after collection has
+# replaced TEST_DATABASE_URL below. Keep the original maintenance database:
+# the controller never runs fixtures, so its isolated database does not exist.
 
 
 def _derive_isolated_db() -> tuple[str, str, str | None]:

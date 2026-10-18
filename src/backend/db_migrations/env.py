@@ -24,7 +24,8 @@ config = context.config
 
 # Override sqlalchemy.url with environment variable
 if SQLALCHEMY_DATABASE_URL:
-    config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+    # ConfigParser interprets percent signs, including URL-encoded credentials.
+    config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL.replace("%", "%%"))
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:
