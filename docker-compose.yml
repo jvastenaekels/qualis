@@ -49,14 +49,11 @@ services:
   # the backend at http://minio:9000 and served to the browser at
   # http://localhost:9000 (see S3_PUBLIC_ENDPOINT_URL on the backend).
   minio:
-    # Pinned to a dated release rather than :latest — MinIO ships breaking
-    # changes between releases, and an unpinned demo silently drifts to a
-    # different server on any machine that pulls later. Bump deliberately.
-    # Pulled from quay.io: the Docker Hub repositories minio/minio and
-    # minio/mc stopped resolving in September 2026 (404 on every tag), which
-    # broke `make demo-up` on any machine without a cached image. Same tags,
-    # same digests, MinIO's own registry.
-    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    # Official community registry images are no longer public. The Dockerfile
+    # pins source commits for both the server and its healthcheck client.
+    build:
+      context: ./docker/minio
+      target: server
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: qualis
@@ -76,7 +73,9 @@ services:
 
   # One-shot: create the audio bucket, then exit.
   minio-init:
-    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z
+    build:
+      context: ./docker/minio
+      target: client
     depends_on:
       minio:
         condition: service_healthy

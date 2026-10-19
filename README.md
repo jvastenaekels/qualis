@@ -112,6 +112,10 @@ For a useful first tour after login:
 
 The Docker stack includes a MinIO object store for the audio comments (console at [http://localhost:9001](http://localhost:9001), login `qualis` / `qualis-demo-secret`).
 
+The first build compiles MinIO and its client from pinned official source
+revisions because the community registry images are no longer public.
+Docker caches the Go dependencies and compiled packages for subsequent builds.
+
 ### Quick-start troubleshooting
 
 | What you see | What to do |

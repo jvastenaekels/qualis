@@ -28,6 +28,23 @@ We patch the latest tagged release. Older releases are best-effort.
 
 Static-analysis tools can flag patterns where the heuristic does not match the actual semantics. These findings are reviewed and documented here rather than silently ignored.
 
+### Build-tool dependency exception (reviewed 2026-10-19)
+
+- **[GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm),
+  `braces <=3.0.3`:** no patched release is available. Deeply nested,
+  attacker-controlled brace patterns can exhaust the Node.js stack. Qualis
+  reaches this dependency only through Tailwind's build/watch tooling and
+  Knip/JSCPD file discovery. These tools use repository-controlled patterns;
+  request payloads and study content are not used as glob patterns. The
+  deployed frontend consists of compiled static assets, not these tools.
+  Both npm audit CI gates accept this advisory alone. Remove the exception
+  when a patched release becomes available or the tooling drops the package;
+  reassess immediately if a caller starts accepting external patterns.
+
+Previously accepted SheetJS, React Router, and brace-expansion advisories are
+no longer exempted. The current dependency tree removes or fixes those
+findings. All other high/critical npm advisories continue to fail CI.
+
 ### Bandit suppressions
 
 `bandit -ll` (run by `make check`) flags a small number of patterns where the static heuristic does not match the actual semantics. Each suppression is annotated inline with `# nosec <test-id>` and the rationale lives next to the code:

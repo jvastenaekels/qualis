@@ -340,33 +340,13 @@ jobs:
         # measured backlog (task 6.7a) and fails on any increase.
         run: npm run lint:a11y
       - name: Security SCA (NPM Audit)
-        # xlsx CVEs are accepted: SheetJS Community has no fix and Qualis only
-        # WRITES XLSX (analysisXlsxExport.ts), never parses untrusted input.
-        # See SECURITY.md ("xlsx (SheetJS Community Edition)") for full rationale.
-        #
-        # GHSA-qwww-vcr4-c8h2 (react-router, high) is accepted: the CSRF bypass
-        # it describes is reachable only in React Server Components mode. Qualis
-        # is a client-side SPA — App.tsx mounts createBrowserRouter with
-        # RouterProvider and there is no server rendering, so the vulnerable
-        # path does not exist in this build. The fix ships in react-router 8.0,
-        # a major upgrade of the routing layer; revisit this entry when that
-        # migration is scheduled, and drop it as soon as we are on 8.x.
-        #
-        # GHSA-mh99-v99m-4gvg (brace-expansion, high) is accepted: an
-        # unbounded-expansion DoS from a maliciously crafted brace pattern.
-        # Every instance is dev/build tooling (orval, spectral, glob/minimatch)
-        # or exceljs's archiver on the XLSX write path — none expands an
-        # untrusted pattern, so the trigger does not exist here (same
-        # write-only/trusted-input basis as xlsx). Fix is brace-expansion
-        # 5.0.8, but three majors are in the tree (1.1.16 / 2.1.2 / 5.0.7) and
-        # a global override collides with the minimatch@3.1.5 → 1.1.16 pin,
-        # risking a broken toolchain for an untriggerable DoS. Keep in sync
-        # with security-scans.yml.
-        #
-        # Fail only on high+ advisories outside the allowlist.
+        # Only GHSA-vfj7-8cjw-p6xm (braces) is accepted: no patched release,
+        # and all callers use repository-controlled build/lint glob patterns.
+        # No application input reaches it. See SECURITY.md for the review and
+        # removal criteria. Keep this gate in sync across both workflows.
         run: |
           set -e
-          accepted='GHSA-4r6h-8v6p-xvw6|GHSA-5pgg-2g8v-p4x9|GHSA-qwww-vcr4-c8h2|GHSA-mh99-v99m-4gvg'
+          accepted='GHSA-vfj7-8cjw-p6xm'
           audit_json=$(npm audit --json) || true
           unknown=$(echo "$audit_json" | jq -r --arg a "$accepted" '
             [.vulnerabilities | to_entries[].value
