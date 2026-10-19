@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.1](https://github.com/jvastenaekels/qualis/compare/v0.8.0...v0.8.1) (2026-10-19)
+
+
+### Bug fixes
+
+* accept PostgreSQL deployment URLs and isolate parallel tests ([8573667](https://github.com/jvastenaekels/qualis/commit/85736673c487fd168fe9f4950d7243593ff687c4))
+* **ci:** update audited dependencies and build MinIO from source ([9fd553a](https://github.com/jvastenaekels/qualis/commit/9fd553a427cbdde7cc4eec445377a78b01a0e0e6))
+
+
+### Documentation
+
+* record the v0.8.0 Zenodo DOI ([#394](https://github.com/jvastenaekels/qualis/issues/394)) ([bd362fa](https://github.com/jvastenaekels/qualis/commit/bd362fab35b6c5c21708d5209d9e1c93dc3b1ebf))
+
 ## [0.8.0](https://github.com/jvastenaekels/qualis/compare/v0.7.6...v0.8.0) (2026-09-19)
 
 
