@@ -17,7 +17,7 @@ from app.schemas.responses import (
 )
 from app.services.study_service import StudyService
 from app.services.recruitment_service import RecruitmentService
-from app.utils.security import verify_password
+from app.utils.security import verify_password_async
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -106,8 +106,9 @@ async def get_study(
             )
 
     # 4. Password Protection
-    if study.access_password and not verify_password(
-        password or "", study.access_password
+    if study.access_password and (
+        password is None
+        or not await verify_password_async(password, study.access_password)
     ):
         # Return only basic metadata if password is not provided or incorrect
         metadata = StudyService.get_basic_metadata(study, lang)
@@ -137,7 +138,7 @@ async def unlock_study(
     if not study.access_password:
         return AckResponse(status="unlocked", details="No password required")
 
-    if verify_password(password, study.access_password):
+    if await verify_password_async(password, study.access_password):
         return AckResponse(status="unlocked")
 
     raise HTTPException(status_code=403, detail="Incorrect password")

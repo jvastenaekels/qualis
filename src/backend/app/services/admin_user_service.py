@@ -50,7 +50,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.models import User
 from app.utils.email import send_password_reset
-from app.utils.security import create_email_token, get_password_hash
+from app.utils.security import create_email_token, get_password_hash_async
 
 
 class AdminUserError(Exception):
@@ -146,7 +146,7 @@ async def force_password_reset(*, db: AsyncSession, target: User) -> None:
     out of band.
     """
     throwaway = secrets.token_urlsafe(32)
-    target.hashed_password = get_password_hash(throwaway)
+    target.hashed_password = await get_password_hash_async(throwaway)
     target.password_changed_at = datetime.now(timezone.utc)
     token = create_email_token(
         email=target.email,

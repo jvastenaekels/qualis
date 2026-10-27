@@ -19,8 +19,8 @@ from app.utils.security import (
     create_access_token,
     create_email_token,
     decode_email_token,
-    verify_password,
-    get_password_hash,
+    verify_password_async,
+    get_password_hash_async,
     decode_invitation_token,
     generate_totp_secret,
     get_totp_uri,
@@ -119,13 +119,13 @@ async def login_for_access_token(
     # the dominant ~150 ms term in either path, so the timing channel
     # collapses.
     if user is None:
-        verify_password(form_data.password, _LOGIN_DECOY_HASH)
+        await verify_password_async(form_data.password, _LOGIN_DECOY_HASH)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    if not verify_password(form_data.password, user.hashed_password):
+    if not await verify_password_async(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -276,7 +276,7 @@ async def register_user(
     #    path it's discarded. Without this, a duplicate-email request
     #    would short-circuit before bcrypt runs, restoring a timing
     #    differential between arms.
-    hashed_password = get_password_hash(user_in.password)
+    hashed_password = await get_password_hash_async(user_in.password)
 
     # 2. Check if user already exists. The duplicate-email arm follows
     #    the F-06-007 "always-200, send-email" path; it returns the
@@ -498,7 +498,7 @@ async def change_password(
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
     """Change current user password."""
-    if not verify_password(
+    if not await verify_password_async(
         password_data.current_password, current_user.hashed_password
     ):
         raise HTTPException(
@@ -507,7 +507,9 @@ async def change_password(
         )
 
     try:
-        current_user.hashed_password = get_password_hash(password_data.new_password)
+        current_user.hashed_password = await get_password_hash_async(
+            password_data.new_password
+        )
         # F-03-010: bump password_changed_at so in-flight access tokens
         # (which carry an iat claim) are rejected by get_current_user.
         current_user.password_changed_at = datetime.now(timezone.utc)
@@ -595,7 +597,7 @@ async def disable_totp(
     db: AsyncSession = Depends(get_db),
 ) -> AckResponse:
     """Disable 2FA after verifying current password."""
-    if not verify_password(
+    if not await verify_password_async(
         password_data.current_password, current_user.hashed_password
     ):
         raise HTTPException(status_code=400, detail="Incorrect password")
@@ -670,7 +672,7 @@ async def resend_verification(
     # negligible next to the bcrypt cost; the e-mail itself is handed to
     # a background task so the SMTP round-trip happens after the response
     # is written and cannot widen the known arm (wave 7).
-    get_password_hash("anti-enum-padding")
+    await get_password_hash_async("anti-enum-padding")
 
     if user is not None and user.email_verified_at is None:
         token = create_email_token(
@@ -711,7 +713,7 @@ async def password_reset_request(
     # response (known is much faster than unknown). The e-mail send is a
     # background task for the same reason: an inline SMTP round-trip on
     # the known arm only would reopen the channel (wave 7).
-    get_password_hash("anti-enum-padding")
+    await get_password_hash_async("anti-enum-padding")
 
     if user is not None:
         token = create_email_token(
@@ -748,7 +750,7 @@ async def password_reset_confirm(
         # Token was issued before the current password — already consumed
         raise HTTPException(status_code=400, detail="token_already_consumed")
 
-    user.hashed_password = get_password_hash(payload.new_password)
+    user.hashed_password = await get_password_hash_async(payload.new_password)
     user.password_changed_at = datetime.now(timezone.utc)
     await db.commit()
 
@@ -882,7 +884,7 @@ async def twofa_disable_request(
     # F-03-007: Constant-time padding on BOTH branches. Token signing is
     # negligible next to the bcrypt cost; the e-mail send runs as a
     # background task after the response (wave 7).
-    get_password_hash("anti-enum-padding")
+    await get_password_hash_async("anti-enum-padding")
 
     if user is not None and user.is_totp_enabled:
         token = create_email_token(

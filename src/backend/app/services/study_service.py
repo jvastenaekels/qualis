@@ -234,9 +234,9 @@ class StudyService:
                 if field in ["translations", "statements", "grid_config"]:
                     continue
                 if field == "access_password" and value is not None:
-                    from ..utils.security import get_password_hash
+                    from ..utils.security import get_password_hash_async
 
-                    value = get_password_hash(value)
+                    value = await get_password_hash_async(value)
                 setattr(study, field, value)
 
             # Grid config

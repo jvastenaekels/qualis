@@ -1,5 +1,6 @@
 """Security utilities."""
 
+import asyncio
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal, TypedDict, cast
@@ -48,6 +49,16 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """Hash a password using bcrypt."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+async def verify_password_async(plain_password: str, hashed_password: str) -> bool:
+    """``verify_password`` in a worker thread (bcrypt releases the GIL)."""
+    return await asyncio.to_thread(verify_password, plain_password, hashed_password)
+
+
+async def get_password_hash_async(password: str) -> str:
+    """``get_password_hash`` in a worker thread (bcrypt releases the GIL)."""
+    return await asyncio.to_thread(get_password_hash, password)
 
 
 def create_access_token(

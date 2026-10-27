@@ -12,6 +12,8 @@ password, unknown slug. The password-gate tests verify the response shape
 extras, which `extra='allow'` would absorb anyway.
 """
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from httpx import AsyncClient
 
@@ -140,3 +142,22 @@ class TestStudyConfigPasswordGate:
         assert data["slug"] == active_study.slug
         # Gate not entered → resolved-config branch emits False.
         assert data["requires_password"] is False
+
+
+@pytest.mark.asyncio
+class TestGetStudyPasswordShortCircuit:
+    async def test_get_study_without_password_skips_bcrypt(
+        self, client: AsyncClient, db, active_study: Study
+    ):
+        """No password in the request: locked metadata, no bcrypt call at all."""
+        active_study.access_password = get_password_hash("pw")
+        await db.commit()
+
+        with patch(
+            "app.routers.submissions.verify_password_async", new=AsyncMock()
+        ) as mock_verify:
+            resp = await client.get(f"/api/study/{active_study.slug}")
+
+        assert resp.status_code == 200
+        assert resp.json()["requires_password"] is True
+        mock_verify.assert_not_called()

@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from app.core.config import settings
 from app.database import get_db
-from app.utils.security import get_password_hash
+from app.utils.security import get_password_hash_async
 
 router = APIRouter(prefix="/api/test", tags=["test"])
 
@@ -71,7 +71,7 @@ else:
         """
         try:
             # Upsert User
-            hashed_password = get_password_hash(data.user.password)
+            hashed_password = await get_password_hash_async(data.user.password)
             result = await db.execute(
                 text("""
                     INSERT INTO users (email, hashed_password, is_active, is_superuser, is_totp_enabled)
