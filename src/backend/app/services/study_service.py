@@ -67,7 +67,6 @@ class StudyService:
             .options(
                 selectinload(Study.translations),
                 selectinload(Study.statements).selectinload(Statement.translations),
-                selectinload(Study.participants),
             )
         )
         result = await db.execute(stmt)

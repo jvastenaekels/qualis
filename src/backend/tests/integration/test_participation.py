@@ -2,10 +2,12 @@
 
 import uuid
 import pytest
+import sqlalchemy
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Study, StudyState, Statement
+from app.models import Participant, ParticipantStatus, Statement, Study, StudyState
+from app.services.study_service import StudyService
 
 
 @pytest.mark.asyncio
@@ -155,3 +157,27 @@ class TestSubmissionValidation:
         response = await client.post("/api/submit", json=payload)
         assert response.status_code == 400
         assert "does not belong" in response.json()["message"]
+
+
+@pytest.mark.asyncio
+async def test_get_study_by_slug_does_not_load_participants(
+    db: AsyncSession, active_study: Study
+):
+    """Participant routes must not eager-load every participant row of the study."""
+    for _ in range(3):
+        db.add(
+            Participant(
+                study_id=active_study.id,
+                session_token=uuid.uuid4(),
+                language_used="en",
+                status=ParticipantStatus.started,
+            )
+        )
+    await db.commit()
+    slug = active_study.slug
+    db.expunge_all()
+
+    study = await StudyService.get_study_by_slug(db, slug)
+
+    assert study is not None
+    assert "participants" not in sqlalchemy.inspect(study).dict
