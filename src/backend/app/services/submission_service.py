@@ -50,7 +50,7 @@ class SubmissionService:
         """Records the exact time and version (hash) of consent.
 
         Consent is the step that creates the participant, so a study with an
-        access password checks it here, for a new participant only.
+        access password checks it here, unless the session already consented.
         A recruitment link is counted here, once, when the participant row is
         created; re-consent on an existing row never touches the link.
         """
@@ -71,13 +71,20 @@ class SubmissionService:
         result = await db.execute(stmt)
         participant = result.scalar_one_or_none()
 
-        if not participant:
-            # Before the link block: a wrong password must not consume link capacity.
-            if study.access_password and (
+        # Also for a row that exists but never consented (e.g. created by a
+        # "started" /submit): otherwise that route skips the password. Before
+        # the link block: a wrong password must not consume link capacity.
+        if (
+            (participant is None or participant.consented_at is None)
+            and study.access_password
+            and (
                 password is None
                 or not await verify_password_async(password, study.access_password)
-            ):
-                raise ForbiddenError("study_password_required")
+            )
+        ):
+            raise ForbiddenError("study_password_required")
+
+        if not participant:
             link: RecruitmentLink | None = None
             if link_token:
                 link = await RecruitmentService.validate_link_token(

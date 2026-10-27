@@ -68,9 +68,7 @@ class TestUnlockStudyEndpoint:
 
     async def test_unlock_unknown_slug_404(self, client: AsyncClient):
         """Unknown study slug returns 404."""
-        resp = await client.post(
-            "/api/study/no-such-study/unlock?password=anything"
-        )
+        resp = await client.post("/api/study/no-such-study/unlock?password=anything")
         assert resp.status_code == 404
 
 
@@ -134,9 +132,7 @@ class TestStudyConfigPasswordGate:
         active_study.access_password = get_password_hash("hunter2")
         await db.commit()
 
-        resp = await client.get(
-            f"/api/study/{active_study.slug}?password=hunter2"
-        )
+        resp = await client.get(f"/api/study/{active_study.slug}?password=hunter2")
         assert resp.status_code == 200
         data = resp.json()
         assert data["slug"] == active_study.slug
@@ -203,7 +199,8 @@ class TestConsentRequiresStudyPassword:
         await self._protect(db, active_study)
         token = str(uuid.uuid4())
         resp = await client.post(
-            f"/api/study/{active_study.slug}/consent", json=self._body(active_study, token)
+            f"/api/study/{active_study.slug}/consent",
+            json=self._body(active_study, token),
         )
         assert resp.status_code == 403
         assert await self._participants(db, token) == 0
@@ -235,6 +232,58 @@ class TestConsentRequiresStudyPassword:
         )
         assert resp.status_code == 200
         assert await self._participants(db, token) == 1
+
+    async def test_consent_after_unconsented_submit_still_requires_password(
+        self, client: AsyncClient, db, active_study: Study
+    ):
+        import uuid
+
+        from sqlalchemy import select
+
+        from app.models import Participant
+
+        await self._protect(db, active_study)
+        token = str(uuid.uuid4())
+        resp = await client.post(
+            "/api/submit",
+            json={
+                "session_token": token,
+                "study_slug": active_study.slug,
+                "language_used": "en",
+                "status": "started",
+                "presort_answers": {},
+                "qsort": [],
+                "postsort_answers": {},
+            },
+        )
+        assert resp.status_code == 200
+        resp = await client.post(
+            f"/api/study/{active_study.slug}/consent",
+            json=self._body(active_study, token),
+        )
+        assert resp.status_code == 403
+        db.expire_all()
+        participant = (
+            await db.execute(
+                select(Participant).where(Participant.session_token == token)
+            )
+        ).scalar_one()
+        assert participant.consented_at is None
+
+    async def test_reconsent_of_consented_session_needs_no_password(
+        self, client: AsyncClient, db, active_study: Study
+    ):
+        import uuid
+
+        await self._protect(db, active_study)
+        token = str(uuid.uuid4())
+        url = f"/api/study/{active_study.slug}/consent"
+        first = await client.post(
+            url, json=self._body(active_study, token, password="hunter2")
+        )
+        assert first.status_code == 200
+        again = await client.post(url, json=self._body(active_study, token))
+        assert again.status_code == 200
 
     async def test_completed_submit_without_consent_still_refused(
         self, client: AsyncClient, db, active_study: Study
