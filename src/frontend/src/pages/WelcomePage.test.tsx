@@ -5,7 +5,7 @@
  */
 
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
@@ -89,6 +89,23 @@ describe('WelcomePage', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Consent Page')).toBeInTheDocument();
+        });
+    });
+
+    it('keeps the recruitment token when continuing to consent', async () => {
+        const Probe = () => <div>{`Consent search: ${useLocation().search}`}</div>;
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<WelcomePage />} />
+                <Route path="/study/:slug/consent" element={<Probe />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/welcome?token=abc'] }
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /Get Started/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Consent search: ?token=abc')).toBeInTheDocument();
         });
     });
 

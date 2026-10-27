@@ -99,7 +99,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     if (!config) return null;
 
     const handleContinue = () => {
-        navigate(`/study/${slug}/consent`);
+        navigate(`/study/${slug}/consent${location.search}`);
     };
 
     const studyLang = config.language || 'en';
