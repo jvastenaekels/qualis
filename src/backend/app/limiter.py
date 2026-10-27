@@ -26,14 +26,21 @@ def _get_real_ip(request: Request) -> str:
     real TCP peer). Operators behind Scalingo / Heroku / Cloudflare /
     nginx etc. should set `TRUSTED_PROXIES=*` (or the specific
     proxy IPs) in their environment.
+
+    Behind a trusted proxy we return the rightmost non-empty hop of
+    X-Forwarded-For: the entry appended by the proxy nearest to us. Any
+    entry to its left (notably the first one) is client-supplied and
+    spoofable. The host's TLS proxy must set or append the header, and the
+    Compose nginx passes it through unchanged so that hop stays rightmost.
     """
     direct_peer = request.client.host if request.client else "127.0.0.1"
     trusted = settings.trusted_proxies_list
 
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded and trusted and ("*" in trusted or direct_peer in trusted):
-        # First entry is the original client IP per RFC 7239 convention
-        return forwarded.split(",")[0].strip()
+        entries = [e.strip() for e in forwarded.split(",") if e.strip()]
+        if entries:
+            return entries[-1]
 
     return direct_peer
 

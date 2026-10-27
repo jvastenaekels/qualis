@@ -181,3 +181,39 @@ async def test_get_study_by_slug_does_not_load_participants(
 
     assert study is not None
     assert "participants" not in sqlalchemy.inspect(study).dict
+
+
+@pytest.mark.asyncio
+async def test_participant_routes_hash_the_forwarded_ip(
+    client: AsyncClient,
+    db: AsyncSession,
+    active_study: Study,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Consent hashes the proxy-added client IP, not the proxy's own address."""
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "TRUSTED_PROXIES", "*")
+    tokens = [str(uuid.uuid4()), str(uuid.uuid4())]
+    for token, ip in zip(tokens, ["203.0.113.7", "203.0.113.8"]):
+        resp = await client.post(
+            f"/api/study/{active_study.slug}/consent",
+            headers={"X-Forwarded-For": f"6.6.6.6, {ip}"},
+            json={
+                "session_token": token,
+                "study_slug": active_study.slug,
+                "language_code": "en",
+                "consent_hash": "test-hash",
+            },
+        )
+        assert resp.status_code == 200
+
+    rows = (
+        await db.execute(
+            sqlalchemy.select(Participant.ip_address).where(
+                Participant.session_token.in_(tokens)
+            )
+        )
+    ).all()
+    assert len(rows) == 2
+    assert rows[0][0] != rows[1][0]

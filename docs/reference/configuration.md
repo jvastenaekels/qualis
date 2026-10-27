@@ -181,7 +181,7 @@ All settings are read from the `Settings` Pydantic class in `src/backend/app/cor
 | ENV_VAR | Type | Default | Description |
 | ------- | ---- | ------- | ----------- |
 | `ALLOWED_ORIGINS` | string (CSV) | localhost dev ports | Comma-separated list of allowed origins. Production must override. |
-| `TRUSTED_PROXIES` | string (CSV) | empty | Reverse-proxy IPs trusted for `X-Forwarded-For`. Empty = use direct peer IP only. |
+| `TRUSTED_PROXIES` | string (CSV) | empty | Reverse-proxy IPs trusted for `X-Forwarded-For`. Empty = use direct peer IP only. When trusted, the rightmost header entry is the client IP, so the host's TLS proxy must set or append the header. |
 
 ### Email (SMTP)
 

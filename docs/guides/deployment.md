@@ -321,7 +321,7 @@ Open `/` to verify the frontend, then request `/health` and confirm it returns
 
 ## SSL
 
-Scalingo provisions SSL certificates automatically. For Docker / VPS deployments, terminate TLS at a reverse proxy (Caddy, Traefik, nginx) and forward to the app on its internal port; if the proxy adds `X-Forwarded-For`, set `TRUSTED_PROXIES` to the proxy's IP so that rate limiting keys on the real client.
+Scalingo provisions SSL certificates automatically. For Docker / VPS deployments, terminate TLS at a reverse proxy (Caddy, Traefik, nginx) and forward to the app on its internal port; the proxy must set or append `X-Forwarded-For` (Caddy, Traefik and nginx with `$proxy_add_x_forwarded_for` all do). Set `TRUSTED_PROXIES` to the proxy's IP so that rate limiting and participant IP hashes key on the real client: Qualis reads the rightmost entry of the header, the one your proxy wrote.
 
 ---
 

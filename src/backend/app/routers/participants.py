@@ -16,7 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.limiter import limiter, resume_code_key_func_sync
+from app.limiter import _get_real_ip, limiter, resume_code_key_func_sync
 from app.schemas import (
     ConsentInput,
     ConsentResponse,
@@ -53,7 +53,7 @@ async def record_consent(
             status_code=400,
             detail="study_slug in the body does not match the study in the URL",
         )
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _get_real_ip(request)
     result = await SubmissionService.record_consent(
         db,
         study_slug=slug,

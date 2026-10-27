@@ -6,7 +6,7 @@ from typing import Any, Literal
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from app.limiter import limiter
+from app.limiter import _get_real_ip, limiter
 from app.middleware.log_scrub import scrub_token_query
 from app.utils.crypto import hash_ip
 
@@ -45,8 +45,7 @@ async def report_log(entry: LogEntry, request: Request) -> dict[str, str]:
     # correlate frontend errors from the same source. The token-scrubber
     # filter (F-03-013) only handles query strings; `extra` payloads
     # need explicit redaction at write time.
-    raw_ip = request.client.host if request.client else None
-    client_ip_hash = hash_ip(raw_ip) if raw_ip else "unknown"
+    client_ip_hash = hash_ip(_get_real_ip(request))
 
     # The scrub filter on ``frontend_error`` rewrites the message, but
     # ``extra`` values land on the record as attributes that a structured

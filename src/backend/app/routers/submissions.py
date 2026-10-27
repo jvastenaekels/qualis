@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.exceptions import ServiceError
-from app.limiter import limiter
+from app.limiter import _get_real_ip, limiter
 from app.schemas import SubmissionInput
 from app.schemas.responses import (
     AckResponse,
@@ -36,10 +36,7 @@ async def submit_study(
 
     Logic moved to StudyService for maintainability.
     """
-    # Edge case: Handle None request.client
-    client_ip = "unknown"
-    if request.client and hasattr(request.client, "host"):
-        client_ip = request.client.host or "unknown"
+    client_ip = _get_real_ip(request)
 
     user_agent = request.headers.get("user-agent")
 
