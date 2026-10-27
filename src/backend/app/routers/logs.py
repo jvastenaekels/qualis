@@ -50,12 +50,22 @@ async def report_log(entry: LogEntry, request: Request) -> dict[str, str]:
     # The scrub filter on ``frontend_error`` rewrites the message, but
     # ``extra`` values land on the record as attributes that a structured
     # sink emits verbatim, so the URL-bearing fields are scrubbed here.
+    # Context values are open-ended client data; a resume code can sit in any
+    # string value (e.g. an endpoint path), so scrub one level deep.
+    context = (
+        {
+            k: scrub_token_query(v) if isinstance(v, str) else v
+            for k, v in entry.context.items()
+        }
+        if entry.context
+        else None
+    )
     log_payload = {
         "source": "frontend",
         "level": entry.level,
         "client_message": scrub_token_query(entry.message),
         "stack": scrub_token_query(entry.stack) if entry.stack else None,
-        "context": entry.context,
+        "context": context,
         "url": scrub_token_query(entry.url) if entry.url else None,
         "userAgent": entry.userAgent or request.headers.get("user-agent"),
         "ip_hash": client_ip_hash,

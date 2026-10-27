@@ -22,6 +22,11 @@ Scope of redaction:
   the recruitment-link bearer and ``password`` the study unlock secret
   (wave 7 — these three were logged raw before).
 
+* The resume-code path segment ``/resume/<code>`` (``/api/study/{slug}/resume/{code}``
+  and the frontend ``/study/{slug}/resume/{code}``). The code is a bearer
+  credential: it returns the session token and draft, so it is redacted
+  as a path segment, not a query key.
+
 Scope of attachment:
 
 * ``uvicorn.access`` — the access logger that renders every request line
@@ -56,6 +61,9 @@ _TOKEN_RE = re.compile(
     re.IGNORECASE,
 )
 
+# The resume code is a path segment, not a query value, so it needs its own pattern.
+_RESUME_PATH_RE = re.compile(r"(/resume/)[^/?\s]+")
+
 # Loggers that may emit URLs containing sensitive query params. Keep
 # this list narrow: every entry must have an audited reason. See module
 # docstring for the rationale on each.
@@ -68,9 +76,11 @@ _TARGET_LOGGER_NAMES: tuple[str, ...] = (
 
 def scrub_token_query(path_with_query: str) -> str:
     """Replace ``?token=…`` / ``?otp=…`` / ``?code=…`` (any case) with
-    ``?<key>=REDACTED``. The key casing is preserved so log lines
-    remain visually faithful to the original request."""
-    return _TOKEN_RE.sub(r"\1\2=REDACTED", path_with_query)
+    ``?<key>=REDACTED``, and ``/resume/<code>`` with ``/resume/REDACTED``.
+    The key casing is preserved so log lines remain visually faithful to
+    the original request."""
+    scrubbed = _TOKEN_RE.sub(r"\1\2=REDACTED", path_with_query)
+    return _RESUME_PATH_RE.sub(r"\1REDACTED", scrubbed)
 
 
 class TokenLogScrubFilter(logging.Filter):
