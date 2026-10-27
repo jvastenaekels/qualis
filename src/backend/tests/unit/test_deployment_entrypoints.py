@@ -1,6 +1,7 @@
 """Exercise deployment entrypoints without touching a deployed database."""
 
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -38,6 +39,17 @@ def test_postdeploy_checks_database_scheme_before_migrating(tmp_path, url, accep
     assert result.returncode == (0 if accepted else 1), result.stdout + result.stderr
     assert ("MIGRATION_REACHED" in result.stdout) == accepted
     assert ("BOOTSTRAP_REACHED" in result.stdout) == accepted
+
+
+def test_nginx_body_limit_covers_audio_limit():
+    from app.core.config import Settings
+
+    nginx_conf = (BACKEND.parents[1] / "src/frontend/nginx.conf").read_text()
+    start = nginx_conf.index("location /api/ {")
+    api_block = nginx_conf[start : nginx_conf.index("\n    }", start)]
+    match = re.search(r"client_max_body_size\s+(\d+)m;", api_block)
+    assert match, "location /api/ must set client_max_body_size (nginx default is 1m)"
+    assert int(match.group(1)) >= Settings().AUDIO_MAX_FILE_SIZE_MB + 1
 
 
 def test_alembic_accepts_percent_encoded_password():
