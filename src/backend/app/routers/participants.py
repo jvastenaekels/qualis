@@ -62,6 +62,7 @@ async def record_consent(
         consent_hash=data.consent_hash,
         ip_address=client_ip,
         user_agent=request.headers.get("user-agent"),
+        link_token=data.link_token,
     )
     return ConsentResponse.model_validate(result)
 

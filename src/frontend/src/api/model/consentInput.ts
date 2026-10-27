@@ -17,4 +17,5 @@ export interface ConsentInput {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
+    link_token?: string | null;
 }

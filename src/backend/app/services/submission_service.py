@@ -43,8 +43,13 @@ class SubmissionService:
         consent_hash: str | None = None,
         ip_address: str | None = None,
         user_agent: str | None = None,
+        link_token: str | None = None,
     ) -> dict[str, Any]:
-        """Records the exact time and version (hash) of consent."""
+        """Records the exact time and version (hash) of consent.
+
+        A recruitment link is counted here, once, when the participant row is
+        created; re-consent on an existing row never touches the link.
+        """
         # 1. Get Study
         study = await StudyService.get_study_by_slug(db, study_slug)
         if not study:
@@ -63,6 +68,16 @@ class SubmissionService:
         participant = result.scalar_one_or_none()
 
         if not participant:
+            link: RecruitmentLink | None = None
+            if link_token:
+                link = await RecruitmentService.validate_link_token(
+                    db, study.id, link_token
+                )
+                if link is None or not await RecruitmentService.increment_usage(
+                    db, link.id
+                ):
+                    raise ForbiddenError("Invalid, expired, or full recruitment link")
+                await RecruitmentService.record_start(db, link.id)
             try:
                 # Create new participant record immediately upon consent
                 participant = Participant(
@@ -81,6 +96,9 @@ class SubmissionService:
                     status=ParticipantStatus.started,
                     last_step_reached=1,
                     last_step_reached_at=datetime.now(timezone.utc),
+                    presort_answers={"_recruitment_token": link_token}
+                    if link_token
+                    else {},
                 )
                 db.add(participant)
                 await db.flush()
@@ -321,7 +339,6 @@ class SubmissionService:
         db: AsyncSession,
         data: SubmissionInput,
         study: Study,
-        link: RecruitmentLink | None,
         *,
         presort_answers: dict[str, Any],
         postsort_answers: dict[str, Any],
@@ -331,7 +348,6 @@ class SubmissionService:
     ) -> tuple[Participant, bool]:
         """Lookup the participant row by session_token; create it if missing.
 
-        On creation, increments the recruitment link usage atomically.
         Handles the race where a concurrent request inserted the same
         session_token by rolling back, re-fetching, and returning the
         existing row. The boolean flag marks whether *this* call did the
@@ -377,14 +393,6 @@ class SubmissionService:
             )
             db.add(participant)
             await db.flush()
-
-            if link and data.link_token:
-                participant.presort_answers = {
-                    **participant.presort_answers,
-                    "_recruitment_token": data.link_token,
-                }
-                if not await RecruitmentService.increment_usage(db, link.id):
-                    raise ForbiddenError("Invalid, expired, or full recruitment link")
 
             return participant, True
         except IntegrityError:
@@ -441,7 +449,13 @@ class SubmissionService:
             raise ValidationError("Session has expired. Please start a new session.")
 
         participant.language_used = data.language_used
-        participant.presort_answers = presort_answers
+        # Attribution was stamped at consent; the client's presort answers must not erase it.
+        token = participant.recruitment_token
+        participant.presort_answers = (
+            {**presort_answers, "_recruitment_token": token}
+            if token
+            else presort_answers
+        )
         participant.postsort_answers = postsort_answers
         if data.status:
             participant.status = data.status
@@ -520,15 +534,6 @@ class SubmissionService:
         # 2.5 Validate study acceptance state (statements loaded, active, not ended)
         SubmissionService._validate_study_state(study)
 
-        # 2.6 Validation: Recruitment Link
-        link = None
-        if data.link_token:
-            link = await RecruitmentService.validate_link_token(
-                db, study.id, data.link_token
-            )
-            if not link:
-                raise ForbiddenError("Invalid, expired, or full recruitment link")
-
         # C4: an already-completed participant re-POSTing must idempotently get
         # its stored confirmation back — even if the grid was edited since, which
         # would make the old Q-sort fail validate_distribution below. Short-
@@ -574,7 +579,6 @@ class SubmissionService:
             db,
             data,
             study,
-            link,
             presort_answers=presort_answers,
             postsort_answers=postsort_answers,
             confirmation_code=confirmation_code,

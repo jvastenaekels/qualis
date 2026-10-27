@@ -1,5 +1,6 @@
 """Consolidated integration tests for recruitment links and collaborator invitations."""
 
+import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -41,8 +42,16 @@ class TestRecruitment:
         assert len(links) == 2
         token = links[0]["token"]
 
-        # 3. Access Study via Link (Increments start_count)
-        response = await client.get(f"/api/study/{study.slug}?link_token={token}")
+        # 3. Consent through the link (increments start_count)
+        response = await client.post(
+            f"/api/study/{study.slug}/consent",
+            json={
+                "session_token": str(uuid.uuid4()),
+                "study_slug": study.slug,
+                "language_code": "en",
+                "link_token": token,
+            },
+        )
         assert response.status_code == 200
 
         # Verify stats

@@ -8741,6 +8741,18 @@
             "maxLength": 5,
             "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
             "title": "Language Code"
+          },
+          "link_token": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Token"
           }
         },
         "type": "object",

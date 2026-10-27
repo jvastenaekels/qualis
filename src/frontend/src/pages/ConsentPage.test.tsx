@@ -12,9 +12,11 @@ import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import ConsentPage from './ConsentPage';
 
+const { recordConsent } = vi.hoisted(() => ({ recordConsent: vi.fn() }));
+
 vi.mock('../api/generated', () => ({
     useRecordConsentApiStudySlugConsentPost: () => ({
-        mutateAsync: vi.fn().mockResolvedValue({}),
+        mutateAsync: recordConsent,
     }),
 }));
 
@@ -54,6 +56,7 @@ vi.mock('../hooks/useStudyConfig', () => ({
 describe('ConsentPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        recordConsent.mockResolvedValue({});
         // Setup initial state
         useConfigStore
             .getState()
@@ -151,6 +154,28 @@ describe('ConsentPage', () => {
             expect(useSessionStore.getState().hasConsented).toBe(true);
             expect(screen.getByText('Presort Page')).toBeInTheDocument();
         });
+    });
+
+    it('sends the recruitment token from the URL with the consent', async () => {
+        window.history.pushState({}, '', '/study/test-study/consent?token=abc');
+        try {
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                    <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+                </Routes>,
+                { initialEntries: ['/study/test-study/consent?token=abc'] }
+            );
+            fireEvent.click(screen.getByRole('checkbox'));
+            const button = screen.getByRole('button', { name: /Start Study/i });
+            await waitFor(() => expect(button).not.toBeDisabled());
+            fireEvent.click(button);
+
+            await waitFor(() => expect(recordConsent).toHaveBeenCalled());
+            expect(recordConsent.mock.calls[0][0].data.link_token).toBe('abc');
+        } finally {
+            window.history.pushState({}, '', '/');
+        }
     });
 
     it('starts a study when randomUUID is unavailable on an insecure HTTP origin', async () => {

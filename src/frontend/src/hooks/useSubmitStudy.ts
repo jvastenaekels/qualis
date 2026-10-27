@@ -43,10 +43,8 @@ function buildPayload(args: {
     presort: Record<string, string | number | boolean>;
     qsort: QSortItem[];
     postsort: { card_comments: Record<number, string>; [k: string]: unknown };
-    linkToken: string | undefined;
 }): SubmissionInput {
-    const { config, sessionToken, sessionLanguage, status, presort, qsort, postsort, linkToken } =
-        args;
+    const { config, sessionToken, sessionLanguage, status, presort, qsort, postsort } = args;
 
     const qsortPayload = qsort.map((item) => {
         const score = config.grid_config?.[item.col]?.score ?? 0;
@@ -65,7 +63,6 @@ function buildPayload(args: {
         presort_answers: presort,
         qsort: qsortPayload,
         postsort_answers: { ...postsort },
-        link_token: linkToken,
     };
 }
 
@@ -114,7 +111,6 @@ function extractConfirmationCode(data: unknown): string | undefined {
 interface SubmissionContext {
     isTestMode: boolean;
     sessionToken: string | null;
-    linkToken: string | undefined;
 }
 
 function resolveSubmissionContext(
@@ -123,8 +119,7 @@ function resolveSubmissionContext(
 ): SubmissionContext {
     const searchParams = new URLSearchParams(window.location.search);
     const isTestMode = searchParams.get('mode') === 'test' || isPilotMode;
-    const linkToken = searchParams.get('token') || undefined;
-    return { isTestMode, sessionToken, linkToken };
+    return { isTestMode, sessionToken };
 }
 
 function assertReadyToSubmit(
@@ -195,7 +190,6 @@ export const useSubmitStudy = () => {
                 presort,
                 qsort,
                 postsort,
-                linkToken: ctx.linkToken,
             });
             const maxAttempts = status === 'completed' ? MAX_RETRIES : 1;
             const data = await runWithRetry(

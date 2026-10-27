@@ -44,6 +44,7 @@ class ConsentInput(BaseModel):
     session_token: UUID
     consent_hash: str | None = None
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
+    link_token: str | None = Field(None, max_length=128)
 
 
 class ProgressUpdate(BaseModel):
@@ -65,6 +66,7 @@ class SubmissionInput(BaseModel):
     presort_answers: dict[str, Any] | None = {}
     qsort: list[QSortEntryInput]
     postsort_answers: dict[str, Any] | None = {}
+    # Ignored: recruitment is recorded at consent; accepted for older clients.
     link_token: str | None = None
 
     @field_validator("qsort")

@@ -82,6 +82,9 @@ const ConsentPage: React.FC = () => {
                             session_token: sessionToken,
                             language_code: i18n.language,
                             consent_hash: consentHash,
+                            link_token:
+                                new URLSearchParams(window.location.search).get('token') ??
+                                undefined,
                         },
                     });
 

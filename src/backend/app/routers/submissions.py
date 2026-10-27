@@ -99,15 +99,11 @@ async def get_study(
 
     # 3. Recruitment Link Validation
     if link_token:
-        link = await RecruitmentService.validate_link_token(db, study.id, link_token)
-        if not link:
+        if not await RecruitmentService.validate_link_token(db, study.id, link_token):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Invalid, expired, or full recruitment link",
             )
-        # Record start (participant accessed the study layout)
-        await RecruitmentService.record_start(db, link.id)
-        await db.commit()
 
     # 4. Password Protection
     if study.access_password and not verify_password(
