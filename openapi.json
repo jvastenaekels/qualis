@@ -8753,6 +8753,18 @@
               }
             ],
             "title": "Link Token"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 256
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
           }
         },
         "type": "object",

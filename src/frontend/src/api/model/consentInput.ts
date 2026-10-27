@@ -18,4 +18,5 @@ export interface ConsentInput {
      */
     language_code: string;
     link_token?: string | null;
+    password?: string | null;
 }

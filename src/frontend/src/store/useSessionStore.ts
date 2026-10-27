@@ -24,6 +24,8 @@ interface SessionState {
     isSaving: boolean;
     isSubmitting: boolean;
     isPilotMode: boolean;
+    // In memory only: the accepted study access password, sent with the consent.
+    studyPassword: string | null;
 
     setToken: (token: string) => void;
     setStudySlug: (slug: string) => void;
@@ -35,6 +37,7 @@ interface SessionState {
     setSaving: (isSaving: boolean) => void;
     setSubmitting: (isSubmitting: boolean) => void;
     setPilotMode: (isPilot: boolean) => void;
+    setStudyPassword: (password: string | null) => void;
     resetSession: () => void;
 }
 
@@ -53,6 +56,7 @@ export const useSessionStore = create<SessionState>()(
             isSaving: false,
             isSubmitting: false,
             isPilotMode: isPilot(),
+            studyPassword: null,
 
             setToken: (token) => set({ token }),
             setStudySlug: (studySlug) => set({ studySlug }),
@@ -72,6 +76,7 @@ export const useSessionStore = create<SessionState>()(
             setSaving: (isSaving) => set({ isSaving }),
             setSubmitting: (isSubmitting) => set({ isSubmitting }),
             setPilotMode: (isPilotMode) => set({ isPilotMode }),
+            setStudyPassword: (studyPassword) => set({ studyPassword }),
             resetSession: () => {
                 clearPilotFlag();
                 resetBaseLocales();
@@ -88,6 +93,7 @@ export const useSessionStore = create<SessionState>()(
                     isSaving: false,
                     isSubmitting: false,
                     isPilotMode: false,
+                    studyPassword: null,
                 });
             },
         }),
@@ -96,8 +102,13 @@ export const useSessionStore = create<SessionState>()(
             version: 2,
             storage: safeLocalStorage,
             partialize: (state) => {
-                // Exclude transient flags from persistence
-                const { isSubmitting: _isSubmitting, isSaving: _isSaving, ...rest } = state;
+                // Exclude transient flags and the study password from persistence
+                const {
+                    isSubmitting: _isSubmitting,
+                    isSaving: _isSaving,
+                    studyPassword: _studyPassword,
+                    ...rest
+                } = state;
                 return rest;
             },
             migrate: (persisted: unknown, version: number) => {

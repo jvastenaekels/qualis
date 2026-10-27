@@ -362,6 +362,10 @@ export const useStudyConfig = () => {
         syncResolvedLanguage(data, slug, sessionLanguage, password, setLanguage);
         setConfigError(null);
         setPasswordError(Boolean(data.requires_password && password));
+        // The server accepted the password: keep it (in memory) for the consent call.
+        if (password && !data.requires_password) {
+            useSessionStore.getState().setStudyPassword(password);
+        }
     }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode, password, slug]);
 
     // --- Effect: Sync Error ---

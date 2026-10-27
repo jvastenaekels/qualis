@@ -25,6 +25,7 @@ from ..models import (
 )
 from ..schemas import SubmissionInput
 from ..utils.crypto import hash_ip, hash_user_agent
+from ..utils.security import verify_password_async
 from .recruitment_service import RecruitmentService
 from .study_service import StudyService
 
@@ -44,9 +45,12 @@ class SubmissionService:
         ip_address: str | None = None,
         user_agent: str | None = None,
         link_token: str | None = None,
+        password: str | None = None,
     ) -> dict[str, Any]:
         """Records the exact time and version (hash) of consent.
 
+        Consent is the step that creates the participant, so a study with an
+        access password checks it here, for a new participant only.
         A recruitment link is counted here, once, when the participant row is
         created; re-consent on an existing row never touches the link.
         """
@@ -68,6 +72,12 @@ class SubmissionService:
         participant = result.scalar_one_or_none()
 
         if not participant:
+            # Before the link block: a wrong password must not consume link capacity.
+            if study.access_password and (
+                password is None
+                or not await verify_password_async(password, study.access_password)
+            ):
+                raise ForbiddenError("study_password_required")
             link: RecruitmentLink | None = None
             if link_token:
                 link = await RecruitmentService.validate_link_token(

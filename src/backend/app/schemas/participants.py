@@ -45,6 +45,7 @@ class ConsentInput(BaseModel):
     consent_hash: str | None = None
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     link_token: str | None = Field(None, max_length=128)
+    password: str | None = Field(None, max_length=256)
 
 
 class ProgressUpdate(BaseModel):

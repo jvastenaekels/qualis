@@ -178,6 +178,25 @@ describe('ConsentPage', () => {
         }
     });
 
+    it('sends the unlocked study password with the consent', async () => {
+        useSessionStore.getState().setStudyPassword('hunter2');
+        renderWithProviders(<ConsentPage />);
+        fireEvent.click(screen.getByRole('checkbox'));
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
+
+        await waitFor(() => expect(recordConsent).toHaveBeenCalled());
+        expect(recordConsent.mock.calls[0][0].data.password).toBe('hunter2');
+    });
+
+    it('never persists the study password and clears it on reset', () => {
+        useSessionStore.getState().setStudyPassword('hunter2');
+        expect(localStorage.getItem('qualis-session') ?? '').not.toContain('hunter2');
+        useSessionStore.getState().resetSession();
+        expect(useSessionStore.getState().studyPassword).toBeNull();
+    });
+
     it('starts a study when randomUUID is unavailable on an insecure HTTP origin', async () => {
         const descriptor = Object.getOwnPropertyDescriptor(crypto, 'randomUUID');
         Object.defineProperty(crypto, 'randomUUID', { configurable: true, value: undefined });

@@ -85,6 +85,7 @@ const ConsentPage: React.FC = () => {
                             link_token:
                                 new URLSearchParams(window.location.search).get('token') ??
                                 undefined,
+                            password: useSessionStore.getState().studyPassword ?? undefined,
                         },
                     });
 
