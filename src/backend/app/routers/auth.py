@@ -34,7 +34,7 @@ from app.utils.email import (
     send_twofa_disabled_notification,
 )
 from app.services.email_change_service import initiate_email_change
-from app.services.email_token_consume_service import mark_jti_consumed
+from app.services.email_token_consume_service import is_jti_consumed, mark_jti_consumed
 from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
@@ -324,6 +324,13 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
+    # Checked outside the creation try: an IntegrityError there is folded into
+    # the anti-enumeration duplicate-email path and would hide a replayed token.
+    if invitation_payload and await is_jti_consumed(db, invitation_payload["jti"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="invitation_already_used"
+        )
+
     try:
         # 4. Create User
         new_user = User(
@@ -354,6 +361,7 @@ async def register_user(
                 role=ProjectRole(invitation_payload["role"]),
             )
             db.add(project_member)
+            await mark_jti_consumed(db, invitation_payload["jti"], purpose="invitation")
 
         await db.commit()
     except IntegrityError:

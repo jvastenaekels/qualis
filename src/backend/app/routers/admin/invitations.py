@@ -1,11 +1,13 @@
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
 
 from app.utils.security import decode_invitation_token
 from app.limiter import limiter
+from app.services.email_token_consume_service import mark_jti_consumed
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import User, ProjectMember, ProjectRole
@@ -77,10 +79,12 @@ async def accept_invitation(
     """
     try:
         payload = decode_invitation_token(data.token)
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired invitation token",
+            detail="invitation_expired"
+            if str(e) == "invitation_expired"
+            else "Invalid or expired invitation token",
         )
 
     # Verify email match
@@ -98,6 +102,15 @@ async def accept_invitation(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token payload"
         )
 
+    # Single use: a removed member cannot replay the same link.
+    try:
+        await mark_jti_consumed(db, payload["jti"], purpose="invitation")
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="invitation_already_used"
+        )
+
     # Check if already a member
     result = await db.execute(
         select(ProjectMember).where(
@@ -106,6 +119,7 @@ async def accept_invitation(
         )
     )
     if result.scalar_one_or_none():
+        await db.commit()  # keep the consumed jti
         return {"message": "Already a member of this project"}
 
     # Add member

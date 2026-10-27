@@ -148,3 +148,29 @@ class TestJWTFamilyIsolation:
             f"SECURITY: access-token decoder accepted an email-flow JWT "
             f"as Bearer credentials. Response: {r.text}"
         )
+
+    async def test_invitation_token_rejected_as_access_token(
+        self, client: AsyncClient, test_user: User
+    ):
+        """An invitation JWT (sub=email) is not a session, even with an iat.
+
+        Re-signing the payload with ``iat`` proves the refusal comes from the
+        ``type`` claim, not from the missing ``iat`` that used to block it.
+        """
+        import time
+
+        import jwt
+
+        from app.core.config import settings
+
+        inv = create_invitation_token(email=test_user.email, role="member", project_id=1)
+        r = await client.get("/api/me", headers={"Authorization": f"Bearer {inv}"})
+        assert r.status_code == 401
+
+        payload = jwt.decode(inv, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload["iat"] = int(time.time())
+        with_iat = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        r = await client.get(
+            "/api/me", headers={"Authorization": f"Bearer {with_iat}"}
+        )
+        assert r.status_code == 401

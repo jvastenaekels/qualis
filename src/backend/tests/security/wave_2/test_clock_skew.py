@@ -85,6 +85,7 @@ def _mint_invitation_token(
         "sub": "skew@example.com",
         "role": "viewer",
         "type": "invitation",
+        "jti": "skew-test-invitation-jti",
         "iat": int((now + timedelta(seconds=iat_offset_seconds)).timestamp()),
         "exp": int((now + timedelta(seconds=exp_offset_seconds)).timestamp()),
     }

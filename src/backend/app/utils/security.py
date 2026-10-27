@@ -96,6 +96,7 @@ def create_invitation_token(
         "sub": email,
         "role": role,
         "type": "invitation",
+        "jti": secrets.token_urlsafe(16),  # consumed on first use
     }
     if study_id:
         to_encode["study_id"] = study_id
@@ -118,12 +119,16 @@ def decode_access_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-
     reason as ``decode_invitation_token``: JWT payloads carry untyped
     wire data and callers downcast individual fields.
     """
-    return jwt.decode(
+    payload: dict[str, Any] = jwt.decode(  # type: ignore[explicit-any]
         token,
         settings.SECRET_KEY,
         algorithms=[settings.ALGORITHM],
         leeway=settings.JWT_LEEWAY_SECONDS,
     )
+    # Invitation (type) and email-flow (aud) tokens also carry sub=email.
+    if "type" in payload or "aud" in payload:
+        raise jwt.InvalidTokenError("not an access token")
+    return payload
 
 
 def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
@@ -141,6 +146,9 @@ def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[expli
     )
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
+    # Tokens minted before single-use invitations carry no jti: resend them.
+    if not payload.get("jti"):
+        raise jwt.InvalidTokenError("invitation_expired")
     return payload
 
 
