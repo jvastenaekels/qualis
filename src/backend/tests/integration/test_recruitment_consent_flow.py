@@ -157,3 +157,73 @@ async def test_expired_link_does_not_block_final_submit(
     await db.commit()
     resp = await _complete(client, active_study, token, link_token="cap-one")
     assert resp.status_code == 200
+
+
+async def _start(client: AsyncClient, study: Study, token: str, presort=None):
+    """A "started" /submit creates the participant row before consent."""
+    return await client.post(
+        "/api/submit",
+        json={
+            "session_token": token,
+            "study_slug": study.slug,
+            "language_used": "en",
+            "status": "started",
+            "presort_answers": presort or {},
+            "qsort": [],
+            "postsort_answers": {},
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_consent_after_started_submit_counts_link_and_attribution(
+    client, db, active_study, capped_link
+):
+    token = str(uuid.uuid4())
+    assert (await _start(client, active_study, token)).status_code == 200
+    resp = await _consent(client, active_study.slug, token, "cap-one")
+    assert resp.status_code == 200
+    await db.refresh(capped_link)
+    assert capped_link.usage_count == 1
+    assert capped_link.start_count == 1
+    assert (await _participant(db, token)).recruitment_token == "cap-one"
+
+
+@pytest.mark.asyncio
+async def test_full_link_refuses_consent_of_started_row(
+    client, db, active_study, capped_link
+):
+    assert (
+        await _consent(client, active_study.slug, str(uuid.uuid4()), "cap-one")
+    ).status_code == 200
+    token = str(uuid.uuid4())
+    assert (await _start(client, active_study, token)).status_code == 200
+    resp = await _consent(client, active_study.slug, token, "cap-one")
+    assert resp.status_code == 403
+    assert (await _participant(db, token)).consented_at is None
+
+
+@pytest.mark.asyncio
+async def test_reconsent_with_link_after_plain_consent_does_not_count(
+    client, db, active_study, capped_link
+):
+    token = str(uuid.uuid4())
+    assert (await _consent(client, active_study.slug, token)).status_code == 200
+    resp = await _consent(client, active_study.slug, token, "cap-one")
+    assert resp.status_code == 200
+    await db.refresh(capped_link)
+    assert capped_link.usage_count == 0
+    assert capped_link.start_count == 0
+
+
+@pytest.mark.asyncio
+async def test_client_supplied_recruitment_token_is_dropped(client, db, active_study):
+    token = str(uuid.uuid4())
+    started = await _start(
+        client, active_study, token, {"_recruitment_token": "forged", "age": 3}
+    )
+    assert started.status_code == 200
+    assert (await _consent(client, active_study.slug, token)).status_code == 200
+    p = await _participant(db, token)
+    assert p.recruitment_token is None
+    assert p.presort_answers["age"] == 3

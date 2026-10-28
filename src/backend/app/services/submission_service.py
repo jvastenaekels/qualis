@@ -19,7 +19,6 @@ from ..models import (
     Participant,
     ParticipantStatus,
     QSortEntry,
-    RecruitmentLink,
     Study,
     StudyState,
 )
@@ -51,8 +50,9 @@ class SubmissionService:
 
         Consent is the step that creates the participant, so a study with an
         access password checks it here, unless the session already consented.
-        A recruitment link is counted here, once, when the participant row is
-        created; re-consent on an existing row never touches the link.
+        A recruitment link is counted here, once, for a session that has not
+        consented yet (new row, or a row created by a "started" /submit);
+        re-consent of a consented session never touches the link.
         """
         # 1. Get Study
         study = await StudyService.get_study_by_slug(db, study_slug)
@@ -74,8 +74,9 @@ class SubmissionService:
         # Also for a row that exists but never consented (e.g. created by a
         # "started" /submit): otherwise that route skips the password. Before
         # the link block: a wrong password must not consume link capacity.
+        first_consent = participant is None or participant.consented_at is None
         if (
-            (participant is None or participant.consented_at is None)
+            first_consent
             and study.access_password
             and (
                 password is None
@@ -84,17 +85,17 @@ class SubmissionService:
         ):
             raise ForbiddenError("study_password_required")
 
+        if first_consent and link_token:
+            link = await RecruitmentService.validate_link_token(
+                db, study.id, link_token
+            )
+            if link is None or not await RecruitmentService.increment_usage(
+                db, link.id
+            ):
+                raise ForbiddenError("Invalid, expired, or full recruitment link")
+            await RecruitmentService.record_start(db, link.id)
+
         if not participant:
-            link: RecruitmentLink | None = None
-            if link_token:
-                link = await RecruitmentService.validate_link_token(
-                    db, study.id, link_token
-                )
-                if link is None or not await RecruitmentService.increment_usage(
-                    db, link.id
-                ):
-                    raise ForbiddenError("Invalid, expired, or full recruitment link")
-                await RecruitmentService.record_start(db, link.id)
             try:
                 # Create new participant record immediately upon consent
                 participant = Participant(
@@ -170,6 +171,11 @@ class SubmissionService:
             if not participant.consented_at:
                 participant.consented_at = datetime.now(timezone.utc)
                 participant.consent_hash = consent_hash
+                if link_token:
+                    participant.presort_answers = {
+                        **(participant.presort_answers or {}),
+                        "_recruitment_token": link_token,
+                    }
             participant.language_used = language_code
             participant.ip_address = hashed_ip
             participant.user_agent = hashed_ua
@@ -555,9 +561,9 @@ class SubmissionService:
         # its stored confirmation back — even if the grid was edited since, which
         # would make the old Q-sort fail validate_distribution below. Short-
         # circuit BEFORE qsort/distribution validation, using a read-only lookup
-        # (no lock, no creation, no link-usage increment — those stay in
-        # _find_or_create_participant). The study_id guard preserves the
-        # "token belongs to this study" invariant that _find_or_create enforces.
+        # (no lock, no creation; link usage is counted at consent, never here).
+        # The study_id guard preserves the "token belongs to this study"
+        # invariant that _find_or_create enforces.
         already_completed = (
             await db.execute(
                 select(Participant).where(
@@ -580,10 +586,13 @@ class SubmissionService:
         # 3-4. Validate Q-sort payload (presence, statement ownership, distribution)
         SubmissionService._validate_qsort_payload(study, data)
 
-        # Edge case: Ensure presort_answers and postsort_answers are dicts, not None
-        presort_answers = (
-            data.presort_answers if data.presort_answers is not None else {}
-        )
+        # Edge case: Ensure presort_answers and postsort_answers are dicts, not None.
+        # Attribution is server-stamped at consent: drop any client-supplied copy.
+        presort_answers = {
+            k: v
+            for k, v in (data.presort_answers or {}).items()
+            if k != "_recruitment_token"
+        }
         postsort_answers = (
             data.postsort_answers if data.postsort_answers is not None else {}
         )
