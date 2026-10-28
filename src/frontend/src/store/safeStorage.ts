@@ -84,8 +84,19 @@ const studyScopedStateStorage: StateStorage = {
             storedStudySlug(safeBrowserLocalStorage.getItem(name.replace(/responses$/, 'session')));
         return owner === slug ? legacy : null;
     },
-    setItem: (name, value) =>
-        safeBrowserLocalStorage.setItem(scopedKey(name, currentStudySlug()), value),
+    setItem(name, value) {
+        const slug = currentStudySlug();
+        safeBrowserLocalStorage.setItem(scopedKey(name, slug), value);
+        if (!slug) return;
+        // The scoped key now holds this study's state: scrub the adopted bare entries so a
+        // previous participant's token, resume code and answers do not linger on the device.
+        const prefix = name.replace(/(session|responses)$/, '');
+        const bareSession = `${prefix}session`;
+        if (storedStudySlug(safeBrowserLocalStorage.getItem(bareSession)) === slug) {
+            safeBrowserLocalStorage.removeItem(bareSession);
+            safeBrowserLocalStorage.removeItem(`${prefix}responses`);
+        }
+    },
     removeItem: (name) => safeBrowserLocalStorage.removeItem(scopedKey(name, currentStudySlug())),
 };
 

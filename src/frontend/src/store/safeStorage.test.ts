@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { safeBrowserLocalStorage, studyScopedLocalStorage } from './safeStorage';
 
 const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
@@ -83,5 +83,56 @@ describe('studyScopedLocalStorage', () => {
         expect(studyScopedLocalStorage?.getItem('qualis-responses')).toEqual(value({ agree: [1] }));
         window.history.pushState({}, '', '/study/b/fine-sort');
         expect(studyScopedLocalStorage?.getItem('qualis-responses')).toBeNull();
+    });
+
+    it('scrubs the adopted bare entries on the first write', () => {
+        localStorage.setItem(
+            'qualis-session',
+            JSON.stringify(value({ studySlug: 'a', token: 't' }))
+        );
+        localStorage.setItem('qualis-responses', JSON.stringify(value({ agree: [1] })));
+        window.history.pushState({}, '', '/study/a/fine-sort');
+        studyScopedLocalStorage?.setItem('qualis-session', value({ studySlug: 'a', token: 'u' }));
+        expect(localStorage.getItem('qualis-session')).toBeNull();
+        expect(localStorage.getItem('qualis-responses')).toBeNull();
+        expect(JSON.parse(localStorage.getItem('qualis-session:a') ?? '{}')).toEqual(
+            value({ studySlug: 'a', token: 'u' })
+        );
+    });
+
+    it('leaves the bare entries of another study untouched', () => {
+        localStorage.setItem('qualis-session', JSON.stringify(value({ studySlug: 'b' })));
+        localStorage.setItem('qualis-responses', JSON.stringify(value({ agree: [1] })));
+        window.history.pushState({}, '', '/study/a/fine-sort');
+        studyScopedLocalStorage?.setItem('qualis-session', value({ studySlug: 'a' }));
+        studyScopedLocalStorage?.setItem('qualis-responses', value({ agree: [2] }));
+        expect(localStorage.getItem('qualis-session')).not.toBeNull();
+        expect(localStorage.getItem('qualis-responses')).not.toBeNull();
+    });
+
+    it('scrubs the pilot bare entries too', () => {
+        localStorage.setItem('qualis-pilot-session', JSON.stringify(value({ studySlug: 'a' })));
+        localStorage.setItem('qualis-pilot-responses', JSON.stringify(value({ agree: [1] })));
+        window.history.pushState({}, '', '/study/a/presort');
+        studyScopedLocalStorage?.setItem('qualis-pilot-responses', value({ agree: [1] }));
+        expect(localStorage.getItem('qualis-pilot-session')).toBeNull();
+        expect(localStorage.getItem('qualis-pilot-responses')).toBeNull();
+    });
+
+    it('still migrates both stores from legacy entries at module init', async () => {
+        localStorage.setItem(
+            'qualis-session',
+            JSON.stringify({ state: { studySlug: 'a', token: 't' }, version: 2 })
+        );
+        localStorage.setItem(
+            'qualis-responses',
+            JSON.stringify({ state: { cards: [], agree: [7] }, version: 2 })
+        );
+        window.history.pushState({}, '', '/study/a/fine-sort');
+        vi.resetModules();
+        const { useSessionStore } = await import('./useSessionStore');
+        const { useResponseStore } = await import('./useResponseStore');
+        expect(useSessionStore.getState().token).toBe('t');
+        expect(useResponseStore.getState().agree).toEqual([7]);
     });
 });
