@@ -65,3 +65,63 @@ def test_alembic_accepts_percent_encoded_password():
     )
     assert result.returncode == 0, result.stderr
     assert "CREATE TABLE" in result.stdout
+
+
+@pytest.fixture
+def lifespan_without_schema_check(monkeypatch):
+    """Run the real lifespan, skipping its database schema check."""
+    import app.schema_validation
+
+    async def no_schema_check(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(app.schema_validation, "validate_schema", no_schema_check)
+
+
+@pytest.mark.asyncio
+async def test_production_refuses_default_secret_key(
+    monkeypatch, lifespan_without_schema_check
+):
+    from app.core.config import settings
+    from app.main import _INSECURE_DEFAULT_SENTINEL, app, lifespan
+
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "SECRET_KEY", _INSECURE_DEFAULT_SENTINEL)
+    monkeypatch.setattr(settings, "IP_HASH_SALT", "a-real-salt")
+    with pytest.raises(
+        RuntimeError, match="SECRET_KEY is the published development default"
+    ):
+        async with lifespan(app):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_production_refuses_default_ip_hash_salt(
+    monkeypatch, lifespan_without_schema_check
+):
+    from app.core.config import settings
+    from app.main import _INSECURE_DEFAULT_SENTINEL, app, lifespan
+
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(settings, "SECRET_KEY", "a-real-secret")
+    monkeypatch.setattr(settings, "IP_HASH_SALT", _INSECURE_DEFAULT_SENTINEL)
+    with pytest.raises(
+        RuntimeError, match="IP_HASH_SALT is the published development default"
+    ):
+        async with lifespan(app):
+            pass
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("environment", ["staging", "test", "development"])
+async def test_non_production_keeps_warning_on_default_secrets(
+    monkeypatch, lifespan_without_schema_check, environment
+):
+    from app.core.config import settings
+    from app.main import _INSECURE_DEFAULT_SENTINEL, app, lifespan
+
+    monkeypatch.setattr(settings, "ENVIRONMENT", environment)
+    monkeypatch.setattr(settings, "SECRET_KEY", _INSECURE_DEFAULT_SENTINEL)
+    monkeypatch.setattr(settings, "IP_HASH_SALT", _INSECURE_DEFAULT_SENTINEL)
+    async with lifespan(app):
+        pass

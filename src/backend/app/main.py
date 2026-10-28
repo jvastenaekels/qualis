@@ -77,12 +77,18 @@ async def lifespan(app: FastAPI):
 
     # Production Readiness Checks
     if settings.ENVIRONMENT != "development":
+        # Production refuses to boot on a published default: the sentinel is public.
+        refuse = settings.ENVIRONMENT == "production"
         if settings.SECRET_KEY == _INSECURE_DEFAULT_SENTINEL:
+            if refuse:
+                raise RuntimeError("SECRET_KEY is the published development default")
             logger.critical(
                 "SECRET_KEY is using the insecure default! Set a strong random SECRET_KEY in environment variables."
             )
 
         if settings.IP_HASH_SALT == _INSECURE_DEFAULT_SENTINEL:
+            if refuse:
+                raise RuntimeError("IP_HASH_SALT is the published development default")
             logger.critical(
                 "IP_HASH_SALT is using the insecure default! Set a unique IP_HASH_SALT in environment variables."
             )
