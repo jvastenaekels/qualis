@@ -209,6 +209,25 @@ describe('useSubmitStudy', () => {
         expect(result.current.isSuccess).toBe(true);
     });
 
+    it('keeps error null when a silent started ping fails', async () => {
+        server.use(
+            http.post('/api/submit', () =>
+                HttpResponse.json({ detail: 'Bad Request' }, { status: 400 })
+            )
+        );
+
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
+
+        await act(async () => {
+            await result.current.submit('started', { silent: true });
+        });
+
+        expect(result.current.error).toBeNull();
+        expect(consoleErrorSpy).toHaveBeenCalled();
+    });
+
     it('a started autosave does not release the submitting guard held by a completed submit', async () => {
         server.use(
             http.post('/api/submit', () =>

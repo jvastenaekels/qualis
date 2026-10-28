@@ -243,7 +243,8 @@ export const useSubmitStudy = () => {
                 if (isCompletion && code) finalizeCompletion(code);
             } catch (err: unknown) {
                 console.error(err);
-                setError(extractErrorMessage(err));
+                // A silent ping is background traffic: its failure must not surface as a submission error.
+                if (!silent) setError(extractErrorMessage(err));
             } finally {
                 if (isCompletion) releaseCompletionGuard();
                 if (!silent) setIsLoading(false);
