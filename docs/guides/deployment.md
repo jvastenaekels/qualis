@@ -321,7 +321,7 @@ Open `/` to verify the frontend, then request `/health` and confirm it returns
 
 ## SSL
 
-Scalingo provisions SSL certificates automatically. For Docker / VPS deployments, terminate TLS at a reverse proxy (Caddy, Traefik, nginx) and forward to the app on its internal port; the proxy must set or append `X-Forwarded-For` (Caddy, Traefik and nginx with `$proxy_add_x_forwarded_for` all do). Set `TRUSTED_PROXIES` to the proxy's IP so that rate limiting and participant IP hashes key on the real client: Qualis reads the rightmost entry of the header, the one your proxy wrote.
+Scalingo provisions SSL certificates automatically. For Docker / VPS deployments, terminate TLS at a reverse proxy (Caddy, Traefik, nginx) and forward to the app on its internal port; the proxy must set or append `X-Forwarded-For` (Caddy, Traefik and nginx with `$proxy_add_x_forwarded_for` all do). Qualis reads the rightmost entry of the header, the one your proxy wrote, so that rate limiting and participant IP hashes key on the real client. `TRUSTED_PROXIES` lists the backend's direct TCP peer. With the provided `docker-compose.production.yml` that peer is the bundled nginx container, not your host proxy, so keep the `TRUSTED_PROXIES: "*"` that the compose file sets (the app default is an empty list): setting it to the host proxy's IP would make the backend ignore the header and put every client in one rate-limit bucket. Outside that compose file, set it to the IP of the proxy that connects to the backend.
 
 ---
 

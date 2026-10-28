@@ -942,7 +942,7 @@ async def twofa_disable_confirm(
     await db.commit()
 
     when = datetime.now(timezone.utc).isoformat()
-    ip = request.client.host if request.client else None
+    ip = _get_real_ip(request)
     background_tasks.add_task(
         send_twofa_disabled_notification, user.email, when=when, ip_hint=ip
     )

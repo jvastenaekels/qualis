@@ -9,10 +9,11 @@
  *
  * Feature-gap note (counter increment):
  *   `usage_count` and `start_count` are only incremented when a participant
- *   uses the link token. The `testDb.createParticipant` helper submits without
- *   a token, so it does not bump the counter for any specific link. A proper
+ *   consents through the link token (POST /consent with `link_token`; submit
+ *   ignores it). The `testDb.createParticipant` helper does not consent through
+ *   a link, so it does not bump the counter for any specific link. A proper
  *   counter-increment test would require either:
- *     (a) passing a `link_token` to the submit API — testDb would need updating, or
+ *     (a) consenting with a `link_token` in testDb — testDb would need updating, or
  *     (b) navigating a second browser context through the full participant UI with
  *         the token in the query string (adds ~3 min to the test).
  *   Both options are tracked as follow-up work. This spec validates the UI

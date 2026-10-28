@@ -312,10 +312,9 @@ module = [
     #   ConcourseItemVersion, ConcourseTag x2, list[ORM] x4, None x3, PaginatedResponse[ConcourseRead]).
     #   FastAPI serialises ORM models to their Pydantic Read counterparts via response_model.
     "app.routers.admin.concourses",
-    # admin/exports: 8 return types (StreamingResponse x6 for CSV/ZIP/audio downloads,
-    #   dict[str, Any] x2 for service-derived dump payloads).
-    #   typing.Any is structurally required: get_study_full_dump is an untyped proxy
-    #   over StudyDataService.get_study_full_dump (returns open-ended StudyDump).
+    # admin/exports: return types (StreamingResponse x6 for CSV/ZIP/audio downloads,
+    #   StudyDumpResponse for the dump). get_study_full_dump is now called directly on
+    #   StudyDataService (typed StudyDump); the module no longer uses typing.Any.
     "app.routers.admin.exports",
     # admin/projects: 5 return types (PaginatedResponse[ProjectWithRole|ProjectMemberRead]
     #   via cast, None x2 for delete endpoints, InvitationLink for invite creation).
