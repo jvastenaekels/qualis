@@ -696,7 +696,7 @@ const StudyLayoutContent: React.FC = () => {
                     {hasConsented && !isCompleted && !isPilotMode && (
                         <span
                             role="status"
-                            className={`hidden sm:flex items-center justify-center w-5 transition-opacity duration-300 ${draftSaveStatus === 'idle' ? 'opacity-0' : 'opacity-100'}`}
+                            className={`${draftSaveStatus === 'error' ? 'flex' : 'hidden sm:flex'} items-center justify-center w-5 transition-opacity duration-300 ${draftSaveStatus === 'idle' ? 'opacity-0' : 'opacity-100'}`}
                             aria-live="polite"
                             aria-label={
                                 draftSaveStatus === 'saving'

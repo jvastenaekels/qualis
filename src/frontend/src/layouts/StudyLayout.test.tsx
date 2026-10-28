@@ -14,6 +14,7 @@ import { renderWithProviders } from '../test-utils/test-utils';
 import StudyLayout from './StudyLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import { useDraftAutoSave } from '../hooks/study/useDraftAutoSave';
 
 const mocks = vi.hoisted(() => ({
     changeLanguage: vi.fn(),
@@ -58,6 +59,10 @@ vi.mock('../hooks/useStudyConfig', () => ({
 
 vi.mock('../hooks/useNetworkStatus', () => ({
     useNetworkStatus: vi.fn(() => ({ isOnline: true })),
+}));
+
+vi.mock('../hooks/study/useDraftAutoSave', () => ({
+    useDraftAutoSave: vi.fn(() => ({ draftSaveStatus: 'idle' })),
 }));
 
 vi.mock('../hooks/useLayout', () => ({
@@ -675,6 +680,19 @@ describe('Network & Password Features', () => {
         });
 
         expect(screen.getByText('common.status.offline')).toBeInTheDocument();
+    });
+
+    it('shows the save error indicator on small screens', () => {
+        vi.mocked(useDraftAutoSave).mockReturnValue({ draftSaveStatus: 'error' });
+        useSessionStore.setState({ hasConsented: true, isCompleted: false, isPilotMode: false });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
+
+        const indicator = screen.getByRole('status', { name: 'resume.save_failed' });
+        expect(indicator).toHaveClass('flex');
+        expect(indicator).not.toHaveClass('hidden');
     });
 
     it('Shows Password Gate when requires_password is true', () => {

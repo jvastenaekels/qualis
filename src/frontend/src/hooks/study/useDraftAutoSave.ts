@@ -9,8 +9,9 @@
  *
  * Subscribes to the response store, debounces save requests by 5s, and
  * persists the latest snapshot to `/api/study/{slug}/save-draft`.
- * Flushes the queued save on `beforeunload` (via `keepalive` fetch) and
- * on unmount (via the regular `customInstance`).
+ * Flushes the queued save on `beforeunload` / `pagehide` (via `keepalive` fetch) and
+ * on unmount (via the regular `customInstance`). A failed save is resent
+ * when the browser fires `online`.
  *
  * The hook returns `draftSaveStatus` so the layout chrome can render a
  * subtle 'saving' / 'saved' / 'error' indicator next to the resume code.
@@ -35,6 +36,7 @@ export function useDraftAutoSave(slug: string | undefined): {
     const draftSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [draftSaveStatus, setDraftSaveStatus] = useState<DraftSaveStatus>('idle');
     const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingRef = useRef(false);
 
     /** Returns the session token when draft-saving is allowed, or null to skip. */
     const getDraftSaveToken = useCallback(() => {
@@ -51,41 +53,40 @@ export function useDraftAutoSave(slug: string | undefined): {
     }, [slug]);
 
     useEffect(() => {
+        const sendDraft = () => {
+            const freshToken = getDraftSaveToken();
+            if (!freshToken) return;
+            const { presort, rough, qsort, postsort } = useResponseStore.getState();
+            setDraftSaveStatus('saving');
+            customInstance({
+                url: `/api/study/${slug}/save-draft`,
+                method: 'PUT',
+                data: {
+                    session_token: freshToken,
+                    draft_responses: { presort, rough, qsort, postsort },
+                },
+            })
+                .then(() => {
+                    pendingRef.current = false;
+                    setDraftSaveStatus('saved');
+                    if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+                    saveStatusTimerRef.current = setTimeout(() => setDraftSaveStatus('idle'), 3000);
+                })
+                .catch(() => {
+                    // The indicator returns to idle after 5s; the flag remembers the owed save.
+                    pendingRef.current = true;
+                    setDraftSaveStatus('error');
+                    if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+                    saveStatusTimerRef.current = setTimeout(() => setDraftSaveStatus('idle'), 5000);
+                });
+        };
+
         const unsub = useResponseStore.subscribe(() => {
             const token = getDraftSaveToken();
             if (!token) return;
 
             if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
-            draftSaveTimerRef.current = setTimeout(() => {
-                const freshToken = getDraftSaveToken();
-                if (!freshToken) return;
-                const { presort, rough, qsort, postsort } = useResponseStore.getState();
-                setDraftSaveStatus('saving');
-                customInstance({
-                    url: `/api/study/${slug}/save-draft`,
-                    method: 'PUT',
-                    data: {
-                        session_token: freshToken,
-                        draft_responses: { presort, rough, qsort, postsort },
-                    },
-                })
-                    .then(() => {
-                        setDraftSaveStatus('saved');
-                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-                        saveStatusTimerRef.current = setTimeout(
-                            () => setDraftSaveStatus('idle'),
-                            3000
-                        );
-                    })
-                    .catch(() => {
-                        setDraftSaveStatus('error');
-                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-                        saveStatusTimerRef.current = setTimeout(
-                            () => setDraftSaveStatus('idle'),
-                            5000
-                        );
-                    });
-            }, 5000);
+            draftSaveTimerRef.current = setTimeout(sendDraft, 5000);
         });
 
         const buildDraftPayload = () => {
@@ -112,11 +113,21 @@ export function useDraftAutoSave(slug: string | undefined): {
                 keepalive: true,
             }).catch(() => {});
         };
+        const handleOnline = () => {
+            if (!pendingRef.current) return;
+            if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
+            sendDraft();
+        };
         window.addEventListener('beforeunload', handleBeforeUnload);
+        // Safari mobile often skips beforeunload; pagehide is the reliable signal.
+        window.addEventListener('pagehide', handleBeforeUnload);
+        window.addEventListener('online', handleOnline);
 
         return () => {
             unsub();
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('pagehide', handleBeforeUnload);
+            window.removeEventListener('online', handleOnline);
             if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
             // Flush (not discard) any pending draft save on unmount.
             if (draftSaveTimerRef.current) {
