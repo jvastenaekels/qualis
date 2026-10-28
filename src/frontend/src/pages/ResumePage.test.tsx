@@ -137,6 +137,9 @@ describe('ResumePage', () => {
         await waitFor(() => {
             expect(mocks.resetResponses).toHaveBeenCalledTimes(1);
         });
+        // A token already on this device must not reach the confirmation screen.
+        expect(mocks.setToken).toHaveBeenCalledWith(null);
+        expect(mocks.setResumeCode).toHaveBeenCalledWith(null);
         // Answers are wiped before the session is marked completed.
         expect(mocks.resetResponses.mock.invocationCallOrder[0]).toBeLessThan(
             mocks.completeSession.mock.invocationCallOrder[0]

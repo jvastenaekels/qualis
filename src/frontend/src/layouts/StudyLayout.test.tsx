@@ -354,6 +354,28 @@ describe('Layout Route Protection', () => {
         );
     });
 
+    it('settles on post-sort after a reload of a completed session (no redirect loop)', () => {
+        // Exactly what persist restores for a completed session.
+        useSessionStore.setState({
+            hasConsented: true,
+            isCompleted: true,
+            studySlug: 'test',
+            token: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<div>Confirmation Content</div>} />
+                    <Route path="welcome" element={<div>Welcome Page</div>} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/test/post-sort'] }
+        );
+
+        expect(screen.getByText('Confirmation Content')).toBeInTheDocument();
+    });
+
     it('Redirects to Post-Sort if study is completed', () => {
         useSessionStore.setState({ isCompleted: true, hasConsented: true, studySlug: 'test' });
 

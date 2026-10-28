@@ -178,6 +178,9 @@ function handleAlreadyCompleted(slug: string, navigate: NavigateFunction): void 
     const state = useSessionStore.getState();
     state.setStudySlug(slug);
     state.setConsent(true);
+    // Never hand a previous participant's token to the confirmation screen's erase button.
+    state.setToken(null);
+    state.setResumeCode(null);
     // Drop answers left on this device by an earlier session of the same browser.
     useResponseStore.getState().resetResponses();
     state.completeSession('');

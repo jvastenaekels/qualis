@@ -66,6 +66,7 @@ describe('useSessionStore', () => {
             isCompleted: true,
             confirmationCode: 'ABC',
             language: null,
+            hasConsented: true,
         });
         // In memory the token lives on until reload (the erase button needs it).
         expect(useSessionStore.getState().token).toBe('t');

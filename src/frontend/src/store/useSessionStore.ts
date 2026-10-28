@@ -27,13 +27,13 @@ interface SessionState {
     // In memory only: the accepted study access password, sent with the consent.
     studyPassword: string | null;
 
-    setToken: (token: string) => void;
+    setToken: (token: string | null) => void;
     setStudySlug: (slug: string) => void;
     setConsent: (hasConsented: boolean) => void;
     setStep: (step: number) => void;
     setLanguage: (lang: string) => void;
     completeSession: (code: string) => void;
-    setResumeCode: (code: string) => void;
+    setResumeCode: (code: string | null) => void;
     setSaving: (isSaving: boolean) => void;
     setSubmitting: (isSubmitting: boolean) => void;
     setPilotMode: (isPilot: boolean) => void;
@@ -103,11 +103,13 @@ export const useSessionStore = create<SessionState>()(
             storage: safeLocalStorage,
             partialize: (state) => {
                 // A finished session keeps only what the one-time-submission guard and the
-                // confirmation screen need: on a shared device the next participant must not
+                // confirmation screen need (hasConsented too: without it the consent guard and the
+                // one-time-submission guard redirect to each other forever): on a shared device the next participant must not
                 // inherit the previous one's token or resume code.
                 if (state.isCompleted) {
-                    const { studySlug, isCompleted, confirmationCode, language } = state;
-                    return { studySlug, isCompleted, confirmationCode, language };
+                    const { studySlug, isCompleted, confirmationCode, language, hasConsented } =
+                        state;
+                    return { studySlug, isCompleted, confirmationCode, language, hasConsented };
                 }
                 // Exclude transient flags and the study password from persistence
                 const {
