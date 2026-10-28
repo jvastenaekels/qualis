@@ -6,7 +6,6 @@
 
 from collections.abc import AsyncGenerator
 from typing import Any, cast
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
@@ -14,24 +13,6 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
 SQLALCHEMY_DATABASE_URL = cast(str, settings.DATABASE_URL)
-
-# Fix for SQLAlchemy + asyncpg: "postgres://" or "postgresql://" -> "postgresql+asyncpg://"
-if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
-    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace(
-        "postgres://", "postgresql+asyncpg://", 1
-    )
-elif SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgresql://"):
-    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace(
-        "postgresql://", "postgresql+asyncpg://", 1
-    )
-
-# asyncpg doesn't support the 'sslmode' query parameter.
-# We strip it if present to avoid TypeError.
-if "sslmode=" in SQLALCHEMY_DATABASE_URL:
-    u = urlparse(SQLALCHEMY_DATABASE_URL)
-    q = parse_qs(u.query)
-    q.pop("sslmode", None)
-    SQLALCHEMY_DATABASE_URL = urlunparse(u._replace(query=urlencode(q, doseq=True)))
 
 # Pool sizing. Production stays conservative to fit sandbox DB plans (~5-10
 # connection slots); local/Docker runs target a self-hosted Postgres (100 slots

@@ -356,10 +356,9 @@ has_empty_factor
 preview_range
 
 # --- auth-email-flows (verification, password reset, 2FA disable) ---
-# FastAPI route endpoints registered via @router.post; slowapi key_func referenced
-# from decorator kwargs; TypedDict keys consumed at the JWT wire boundary; service
-# helpers consumed by the cleanup-cron / future call sites vulture cannot follow.
-email_hash_key_func
+# FastAPI route endpoints registered via @router.post; TypedDict keys consumed at the
+# JWT wire boundary; service helpers consumed by the cleanup-cron / future call sites
+# vulture cannot follow.
 verify_email
 resend_verification
 password_reset_request
