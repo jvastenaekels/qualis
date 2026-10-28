@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.8.1](https://github.com/jvastenaekels/qualis/compare/v0.8.0...v0.8.1) (2026-10-28)
+
+
+### Bug fixes
+
+* accept PostgreSQL deployment URLs and isolate parallel tests ([8573667](https://github.com/jvastenaekels/qualis/commit/85736673c487fd168fe9f4950d7243593ff687c4))
+* **auth:** make invitations single-use and refuse typed tokens as access tokens ([86912a3](https://github.com/jvastenaekels/qualis/commit/86912a3535a0d1b5b4fefe12688c6d314d54edce))
+* **ci:** update audited dependencies and build MinIO from source ([9fd553a](https://github.com/jvastenaekels/qualis/commit/9fd553a427cbdde7cc4eec445377a78b01a0e0e6))
+* **config:** refuse to start production with the published SECRET_KEY ([c186b35](https://github.com/jvastenaekels/qualis/commit/c186b35c68a304d814e284f042fb2ba5b79616e9))
+* **docker:** raise nginx body limit so audio answers over 1 MB reach the backend ([79ae3a3](https://github.com/jvastenaekels/qualis/commit/79ae3a327b570d3f87aa0a7118d85a4a98e2c147))
+* **logs:** redact resume codes carried in URL paths and frontend error context ([c1f5cbb](https://github.com/jvastenaekels/qualis/commit/c1f5cbb0a9ddf5e4e452ef48b10f5ebad36d70fa))
+* **participant:** a failed background ping no longer shows "Submission failed" ([362f8bf](https://github.com/jvastenaekels/qualis/commit/362f8bf9847e694c13bae849ba5ffe2c52253110))
+* **participant:** check the study password for any session that has not consented yet ([50abf49](https://github.com/jvastenaekels/qualis/commit/50abf49aec8e2027725a4cf88c0abefbe56b4a58))
+* **participant:** drop the link token after consent, keep legacy answers on scrub, readable restart link ([12f520a](https://github.com/jvastenaekels/qualis/commit/12f520a0ea13fb7969511289069fed0061eb9947))
+* **participant:** keep each study's local answers under its own storage key ([9c25bf1](https://github.com/jvastenaekels/qualis/commit/9c25bf1f34884ea9492141358161f17eecb5a256))
+* **participant:** keep hasConsented for a finished session and drop stale tokens on 410 ([fd38cb3](https://github.com/jvastenaekels/qualis/commit/fd38cb3aa57cdd6d195ba40b3e934202624a27c4))
+* **participant:** require the study password at consent, the step that creates the participant ([f5c4819](https://github.com/jvastenaekels/qualis/commit/f5c4819227fbd436513db5a314dfda2742a8400c))
+* **participant:** resend the draft after reconnecting and flush it on pagehide ([a2ea67a](https://github.com/jvastenaekels/qualis/commit/a2ea67a1046d61f097d2987cd201801463e9b07b))
+* **participant:** scrub adopted bare storage entries after the first scoped write ([b65d9da](https://github.com/jvastenaekels/qualis/commit/b65d9da38e29e9b8d5d5e95c0184e9db7d97c45f))
+* **participant:** stop persisting a finished session's token on shared devices ([957f15c](https://github.com/jvastenaekels/qualis/commit/957f15c7d6994d260889f5ce2df5ea5c663da831))
+* **recruitment:** count link usage and attribution at consent, where the participant row is created ([94ace13](https://github.com/jvastenaekels/qualis/commit/94ace13c42a6e0f5c9f38ec04f585a29aa93d14c))
+* **recruitment:** count the link when a started session consents, and ignore a client-supplied attribution ([123f0ad](https://github.com/jvastenaekels/qualis/commit/123f0adbeea70c0e6217a78c395d5a6d98758412))
+* **recruitment:** keep the link token when continuing from welcome to consent ([de44630](https://github.com/jvastenaekels/qualis/commit/de44630a6cf96d6f71d7fbea6de093f0d801b8bf))
+* **security:** key rate limits and participant IP hashes on the proxy-added client IP ([51f58a6](https://github.com/jvastenaekels/qualis/commit/51f58a6642c19aef1feb963048f4d520d5bb1550))
+
+
+### Performance
+
+* **auth:** run bcrypt in a worker thread so one password check no longer stalls every request ([e634a97](https://github.com/jvastenaekels/qualis/commit/e634a97b00f11d2d4e94521375bb560937338a49))
+* **participant:** stop loading every participant row on each participant request ([571708f](https://github.com/jvastenaekels/qualis/commit/571708f8ed731f1a96ee65eca042dfc1385ddf49))
+
+
+### Refactor
+
+* **services:** call the real services instead of eight untyped StudyService relays ([f6ac8e9](https://github.com/jvastenaekels/qualis/commit/f6ac8e938f9f82dfea2fb014a84552862bbdb069))
+
+
+### Documentation
+
+* plan the fixes from the 2026-10-27 audit ([8cdec3e](https://github.com/jvastenaekels/qualis/commit/8cdec3e60f7fe04735ab978bb65835272cdec5ba))
+* record the v0.8.0 Zenodo DOI ([#394](https://github.com/jvastenaekels/qualis/issues/394)) ([bd362fa](https://github.com/jvastenaekels/qualis/commit/bd362fab35b6c5c21708d5209d9e1c93dc3b1ebf))
+
 ## [0.8.0](https://github.com/jvastenaekels/qualis/compare/v0.7.6...v0.8.0) (2026-09-19)
 
 
