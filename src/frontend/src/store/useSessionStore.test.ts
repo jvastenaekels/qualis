@@ -1,9 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useSessionStore } from './useSessionStore';
 
 describe('useSessionStore', () => {
     beforeEach(() => {
         useSessionStore.getState().resetSession();
+    });
+
+    afterEach(() => {
+        window.history.pushState({}, '', '/');
     });
 
     it('initializes with default values', () => {
@@ -52,6 +56,7 @@ describe('useSessionStore', () => {
     });
 
     it('does not persist the session token once the session is completed', () => {
+        window.history.pushState({}, '', '/study/demo/thanks');
         const store = useSessionStore.getState();
         store.setStudySlug('demo');
         store.setToken('t');
@@ -60,7 +65,7 @@ describe('useSessionStore', () => {
         store.setStep(4);
         store.completeSession('ABC');
 
-        const persisted = JSON.parse(localStorage.getItem('qualis-session') ?? '{}').state;
+        const persisted = JSON.parse(localStorage.getItem('qualis-session:demo') ?? '{}').state;
         expect(persisted).toEqual({
             studySlug: 'demo',
             isCompleted: true,
@@ -73,11 +78,12 @@ describe('useSessionStore', () => {
     });
 
     it('keeps persisting the token and excluding the study password during a live session', () => {
+        window.history.pushState({}, '', '/study/demo/presort');
         const store = useSessionStore.getState();
         store.setToken('t');
         store.setStudyPassword('secret');
 
-        const persisted = JSON.parse(localStorage.getItem('qualis-session') ?? '{}').state;
+        const persisted = JSON.parse(localStorage.getItem('qualis-session:demo') ?? '{}').state;
         expect(persisted.token).toBe('t');
         expect(persisted).not.toHaveProperty('studyPassword');
     });

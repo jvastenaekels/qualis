@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { isPilot } from '../utils/pilotMode';
 import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
-import { safeLocalStorage } from './safeStorage';
+import { studyScopedLocalStorage } from './safeStorage';
 
 interface AudioRecordingMetadata {
     id: number;
@@ -317,7 +317,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
         {
             name: isPilot() ? 'qualis-pilot-responses' : 'qualis-responses',
             version: 2,
-            storage: safeLocalStorage,
+            storage: studyScopedLocalStorage,
             migrate: (persisted: unknown, version: number) => {
                 // v1 → v2: deck slice added; structurally compatible because
                 // `deck` defaults to [] via the `...initialResponses` spread on

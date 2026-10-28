@@ -9,7 +9,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { resetBaseLocales } from '../utils/i18nOverrides';
 import { clearPilotFlag, isPilot } from '../utils/pilotMode';
-import { safeLocalStorage } from './safeStorage';
+import { studyScopedLocalStorage } from './safeStorage';
 
 interface SessionState {
     token: string | null;
@@ -100,7 +100,7 @@ export const useSessionStore = create<SessionState>()(
         {
             name: isPilot() ? 'qualis-pilot-session' : 'qualis-session',
             version: 2,
-            storage: safeLocalStorage,
+            storage: studyScopedLocalStorage,
             partialize: (state) => {
                 // A finished session keeps only what the one-time-submission guard and the
                 // confirmation screen need (hasConsented too: without it the consent guard and the

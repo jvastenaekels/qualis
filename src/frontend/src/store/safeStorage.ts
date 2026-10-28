@@ -1,4 +1,4 @@
-import { createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage, type StateStorage } from 'zustand/middleware';
 
 /**
  * Creates a Storage wrapper that catches errors from localStorage/sessionStorage.
@@ -53,3 +53,40 @@ export const safeBrowserSessionStorage = createSafeStorage(() => sessionStorage)
 export const safeLocalStorage = createJSONStorage(() => safeBrowserLocalStorage);
 
 export const safeSessionStorage = createJSONStorage(() => safeBrowserSessionStorage);
+
+const currentStudySlug = (): string | null =>
+    /^\/study\/([^/]+)/.exec(window.location.pathname)?.[1] ?? null;
+
+const scopedKey = (name: string, slug: string | null): string => (slug ? `${name}:${slug}` : name);
+
+function storedStudySlug(raw: string | null): unknown {
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw)?.state?.studySlug ?? null;
+    } catch {
+        return null;
+    }
+}
+
+// One key per study, so two tabs on two studies do not overwrite each other. Outside a
+// /study/:slug route the key stays the bare name.
+const studyScopedStateStorage: StateStorage = {
+    getItem(name) {
+        const slug = currentStudySlug();
+        const scoped = safeBrowserLocalStorage.getItem(scopedKey(name, slug));
+        if (scoped !== null || !slug) return scoped;
+        // Migration fallback: a pre-scoping entry belongs to this study only if it says so. The
+        // responses entry carries no studySlug; it was always written with the session entry
+        // (qualis[-pilot]-session), which does.
+        const legacy = safeBrowserLocalStorage.getItem(name);
+        const owner =
+            storedStudySlug(legacy) ??
+            storedStudySlug(safeBrowserLocalStorage.getItem(name.replace(/responses$/, 'session')));
+        return owner === slug ? legacy : null;
+    },
+    setItem: (name, value) =>
+        safeBrowserLocalStorage.setItem(scopedKey(name, currentStudySlug()), value),
+    removeItem: (name) => safeBrowserLocalStorage.removeItem(scopedKey(name, currentStudySlug())),
+};
+
+export const studyScopedLocalStorage = createJSONStorage(() => studyScopedStateStorage);
