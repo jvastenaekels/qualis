@@ -14269,7 +14269,7 @@ export const useUnresolveCommentApiAdminMemoCommentsCidUnresolvePost = <
 /**
  * Submits or updates a study participation.
  *
- * Logic moved to StudyService for maintainability.
+ * Logic lives in SubmissionService for maintainability.
  * @summary Submit Study
  */
 export const submitStudyApiSubmitPost = (

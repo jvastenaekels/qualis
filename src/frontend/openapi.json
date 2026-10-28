@@ -6214,7 +6214,7 @@
           "submissions"
         ],
         "summary": "Submit Study",
-        "description": "Submits or updates a study participation.\n\nLogic moved to StudyService for maintainability.",
+        "description": "Submits or updates a study participation.\n\nLogic lives in SubmissionService for maintainability.",
         "operationId": "submit_study_api_submit_post",
         "requestBody": {
           "content": {
@@ -12726,7 +12726,7 @@
           "id"
         ],
         "title": "SubmissionResultResponse",
-        "description": "Result of a participant Q-sort submission (POST /api/submit).\n\nReturned by the submit endpoint after StudyService.process_submission\ncompletes. `already_submitted` is only present when re-submitting a\ncompleted participation. `extra='allow'` covers any future additions."
+        "description": "Result of a participant Q-sort submission (POST /api/submit).\n\nReturned by the submit endpoint after SubmissionService.process_submission\ncompletes. `already_submitted` is only present when re-submitting a\ncompleted participation. `extra='allow'` covers any future additions."
       },
       "TOTPEnableResponse": {
         "properties": {
