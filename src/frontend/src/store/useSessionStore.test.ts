@@ -51,6 +51,36 @@ describe('useSessionStore', () => {
         expect(useSessionStore.getState().studySlug).toBe('my-study');
     });
 
+    it('does not persist the session token once the session is completed', () => {
+        const store = useSessionStore.getState();
+        store.setStudySlug('demo');
+        store.setToken('t');
+        store.setResumeCode('RES');
+        store.setConsent(true);
+        store.setStep(4);
+        store.completeSession('ABC');
+
+        const persisted = JSON.parse(localStorage.getItem('qualis-session') ?? '{}').state;
+        expect(persisted).toEqual({
+            studySlug: 'demo',
+            isCompleted: true,
+            confirmationCode: 'ABC',
+            language: null,
+        });
+        // In memory the token lives on until reload (the erase button needs it).
+        expect(useSessionStore.getState().token).toBe('t');
+    });
+
+    it('keeps persisting the token and excluding the study password during a live session', () => {
+        const store = useSessionStore.getState();
+        store.setToken('t');
+        store.setStudyPassword('secret');
+
+        const persisted = JSON.parse(localStorage.getItem('qualis-session') ?? '{}').state;
+        expect(persisted.token).toBe('t');
+        expect(persisted).not.toHaveProperty('studyPassword');
+    });
+
     it('completes session', () => {
         useSessionStore.getState().completeSession('code-123');
         const state = useSessionStore.getState();

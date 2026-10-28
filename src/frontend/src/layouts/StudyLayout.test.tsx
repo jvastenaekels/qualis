@@ -338,6 +338,22 @@ describe('Layout Route Protection', () => {
         // Wait, steps are rendered in header.
     });
 
+    it('shows the restart link during an unfinished session', () => {
+        useSessionStore.setState({ hasConsented: true, isCompleted: false });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/presort'] }
+        );
+
+        expect(screen.getByRole('link', { name: 'welcome.restart' })).toHaveAttribute(
+            'href',
+            '/study/test/reset'
+        );
+    });
+
     it('Redirects to Post-Sort if study is completed', () => {
         useSessionStore.setState({ isCompleted: true, hasConsented: true, studySlug: 'test' });
 

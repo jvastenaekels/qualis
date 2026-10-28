@@ -263,6 +263,27 @@ describe('PostSortPage', () => {
         expect(screen.getByText('Copy link')).toBeInTheDocument();
     });
 
+    it('offers a new session link on the confirmation screen', async () => {
+        const { useSubmitStudy } = await import('../hooks/useSubmitStudy');
+        vi.mocked(useSubmitStudy).mockReturnValue({
+            submit: vi.fn(),
+            isLoading: false,
+            isSuccess: true,
+            error: null,
+            confirmationCode: 'ABC12345',
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        const link = await screen.findByRole('link', { name: /start a new session/i });
+        expect(link).toHaveAttribute('href', '/study/demo/reset');
+    });
+
     describe('Step 1 label accessible names (Task 6.7b)', () => {
         beforeEach(async () => {
             // A prior test in this file (`Shows share links…`) permanently

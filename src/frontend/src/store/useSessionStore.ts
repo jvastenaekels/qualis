@@ -102,6 +102,13 @@ export const useSessionStore = create<SessionState>()(
             version: 2,
             storage: safeLocalStorage,
             partialize: (state) => {
+                // A finished session keeps only what the one-time-submission guard and the
+                // confirmation screen need: on a shared device the next participant must not
+                // inherit the previous one's token or resume code.
+                if (state.isCompleted) {
+                    const { studySlug, isCompleted, confirmationCode, language } = state;
+                    return { studySlug, isCompleted, confirmationCode, language };
+                }
                 // Exclude transient flags and the study password from persistence
                 const {
                     isSubmitting: _isSubmitting,

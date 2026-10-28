@@ -178,6 +178,8 @@ function handleAlreadyCompleted(slug: string, navigate: NavigateFunction): void 
     const state = useSessionStore.getState();
     state.setStudySlug(slug);
     state.setConsent(true);
+    // Drop answers left on this device by an earlier session of the same browser.
+    useResponseStore.getState().resetResponses();
     state.completeSession('');
     navigate(`/study/${slug}/post-sort`, { replace: true });
 }

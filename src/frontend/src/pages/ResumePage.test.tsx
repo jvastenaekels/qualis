@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
     setResumeCode: vi.fn(),
     completeSession: vi.fn(),
     setState: vi.fn(),
+    resetResponses: vi.fn(),
     toastSuccess: vi.fn(),
 }));
 
@@ -77,7 +78,7 @@ vi.mock('../store/useResponseStore', () => ({
         postsort: {},
     },
     useResponseStore: {
-        getState: () => ({}),
+        getState: () => ({ resetResponses: mocks.resetResponses }),
         setState: mocks.setState,
     },
 }));
@@ -127,6 +128,19 @@ describe('ResumePage', () => {
                 replace: true,
             });
         });
+    });
+
+    it('clears local answers when the resume code belongs to a completed session', async () => {
+        mocks.customInstance.mockRejectedValue({ status: 410 });
+        renderResumePage();
+
+        await waitFor(() => {
+            expect(mocks.resetResponses).toHaveBeenCalledTimes(1);
+        });
+        // Answers are wiped before the session is marked completed.
+        expect(mocks.resetResponses.mock.invocationCallOrder[0]).toBeLessThan(
+            mocks.completeSession.mock.invocationCallOrder[0]
+        );
     });
 
     it('shows study_closed error on 403', async () => {

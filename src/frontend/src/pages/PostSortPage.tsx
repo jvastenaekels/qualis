@@ -7,7 +7,7 @@
 import { AlertTriangle, Check, Loader2 } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
 import { useConfigStore } from '../store/useConfigStore';
@@ -129,6 +129,14 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     slug={slug || ''}
                     sessionToken={useSessionStore.getState().token}
                 />
+                <div className="mt-6">
+                    <Link
+                        to={`/study/${slug}/reset`}
+                        className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                    >
+                        {t('welcome.restart', 'Start a new session')}
+                    </Link>
+                </div>
             </div>
         );
     }

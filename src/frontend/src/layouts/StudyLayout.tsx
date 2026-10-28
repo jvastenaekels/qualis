@@ -29,6 +29,7 @@ import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
+    Link,
     Navigate,
     Outlet,
     useLocation,
@@ -859,6 +860,19 @@ const StudyLayoutContent: React.FC = () => {
                                 )}
                             </div>
                         )}
+
+                    {/* Shared devices: a way out of this session that clears the local one */}
+                    {hasConsented && !isCompleted && (
+                        <Link
+                            to={`/study/${slug}/reset`}
+                            onClick={(e) => {
+                                if (!window.confirm(t('welcome.reset_confirm'))) e.preventDefault();
+                            }}
+                            className="hidden sm:inline text-xs text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                        >
+                            {t('welcome.restart', 'Start a new session')}
+                        </Link>
+                    )}
 
                     <HelpOverlay />
 
