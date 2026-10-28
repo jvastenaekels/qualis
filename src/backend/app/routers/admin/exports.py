@@ -26,6 +26,7 @@ from ...models import (
 from ...schemas.responses import ParticipantExportResponse, StudyDumpResponse
 from ...services.export_service import ExportService
 from ...services.storage_service import get_storage_service
+from ...services.study_data_service import StudyDataService
 
 logger = logging.getLogger(__name__)
 
@@ -167,9 +168,7 @@ async def get_study_dump(
     db: AsyncSession = Depends(get_db),
 ) -> StudyDumpResponse:
     """Get complete study data and participant placements for client-side export generation."""
-    from ...services.study_service import StudyService
-
-    dump = await StudyService.get_study_full_dump(db, study.id)
+    dump = await StudyDataService.get_study_full_dump(db, study.id)
     return StudyDumpResponse.model_validate(dump)
 
 
@@ -253,8 +252,6 @@ async def export_participant_json(
     ``/dump`` endpoint still surfaces them as anonymous research
     entries with PII zeroed.
     """
-    from ...services.study_service import StudyService
-
     # Confirm the participant exists, belongs to this study, and is not
     # anonymised — same scope rule as the per-participant CSV endpoint.
     scope_res = await db.execute(
@@ -269,7 +266,7 @@ async def export_participant_json(
 
     # Use the existing full dump logic but we'll filter it for the single participant
     # This ensures consistency with the data format researchers expect from the full dump.
-    full_dump = await StudyService.get_study_full_dump(db, study.id)
+    full_dump = await StudyDataService.get_study_full_dump(db, study.id)
 
     # Filter participants
     participant = next(
@@ -421,9 +418,9 @@ async def get_research_package(
     # already-loaded ORM graph (full_study) so the dump is built in memory
     # instead of re-fetching every participant + Q-sort + audio row a second
     # time.
-    from ...services.study_service import StudyService
-
-    full_dump = await StudyService.get_study_full_dump(db, study.id, study=full_study)
+    full_dump = await StudyDataService.get_study_full_dump(
+        db, study.id, study=full_study
+    )
 
     # Fetch memo and render markdown for inclusion in the package
     from ...models import MemoParentType, User

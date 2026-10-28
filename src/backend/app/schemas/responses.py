@@ -100,7 +100,7 @@ class ParticipantExportResponse(BaseModel):
 class SubmissionResultResponse(BaseModel):
     """Result of a participant Q-sort submission (POST /api/submit).
 
-    Returned by the submit endpoint after StudyService.process_submission
+    Returned by the submit endpoint after SubmissionService.process_submission
     completes. `already_submitted` is only present when re-submitting a
     completed participation. `extra='allow'` covers any future additions.
     """

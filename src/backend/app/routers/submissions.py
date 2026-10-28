@@ -16,6 +16,7 @@ from app.schemas.responses import (
     SubmissionResultResponse,
 )
 from app.services.study_service import StudyService
+from app.services.submission_service import SubmissionService
 from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password_async
 
@@ -34,14 +35,16 @@ async def submit_study(
 ) -> SubmissionResultResponse:
     """Submits or updates a study participation.
 
-    Logic moved to StudyService for maintainability.
+    Logic lives in SubmissionService for maintainability.
     """
     client_ip = _get_real_ip(request)
 
     user_agent = request.headers.get("user-agent")
 
     try:
-        result = await StudyService.process_submission(db, data, client_ip, user_agent)
+        result = await SubmissionService.process_submission(
+            db, data, client_ip, user_agent
+        )
         await db.commit()
         return SubmissionResultResponse(
             status="success",

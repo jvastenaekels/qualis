@@ -25,7 +25,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.models import User
-from app.services.study_service import StudyService
+from app.services.submission_service import SubmissionService
 
 
 def _minimal_valid_config() -> dict:
@@ -61,7 +61,7 @@ async def test_submit_500_does_not_leak_exception_text(
     async def _boom(*_args, **_kwargs):
         raise RuntimeError(secret)
 
-    monkeypatch.setattr(StudyService, "process_submission", _boom)
+    monkeypatch.setattr(SubmissionService, "process_submission", _boom)
 
     resp = await client.post(
         "/api/submit",

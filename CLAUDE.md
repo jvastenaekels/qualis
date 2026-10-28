@@ -99,7 +99,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.projects` — wave 4 batch 3: PaginatedResponse[ProjectWithRole|ProjectMemberRead] casts
 - `app.routers.admin.studies_import_export` — wave 4 batch 3: ValidationResult/StudyImportResponse + JSONResponse for export
 - `app.services.submission_service` — services round batch 1: 3 dict[str, Any] payloads at JSON boundary
-- `app.services.study_service` — services round batch 2: backward-compat *args/**kwargs proxy methods kept as Any → Any (record_consent's last production caller now calls SubmissionService directly) (deliberate; narrowing requires duplicating each proxy with the underlying signature)
+- `app.services.study_service` — services round batch 2: study config/translations/validation only; submission and data-export calls go straight to SubmissionService / StudyDataService (the eight `*args/**kwargs` relays were removed)
 - `app.routers.admin.memos` — phase 5 memo subsystem
 - `app.schemas.memos` — phase 5 memo subsystem (Pydantic BaseModel)
 - `app.services.email_token_consume_service` — v0.6.0 auth email flows: single-use JTI denylist (no Any at ORM boundary)

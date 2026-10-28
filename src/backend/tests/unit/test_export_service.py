@@ -195,10 +195,10 @@ class TestKenQStructure:
         When: Calling get_study_full_dump()
         Then: Result contains all required keys for KenQ/analysis
         """
-        from app.services.study_service import StudyService
+        from app.services.study_data_service import StudyDataService
 
         # Act
-        result = await StudyService.get_study_full_dump(db, seed_study.id)
+        result = await StudyDataService.get_study_full_dump(db, seed_study.id)
 
         # Assert: Required keys
         assert "study" in result

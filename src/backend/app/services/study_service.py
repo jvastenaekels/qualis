@@ -7,9 +7,6 @@
 Submission and data-export logic live in dedicated services:
 - ``submission_service.SubmissionService``
 - ``study_data_service.StudyDataService``
-
-For backward compatibility, ``StudyService`` delegates to those services so
-that existing ``StudyService.process_submission(...)`` calls keep working.
 """
 
 import hashlib
@@ -838,58 +835,3 @@ class StudyService:
         errors.extend(StudyService._check_questions(study, study_langs))
         errors.extend(StudyService._check_statement_translations(study, study_langs))
         return errors
-
-    # ------------------------------------------------------------------
-    # Backward-compatible delegates
-    # ------------------------------------------------------------------
-    # These static methods forward to the new dedicated services so that
-    # existing callers (``StudyService.process_submission(…)``, etc.)
-    # continue to work without changes.
-
-    @staticmethod
-    async def record_consent(*args: Any, **kwargs: Any) -> Any:
-        from .submission_service import SubmissionService
-
-        return await SubmissionService.record_consent(*args, **kwargs)
-
-    @staticmethod
-    def validate_distribution(*args: Any, **kwargs: Any) -> Any:
-        from .submission_service import SubmissionService
-
-        return SubmissionService.validate_distribution(*args, **kwargs)
-
-    @staticmethod
-    async def process_submission(*args: Any, **kwargs: Any) -> Any:
-        from .submission_service import SubmissionService
-
-        return await SubmissionService.process_submission(*args, **kwargs)
-
-    @staticmethod
-    async def delete_audio_files_for_study(*args: Any, **kwargs: Any) -> Any:
-        from .study_data_service import StudyDataService
-
-        return await StudyDataService.delete_audio_files_for_study(*args, **kwargs)
-
-    @staticmethod
-    async def reset_study_participants(*args: Any, **kwargs: Any) -> Any:
-        from .study_data_service import StudyDataService
-
-        return await StudyDataService.reset_study_participants(*args, **kwargs)
-
-    @staticmethod
-    async def get_study_stats(*args: Any, **kwargs: Any) -> Any:
-        from .study_data_service import StudyDataService
-
-        return await StudyDataService.get_study_stats(*args, **kwargs)
-
-    @staticmethod
-    async def get_study_full_dump(*args: Any, **kwargs: Any) -> Any:
-        from .study_data_service import StudyDataService
-
-        return await StudyDataService.get_study_full_dump(*args, **kwargs)
-
-    @staticmethod
-    async def get_study_sort_data(*args: Any, **kwargs: Any) -> Any:
-        from .study_data_service import StudyDataService
-
-        return await StudyDataService.get_study_sort_data(*args, **kwargs)

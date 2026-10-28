@@ -10,7 +10,8 @@ from sqlalchemy.orm import selectinload
 from app.exceptions import ValidationError
 from app.models import DistributionMode, Participant, ParticipantStatus
 from app.schemas import QSortEntryInput, SubmissionInput
-from app.services.study_service import StudyService
+from app.services.study_data_service import StudyDataService
+from app.services.submission_service import SubmissionService
 
 
 @pytest.mark.asyncio
@@ -23,14 +24,14 @@ async def test_validate_distribution_valid(active_study):
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     # Should not raise
-    StudyService.validate_distribution(active_study, qsort)
+    SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
 async def test_validate_distribution_incomplete(active_study):
     qsort = [QSortEntryInput(statement_id=1, grid_score=0)]
     with pytest.raises(ValidationError, match="Submission incomplete"):
-        StudyService.validate_distribution(active_study, qsort)
+        SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -43,7 +44,7 @@ async def test_validate_distribution_wrong_counts(active_study):
         QSortEntryInput(statement_id=4, grid_score=0),
     ]
     with pytest.raises(ValidationError, match="incorrect number of cards"):
-        StudyService.validate_distribution(active_study, qsort)
+        SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -57,7 +58,7 @@ async def test_validate_distribution_invalid_score(active_study):
     # It hits the "incorrect number of cards" for column 1 first, because 4 cards are expected
     # and column 1 has 0.
     with pytest.raises(ValidationError, match="incorrect number of cards"):
-        StudyService.validate_distribution(active_study, qsort)
+        SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -73,7 +74,7 @@ async def test_process_submission_new_participant(db, active_study):
         ],
     )
 
-    result = await StudyService.process_submission(db, data, "127.0.0.1")
+    result = await SubmissionService.process_submission(db, data, "127.0.0.1")
     assert result["confirmation_code"] == str(session_token)[:8].upper()
     assert "id" in result
 
@@ -101,7 +102,7 @@ async def test_process_submission_update_existing(db, active_study):
             QSortEntryInput(statement_id=active_study.statements[0].id, grid_score=0)
         ],
     )
-    await StudyService.process_submission(db, data1, "1.1.1.1")
+    await SubmissionService.process_submission(db, data1, "1.1.1.1")
 
     # 2. Update
     data2 = SubmissionInput(
@@ -114,7 +115,7 @@ async def test_process_submission_update_existing(db, active_study):
             QSortEntryInput(statement_id=active_study.statements[1].id, grid_score=-1),
         ],
     )
-    await StudyService.process_submission(db, data2, "2.2.2.2")
+    await SubmissionService.process_submission(db, data2, "2.2.2.2")
 
     # Verify
     res = await db.execute(
@@ -151,7 +152,7 @@ async def test_process_submission_completed_early_return(db, active_study):
     )
 
     # Should return existing code, flag already_submitted, and NOT update anything
-    result = await StudyService.process_submission(db, data, "1.2.3.4")
+    result = await SubmissionService.process_submission(db, data, "1.2.3.4")
     assert result["confirmation_code"] == "OLDCODE"
     assert result["already_submitted"] is True
 
@@ -179,7 +180,7 @@ async def test_validate_distribution_forced_default_rejects_mismatched_columns(
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     with pytest.raises(ValidationError, match="incorrect number of cards"):
-        StudyService.validate_distribution(active_study, qsort)
+        SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -193,7 +194,7 @@ async def test_validate_distribution_free_accepts_lopsided(active_study):
         QSortEntryInput(statement_id=4, grid_score=0),
     ]
     # Should not raise: total cards == stmt_count, all scores valid.
-    StudyService.validate_distribution(active_study, qsort)
+    SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -214,7 +215,7 @@ async def test_submission_free_mode_accepts_overstacked_column(active_study):
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     # Should not raise: free mode treats per-column capacity as a soft hint.
-    StudyService.validate_distribution(active_study, qsort)
+    SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -229,7 +230,7 @@ async def test_validate_distribution_flexible_accepts_and_warns(active_study, ca
     ]
     with caplog.at_level(logging.WARNING, logger="app.services.submission_service"):
         # Should not raise.
-        StudyService.validate_distribution(active_study, qsort)
+        SubmissionService.validate_distribution(active_study, qsort)
     assert any(
         "Flexible mode" in r.message and "soft hint" in r.message
         for r in caplog.records
@@ -257,10 +258,10 @@ async def test_validate_distribution_invalid_score_rejected_all_modes(
         with pytest.raises(
             ValidationError, match=r"(incorrect number of cards|invalid grid scores)"
         ):
-            StudyService.validate_distribution(active_study, qsort)
+            SubmissionService.validate_distribution(active_study, qsort)
     else:
         with pytest.raises(ValidationError, match="invalid grid scores"):
-            StudyService.validate_distribution(active_study, qsort)
+            SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -275,7 +276,7 @@ async def test_validate_distribution_legacy_dict(active_study):
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     # Should not raise
-    StudyService.validate_distribution(active_study, qsort)
+    SubmissionService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
@@ -314,7 +315,7 @@ async def test_get_study_stats(db, active_study):
     db.add_all([p1, p2, p3])
     await db.commit()
 
-    stats = await StudyService.get_study_stats(db, active_study.id)
+    stats = await StudyDataService.get_study_stats(db, active_study.id)
 
     assert stats["started_count"] == 2  # p1 + p2 (p3 discarded)
     assert stats["completed_count"] == 1  # p2 only
@@ -371,7 +372,7 @@ async def test_get_study_full_dump(db, active_study):
     db.add_all(entries)
     await db.commit()
 
-    dump = await StudyService.get_study_full_dump(db, active_study.id)
+    dump = await StudyDataService.get_study_full_dump(db, active_study.id)
 
     assert dump["study"]["slug"] == active_study.slug
     assert len(dump["study"]["statements"]) == 4
@@ -415,7 +416,7 @@ async def test_get_study_full_dump_preloaded_matches_query_path(db, active_study
     await db.commit()
 
     # Query path
-    query_dump = await StudyService.get_study_full_dump(db, active_study.id)
+    query_dump = await StudyDataService.get_study_full_dump(db, active_study.id)
 
     # Pre-loaded path: same eager-load graph the research-package endpoint holds.
     stmt = (
@@ -429,7 +430,7 @@ async def test_get_study_full_dump_preloaded_matches_query_path(db, active_study
         )
     )
     full_study = (await db.execute(stmt)).scalar_one()
-    preloaded_dump = await StudyService.get_study_full_dump(
+    preloaded_dump = await StudyDataService.get_study_full_dump(
         db, active_study.id, study=full_study
     )
 
