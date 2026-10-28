@@ -5,7 +5,7 @@
  */
 
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -176,6 +176,28 @@ describe('ConsentPage', () => {
         } finally {
             window.history.pushState({}, '', '/');
         }
+    });
+
+    it('drops the link token from the URL after consent, keeping the other params', async () => {
+        // An expired link would otherwise lock out a consented participant who reloads later.
+        const SearchProbe = () => <div data-testid="next-search">{useLocation().search}</div>;
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/presort" element={<SearchProbe />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent?token=abc&lang=fr'] }
+        );
+        fireEvent.click(screen.getByRole('checkbox'));
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
+
+        const search = new URLSearchParams(
+            (await screen.findByTestId('next-search')).textContent ?? ''
+        );
+        expect(search.get('lang')).toBe('fr');
+        expect(search.has('token')).toBe(false);
     });
 
     it('sends the unlocked study password with the consent', async () => {

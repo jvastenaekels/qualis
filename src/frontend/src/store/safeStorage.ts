@@ -93,8 +93,18 @@ const studyScopedStateStorage: StateStorage = {
         const prefix = name.replace(/(session|responses)$/, '');
         const bareSession = `${prefix}session`;
         if (storedStudySlug(safeBrowserLocalStorage.getItem(bareSession)) === slug) {
+            const bareResponses = `${prefix}responses`;
+            const scopedResponses = scopedKey(bareResponses, slug);
+            const legacyResponses = safeBrowserLocalStorage.getItem(bareResponses);
+            // The session store may write first: copy the answers forward before scrubbing them.
+            if (
+                legacyResponses !== null &&
+                safeBrowserLocalStorage.getItem(scopedResponses) === null
+            ) {
+                safeBrowserLocalStorage.setItem(scopedResponses, legacyResponses);
+            }
             safeBrowserLocalStorage.removeItem(bareSession);
-            safeBrowserLocalStorage.removeItem(`${prefix}responses`);
+            safeBrowserLocalStorage.removeItem(bareResponses);
         }
     },
     removeItem: (name) => safeBrowserLocalStorage.removeItem(scopedKey(name, currentStudySlug())),

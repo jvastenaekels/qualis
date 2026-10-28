@@ -100,6 +100,18 @@ describe('studyScopedLocalStorage', () => {
         );
     });
 
+    it('carries the legacy answers forward when the session store writes first', () => {
+        localStorage.setItem('qualis-session', JSON.stringify(value({ studySlug: 'a' })));
+        localStorage.setItem('qualis-responses', JSON.stringify(value({ agree: [1] })));
+        window.history.pushState({}, '', '/study/a/fine-sort');
+        studyScopedLocalStorage?.setItem('qualis-session', value({ studySlug: 'a', token: 'u' }));
+        expect(JSON.parse(localStorage.getItem('qualis-responses:a') ?? '{}')).toEqual(
+            value({ agree: [1] })
+        );
+        expect(localStorage.getItem('qualis-session')).toBeNull();
+        expect(localStorage.getItem('qualis-responses')).toBeNull();
+    });
+
     it('leaves the bare entries of another study untouched', () => {
         localStorage.setItem('qualis-session', JSON.stringify(value({ studySlug: 'b' })));
         localStorage.setItem('qualis-responses', JSON.stringify(value({ agree: [1] })));

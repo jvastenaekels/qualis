@@ -131,8 +131,8 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 />
                 <div className="mt-6">
                     <Link
-                        to={`/study/${slug}/reset`}
-                        className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                        to={`/study/${slug}/reset${location.search}`}
+                        className="text-sm text-slate-500 hover:text-slate-700 underline decoration-slate-300 underline-offset-4 transition-colors"
                     >
                         {t('welcome.restart', 'Start a new session')}
                     </Link>

@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -46,6 +46,12 @@ describe('useStudyConfig', () => {
         // Reset Stores
         useConfigStore.getState().resetConfig();
         useSessionStore.getState().resetSession();
+    });
+
+    // The pilot-mode tests spy on URLSearchParams.get; without a restore, test mode leaks
+    // into every later test and disables the server-config path.
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it('fetches study config on mount', async () => {
@@ -291,6 +297,30 @@ describe('useStudyConfig', () => {
         await Promise.resolve();
 
         expect(useConfigStore.getState().config).toBeNull();
+    });
+
+    it('keeps the unlocked password for the consent call once the server accepts it', async () => {
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: {
+                slug: 'test-study',
+                title: 'Unlocked',
+                language: 'en',
+                presort_config: {},
+                statements: [],
+                requires_password: false,
+            },
+            isLoading: false,
+            error: null,
+            refetch: vi.fn(),
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        } as any);
+
+        const { result } = renderHook(() => useStudyConfig());
+        act(() => result.current.unlock('pw'));
+
+        await waitFor(() => {
+            expect(useSessionStore.getState().studyPassword).toBe('pw');
+        });
     });
 
     it('does NOT write a config response whose slug mismatches the URL slug', async () => {

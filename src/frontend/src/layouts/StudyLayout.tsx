@@ -864,11 +864,19 @@ const StudyLayoutContent: React.FC = () => {
                     {/* Shared devices: a way out of this session that clears the local one */}
                     {hasConsented && !isCompleted && (
                         <Link
-                            to={`/study/${slug}/reset`}
+                            to={`/study/${slug}/reset${location.search}`}
                             onClick={(e) => {
-                                if (!window.confirm(t('welcome.reset_confirm'))) e.preventDefault();
+                                if (
+                                    !window.confirm(
+                                        t(
+                                            'welcome.reset_confirm',
+                                            'Are you sure you want to start a new session? This will clear your current progress.'
+                                        )
+                                    )
+                                )
+                                    e.preventDefault();
                             }}
-                            className="hidden sm:inline text-xs text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                            className="hidden sm:inline text-xs text-slate-500 hover:text-slate-700 underline decoration-slate-300 underline-offset-4 transition-colors"
                         >
                             {t('welcome.restart', 'Start a new session')}
                         </Link>

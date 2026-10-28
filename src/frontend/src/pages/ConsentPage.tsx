@@ -121,7 +121,11 @@ const ConsentPage: React.FC = () => {
             }
 
             setStep(nextStep);
-            navigate(`/study/${slug}/${nextPath}${location.search}`);
+            // The link token has been counted; past consent an expired link would 403 a reload.
+            const params = new URLSearchParams(location.search);
+            params.delete('token');
+            const search = params.toString();
+            navigate(`/study/${slug}/${nextPath}${search ? `?${search}` : ''}`);
         }
     };
 
