@@ -11,7 +11,6 @@ import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { SurveyField } from '@/components/survey/SurveyField';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import {
@@ -202,11 +201,10 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
         trigger: triggerFormValidation,
         watch,
         formState: { errors: formErrors },
-    } = useForm({
+    } = useForm<Record<string, unknown>>({
         mode: 'onChange',
         resolver: async (data, context, options) => {
-            if (!questions) return zodResolver(z.object({}))(data, context, options);
-            const schema = buildQuestionnaireSchema(questions, data, t);
+            const schema = buildQuestionnaireSchema(questions ?? {}, data, t);
             return zodResolver(schema)(data, context, options);
         },
         defaultValues: postsort.questions_answers,

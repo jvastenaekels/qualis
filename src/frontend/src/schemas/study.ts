@@ -64,7 +64,7 @@ export const PreSortFieldSchema = z.object({
         'text_audio',
         'rating',
     ]),
-    label: z.union([z.string(), z.record(z.string())]),
+    label: z.union([z.string(), z.record(z.string(), z.string())]),
     required: z.boolean().optional(),
     options: z
         .array(
@@ -72,12 +72,12 @@ export const PreSortFieldSchema = z.object({
                 z.string(),
                 z.object({
                     value: z.string(),
-                    label: z.union([z.string(), z.record(z.string())]),
+                    label: z.union([z.string(), z.record(z.string(), z.string())]),
                 }),
             ])
         )
         .optional(),
-    placeholder: z.union([z.string(), z.record(z.string())]).optional(),
+    placeholder: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
     min: z.number().optional(),
     max: z.number().optional(),
     minLength: z.number().optional(),
@@ -86,9 +86,9 @@ export const PreSortFieldSchema = z.object({
     scale_points: z.number().int().min(2).max(10).optional(),
     scale_labels: z
         .object({
-            left: z.union([z.string(), z.record(z.string())]).optional(),
-            right: z.union([z.string(), z.record(z.string())]).optional(),
-            middle: z.union([z.string(), z.record(z.string())]).optional(),
+            left: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
+            right: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
+            middle: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
         })
         .optional(),
     visibility_condition: VisibilityConditionSchema.optional(),
@@ -110,7 +110,7 @@ export const StudyConfigSchema = z.object({
     presort_config: z
         .object({
             enabled: z.boolean(),
-            fields: z.record(PreSortFieldSchema),
+            fields: z.record(z.string(), PreSortFieldSchema),
         })
         .passthrough(),
     grid_config: z.array(GridConfigSchema).optional(),
@@ -122,16 +122,24 @@ export const StudyConfigSchema = z.object({
             ask_general_comment: z.boolean().optional(),
             prompts: z
                 .object({
-                    extreme: z.union([z.string(), z.record(z.string())]).optional(),
-                    extreme_positive: z.union([z.string(), z.record(z.string())]).optional(),
-                    extreme_negative: z.union([z.string(), z.record(z.string())]).optional(),
-                    extreme_neutral: z.union([z.string(), z.record(z.string())]).optional(),
-                    missing: z.union([z.string(), z.record(z.string())]).optional(),
-                    missing_statements: z.union([z.string(), z.record(z.string())]).optional(),
-                    general: z.union([z.string(), z.record(z.string())]).optional(),
+                    extreme: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
+                    extreme_positive: z
+                        .union([z.string(), z.record(z.string(), z.string())])
+                        .optional(),
+                    extreme_negative: z
+                        .union([z.string(), z.record(z.string(), z.string())])
+                        .optional(),
+                    extreme_neutral: z
+                        .union([z.string(), z.record(z.string(), z.string())])
+                        .optional(),
+                    missing: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
+                    missing_statements: z
+                        .union([z.string(), z.record(z.string(), z.string())])
+                        .optional(),
+                    general: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
                 })
                 .optional(),
-            questions: z.record(PreSortFieldSchema).optional(),
+            questions: z.record(z.string(), PreSortFieldSchema).optional(),
             allow_random_comments: z.boolean().optional(),
             email_collection_enabled: z.boolean().optional(),
             interview_consent_enabled: z.boolean().optional(),
@@ -147,7 +155,7 @@ export const StudyConfigSchema = z.object({
         .optional(),
     statements: z.array(StatementSchema),
     consent: ConsentSchema.optional(),
-    ui_labels: z.record(z.string()).optional(),
+    ui_labels: z.record(z.string(), z.string()).optional(),
     available_languages: z.array(z.string()).optional(),
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
@@ -159,7 +167,7 @@ export const StudyConfigSchema = z.object({
     process_steps: z.array(ProcessStepSchema).optional(),
     requires_password: z.boolean().optional(),
     methodology_tips: z.array(z.string()).optional(),
-    step_help: z.record(z.object({ what: z.string(), why: z.string() })).optional(),
+    step_help: z.record(z.string(), z.object({ what: z.string(), why: z.string() })).optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

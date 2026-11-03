@@ -53,7 +53,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         handleSubmit,
         watch,
         formState: { errors, isValid },
-    } = useForm({
+    } = useForm<Record<string, unknown>>({
         mode: 'onChange',
         resolver: async (data, context, options) => {
             // useMemo above can return a union including a bare PreSortField when
@@ -90,8 +90,9 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
     if (!config) return null;
 
-    const onSubmit = (data: Record<string, string | number | boolean>) => {
-        setPresortResponse(data);
+    const onSubmit = (data: Record<string, unknown>) => {
+        // The resolver has validated every field against buildQuestionnaireSchema.
+        setPresortResponse(data as Record<string, string | number | boolean>);
         setStep(3);
         navigate(`/study/${slug}/rough-sort${location.search}`);
     };

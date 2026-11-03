@@ -80,10 +80,7 @@ function buildRequiredFieldSchema(field: QuestionnaireField, t: TranslateFn): z.
     }
 
     if (field.type === 'number') {
-        let numSchema = z.number({
-            required_error: t('presort.error_required'),
-            invalid_type_error: t('presort.error_required'),
-        });
+        let numSchema = z.number({ error: t('presort.error_required') });
         if (field.min !== undefined) {
             numSchema = numSchema.min(field.min, t('common.errors.min', { min: field.min }));
         }
@@ -144,7 +141,7 @@ export function buildQuestionnaireSchema(
     questions: Record<string, QuestionnaireField>,
     formData: Record<string, unknown>,
     t: TranslateFn
-): z.ZodObject<z.ZodRawShape> {
+): z.ZodObject<Record<string, z.ZodTypeAny>> {
     const shape: Record<string, z.ZodTypeAny> = {};
 
     for (const [key, field] of Object.entries(questions)) {

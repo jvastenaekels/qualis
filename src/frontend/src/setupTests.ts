@@ -60,6 +60,11 @@ Object.defineProperty(window, 'matchMedia', {
     }),
 });
 
+// happy-dom 21 implements Element.animate; framer-motion then runs WAAPI animations whose
+// cancellation rejects `finished` unhandled. Removing it keeps motion on its JS frameloop,
+// as under happy-dom 20.
+Reflect.deleteProperty(Element.prototype, 'animate');
+
 // Polyfill scrollTo
 window.scrollTo = vi.fn();
 window.confirm = vi.fn();
