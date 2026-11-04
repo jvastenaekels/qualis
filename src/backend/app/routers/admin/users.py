@@ -25,6 +25,7 @@ from ...schemas.users import (
 from ...services.admin_user_service import (
     AdminUserError,
     assert_can_deactivate,
+    assert_can_delete,
     assert_can_demote_superuser,
     assert_can_promote_superuser,
     force_password_reset,
@@ -328,6 +329,11 @@ async def delete_user(
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    try:
+        await assert_can_delete(db=db, target=user)
+    except AdminUserError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     await db.execute(delete(User).where(User.id == user_id))
     await db.commit()

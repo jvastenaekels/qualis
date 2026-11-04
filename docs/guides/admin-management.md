@@ -43,6 +43,12 @@ For an invited person already registered, the link grants project access immedia
 
 An account invited without a project (by a superuser, from the Users page) signs in on the researcher hub. With no project yet, the hub offers **New project**: the person creates their own project there and becomes its Owner. Project pages stay closed to them until they own or join a project.
 
+The sign-in email address is case-sensitive: an invited person must type it in lowercase, as stored.
+
+### End of a collaboration
+
+When someone leaves, **deactivate** the account from the Users page rather than deleting it. Deactivation keeps their work and their place in the project history. Deleting a user whose account is the Owner of a project is refused (the error lists the project slugs): delete those projects first, or deactivate the account instead.
+
 ### Roles
 
 Project membership maps to study-level capability as follows:

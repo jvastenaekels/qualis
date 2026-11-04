@@ -326,3 +326,87 @@ async def test_reset_totp_404_when_target_missing(
         headers={"Authorization": f"Bearer {superuser_token}"},
     )
     assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_user_succeeds(
+    client: AsyncClient, superuser_token: str, regular_user: User, db: AsyncSession
+) -> None:
+    user_id = regular_user.id
+    resp = await client.delete(
+        f"/api/admin/users/{user_id}",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 204
+    db.expire_all()
+    assert await db.get(User, user_id) is None
+
+
+@pytest.mark.asyncio
+async def test_delete_refuses_self(
+    client: AsyncClient, superuser: User, superuser_token: str
+) -> None:
+    resp = await client.delete(
+        f"/api/admin/users/{superuser.id}",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_delete_403_for_non_superuser(
+    client: AsyncClient, regular_user_token: str, totp_user: User
+) -> None:
+    resp = await client.delete(
+        f"/api/admin/users/{totp_user.id}",
+        headers={"Authorization": f"Bearer {regular_user_token}"},
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_delete_refuses_project_owner(
+    client: AsyncClient,
+    superuser_token: str,
+    regular_user: User,
+    project_factory,
+    db: AsyncSession,
+) -> None:
+    first = await project_factory(regular_user)
+    second = await project_factory(regular_user)
+    user_id, slugs = regular_user.id, (first.slug, second.slug)
+    resp = await client.delete(
+        f"/api/admin/users/{user_id}",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 400
+    message = resp.json()["message"]
+    assert all(slug in message for slug in slugs)
+    db.expire_all()
+    assert await db.get(User, user_id) is not None
+
+
+@pytest.mark.asyncio
+async def test_delete_allows_plain_member(
+    client: AsyncClient,
+    superuser_token: str,
+    regular_user: User,
+    totp_user: User,
+    project_factory,
+    project_member_factory,
+    db: AsyncSession,
+) -> None:
+    from app.models import Project, ProjectMember, ProjectRole
+
+    project = await project_factory(totp_user)
+    await project_member_factory(project, regular_user, ProjectRole.member)
+    user_id, project_id, owner_id = regular_user.id, project.id, totp_user.id
+    resp = await client.delete(
+        f"/api/admin/users/{user_id}",
+        headers={"Authorization": f"Bearer {superuser_token}"},
+    )
+    assert resp.status_code == 204
+    db.expire_all()
+    assert await db.get(User, user_id) is None
+    assert await db.get(Project, project_id) is not None
+    assert await db.get(ProjectMember, (project_id, owner_id)) is not None

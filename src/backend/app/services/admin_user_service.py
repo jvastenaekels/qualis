@@ -48,7 +48,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.models import User
+from app.models import Project, ProjectMember, ProjectRole, User
 from app.utils.email import send_password_reset
 from app.utils.security import create_email_token, get_password_hash_async
 
@@ -113,6 +113,24 @@ async def assert_can_deactivate(*, db: AsyncSession, actor: User, target: User) 
     if remaining <= 1:
         raise AdminUserError(
             "Refusing: the platform must keep at least one active superuser."
+        )
+
+
+async def assert_can_delete(*, db: AsyncSession, target: User) -> None:
+    """Refuse to delete a project Owner: ``project_members`` cascades, which
+    would leave a project nobody can reach."""
+    stmt = (
+        select(Project.slug)
+        .join(ProjectMember, ProjectMember.project_id == Project.id)
+        .where(ProjectMember.user_id == target.id)
+        .where(ProjectMember.role == ProjectRole.owner)
+        .order_by(Project.slug)
+    )
+    slugs = (await db.execute(stmt)).scalars().all()
+    if slugs:
+        raise AdminUserError(
+            f"User owns project(s): {', '.join(slugs)}. "
+            "Delete those projects or deactivate the account instead."
         )
 
 
