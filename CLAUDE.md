@@ -76,7 +76,6 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.users` — wave 4 batch 1: cast(PaginatedResponse[UserRead], …) aligns mypy with FastAPI serialisation
 - `app.routers.admin.analysis` — wave 4 batch 2: _get_analysis_dump returns SortDataDump; _get_statement_text typed StatementDumpRecord; typing.Any removed entirely
 - `app.services.memo_service` — phase 5 memo subsystem
-- `app.services.quotas` — quota helpers for project-roles-refactor (TypedDict QuotaState, no Any)
 - `app.services.admin_user_service` — admin-users feature: guard rails (self-demote, last-active-superuser floor, 2FA-for-promotion) + verb actions (force_password_reset, reset_totp); SQLAlchemy func.count(), no Any
 
 **Strict without disallow_any_explicit** (Pydantic/SQLAlchemy stubs or load-bearing Any at JSON boundaries):
@@ -107,7 +106,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 - `app.services.email_change_service` — F-03-011 dual-confirmation flow: park pending_email + dispatch confirm/cancel tokens (no Any)
 
-Total: 71 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas); +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
+Total: 70 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from F-03-011 (email-change dual-confirmation); +1 from admin-users feature (admin_user_service).
 Previous milestone: 67 (after F-03-011). Added 1 in admin-users feature (admin_user_service).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.

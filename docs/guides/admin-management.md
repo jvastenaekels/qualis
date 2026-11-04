@@ -6,6 +6,12 @@ For initial bootstrap of the first admin account on a fresh deployment, see [`de
 
 ---
 
+## Create an account
+
+A superuser creates an account from **Admin → Users → Invite user**. Qualis generates a single-use link, valid for 7 days, and the person chooses their own password when they open it. With SMTP configured the link is emailed; without SMTP it is shown on screen and the admin sends it.
+
+---
+
 ## Account security (2FA)
 
 Researchers are strongly encouraged to enable Two-Factor Authentication (TOTP).
@@ -43,7 +49,7 @@ For an invited person already registered, the link grants project access immedia
 
 An account invited without a project (by a superuser, from the Users page) signs in on the researcher hub. With no project yet, the hub offers **New project**: the person creates their own project there and becomes its Owner. Project pages stay closed to them until they own or join a project.
 
-The sign-in email address is case-sensitive: an invited person must type it in lowercase, as stored.
+The sign-in email address is case-sensitive: an invited person must type it exactly as it was entered when they were invited.
 
 ### End of a collaboration
 

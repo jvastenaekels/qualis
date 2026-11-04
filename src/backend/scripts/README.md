@@ -28,7 +28,6 @@ We use **Alembic** to manage database schema versions. The legacy manual migrati
 ## 🛠️ Utility Scripts
 
 - **`init_db.py`**: (Located in `src/backend/`) Initializes the database from scratch. **WARNING**: Use `--reset` with caution as it wipes all data.
-- **`create_user.py`**: Manually creates a new user in the database.
 - **`check_relationships.py`**: Validates that all SQLAlchemy relationships use async-safe loading strategies (preventing implicit IO errors).
 - **`dump_openapi.py`**: Generates the `openapi.json` file from the FastAPI app.
 

@@ -17,7 +17,7 @@ manual superuser recovery actions referenced below, see
 
 | Flow | Without SMTP |
 |---|---|
-| Registration | ✅ Account is active immediately; no verification email needed. |
+| Registration | ⚙️ A superuser invites the person from **Admin → Users → Invite user**. The link is shown on screen and the admin sends it out of band. |
 | Password reset (user clicks "forgot") | ⚙️ User contacts the operator. A superuser opens **Admin → Users → ⋯ → Generate password-reset link** and sends the link out of band. |
 | Project invitation | ✅ The invite link is shown with a copy button right after inviting — no email involved. |
 | Email change | ⚙️ Self-service is disabled. A superuser opens **Admin → Users → ⋯ → Set email** and sets the new address directly (no confirmation email is sent). |
@@ -36,25 +36,12 @@ available to perform the **Reset 2FA** action. If the **only** superuser
 has email-based 2FA and SMTP is unavailable, that account cannot log in
 and no one can reset it from the UI.
 
-An operator with shell access on the backend host creates a fresh
-superuser, who can then sign in and **Reset 2FA** on the locked account
-from **Admin → Users → ⋯ → Reset 2FA**.
+If another superuser can sign in, that superuser opens **Admin → Users → ⋯ →
+Reset 2FA** on the locked account. Nothing else is needed.
 
-If at least one *other* working admin credential exists (no 2FA, or a
-known authenticator), use the interactive script — it authenticates as
-that admin and creates the new user through the Admin API:
-
-```bash
-cd src/backend && uv run python scripts/create_user.py
-```
-
-It prompts for the existing admin's email and password, then the new
-user's email, password, and whether it is a superuser (answer `y`).
-
-If **no** usable admin credential exists at all (the single superuser is
-the only account and is locked out by 2FA), `create_user.py` cannot
-authenticate, so create the superuser directly against the database from
-the backend environment:
+If no superuser can sign in, an operator with shell access on the backend
+host creates a fresh superuser directly against the database from the
+backend environment:
 
 ```bash
 cd src/backend && uv run python - <<'PY'
