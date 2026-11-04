@@ -20,6 +20,7 @@
 | 6 | La page d'inscription ne demande pas de nom : l'admin ne voit qu'une adresse | `RegistrationPage.tsx:62` | 3 |
 | 7 | Supprimer l'Owner d'un projet laisse un projet sans Owner : `project_members` part en cascade, `delete_user` ne contrôle rien, et `list_projects` ne montre à un superuser que ses propres projets. Études et données participant deviennent inaccessibles depuis l'interface | `models/project.py:77`, `routers/admin/users.py:263`, `routers/admin/projects.py:39` | 4 |
 | 8 | `delete_user` n'a aucun test | `tests/integration/test_admin*.py` | 4 |
+| 10 | Un compte sans projet tombe sur « Access denied » à la connexion : `RequireAdmin` bloque aussi `/hub` et `/app/projects/new`, alors que l'API autorise tout compte actif à créer un projet. Trouvé en cours d'exécution ; sans correction, les invitations de compte mènent à une impasse | `components/auth/RequireAdmin.tsx`, `App.tsx:161,294-302`, `create_project` | 7 |
 | 9 | `CLAUDE.md` et `pyproject.toml` déclarent `app.services.quotas`, un module absent | `pyproject.toml:361-363` | 5 |
 
 ## Décisions
@@ -167,11 +168,29 @@ test_email_sent_when_smtp_configured            # tâche de fond planifiée
 
 - [ ] **Step 6: Commit** — `chore: remove the dead create_user script and the quotas override`.
 
+### Task 7: Ouvrir le hub aux comptes sans projet
+
+**Files:**
+- Create: `src/frontend/src/components/auth/RequireAdmin.test.tsx`
+- Modify: `src/frontend/src/components/auth/RequireAdmin.tsx`, `docs/guides/admin-management.md`
+
+- [ ] **Step 1: Écrire les tests qui échouent.** `shows the hub to a user without a project`, `shows /app/projects/new to a user without a project`, `denies a project page to a user without a project`, `redirects an anonymous visitor to login`, `lets a project member through`.
+
+- [ ] **Step 2: Vérifier l'échec.** Run: `cd src/frontend && npx vitest run src/components/auth/RequireAdmin.test.tsx`. Expected: FAIL sur les deux premiers.
+
+- [ ] **Step 3: Implémenter.** Dans `RequireAdmin`, accorder l'accès à un compte authentifié sans projet quand `location.pathname` vaut `/hub` ou `/app/projects/new`. Le reste de la garde ne change pas.
+
+- [ ] **Step 4: Vérifier.** Même commande. Expected: PASS. Puis contrôler que `ResearcherHub` affiche `New project` à un compte sans projet.
+
+- [ ] **Step 5: Documenter** dans `admin-management.md` : un compte invité arrive sur le hub et crée son projet.
+
+- [ ] **Step 6: Commit** — `fix(auth): let an account without a project reach the hub`.
+
 ### Task 6: Fermer l'inscription publique en production
 
 **Requiert l'accord explicite de Julien :** cette tâche suit un déploiement et modifie la production.
 
-- [ ] **Step 1: Déployer** les tâches 1 à 5, puis contrôler `scalingo --app qualis ps` et `/health` : `scalingo deployments` peut dire `success` avec `web-1` en panne.
+- [ ] **Step 1: Déployer** les tâches 1 à 5 et 7, puis contrôler `scalingo --app qualis ps` et `/health` : `scalingo deployments` peut dire `success` avec `web-1` en panne.
 
 - [ ] **Step 2: Fermer.** Run: `scalingo --app qualis env-set ALLOW_PUBLIC_REGISTRATION=false && scalingo --app qualis restart`. `env-set` seul ne redémarre pas l'application.
 
