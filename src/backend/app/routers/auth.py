@@ -270,10 +270,10 @@ async def register_user(
       and the response mirrors the fresh-email shape.
     """
     # Operator switch: when public (token-less) registration is disabled,
-    # only invitation-token sign-ups are accepted. The check depends solely
-    # on the presence of a token, never on the submitted email, so it adds
-    # no enumeration signal (F-06-007) — every token-less attempt gets the
-    # same 403 whether or not the email is already registered.
+    # only invitation-token sign-ups are accepted. This gate tests only that a
+    # token is present, so every token-less attempt gets the same 403 whether
+    # or not the email is registered (F-06-007). Any non-empty string passes
+    # here: the token's validity is enforced at step 2, before any email lookup.
     if not settings.ALLOW_PUBLIC_REGISTRATION and not user_in.invitation_token:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -301,19 +301,9 @@ async def register_user(
     #    differential between arms.
     hashed_password = await get_password_hash_async(user_in.password)
 
-    # 2. Check if user already exists. The duplicate-email arm follows
-    #    the F-06-007 "always-200, send-email" path; it returns the
-    #    same response shape and status as the fresh arm.
-    existing = await user_by_email(db, user_in.email)
-    if existing is not None:
-        _notify_already_registered(existing, background_tasks)
-        return _build_anti_enum_register_response(
-            user_in.email, requires_email_verification=needs_verification_step
-        )
-
-    # 3. Verify Invitation Token (if provided). Invitation-token errors
-    #    are not enumeration-relevant — the token's validity is decided
-    #    by its signature, not by the email's registration state.
+    # 2. Verify Invitation Token (if provided), before any email lookup:
+    #    a bad or replayed token gets the same 400 whether or not the email
+    #    is registered, so these errors stay free of enumeration signal.
     invitation_payload = None
     if user_in.invitation_token:
         try:
@@ -332,6 +322,23 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
+    # Checked outside the creation try: an IntegrityError there is folded into
+    # the anti-enumeration duplicate-email path and would hide a replayed token.
+    if invitation_payload and await is_jti_consumed(db, invitation_payload["jti"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="invitation_already_used"
+        )
+
+    # 3. Check if user already exists. The duplicate-email arm follows
+    #    the F-06-007 "always-200, send-email" path; it returns the
+    #    same response shape and status as the fresh arm.
+    existing = await user_by_email(db, user_in.email)
+    if existing is not None:
+        _notify_already_registered(existing, background_tasks)
+        return _build_anti_enum_register_response(
+            user_in.email, requires_email_verification=needs_verification_step
+        )
+
     # An account created in another case after the invitation would slip past
     # the exact-match lookup above; fold case here (not in user_by_email, whose
     # scalar_one_or_none would raise on legacy case-duplicates) and take the
@@ -349,13 +356,6 @@ async def register_user(
             return _build_anti_enum_register_response(
                 user_in.email, requires_email_verification=needs_verification_step
             )
-
-    # Checked outside the creation try: an IntegrityError there is folded into
-    # the anti-enumeration duplicate-email path and would hide a replayed token.
-    if invitation_payload and await is_jti_consumed(db, invitation_payload["jti"]):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="invitation_already_used"
-        )
 
     try:
         # 4. Create User
@@ -393,7 +393,7 @@ async def register_user(
         await db.commit()
     except IntegrityError:
         # F-06-007: race-condition fallback — between the SELECT at
-        # step 2 and the INSERT here, a concurrent request inserted the
+        # step 3 and the INSERT here, a concurrent request inserted the
         # same email. Fold this into the same anti-enumeration response
         # as the steady-state duplicate path: dispatch the "already
         # registered" email and return the generic shape. Don't log

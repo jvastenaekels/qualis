@@ -8,7 +8,7 @@ def smtp_mode_banner_lines(*, smtp_configured: bool) -> list[str]:
         return []
     return [
         "Email delivery is not configured. Qualis is running in email-optional mode.",
-        "  Outgoing emails are written to the application log only.",
+        "  Outgoing emails are not sent; only recipient and subject are logged.",
         "  Password reset: generate a recovery link from "
         "Admin > Users (no email needed).",
         "  Project invitations: copy the invite link shown after inviting.",

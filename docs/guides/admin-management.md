@@ -43,7 +43,7 @@ Project Owners can invite collaborators and set their role from **Project settin
 2. Choose a role (**Member** or **Viewer**).
 3. Click **Create & send invitation**.
 
-Qualis generates a unique registration link. If SMTP is configured, the user receives an email; otherwise, the link is logged to stdout (visible in the deployment logs) and shown in the dashboard for manual sharing.
+Qualis generates a unique registration link. If SMTP is configured, the user receives an email; otherwise, the link is shown in the dashboard for manual sharing.
 
 For an invited person already registered, the link grants project access immediately. For a new user, the link pre-fills the registration form; access is granted once the account is created.
 

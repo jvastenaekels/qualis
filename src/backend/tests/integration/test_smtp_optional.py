@@ -5,6 +5,23 @@ import logging
 import pytest
 
 from app.core.config import settings
+from app.utils import email as email_module
+
+
+def test_reset_link_stays_out_of_logs_without_smtp(monkeypatch, caplog):
+    monkeypatch.setattr(settings, "SMTP_HOST", None)
+    monkeypatch.setattr(settings, "ENVIRONMENT", "test")
+    monkeypatch.setattr(email_module, "_last_test_email", None)
+    reset_url = "https://qualis.test/reset-password?token=secret-reset-token"
+
+    with caplog.at_level(logging.DEBUG):
+        email_module.send_password_reset("reset@example.com", reset_url)
+
+    assert "secret-reset-token" not in caplog.text
+    assert "Reset your Qualis password" in caplog.text
+    # The e2e helper /api/test/debug/last-email reads the body from this capture.
+    captured = email_module._last_test_email
+    assert captured is not None and reset_url in captured["body"]
 
 
 @pytest.mark.asyncio

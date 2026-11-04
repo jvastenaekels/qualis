@@ -90,6 +90,8 @@ async def create_account_invitation(
     if existing.first() is not None:
         raise HTTPException(status_code=409, detail="email_already_registered")
 
+    # Keep scripts/cleanup_consumed_email_tokens.py retention at or above this
+    # lifetime: dropping a consumed jti before the token expires reopens replay.
     expires_delta = timedelta(days=7)
     token = create_invitation_token(
         email=email, role="member", expires_delta=expires_delta

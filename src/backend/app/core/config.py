@@ -170,8 +170,8 @@ class Settings(BaseSettings):
     def is_smtp_configured(self) -> bool:
         """True iff all three SMTP credentials are populated.
 
-        When False, the email subsystem falls back to logging the email
-        body to stdout (see app.utils.email._send_or_log). The auth-email
+        When False, the email subsystem sends nothing and logs only the
+        recipient and subject (see app.utils.email._send_or_log). The auth-email
         verification gate uses this to avoid locking users out of an
         unconfigured deployment.
         """

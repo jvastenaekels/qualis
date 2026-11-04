@@ -47,7 +47,7 @@ async def test_superuser_invites_and_invitee_registers(
     assert body["expires_at"]
 
     reg = await _register(client, "newcomer@example.com", _token_of(resp))
-    assert reg.status_code in (200, 201), reg.text
+    assert reg.status_code == 201, reg.text
 
     login = await client.post(
         "/api/token",
@@ -102,7 +102,14 @@ async def test_register_works_when_public_registration_closed(
     monkeypatch.setattr(settings, "ALLOW_PUBLIC_REGISTRATION", False)
     resp = await _invite(client, superuser_token, "closed@example.com")
     reg = await _register(client, "closed@example.com", _token_of(resp))
-    assert reg.status_code in (200, 201), reg.text
+    assert reg.status_code == 201, reg.text
+
+    # 201 is also the anti-enumeration no-op shape: only a login proves creation.
+    login = await client.post(
+        "/api/token",
+        data={"username": "closed@example.com", "password": "chosen-pw-123"},
+    )
+    assert login.status_code == 200
 
 
 @pytest.mark.asyncio
@@ -111,16 +118,28 @@ async def test_replay_after_account_deletion_is_refused(
 ) -> None:
     resp = await _invite(client, superuser_token, "replay@example.com")
     token = _token_of(resp)
-    assert (await _register(client, "replay@example.com", token)).status_code in (
-        200,
-        201,
-    )
+    assert (await _register(client, "replay@example.com", token)).status_code == 201
     await db.execute(delete(User).where(User.email == "replay@example.com"))
     await db.commit()
 
     again = await _register(client, "replay@example.com", token)
     assert again.status_code == 400
     assert again.json()["message"] == "invitation_already_used"
+
+
+@pytest.mark.asyncio
+async def test_replay_on_existing_account_is_refused(
+    client: AsyncClient, superuser_token: str
+) -> None:
+    resp = await _invite(client, superuser_token, "twice@example.com")
+    token = _token_of(resp)
+    assert (await _register(client, "twice@example.com", token)).status_code == 201
+
+    with patch("app.routers.auth.send_register_already_registered") as notify:
+        again = await _register(client, "twice@example.com", token, pw="other-pw-456")
+    assert again.status_code == 400
+    assert again.json()["message"] == "invitation_already_used"
+    notify.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -173,6 +192,19 @@ async def test_verify_reports_no_project(
 
 
 @pytest.mark.asyncio
+async def test_verify_refuses_used_invitation(
+    client: AsyncClient, superuser_token: str
+) -> None:
+    resp = await _invite(client, superuser_token, "used@example.com")
+    token = _token_of(resp)
+    assert (await _register(client, "used@example.com", token)).status_code == 201
+
+    out = await client.get("/api/admin/invitations/verify", params={"token": token})
+    assert out.status_code == 400
+    assert out.json()["message"] == "invitation_already_used"
+
+
+@pytest.mark.asyncio
 async def test_no_email_and_no_token_in_logs_without_smtp(
     client: AsyncClient, superuser_token: str, monkeypatch, caplog
 ) -> None:
@@ -210,7 +242,7 @@ async def test_register_folds_case_against_account_created_after_invitation(
     reg = await _register(
         client, "alice@example.com", _token_of(resp), pw="new-password-2"
     )
-    assert reg.status_code in (200, 201), reg.text
+    assert reg.status_code == 201, reg.text
 
     rows = (
         (

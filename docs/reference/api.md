@@ -217,7 +217,7 @@ Polymorphic memo subsystem attached to either a study or a concourse.
 | GET | `/api/admin/projects/{slug}/members` | Viewer | — | List members and their roles |
 | PATCH | `/api/admin/projects/{slug}/members/{user_id}` | Owner | 30/min | Update a member's role; audit-logged |
 | DELETE | `/api/admin/projects/{slug}/members/{user_id}` | Owner | 30/min | Remove a member (cannot self-remove) |
-| POST | `/api/admin/projects/{slug}/invitations` | Owner | 30/min | Send a project invitation by email; logs the URL if SMTP is unconfigured |
+| POST | `/api/admin/projects/{slug}/invitations` | Owner | 30/min | Send a project invitation by email; the response carries the link, for sharing it if SMTP is unconfigured |
 
 ### Admin — invitations (`/api/admin/invitations`)
 

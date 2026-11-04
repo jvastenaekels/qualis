@@ -185,7 +185,7 @@ All settings are read from the `Settings` Pydantic class in `src/backend/app/cor
 
 ### Email (SMTP)
 
-If `SMTP_HOST` is unset, the backend falls back to logging invitation URLs instead of sending email.
+If `SMTP_HOST` is unset, the backend sends no email and logs only the recipient and subject; invitation links are shown in the dashboard.
 
 | ENV_VAR | Type | Default | Description |
 | ------- | ---- | ------- | ----------- |

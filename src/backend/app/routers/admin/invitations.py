@@ -7,7 +7,10 @@ from pydantic import BaseModel
 
 from app.utils.security import decode_invitation_token
 from app.limiter import limiter
-from app.services.email_token_consume_service import mark_jti_consumed
+from app.services.email_token_consume_service import (
+    is_jti_consumed,
+    mark_jti_consumed,
+)
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import User, ProjectMember, ProjectRole
@@ -40,6 +43,11 @@ async def verify_invitation(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid invitation token payload",
+        )
+
+    if await is_jti_consumed(db, payload["jti"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="invitation_already_used"
         )
 
     project_id = payload.get("project_id") or payload.get("workspace_id")

@@ -46,16 +46,18 @@ ordering in ``register_user``.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import User
-from app.utils.security import get_password_hash
+from app.utils.security import create_invitation_token, get_password_hash
 
 
 @pytest_asyncio.fixture
@@ -251,3 +253,48 @@ class TestImplementationContract:
             "register_user must not raise the prior 409 'likely already "
             "exists' detail (F-06-007). Source preview:\n" + source[:1500]
         )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("public_registration", [True, False])
+class TestRegisterBadTokenIsNoOracle:
+    """A bad token is refused before any email lookup, open or closed instance."""
+
+    @pytest.mark.parametrize(
+        "token_for",
+        [
+            lambda: "junk",
+            lambda: create_invitation_token(
+                email="someone-else@example.com", role="member"
+            ),
+        ],
+        ids=["junk", "other-address"],
+    )
+    @patch("app.routers.auth.send_register_already_registered")
+    async def test_same_answer_for_known_and_unknown_address(
+        self,
+        mock_already: MagicMock,
+        client: AsyncClient,
+        existing_user: User,
+        monkeypatch: pytest.MonkeyPatch,
+        public_registration: bool,
+        token_for: Callable[[], str],
+    ) -> None:
+        monkeypatch.setattr(settings, "ALLOW_PUBLIC_REGISTRATION", public_registration)
+        token = token_for()
+
+        known, unknown = [
+            await client.post(
+                "/api/register",
+                json={
+                    "email": email,
+                    "password": "any-password-12",
+                    "invitation_token": token,
+                },
+            )
+            for email in (existing_user.email, "no-such-enum@example.com")
+        ]
+
+        assert known.status_code == unknown.status_code == 400
+        assert known.json()["message"] == unknown.json()["message"]
+        mock_already.assert_not_called()

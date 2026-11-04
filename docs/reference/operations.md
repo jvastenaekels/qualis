@@ -44,8 +44,8 @@ schema elements produce a warning with a remediation step, normally
 
 ## Optional services
 
-When `SMTP_HOST` is unset, invitation emails are logged instead of sent. Email
-verification and recovery flows degrade as described in the
+When `SMTP_HOST` is unset, emails are not sent and the log records only their
+recipient and subject. Email verification and recovery flows degrade as described in the
 [without-SMTP guide](../guides/running-without-smtp.md).
 
 When S3 variables are absent, Qualis uses storage-optional mode. See the

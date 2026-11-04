@@ -2,8 +2,9 @@
 
 Qualis is fully usable without an SMTP server. When `SMTP_HOST`,
 `SMTP_USER`, or `SMTP_PASSWORD` is unset, Qualis runs in **email-optional
-mode**: outgoing emails are written to the application log, and every
-account-recovery action has an in-product path that needs no email.
+mode**: outgoing emails are not sent, the application log records only their
+recipient and subject (never a link), and every account-recovery action has
+an in-product path that needs no email.
 
 A startup log line confirms the mode and lists the consequences. For the
 canonical list of email-related environment variables, see
@@ -23,7 +24,7 @@ manual superuser recovery actions referenced below, see
 | Email change | ⚙️ Self-service is disabled. A superuser opens **Admin → Users → ⋯ → Set email** and sets the new address directly (no confirmation email is sent). |
 | Lost authenticator (2FA) | ⚙️ A superuser uses **Admin → Users → ⋯ → Reset 2FA**. See [Recovering the last superuser](#recovering-the-last-superuser) if no second superuser exists. |
 | Email-based 2FA | 🚫 Disabled. Users must use an authenticator app. Existing email-2FA accounts are recovered via "Reset 2FA". |
-| Memo mentions / notifications | ✅ Informational only; written to the log, never blocking. |
+| Memo mentions / notifications | ✅ Informational only; not delivered, never blocking. |
 
 Legend: ✅ works unchanged · ⚙️ requires a manual superuser action · 🚫 disabled.
 

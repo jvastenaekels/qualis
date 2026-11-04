@@ -13,18 +13,19 @@ _last_test_email: dict[str, str] | None = None
 
 
 def _send_or_log(*, email_to: str, subject: str, html_content: str, label: str) -> None:
-    """Send via SMTP, or log a structured MOCK EMAIL block when SMTP is unset.
+    """Send via SMTP, or log a MOCK EMAIL block when SMTP is unset.
 
+    The block never holds the body: bodies carry live tokens.
     `label` is a short tag identifying the email type for log filtering
     (e.g., 'invitation', 'memo-mention', 'email-verification').
     """
     if not settings.SMTP_HOST or not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning("SMTP settings missing. Logging email content instead:")
+        logger.warning("SMTP settings missing. Email not sent:")
         logger.warning(f"To: {email_to}")
         logger.warning(f"Subject: {subject}")
         logger.info(
             f"\n--- MOCK EMAIL [{label}] ---\nTo: {email_to}\nSubject: {subject}\n"
-            f"Body:\n{html_content}\n----------------------------\n"
+            "----------------------------\n"
         )
         if settings.ENVIRONMENT == "test":
             global _last_test_email
