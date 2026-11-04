@@ -49,7 +49,7 @@ For an invited person already registered, the link grants project access immedia
 
 An account invited without a project (by a superuser, from the Users page) signs in on the researcher hub. With no project yet, the hub offers **New project**: the person creates their own project there and becomes its Owner. Project pages stay closed to them until they own or join a project.
 
-The sign-in email address is case-sensitive: an invited person must type it exactly as it was entered when they were invited.
+The sign-in email address is case-sensitive. An account created from **Invite user** is stored in lowercase, so the person signs in with the lowercase address, whatever case the admin typed. An account invited from a project keeps the case entered at invitation, and the person must type it the same way.
 
 ### End of a collaboration
 
