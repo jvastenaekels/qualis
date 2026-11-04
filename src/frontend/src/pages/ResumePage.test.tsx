@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
     navigate: vi.fn(),
     resetAllStores: vi.fn(),
     setToken: vi.fn(),
+    setSessionState: vi.fn(),
     setStudySlug: vi.fn(),
     setConsent: vi.fn(),
     setStep: vi.fn(),
@@ -58,6 +59,7 @@ vi.mock('react-router-dom', async () => {
 
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
+        setState: mocks.setSessionState,
         getState: () => ({
             setToken: mocks.setToken,
             setStudySlug: mocks.setStudySlug,

@@ -14,5 +14,6 @@ export interface ResumeResponse {
     language: string;
     last_step_reached: number;
     draft_responses: ResumeResponseDraftResponses;
+    draft_revision?: number | null;
     resume_code: string;
 }

@@ -11,6 +11,7 @@ import type { DraftSaveInputDraftResponses } from './draftSaveInputDraftResponse
  */
 export interface DraftSaveInput {
     session_token: string;
+    draft_revision?: number | null;
     /** Full response store state snapshot */
     draft_responses: DraftSaveInputDraftResponses;
 }

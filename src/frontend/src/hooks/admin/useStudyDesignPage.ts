@@ -352,9 +352,10 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         const studyWithDefaults = applyTranslationDefaults(study);
         const currentDraft = useStudyDesigner.getState().draft;
 
-        if (!currentDraft) {
-            // First-time load: initialize both original and draft
+        if (!currentDraft || useStudyDesigner.getState().original?.id !== study.id) {
+            // A different study must never inherit the previous study's draft.
             setStudy(studyWithDefaults);
+            useStudyDesigner.setState({ syncStatus: 'synced', lastSavedAt: null });
             return;
         }
 

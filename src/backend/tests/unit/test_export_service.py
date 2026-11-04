@@ -6,7 +6,10 @@ Pillar 1: Scientific Validation
 - "Symmetry" test: Grid configuration mismatch detection
 """
 
+import csv
 import io
+import shutil
+import subprocess
 import zipfile
 from unittest.mock import MagicMock
 
@@ -352,6 +355,102 @@ class TestExportHardening:
 
         # A fetch failure is distinguishable from a genuine "no recording" blank.
         assert "ERROR_URL_UNAVAILABLE" in csv_content
+
+
+class TestQuestionnaireOptions:
+    @pytest.mark.parametrize("section", ["presort", "postsort"])
+    @pytest.mark.parametrize("answer, expected", [("Alpha", "Alpha"), ("b", "Bêta")])
+    def test_csv_accepts_string_and_localized_object_options(
+        self, section, answer, expected
+    ):
+        study = MockStudy([])
+        study.default_language = "fr"
+        question = {
+            "label": "Choice",
+            "options": ["Alpha", {"value": "b", "label": {"fr": "Bêta"}}],
+        }
+        setattr(
+            study,
+            f"{section}_config",
+            {"fields" if section == "presort" else "questions": {"choice": question}},
+        )
+        participant = MockParticipant([])
+        setattr(participant, f"{section}_answers", {"choice": answer})
+
+        rows = list(
+            csv.DictReader(
+                io.StringIO(ExportService.generate_csv(study, [participant]))
+            )
+        )
+
+        assert (
+            rows[0]["Pre_Choice" if section == "presort" else "Post_Choice"] == expected
+        )
+
+    def test_codebook_accepts_string_and_localized_object_options(self):
+        study = MockStudy([])
+        study.state = MagicMock(value="active")
+        study.participants = []
+        study.default_language = "fr"
+        study.presort_config = {
+            "fields": {
+                "choice": {
+                    "label": "Choice",
+                    "options": ["Alpha", {"value": "b", "label": {"fr": "Bêta"}}],
+                }
+            }
+        }
+
+        codebook = ExportService.generate_codebook(study)
+
+        assert "- Alpha: Alpha" in codebook
+        assert "- b: Bêta" in codebook
+
+
+def test_r_kit_passes_statements_by_participants_to_analysis(tmp_path):
+    rscript = shutil.which("Rscript")
+    if not rscript:
+        pytest.skip("Rscript is needed to execute the generated analysis script")
+    study = MockStudy(
+        [MockStatement(id=i, code=f"S{i}", display_order=i) for i in range(1, 5)]
+    )
+    participants = []
+    for name, scores in [
+        ("p-a", [-1, 0, 0, 1]),
+        ("p-b", [0, -1, 1, 0]),
+        ("p-c", [1, 0, -1, 0]),
+    ]:
+        participant = MockParticipant(
+            [MockQSortEntry(i, score) for i, score in enumerate(scores, 1)]
+        )
+        participant.session_token = name
+        participants.append(participant)
+    with zipfile.ZipFile(
+        io.BytesIO(ExportService.generate_r_kit(study, participants))
+    ) as archive:
+        archive.extractall(tmp_path)
+    # Execute the generated artifact; replace only the external analysis package.
+    # Its input contract is statements in rows, participants in columns.
+    (tmp_path / "capture.R").write_text("""
+library <- function(...) invisible(NULL)
+qmethod <- function(dataset, ...) { write.csv(dataset, "received.csv"); NULL }
+summary <- function(...) invisible(NULL)
+plot <- function(...) invisible(NULL)
+source("analysis.R")
+""")
+    result = subprocess.run(
+        [rscript, "capture.R"], cwd=tmp_path, capture_output=True, text=True, timeout=30
+    )
+    assert result.returncode == 0, result.stderr
+    with (tmp_path / "received.csv").open() as captured:
+        rows = list(csv.reader(captured))
+    assert rows == [
+        ["", "p-a", "p-b", "p-c"],
+        ["S1", "-1", "0", "1"],
+        ["S2", "0", "-1", "0"],
+        ["S3", "0", "1", "-1"],
+        ["S4", "1", "0", "0"],
+    ]
 
 
 class TestRenderMemoMd:

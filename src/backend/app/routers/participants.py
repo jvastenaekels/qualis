@@ -94,7 +94,9 @@ async def save_draft(
 ) -> AckResponse:
     """Saves participant draft responses (fire-and-forget from frontend)."""
     try:
-        await sessions.save_draft(db, slug, data.session_token, data.draft_responses)
+        await sessions.save_draft(
+            db, slug, data.session_token, data.draft_responses, data.draft_revision
+        )
     except SessionRejected as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail)
     return AckResponse(status="ok")

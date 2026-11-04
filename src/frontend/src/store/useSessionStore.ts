@@ -26,6 +26,7 @@ interface SessionState {
     isPilotMode: boolean;
     // In memory only: the accepted study access password, sent with the consent.
     studyPassword: string | null;
+    draftRevision: number;
 
     setToken: (token: string | null) => void;
     setStudySlug: (slug: string) => void;
@@ -39,6 +40,7 @@ interface SessionState {
     setPilotMode: (isPilot: boolean) => void;
     setStudyPassword: (password: string | null) => void;
     resetSession: () => void;
+    nextDraftRevision: () => number;
 }
 
 export const useSessionStore = create<SessionState>()(
@@ -57,7 +59,19 @@ export const useSessionStore = create<SessionState>()(
             isSubmitting: false,
             isPilotMode: isPilot(),
             studyPassword: null,
+            draftRevision: 0,
 
+            nextDraftRevision: () => {
+                let revision = 0;
+                set((state) => {
+                    revision = state.draftRevision + 1;
+                    if (!Number.isSafeInteger(revision) || revision < 1) {
+                        throw new Error('Draft revision exhausted');
+                    }
+                    return { draftRevision: revision };
+                });
+                return revision;
+            },
             setToken: (token) => set({ token }),
             setStudySlug: (studySlug) => set({ studySlug }),
             setConsent: (hasConsented) => set({ hasConsented }),
@@ -94,6 +108,7 @@ export const useSessionStore = create<SessionState>()(
                     isSubmitting: false,
                     isPilotMode: false,
                     studyPassword: null,
+                    draftRevision: 0,
                 });
             },
         }),

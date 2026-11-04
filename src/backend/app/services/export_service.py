@@ -82,6 +82,10 @@ class ExportService:
 
             # Look for option by 'value' or 'id'
             for opt in options:
+                if isinstance(opt, str):
+                    if opt == str(value):
+                        return opt
+                    continue
                 if str(opt.get("value")) == str(value) or str(opt.get("id")) == str(
                     value
                 ):
@@ -494,6 +498,9 @@ class ExportService:
                     if options:
                         lines.append("  Options:")
                         for opt in options:
+                            if isinstance(opt, str):
+                                lines.append(f"    - {opt}: {opt}")
+                                continue
                             opt_val = opt.get("id") or opt.get("value")
                             opt_label = opt.get("label", opt_val)
                             if isinstance(opt_label, dict):
@@ -652,7 +659,7 @@ n_items <- {n_items}
 
 # Extract only score columns: S1, S2, S3, ... (skipping comments and audio metadata)
 score_cols <- seq(n_meta + 1, n_meta + (n_items * 5), by = 5)
-q_sorts <- data[, score_cols]
+q_sorts <- data[, score_cols, drop = FALSE]
 
 # Set row names to participant UIDs
 rownames(q_sorts) <- data$Participant_UID
@@ -660,6 +667,9 @@ rownames(q_sorts) <- data$Participant_UID
 # Set column names to statement codes
 statement_cols <- colnames(data)[score_cols]
 colnames(q_sorts) <- statement_cols
+
+# qmethod expects statements in rows and participants in columns.
+q_sorts <- t(as.matrix(q_sorts))
 
 # 3. Basic Analysis
 # Extract 3 factors using varimax rotation (adjust nfactors as needed)

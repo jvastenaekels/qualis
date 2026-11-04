@@ -11,7 +11,7 @@ import os
 import re
 from datetime import UTC, datetime
 from typing import TypedDict, cast
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import boto3
 from botocore.config import Config as BotoConfig
@@ -67,7 +67,7 @@ def _hashed_audio_prefix(study_slug: str, participant_token: UUID) -> str:
     ``hash_ip`` and ``hash_user_agent`` (one salt, one var).
     Truncated to 32 hex chars (16 bytes) — the prefix only needs to
     avoid collisions across the bucket; the per-key uniqueness lives
-    in the timestamp + question_key suffix.
+    in the random upload identifier in the suffix.
     """
     salt = os.getenv("IP_HASH_SALT")
     if not salt:
@@ -167,7 +167,8 @@ class StorageService:
         """
         file_size = len(content)
 
-        # Generate S3 key with timestamp for uniqueness.
+        # Every upload needs its own object: rollback cleanup must never
+        # delete bytes belonging to an earlier or concurrent upload.
         # question_key is sanitised before being concatenated into the path
         # — see _sanitise_question_key for the threat model.
         # The (study, participant) prefix is a 32-char hex hash of
@@ -180,7 +181,9 @@ class StorageService:
         extension = self._get_extension(content_type)
         safe_question_key = _sanitise_question_key(question_key)
         prefix = _hashed_audio_prefix(study_slug, participant_token)
-        s3_key = f"audio/{prefix}/{timestamp}_{safe_question_key}{extension}"
+        s3_key = (
+            f"audio/{prefix}/{timestamp}_{uuid4().hex}_{safe_question_key}{extension}"
+        )
 
         # Upload to S3 with retry for transient failures
         loop = asyncio.get_running_loop()

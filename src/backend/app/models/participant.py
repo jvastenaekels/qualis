@@ -4,7 +4,7 @@
 
 """Participant, QSortEntry, and AudioRecording models."""
 
-from sqlalchemy import Index
+from sqlalchemy import BigInteger, Index
 
 from .base import (
     Any,
@@ -102,6 +102,7 @@ class Participant(Base):
 
     # Draft state for resume functionality
     draft_responses: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    draft_revision: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
     study: Mapped["Study"] = relationship(back_populates="participants", lazy="raise")  # type: ignore[name-defined]  # noqa: F821
     qsort_entries: Mapped[list["QSortEntry"]] = relationship(

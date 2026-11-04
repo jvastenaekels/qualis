@@ -58,6 +58,8 @@ class SubmissionService:
         study = await StudyService.get_study_by_slug(db, study_slug)
         if not study:
             raise NotFoundError("Study")
+        # Rollback during insert-race recovery expires ORM attributes.
+        study_id = study.id
 
         hashed_ip = hash_ip(ip_address or "unknown")
         hashed_ua = hash_user_agent(user_agent)
@@ -70,6 +72,9 @@ class SubmissionService:
         )
         result = await db.execute(stmt)
         participant = result.scalar_one_or_none()
+
+        if participant and participant.study_id != study_id:
+            raise ValidationError("Session token does not belong to this study.")
 
         # Also for a row that exists but never consented (e.g. created by a
         # "started" /submit): otherwise that route skips the password. Before
@@ -159,6 +164,10 @@ class SubmissionService:
                 participant = result.scalar_one_or_none()
                 if not participant:
                     raise ConcurrencyError("Concurrency error during consent.")
+                if participant.study_id != study_id:
+                    raise ValidationError(
+                        "Session token does not belong to this study."
+                    )
 
         # If we fell through (update existing)
         if participant and participant not in db.new:
@@ -376,6 +385,7 @@ class SubmissionService:
         existing row. The boolean flag marks whether *this* call did the
         creation (used downstream to skip the existing-row update path).
         """
+        study_id = study.id
         participant_stmt = (
             select(Participant)
             .where(Participant.session_token == data.session_token)
@@ -428,6 +438,8 @@ class SubmissionService:
                 raise ConcurrencyError(
                     "Concurrency error: Could not resolve participant."
                 )
+            if participant.study_id != study_id:
+                raise ValidationError("Session token does not belong to this study.")
             return participant, False
         except (NotFoundError, ValidationError, ForbiddenError, ConcurrencyError):
             raise

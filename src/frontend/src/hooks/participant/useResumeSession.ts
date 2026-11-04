@@ -148,6 +148,7 @@ async function applyResumeSuccess(
 
     const session = useSessionStore.getState();
     session.setToken(data.session_token);
+    useSessionStore.setState({ draftRevision: data.draft_revision ?? 0 });
     session.setStudySlug(slug);
     session.setConsent(true);
     session.setStep(data.last_step_reached);

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.8.1](https://github.com/jvastenaekels/qualis/compare/v0.8.0...v0.8.1) (2026-11-04)
+
+### Bug fixes
+
+* Keep participant sessions and local answers isolated when switching studies; restore saved draft revisions on resume and reject out-of-order autosaves.
+* Enforce study ownership and password checks when adopting participant sessions, including concurrent consent requests.
+* Preserve edits made while a study design is saving, and reset the designer when switching studies.
+* Avoid collisions between audio uploads, accept plain-string questionnaire options in CSV/codebook exports, and orient the R analysis matrix correctly.
+* Preserve recruitment attribution through consent and scrub completed session tokens and sensitive log fields.
+* Reject reused invitations and inappropriate token types; use the trusted proxy's client IP for rate limits and refuse production startup with the public default signing key.
+* Accept PostgreSQL deployment URLs and allow audio uploads larger than 1 MB through the bundled nginx proxy.
+
+### Performance and maintenance
+
+* Avoid loading all participants for individual requests and move password verification off the event loop.
+* Update dependencies and generated API clients, simplify service delegation, and align deployment guidance.
+
+### Deployment
+
+* Run Alembic migrations before starting the new backend. Migration `b839ce2f641a` adds a nullable draft revision column; existing drafts remain compatible until their first versioned save.
+
 ## [0.8.0](https://github.com/jvastenaekels/qualis/compare/v0.7.6...v0.8.0) (2026-09-19)
 
 

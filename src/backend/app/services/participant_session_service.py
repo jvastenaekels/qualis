@@ -151,16 +151,31 @@ async def update_progress(
 
 
 async def save_draft(
-    db: AsyncSession, slug: str, session_token: UUID, draft: JsonDraft
+    db: AsyncSession,
+    slug: str,
+    session_token: UUID,
+    draft: JsonDraft,
+    draft_revision: int | None = None,
 ) -> None:
     participant, study = await session_in_study(db, slug, session_token, lock="both")
     if participant.status != ParticipantStatus.started:
         raise SessionRejected(410, "Session is no longer active")
     if study.state != StudyState.active:
         raise SessionRejected(403, "Study is not currently accepting responses")
-    participant.draft_responses = strip_rough_slice(
+    normalized_draft = strip_rough_slice(
         draft, rough_sort_enabled=study.rough_sort_enabled
     )
+    if participant.draft_revision is not None and (
+        draft_revision is None or draft_revision <= participant.draft_revision
+    ):
+        if (
+            draft_revision == participant.draft_revision
+            and normalized_draft == participant.draft_responses
+        ):
+            return
+        raise SessionRejected(409, "Draft revision conflicts with the saved draft")
+    participant.draft_responses = normalized_draft
+    participant.draft_revision = draft_revision
     await db.commit()
 
 
@@ -178,6 +193,7 @@ async def withdraw_draft(db: AsyncSession, slug: str, session_token: UUID) -> No
     if participant.status == ParticipantStatus.completed:
         return
     participant.draft_responses = None
+    # Keep the revision watermark so delayed older saves cannot restore the draft.
     participant.last_step_reached = 1
     participant.last_step_reached_at = datetime.now(timezone.utc)
     await db.commit()
@@ -198,6 +214,7 @@ async def resume(db: AsyncSession, slug: str, code: str) -> ResumeResponse:
         language=participant.language_used,
         last_step_reached=participant.last_step_reached or 1,
         draft_responses=participant.draft_responses or {},
+        draft_revision=participant.draft_revision,
         resume_code=participant.resume_code or "",
     )
 

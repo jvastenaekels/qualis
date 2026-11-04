@@ -190,6 +190,7 @@ class DraftSaveInput(BaseModel):
     """Schema for saving participant draft responses."""
 
     session_token: UUID
+    draft_revision: int | None = Field(None, strict=True, ge=1, le=9007199254740991)
     draft_responses: dict[str, Any] = Field(
         ..., description="Full response store state snapshot"
     )
@@ -220,6 +221,7 @@ class ResumeResponse(BaseModel):
     language: str
     last_step_reached: int
     draft_responses: dict[str, Any]
+    draft_revision: int | None = None
     resume_code: str
 
 

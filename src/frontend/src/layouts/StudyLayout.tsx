@@ -55,7 +55,8 @@ import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
-import { resetAllStores } from '../utils/sessionReset';
+import { restoreStudySession } from '../utils/sessionReset';
+import { setStudyStorageScope, releaseStudyStorageScope } from '../store/safeStorage';
 import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
 import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 
@@ -146,16 +147,6 @@ const StudyLayoutContent: React.FC = () => {
 
     // Trigger config fetch/re-fetch on slug or language change
     const { retry, unlock, passwordError } = useStudyConfig();
-
-    // Cross-study session cleanup
-    // If the stored session belongs to a different study, reset it so the participant can
-    // start fresh in this study. Their submitted data is safe on the backend — only the
-    // local state is cleared.
-    useEffect(() => {
-        if (shouldResetParticipantSessionForStudy(slug, studySlug)) {
-            resetAllStores({ skipConfig: true });
-        }
-    }, [slug, studySlug]);
 
     // copyTimeoutRef and resumeButtonRef are stable refs; setters are stable too.
     // biome-ignore lint/correctness/useExhaustiveDependencies: stable refs/setters
@@ -981,9 +972,38 @@ const StudyLayoutContent: React.FC = () => {
 };
 
 const StudyLayout: React.FC = () => {
+    const { slug } = useParams<{ slug: string }>();
+    const [readySlug, setReadySlug] = useState(() =>
+        !slug ||
+        useSessionStore.getState().studySlug === slug ||
+        (!useSessionStore.getState().studySlug &&
+            (useSessionStore.getState().hasConsented || useSessionStore.getState().isCompleted))
+            ? slug
+            : null
+    );
+    useEffect(() => {
+        if (!slug) return;
+        if (readySlug === slug) {
+            setStudyStorageScope(slug);
+            return;
+        }
+        // The previous subtree has already unmounted: its final save still used
+        // its own session and storage scope. Hydrate before mounting new effects.
+        restoreStudySession(slug);
+        setReadySlug(slug);
+    }, [slug, readySlug]);
+    useEffect(
+        () => () => {
+            // Destination routes may synchronously restore a session in mount
+            // effects. Outgoing autosave cleanup explicitly scopes its own writes.
+            if (slug) releaseStudyStorageScope(slug);
+        },
+        [slug]
+    );
+    if (readySlug !== slug) return null;
     return (
         <LayoutProvider>
-            <StudyLayoutContent />
+            <StudyLayoutContent key={slug} />
         </LayoutProvider>
     );
 };

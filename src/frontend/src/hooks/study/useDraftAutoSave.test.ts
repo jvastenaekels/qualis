@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { customInstance } from '../../api/mutator';
 import { useResponseStore } from '../../store/useResponseStore';
 import { useSessionStore } from '../../store/useSessionStore';
+import { withoutStudyStorageWrites } from '../../store/safeStorage';
 import { useDraftAutoSave } from './useDraftAutoSave';
 
 vi.mock('../../api/mutator', () => ({
@@ -24,10 +25,13 @@ const lastDraft = () => {
 
 describe('useDraftAutoSave', () => {
     beforeEach(() => {
+        window.history.replaceState({}, '', '/study/s/fine-sort');
         vi.useFakeTimers();
         vi.mocked(customInstance).mockReset().mockResolvedValue({});
         useSessionStore.setState({
             token: 'tok',
+            studySlug: 's',
+            draftRevision: 0,
             isPilotMode: false,
             isCompleted: false,
             isSubmitting: false,
@@ -37,6 +41,7 @@ describe('useDraftAutoSave', () => {
     afterEach(() => {
         vi.useRealTimers();
         vi.unstubAllGlobals();
+        window.history.replaceState({}, '', '/');
     });
 
     it('resends the draft when the browser comes back online after a failed save', async () => {
@@ -51,13 +56,13 @@ describe('useDraftAutoSave', () => {
         await act(() => vi.advanceTimersByTimeAsync(10000));
         vi.mocked(customInstance).mockClear();
         act(() => useResponseStore.setState({ qsort: { a: 3 } as never }));
-        window.dispatchEvent(new Event('online'));
+        act(() => window.dispatchEvent(new Event('online')));
         await act(() => vi.advanceTimersByTimeAsync(0));
         expect(customInstance).toHaveBeenCalledTimes(1);
         expect(lastDraft()).toEqual({ a: 3 });
 
         // Nothing owed any more: a second reconnection sends nothing.
-        window.dispatchEvent(new Event('online'));
+        act(() => window.dispatchEvent(new Event('online')));
         expect(customInstance).toHaveBeenCalledTimes(1);
         unmount();
     });
@@ -76,5 +81,86 @@ describe('useDraftAutoSave', () => {
         unmount();
         window.dispatchEvent(new Event('pagehide'));
         expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('draft ordering across requests and lifecycle flushes', () => {
+    beforeEach(() => {
+        window.history.replaceState({}, '', '/study/s/fine-sort');
+        vi.useFakeTimers();
+        vi.mocked(customInstance).mockReset().mockResolvedValue({});
+        useSessionStore.setState({
+            token: 'tok',
+            studySlug: 's',
+            draftRevision: 12,
+            isPilotMode: false,
+            isCompleted: false,
+            isSubmitting: false,
+        });
+    });
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('orders a pending save, a newer edit and both unload signals without reusing revisions', async () => {
+        vi.mocked(customInstance).mockImplementation(() => new Promise(() => {}));
+        const fetchMock = vi.fn().mockResolvedValue({});
+        vi.stubGlobal('fetch', fetchMock);
+        const { unmount } = renderHook(() => useDraftAutoSave('s'));
+        act(() => useResponseStore.setState({ presort: { answer: 'old' } }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+        act(() => useResponseStore.setState({ presort: { answer: 'new' } }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+        window.dispatchEvent(new Event('beforeunload'));
+        window.dispatchEvent(new Event('pagehide'));
+        const requests = vi.mocked(customInstance).mock.calls.map(([req]) => req.data);
+        const flushes = fetchMock.mock.calls.map(([, req]) => JSON.parse(req.body));
+        expect([...requests, ...flushes].map((req) => req.draft_revision)).toEqual([
+            13, 14, 15, 16,
+        ]);
+        expect(flushes[1].draft_responses.presort).toEqual({ answer: 'new' });
+        // A remounted hook continues the persisted session counter.
+        unmount();
+        withoutStudyStorageWrites(() => useSessionStore.setState({ draftRevision: 0 }));
+        await useSessionStore.persist.rehydrate();
+        expect(useSessionStore.getState().draftRevision).toBeGreaterThan(16);
+        const second = renderHook(() => useDraftAutoSave('s'));
+        act(() => useResponseStore.setState({ presort: { answer: 'after reload' } }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+        expect(
+            vi.mocked(customInstance).mock.calls.at(-1)?.[0].data.draft_revision
+        ).toBeGreaterThan(16);
+        second.unmount();
+    });
+
+    it('keeps a current revision conflict visible when an older request succeeds later', async () => {
+        let finishOlder: () => void = () => {};
+        vi.mocked(customInstance)
+            .mockImplementationOnce(
+                () =>
+                    new Promise((resolve) => {
+                        finishOlder = () => resolve({});
+                    })
+            )
+            .mockRejectedValueOnce({ status: 409 });
+        const { result, unmount } = renderHook(() => useDraftAutoSave('s'));
+        act(() => useResponseStore.setState({ presort: { answer: 'old' } }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+        act(() => useResponseStore.setState({ presort: { answer: 'new' } }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+        expect(result.current.draftSaveStatus).toBe('error');
+        await act(async () => finishOlder());
+        expect(result.current.draftSaveStatus).toBe('error');
+        unmount();
+    });
+
+    it('does not flush another study session through a stale hook', () => {
+        const { unmount } = renderHook(() => useDraftAutoSave('s'));
+        act(() => useResponseStore.setState({ presort: { answer: 'outgoing' } }));
+        useSessionStore.setState({ studySlug: 'other', token: 'other-token' });
+        unmount();
+        expect(customInstance).not.toHaveBeenCalled();
     });
 });

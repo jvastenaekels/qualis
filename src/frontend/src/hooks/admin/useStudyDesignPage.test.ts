@@ -17,7 +17,7 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
 import { applyTranslationDefaults, DESIGN_STEPS, useStudyDesignPage } from './useStudyDesignPage';
-import type { StudyRead } from '@/api/model';
+import type { StudyRead, StudyUpdate } from '@/api/model';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
 const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
@@ -148,6 +148,197 @@ describe('useStudyDesignPage', () => {
             syncStatus: 'synced',
             lastSavedAt: null,
         });
+    });
+
+    it('loads the selected study instead of retaining another study draft', () => {
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        const { result, rerender, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        const second = {
+            ...mockStudy,
+            id: 2,
+            slug: 'second-study',
+            translations: [{ ...mockStudy.translations[0], title: 'Second study' }],
+        };
+        act(() => useStudyDesigner.setState({ lastSavedAt: new Date(), syncStatus: 'error' }));
+        mockUseParams.mockReturnValue({ projectSlug: 'my-project', studySlug: 'second-study' });
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: second }));
+        rerender();
+        expect(result.current.draft?.slug).toBe('second-study');
+        expect(result.current.currentTranslation?.title).toBe('Second study');
+        expect(result.current.original?.id).toBe(2);
+        expect(result.current.syncStatus).toBe('synced');
+        expect(useStudyDesigner.getState().lastSavedAt).toBeNull();
+        unmount();
+    });
+
+    it('preserves edits typed during save and uses the returned revision on the next save', async () => {
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        let resolve!: (study: StudyRead) => void;
+        const mutateAsync = vi.fn(
+            (_request: { slug: string; data: StudyUpdate }) =>
+                new Promise<StudyRead>((r) => {
+                    resolve = r;
+                })
+        );
+        mockUpdateMutation.mockReturnValue({ mutateAsync, isPending: false });
+        const { result, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        act(() =>
+            useStudyDesigner.getState().updateTranslation('en', (tr) => {
+                tr.title = 'Sent title ';
+            })
+        );
+        let pending!: Promise<void>;
+        act(() => {
+            pending = result.current.save();
+        });
+        act(() =>
+            useStudyDesigner.getState().updateTranslation('en', (tr) => {
+                tr.title = 'Newer title';
+            })
+        );
+        const savedStudy = {
+            ...mockStudy,
+            updated_at: '2026-01-02T00:00:00Z',
+            translations: [{ ...mockStudy.translations[0], title: 'Sent title' }],
+        };
+        await act(async () => {
+            resolve(savedStudy);
+            await pending;
+        });
+        expect(result.current.currentTranslation?.title).toBe('Newer title');
+        expect(result.current.syncStatus).toBe('modified');
+        expect(result.current.original?.translations[0].title).toBe('Sent title');
+        expect(result.current.draft?.last_updated_at).toBe('2026-01-02T00:00:00Z');
+
+        mutateAsync.mockResolvedValueOnce({
+            ...savedStudy,
+            translations: [{ ...savedStudy.translations[0], title: 'Newer title' }],
+        });
+        await act(async () => {
+            await result.current.save();
+        });
+        expect(mutateAsync.mock.calls[1][0]).toMatchObject({
+            slug: 'test-study',
+            data: {
+                last_updated_at: '2026-01-02T00:00:00Z',
+                translations: [{ title: 'Newer title' }],
+            },
+        });
+        expect(result.current.syncStatus).toBe('synced');
+        unmount();
+    });
+
+    it('ignores a save response belonging to a study that has been left', async () => {
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        let resolve!: (study: StudyRead) => void;
+        const mutateAsync = vi.fn(
+            (_request: { slug: string; data: StudyUpdate }) =>
+                new Promise<StudyRead>((r) => {
+                    resolve = r;
+                })
+        );
+        mockUpdateMutation.mockReturnValue({ mutateAsync, isPending: false });
+        const { result, rerender, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        let pending!: Promise<void>;
+        act(() => {
+            pending = result.current.save();
+        });
+        const second = { ...mockStudy, id: 2, slug: 'second-study' };
+        mockUseParams.mockReturnValue({ projectSlug: 'my-project', studySlug: 'second-study' });
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: second }));
+        rerender();
+        await act(async () => {
+            resolve(mockStudy);
+            await pending;
+        });
+        expect(result.current.original?.id).toBe(2);
+        expect(result.current.draft?.slug).toBe('second-study');
+        expect(result.current.syncStatus).toBe('synced');
+        unmount();
+    });
+
+    it('ignores the previous save while the next study is still loading', async () => {
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        let resolve!: (study: StudyRead) => void;
+        mockUpdateMutation.mockReturnValue({
+            mutateAsync: () =>
+                new Promise<StudyRead>((r) => {
+                    resolve = r;
+                }),
+        });
+        const { result, rerender, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        let pending!: Promise<void>;
+        act(() => {
+            pending = result.current.save();
+        });
+        mockUseParams.mockReturnValue({ projectSlug: 'my-project', studySlug: 'second-study' });
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ isLoading: true }));
+        rerender();
+        await act(async () => {
+            resolve({ ...mockStudy, updated_at: '2026-01-02T00:00:00Z' });
+            await pending;
+        });
+        expect(result.current.original?.updated_at).toBe('2026-01-01T00:00:00Z');
+        expect(useStudyDesigner.getState().lastSavedAt).toBeNull();
+        unmount();
+    });
+
+    it('preserves edits typed while a conflicting save is pending', async () => {
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        let reject!: (error: unknown) => void;
+        mockUpdateMutation.mockReturnValue({
+            mutateAsync: () =>
+                new Promise<StudyRead>((_resolve, r) => {
+                    reject = r;
+                }),
+        });
+        const { result, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        let pending!: Promise<void>;
+        act(() => {
+            pending = result.current.save();
+        });
+        act(() =>
+            useStudyDesigner.getState().updateTranslation('en', (tr) => {
+                tr.title = 'Newer title';
+            })
+        );
+        await act(async () => {
+            reject({
+                status: 409,
+                details: { server_state: { ...mockStudy, updated_at: '2026-01-02T00:00:00Z' } },
+            });
+            await pending;
+        });
+        expect(result.current.currentTranslation?.title).toBe('Newer title');
+        expect(result.current.draft?.last_updated_at).toBe('2026-01-02T00:00:00Z');
+        expect(result.current.syncStatus).toBe('modified');
+        unmount();
+    });
+
+    it('does not save the old draft to a route whose study is still loading', async () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockUseParams.mockReturnValue({ projectSlug: 'my-project', studySlug: 'second-study' });
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ isLoading: true }));
+        const mutateAsync = vi.fn().mockResolvedValue(mockStudy);
+        mockUpdateMutation.mockReturnValue({ mutateAsync });
+        const { result, unmount } = renderHook(() => useStudyDesignPage(), {
+            wrapper: AllTheProviders,
+        });
+        await act(async () => {
+            await result.current.save();
+        });
+        expect(mutateAsync).not.toHaveBeenCalled();
+        unmount();
     });
 
     it('derives effectiveSlug from studySlug when present, else from projectSlug', () => {

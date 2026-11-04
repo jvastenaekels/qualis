@@ -37,6 +37,12 @@ export function useStudyPersistence() {
 
     // Track the last draft we successfully sent to avoid redundant saves
     const lastSavedDraftRef = useRef<string | null>(null);
+    const activeSlugRef = useRef(effectiveSlug);
+
+    useEffect(() => {
+        lastSavedDraftRef.current = null;
+        activeSlugRef.current = effectiveSlug;
+    }, [effectiveSlug]);
 
     // 2. BeforeUnload Guard
     useEffect(() => {
@@ -59,8 +65,10 @@ export function useStudyPersistence() {
     // Exposed blocker for UI handling
     // We intentionally removed the window.confirm logic here to let the UI handle it via the blocker object
 
+    // Route changes render once before the selected study initializes.
+    const isCurrentStudy = !!effectiveSlug && (!original || original.slug === effectiveSlug);
     useEffect(() => {
-        if (!draft || !effectiveSlug) return;
+        if (!draft || !isCurrentStudy) return;
 
         const synced = isDraftInSync(
             draft,
@@ -102,7 +110,7 @@ export function useStudyPersistence() {
         }, 1000);
 
         return () => clearTimeout(backupTimer);
-    }, [draft, effectiveSlug, original, setSyncStatus, syncStatus]);
+    }, [draft, effectiveSlug, original, setSyncStatus, syncStatus, isCurrentStudy]);
 
     // Applies a resolved 409 conflict to local state.
     const applyConflict = useCallback(
@@ -111,7 +119,7 @@ export function useStudyPersistence() {
             const serverUpdate = projectStudyToUpdate(serverRead);
             const originalUpdate = original ? projectStudyToUpdate(original) : null;
             const resolution = resolveServerConflict(
-                draft as StudyUpdate,
+                useStudyDesigner.getState().draft ?? (draft as StudyUpdate),
                 serverUpdate,
                 originalUpdate
             );
@@ -186,7 +194,7 @@ export function useStudyPersistence() {
 
     // 5. Manual Save Function
     const save = useCallback(async () => {
-        if (!draft || !effectiveSlug || syncStatus === 'saving') return;
+        if (!draft || !isCurrentStudy || syncStatus === 'saving') return;
 
         const draftJson = JSON.stringify(draft);
 
@@ -198,26 +206,55 @@ export function useStudyPersistence() {
                 data: draft as StudyUpdate,
             });
 
+            const current = useStudyDesigner.getState();
+            if (activeSlugRef.current !== effectiveSlug || current.original?.id !== original?.id)
+                return;
+
             lastSavedDraftRef.current = draftJson;
-            setSyncStatus('synced');
             setLastSavedAt(new Date());
-            setStudy(result);
+            if (current.draft && JSON.stringify(current.draft) !== draftJson) {
+                // Rebase edits made during the request on the acknowledged snapshot.
+                const resolution = resolveServerConflict(
+                    current.draft,
+                    projectStudyToUpdate(result),
+                    draft
+                );
+                updateOriginal(result);
+                updateDraft((d) => {
+                    if (resolution.kind === 'merged') Object.assign(d, resolution.merged);
+                    // Even an unmergeable response must not discard newer edits.
+                    d.last_updated_at = result.updated_at;
+                });
+                setSyncStatus('modified');
+            } else {
+                setStudy(result);
+                setSyncStatus('synced');
+            }
             safeBrowserLocalStorage.setItem(
                 `qualis-test-draft-${effectiveSlug}`,
-                JSON.stringify(draft)
+                JSON.stringify(useStudyDesigner.getState().draft)
             );
             toast.success(t('admin.study.save.success'));
         } catch (error) {
+            if (
+                activeSlugRef.current !== effectiveSlug ||
+                useStudyDesigner.getState().original?.id !== original?.id
+            )
+                return;
             handleSaveError(error);
         }
     }, [
         draft,
+        original,
         effectiveSlug,
+        isCurrentStudy,
         syncStatus,
         setSyncStatus,
         updateMutation,
         setLastSavedAt,
         setStudy,
+        updateOriginal,
+        updateDraft,
         handleSaveError,
         t,
     ]);

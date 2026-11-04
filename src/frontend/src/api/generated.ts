@@ -20196,6 +20196,10 @@ export const getResumeSessionApiStudySlugResumeCodeGetResponseMock = (
     language: faker.string.alpha({ length: { min: 10, max: 20 } }),
     last_step_reached: faker.number.int(),
     draft_responses: {},
+    draft_revision: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int(), null]),
+        undefined,
+    ]),
     resume_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
     ...overrideResponse,
 });

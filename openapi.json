@@ -8864,6 +8864,19 @@
             "format": "uuid",
             "title": "Session Token"
           },
+          "draft_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 9007199254740991.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Revision"
+          },
           "draft_responses": {
             "additionalProperties": true,
             "type": "object",
@@ -11081,6 +11094,17 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Draft Responses"
+          },
+          "draft_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Revision"
           },
           "resume_code": {
             "type": "string",

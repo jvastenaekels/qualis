@@ -54,8 +54,42 @@ export const safeLocalStorage = createJSONStorage(() => safeBrowserLocalStorage)
 
 export const safeSessionStorage = createJSONStorage(() => safeBrowserSessionStorage);
 
+let studyStorageScope: string | null | undefined;
+let studyStorageWritesPaused = false;
+
+// Bind writes to the mounted study, including its cleanup after the URL changes.
+export function setStudyStorageScope(slug: string | null | undefined): void {
+    studyStorageScope = slug;
+}
+
+export function withStudyStorageScope<T>(slug: string, action: () => T): T {
+    const previous = studyStorageScope;
+    studyStorageScope = slug;
+    try {
+        return action();
+    } finally {
+        studyStorageScope = previous;
+    }
+}
+
+export function releaseStudyStorageScope(slug: string): void {
+    if (studyStorageScope === slug) studyStorageScope = undefined;
+}
+
+export function withoutStudyStorageWrites(action: () => void): void {
+    const previous = studyStorageWritesPaused;
+    studyStorageWritesPaused = true;
+    try {
+        action();
+    } finally {
+        studyStorageWritesPaused = previous;
+    }
+}
+
 const currentStudySlug = (): string | null =>
-    /^\/study\/([^/]+)/.exec(window.location.pathname)?.[1] ?? null;
+    studyStorageScope !== undefined
+        ? studyStorageScope
+        : (/^\/study\/([^/]+)/.exec(window.location.pathname)?.[1] ?? null);
 
 const scopedKey = (name: string, slug: string | null): string => (slug ? `${name}:${slug}` : name);
 
@@ -85,6 +119,7 @@ const studyScopedStateStorage: StateStorage = {
         return owner === slug ? legacy : null;
     },
     setItem(name, value) {
+        if (studyStorageWritesPaused) return;
         const slug = currentStudySlug();
         safeBrowserLocalStorage.setItem(scopedKey(name, slug), value);
         if (!slug) return;

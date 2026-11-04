@@ -71,6 +71,7 @@ vi.mock('../hooks/useLayout', () => ({
 
 vi.mock('../utils/sessionReset', () => ({
     resetAllStores: mocks.resetAllStores,
+    restoreStudySession: mocks.resetAllStores,
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -433,7 +434,7 @@ describe('Layout Route Protection', () => {
         expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
         expect(screen.queryByText('Post Sort Page')).not.toBeInTheDocument();
         expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
-        expect(mocks.resetAllStores).toHaveBeenCalledWith({ skipConfig: true });
+        expect(mocks.resetAllStores).toHaveBeenCalledWith('test');
     });
 
     it('Resets active other-study sessions without showing stale-session spinner', () => {
@@ -452,7 +453,7 @@ describe('Layout Route Protection', () => {
 
         expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
         expect(screen.getByTestId('layout-header')).toBeInTheDocument();
-        expect(mocks.resetAllStores).toHaveBeenCalledWith({ skipConfig: true });
+        expect(mocks.resetAllStores).toHaveBeenCalledWith('test');
     });
 
     it('Skips rendering Pre-sort step node when disabled', () => {

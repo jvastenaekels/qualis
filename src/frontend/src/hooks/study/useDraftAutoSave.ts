@@ -27,6 +27,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BASE_URL, customInstance } from '../../api/mutator';
 import { useResponseStore } from '../../store/useResponseStore';
 import { useSessionStore } from '../../store/useSessionStore';
+import { withStudyStorageScope } from '../../store/safeStorage';
 
 export type DraftSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -43,6 +44,7 @@ export function useDraftAutoSave(slug: string | undefined): {
         const session = useSessionStore.getState();
         if (
             !session.token ||
+            (session.studySlug !== null && session.studySlug !== slug) ||
             session.isPilotMode ||
             session.isCompleted ||
             session.isSubmitting ||
@@ -55,24 +57,38 @@ export function useDraftAutoSave(slug: string | undefined): {
     useEffect(() => {
         const sendDraft = () => {
             const freshToken = getDraftSaveToken();
-            if (!freshToken) return;
+            if (!freshToken || !slug) return;
             const { presort, rough, qsort, postsort } = useResponseStore.getState();
             setDraftSaveStatus('saving');
+            const revision = withStudyStorageScope(slug, () =>
+                useSessionStore.getState().nextDraftRevision()
+            );
             customInstance({
                 url: `/api/study/${slug}/save-draft`,
                 method: 'PUT',
                 data: {
                     session_token: freshToken,
+                    draft_revision: revision,
                     draft_responses: { presort, rough, qsort, postsort },
                 },
             })
                 .then(() => {
+                    if (
+                        useSessionStore.getState().token !== freshToken ||
+                        useSessionStore.getState().draftRevision !== revision
+                    )
+                        return;
                     pendingRef.current = false;
                     setDraftSaveStatus('saved');
                     if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
                     saveStatusTimerRef.current = setTimeout(() => setDraftSaveStatus('idle'), 3000);
                 })
                 .catch(() => {
+                    if (
+                        useSessionStore.getState().token !== freshToken ||
+                        useSessionStore.getState().draftRevision !== revision
+                    )
+                        return;
                     // The indicator returns to idle after 5s; the flag remembers the owed save.
                     pendingRef.current = true;
                     setDraftSaveStatus('error');
@@ -91,12 +107,15 @@ export function useDraftAutoSave(slug: string | undefined): {
 
         const buildDraftPayload = () => {
             const token = getDraftSaveToken();
-            if (!token) return null;
+            if (!token || !slug) return null;
             const { presort, rough, qsort, postsort } = useResponseStore.getState();
             return {
                 url: `${BASE_URL}/api/study/${slug}/save-draft`,
                 body: JSON.stringify({
                     session_token: token,
+                    draft_revision: withStudyStorageScope(slug, () =>
+                        useSessionStore.getState().nextDraftRevision()
+                    ),
                     draft_responses: { presort, rough, qsort, postsort },
                 }),
             };
