@@ -90,6 +90,29 @@ def send_invitation_email(
     )
 
 
+def send_account_invitation_email(email_to: str, invite_url: str) -> None:
+    """Send a single-use link to create a Qualis account (no project attached)."""
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Hello!</h2>
+            <p>An administrator invited you to create an account on Qualis.</p>
+            <p>Follow the link below to choose your password:</p>
+            <p><a href="{invite_url}">{invite_url}</a></p>
+            <p>This link expires in 7 days and can only be used once.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject="Your Qualis account",
+        html_content=html_content,
+        label="account-invitation",
+    )
+
+
 def send_memo_mention_email(
     email_to: str,
     *,

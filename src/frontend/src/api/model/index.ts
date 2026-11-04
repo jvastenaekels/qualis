@@ -6,6 +6,8 @@
  */
 
 export * from './acceptInvitationApiAdminInvitationsAcceptPost200';
+export * from './accountInvitationCreate';
+export * from './accountInvitationLink';
 export * from './ackResponse';
 export * from './ackResponseDetails';
 export * from './adminSetEmailRequest';

@@ -361,6 +361,7 @@ async def register_user(
                 role=ProjectRole(invitation_payload["role"]),
             )
             db.add(project_member)
+        if invitation_payload:
             await mark_jti_consumed(db, invitation_payload["jti"], purpose="invitation")
 
         await db.commit()

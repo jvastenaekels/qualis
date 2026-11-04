@@ -1,17 +1,21 @@
 """API router for administrative user management."""
 
+from datetime import datetime, timedelta, timezone
 from typing import cast
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ...core.config import settings
 from ...database import get_db
 from ...dependencies import PaginationParams, check_superuser
 from ...limiter import limiter
 from ...models import User
 from ...schemas.common import PaginatedResponse
 from ...schemas.users import (
+    AccountInvitationCreate,
+    AccountInvitationLink,
     AdminSetEmailRequest,
     RecoveryLinkRequest,
     RecoveryLinkResponse,
@@ -29,6 +33,8 @@ from ...services.admin_user_service import (
     set_user_email,
 )
 from ...utils.audit import log_admin_action
+from ...utils.email import send_account_invitation_email
+from ...utils.security import create_invitation_token
 
 router = APIRouter(tags=["Admin Users"])
 
@@ -54,6 +60,51 @@ async def list_users(
         PaginatedResponse(
             items=items, total=total, limit=pagination.limit, offset=pagination.offset
         ),
+    )
+
+
+@router.post(
+    "/invitations",
+    response_model=AccountInvitationLink,
+    status_code=status.HTTP_201_CREATED,
+)
+@limiter.limit("30/minute")
+async def create_account_invitation(
+    request: Request,
+    invitation_in: AccountInvitationCreate,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(check_superuser),
+) -> AccountInvitationLink:
+    """Superuser-only: mint a single-use registration link for an address.
+
+    No project is attached and no password is set: the invitee chooses it
+    on /register. The e-mail goes out only when SMTP is configured; the
+    link is always returned so the superuser can hand it over directly.
+    Declared before the ``/{user_id}`` routes. Exact-match ``user_by_email``
+    would miss ``A@X.FI`` against ``a@x.fi``, so the lookup folds case here.
+    """
+    email = str(invitation_in.email).lower()
+    existing = await db.execute(select(User.id).where(func.lower(User.email) == email))
+    if existing.first() is not None:
+        raise HTTPException(status_code=409, detail="email_already_registered")
+
+    expires_delta = timedelta(days=7)
+    token = create_invitation_token(
+        email=email, role="member", expires_delta=expires_delta
+    )
+    invite_url = f"{settings.FRONTEND_URL}/register?token={token}"
+    if settings.is_smtp_configured:
+        background_tasks.add_task(send_account_invitation_email, email, invite_url)
+
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="invite",
+        resource="user",
+        target_email=email,
+    )
+    return AccountInvitationLink(
+        invite_url=invite_url, expires_at=datetime.now(timezone.utc) + expires_delta
     )
 
 

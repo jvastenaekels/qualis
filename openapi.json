@@ -3234,6 +3234,54 @@
         }
       }
     },
+    "/api/admin/users/invitations": {
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Create Account Invitation",
+        "description": "Superuser-only: mint a single-use registration link for an address.\n\nNo project is attached and no password is set: the invitee chooses it\non /register. The e-mail goes out only when SMTP is configured; the\nlink is always returned so the superuser can hand it over directly.\nDeclared before the ``/{user_id}`` routes. Exact-match ``user_by_email``\nwould miss ``A@X.FI`` against ``a@x.fi``, so the lookup folds case here.",
+        "operationId": "create_account_invitation_api_admin_users_invitations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountInvitationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountInvitationLink"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/admin/users/{user_id}": {
       "patch": {
         "tags": [
@@ -6981,6 +7029,41 @@
   },
   "components": {
     "schemas": {
+      "AccountInvitationCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "AccountInvitationCreate",
+        "description": "Body for POST /api/admin/users/invitations (superuser-only)."
+      },
+      "AccountInvitationLink": {
+        "properties": {
+          "invite_url": {
+            "type": "string",
+            "title": "Invite Url"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "invite_url",
+          "expires_at"
+        ],
+        "title": "AccountInvitationLink",
+        "description": "A single-use registration link. The invitee picks the password."
+      },
       "AckResponse": {
         "properties": {
           "status": {

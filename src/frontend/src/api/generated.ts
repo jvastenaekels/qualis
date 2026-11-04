@@ -22,6 +22,8 @@ import type {
 
 import type {
     AcceptInvitationApiAdminInvitationsAcceptPost200,
+    AccountInvitationCreate,
+    AccountInvitationLink,
     AckResponse,
     AdminSetEmailRequest,
     AnalysisRequest,
@@ -8407,6 +8409,105 @@ export function useListUsersApiAdminUsersGet<
 
     return withQueryKey(query, queryOptions.queryKey);
 }
+
+/**
+ * Superuser-only: mint a single-use registration link for an address.
+ *
+ * No project is attached and no password is set: the invitee chooses it
+ * on /register. The e-mail goes out only when SMTP is configured; the
+ * link is always returned so the superuser can hand it over directly.
+ * Declared before the ``/{user_id}`` routes. Exact-match ``user_by_email``
+ * would miss ``A@X.FI`` against ``a@x.fi``, so the lookup folds case here.
+ * @summary Create Account Invitation
+ */
+export const createAccountInvitationApiAdminUsersInvitationsPost = (
+    accountInvitationCreate: AccountInvitationCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<AccountInvitationLink>({
+        url: `/api/admin/users/invitations`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: accountInvitationCreate,
+        signal,
+    });
+};
+
+export const getCreateAccountInvitationApiAdminUsersInvitationsPostMutationKey = () =>
+    ['createAccountInvitationApiAdminUsersInvitationsPost'] as const;
+
+export const getCreateAccountInvitationApiAdminUsersInvitationsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>,
+        TError,
+        CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>,
+    TError,
+    CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables,
+    TContext
+> => {
+    const mutationKey = getCreateAccountInvitationApiAdminUsersInvitationsPostMutationKey();
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>,
+        CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return createAccountInvitationApiAdminUsersInvitationsPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateAccountInvitationApiAdminUsersInvitationsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>
+>;
+export type CreateAccountInvitationApiAdminUsersInvitationsPostMutationBody =
+    AccountInvitationCreate;
+export type CreateAccountInvitationApiAdminUsersInvitationsPostMutationError = HTTPValidationError;
+export type CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables = {
+    data: AccountInvitationCreate;
+};
+
+/**
+ * @summary Create Account Invitation
+ */
+export const useCreateAccountInvitationApiAdminUsersInvitationsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>,
+            TError,
+            CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createAccountInvitationApiAdminUsersInvitationsPost>>,
+    TError,
+    CreateAccountInvitationApiAdminUsersInvitationsPostMutationVariables,
+    TContext
+> => {
+    return useMutation(
+        getCreateAccountInvitationApiAdminUsersInvitationsPostMutationOptions(options),
+        queryClient
+    );
+};
 
 /**
  * Superuser-only flag update. One field at a time is fine.
@@ -19014,6 +19115,14 @@ export const getListUsersApiAdminUsersGetResponseMock = (
     ...overrideResponse,
 });
 
+export const getCreateAccountInvitationApiAdminUsersInvitationsPostResponseMock = (
+    overrideResponse: Partial<Extract<AccountInvitationLink, object>> = {}
+): AccountInvitationLink => ({
+    invite_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    expires_at: faker.date.past().toISOString().slice(0, 19) + 'Z',
+    ...overrideResponse,
+});
+
 export const getPatchUserApiAdminUsersUserIdPatchResponseMock = (
     overrideResponse: Partial<Extract<UserReadAdmin, object>> = {}
 ): UserReadAdmin => ({
@@ -21683,6 +21792,30 @@ export const getListUsersApiAdminUsersGetMockHandler = (
     );
 };
 
+export const getCreateAccountInvitationApiAdminUsersInvitationsPostMockHandler = (
+    overrideResponse?:
+        | AccountInvitationLink
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AccountInvitationLink> | AccountInvitationLink),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users/invitations',
+        async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === 'function'
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getCreateAccountInvitationApiAdminUsersInvitationsPostResponseMock(),
+                { status: 201 }
+            );
+        },
+        options
+    );
+};
+
 export const getPatchUserApiAdminUsersUserIdPatchMockHandler = (
     overrideResponse?:
         | UserReadAdmin
@@ -23231,6 +23364,7 @@ export const getQualisAPIMock = () => [
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
     getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
     getListUsersApiAdminUsersGetMockHandler(),
+    getCreateAccountInvitationApiAdminUsersInvitationsPostMockHandler(),
     getPatchUserApiAdminUsersUserIdPatchMockHandler(),
     getDeleteUserApiAdminUsersUserIdDeleteMockHandler(),
     getForcePasswordResetEndpointApiAdminUsersUserIdForcePasswordResetPostMockHandler(),

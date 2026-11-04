@@ -120,7 +120,7 @@ get_audio_url
 
 # admin/users.py
 list_users
-create_user
+create_account_invitation
 delete_user
 
 # admin/projects.py

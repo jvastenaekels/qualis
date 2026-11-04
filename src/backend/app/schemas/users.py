@@ -124,6 +124,19 @@ class RecoveryLinkResponse(BaseModel):
     expires_at: datetime
 
 
+class AccountInvitationCreate(BaseModel):
+    """Body for POST /api/admin/users/invitations (superuser-only)."""
+
+    email: EmailStr
+
+
+class AccountInvitationLink(BaseModel):
+    """A single-use registration link. The invitee picks the password."""
+
+    invite_url: str
+    expires_at: datetime
+
+
 class AdminSetEmailRequest(BaseModel):
     """Body for POST /api/admin/users/{id}/set-email (superuser-only,
     SMTP-optional direct email swap)."""

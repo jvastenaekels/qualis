@@ -44,8 +44,9 @@ async def verify_invitation(
 
     project_id = payload.get("project_id") or payload.get("workspace_id")
 
-    project_name = "Unknown Project"
+    project_name = None
     if project_id:
+        project_name = "Unknown Project"
         from app.models import Project
 
         result = await db.execute(select(Project).where(Project.id == project_id))
