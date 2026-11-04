@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { customInstance } from '@/api/mutator';
 import { registerUserApiRegisterPost } from '@/api/generated';
+import type { UserCreate } from '@/api/model';
 
 const RegistrationPage = () => {
     const { t } = useTranslation();
@@ -36,6 +37,7 @@ const RegistrationPage = () => {
     const token = searchParams.get('token');
 
     const [email, setEmail] = useState('');
+    const [fullName, setFullName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
@@ -44,7 +46,12 @@ const RegistrationPage = () => {
         data: invite,
         isLoading: isVerifying,
         error: verifyError,
-    } = useQuery<{ email: string; workspace_name: string; role: string }>({
+    } = useQuery<{
+        email: string;
+        project_id: number | null;
+        project_name: string | null;
+        role: string;
+    }>({
         queryKey: ['verify-invite', token],
         queryFn: ({ signal }) =>
             customInstance({
@@ -59,9 +66,10 @@ const RegistrationPage = () => {
 
     // Manual Mutation for Registration
     const registerMutation = useMutation({
-        mutationFn: (data: { email: string; password: string; invitation_token?: string }) =>
-            registerUserApiRegisterPost(data),
+        mutationFn: (data: UserCreate) => registerUserApiRegisterPost(data),
     });
+
+    const isAccountInvite = !!invite && invite.project_id === null;
 
     useEffect(() => {
         if (invite) {
@@ -81,6 +89,7 @@ const RegistrationPage = () => {
                 email,
                 password,
                 invitation_token: token || undefined,
+                full_name: fullName.trim() || undefined,
             });
             if (result.requires_email_verification) {
                 navigate('/verify-email-sent', { state: { email } });
@@ -158,7 +167,11 @@ const RegistrationPage = () => {
                         <CardTitle className="text-emerald-600 font-black">
                             {t('auth.register.success_title')}
                         </CardTitle>
-                        <CardDescription>{t('auth.register.success_desc')}</CardDescription>
+                        <CardDescription>
+                            {isAccountInvite
+                                ? t('auth.register.success_desc_account', 'Your account is ready.')
+                                : t('auth.register.success_desc')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-sm text-slate-500">{t('auth.register.success_hint')}</p>
@@ -186,7 +199,11 @@ const RegistrationPage = () => {
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 italic">
                         Qual<span className="text-primary">is</span>
                     </h1>
-                    <p className="text-slate-500 font-medium">{t('auth.register.subtitle')}</p>
+                    <p className="text-slate-500 font-medium">
+                        {isAccountInvite
+                            ? t('auth.register.subtitle_account', 'Create your researcher account')
+                            : t('auth.register.subtitle')}
+                    </p>
                 </div>
 
                 <Card className="shadow-2xl border-none bg-white/90 backdrop-blur-xl ring-1 ring-slate-900/5">
@@ -197,31 +214,30 @@ const RegistrationPage = () => {
                             </span>
                             <UserPlus className="h-5 w-5 text-indigo-600" />
                         </CardTitle>
-                        <CardDescription className="pt-4">
-                            <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
-                                <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
-                                    <span className="text-2xs font-black text-indigo-400">
-                                        {t('auth.register.invitation_to')}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-slate-900">
-                                            {invite?.workspace_name}
-                                        </span>
-                                        <span className="text-xs text-slate-500 font-medium">
-                                            {t('admin.project.switcher.new_project_desc')}
+                        {!isAccountInvite && (
+                            <CardDescription className="pt-4">
+                                <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
+                                    <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
+                                        <span className="text-2xs font-black text-indigo-400">
+                                            {t('auth.register.invitation_to')}
                                         </span>
                                     </div>
-                                    <Badge
-                                        variant="outline"
-                                        className="bg-white text-2xs font-bold text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
-                                    >
-                                        {invite?.role}
-                                    </Badge>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-slate-900">
+                                                {invite?.project_name}
+                                            </span>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="bg-white text-2xs font-bold text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
+                                        >
+                                            {invite?.role}
+                                        </Badge>
+                                    </div>
                                 </div>
-                            </div>
-                        </CardDescription>
+                            </CardDescription>
+                        )}
                     </CardHeader>
                     <form onSubmit={handleRegister}>
                         <CardContent className="space-y-4 pt-4">
@@ -240,6 +256,22 @@ const RegistrationPage = () => {
                                         readOnly
                                     />
                                 </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="full-name"
+                                    className="text-xs font-bold text-slate-400"
+                                >
+                                    {t('auth.register.full_name_label', 'Full name (optional)')}
+                                </Label>
+                                <Input
+                                    id="full-name"
+                                    type="text"
+                                    autoComplete="name"
+                                    className="h-11 bg-slate-50/50 border-slate-200 focus:bg-white"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                />
                             </div>
                             <div className="space-y-2">
                                 <Label
