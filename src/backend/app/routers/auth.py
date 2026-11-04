@@ -6,6 +6,7 @@ import logging
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -209,6 +210,28 @@ def _build_anti_enum_register_response(
     )
 
 
+def _notify_already_registered(
+    existing: User, background_tasks: BackgroundTasks
+) -> None:
+    """Out-of-band notify a registered address with a recovery link.
+
+    The "pwa" claim mirrors the password-reset-request shape so the link is
+    single-use against the existing account's current password_changed_at.
+    """
+    reset_token = create_email_token(
+        email=existing.email,
+        purpose="password_reset",
+        expires_delta=timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS),
+        password_changed_at=existing.password_changed_at,
+    )
+    reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+    background_tasks.add_task(
+        send_register_already_registered,
+        email_to=existing.email,
+        reset_url=reset_url,
+    )
+
+
 @router.post(
     "/register", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED
 )
@@ -283,22 +306,7 @@ async def register_user(
     #    same response shape and status as the fresh arm.
     existing = await user_by_email(db, user_in.email)
     if existing is not None:
-        # Out-of-band notify the registered address with a recovery link.
-        # The "pwa" claim mirrors the password-reset-request shape so the
-        # link is single-use against the existing account's current
-        # password_changed_at.
-        reset_token = create_email_token(
-            email=existing.email,
-            purpose="password_reset",
-            expires_delta=timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS),
-            password_changed_at=existing.password_changed_at,
-        )
-        reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
-        background_tasks.add_task(
-            send_register_already_registered,
-            email_to=existing.email,
-            reset_url=reset_url,
-        )
+        _notify_already_registered(existing, background_tasks)
         return _build_anti_enum_register_response(
             user_in.email, requires_email_verification=needs_verification_step
         )
@@ -322,6 +330,24 @@ async def register_user(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid invitation token: {str(e)}",
+            )
+
+    # An account created in another case after the invitation would slip past
+    # the exact-match lookup above; fold case here (not in user_by_email, whose
+    # scalar_one_or_none would raise on legacy case-duplicates) and take the
+    # same duplicate arm. LIMIT 1: legacy rows may match several times.
+    if invitation_payload:
+        folded = await db.execute(
+            select(User)
+            .where(func.lower(User.email) == user_in.email.lower())
+            .order_by(User.id)
+            .limit(1)
+        )
+        folded_user = folded.scalars().first()
+        if folded_user is not None:
+            _notify_already_registered(folded_user, background_tasks)
+            return _build_anti_enum_register_response(
+                user_in.email, requires_email_verification=needs_verification_step
             )
 
     # Checked outside the creation try: an IntegrityError there is folded into

@@ -198,3 +198,37 @@ async def test_email_sent_when_smtp_configured(
         resp = await _invite(client, superuser_token, "mailed@example.com")
     assert resp.status_code == 201
     sender.assert_called_once_with("mailed@example.com", resp.json()["invite_url"])
+
+
+@pytest.mark.asyncio
+async def test_register_folds_case_against_account_created_after_invitation(
+    client: AsyncClient, superuser_token: str, user_factory, db
+) -> None:
+    resp = await _invite(client, superuser_token, "alice@example.com")
+    await user_factory(email="Alice@Example.com", password="old-password-1")
+
+    reg = await _register(
+        client, "alice@example.com", _token_of(resp), pw="new-password-2"
+    )
+    assert reg.status_code in (200, 201), reg.text
+
+    rows = (
+        (
+            await db.execute(
+                select(User.email).where(func.lower(User.email) == "alice@example.com")
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert rows == ["Alice@Example.com"]
+    old = await client.post(
+        "/api/token",
+        data={"username": "Alice@Example.com", "password": "old-password-1"},
+    )
+    new = await client.post(
+        "/api/token",
+        data={"username": "Alice@Example.com", "password": "new-password-2"},
+    )
+    assert old.status_code == 200
+    assert new.status_code == 401
