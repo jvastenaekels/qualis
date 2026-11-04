@@ -6,6 +6,10 @@ import { ShieldAlert } from 'lucide-react';
 import { useListProjectsApiAdminProjectsGet } from '@/api/generated';
 import { useTranslation } from 'react-i18next';
 
+// Pages an authenticated account can use before it belongs to any project:
+// the hub (empty state) and the project creation form.
+const PROJECTLESS_PATHS = ['/hub', '/app/projects/new'];
+
 const RequireAdmin = () => {
     const { t } = useTranslation();
     const { isLoading, isAuthenticated, isSuperuser } = useAuth();
@@ -44,7 +48,8 @@ const RequireAdmin = () => {
     // Admin area is open to superusers and to any user with at least
     // one project membership. The /admin/users page within does its
     // own superuser-only gate.
-    const canAccessAdminArea = isSuperuser || hasProjectAccess;
+    const canAccessAdminArea =
+        isSuperuser || hasProjectAccess || PROJECTLESS_PATHS.includes(location.pathname);
     if (!canAccessAdminArea) {
         return (
             <div className="flex h-screen w-full items-center justify-center p-4">

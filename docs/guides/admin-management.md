@@ -41,6 +41,8 @@ Qualis generates a unique registration link. If SMTP is configured, the user rec
 
 For an invited person already registered, the link grants project access immediately. For a new user, the link pre-fills the registration form; access is granted once the account is created.
 
+An account invited without a project (by a superuser, from the Users page) signs in on the researcher hub. With no project yet, the hub offers **New project**: the person creates their own project there and becomes its Owner. Project pages stay closed to them until they own or join a project.
+
 ### Roles
 
 Project membership maps to study-level capability as follows:
