@@ -55,8 +55,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
-import { resolveApiErrorKey } from '@/lib/error-utils';
+import { readMutationError } from '@/lib/error-utils';
 import { formatDate } from '@/lib/datetime';
 import {
     useAdminUsersPage,
@@ -108,22 +109,6 @@ function formatLastSeen(value: string | null | undefined, language: string): str
     return formatDate(value, language);
 }
 
-// Deliberately surfaces the server's human-readable message and ignores the
-// resolved i18n key (unlike ProjectMembersPage, which prefers a mapped key):
-// backend guard-rail messages ("You cannot demote yourself.", "...must keep at
-// least one active superuser.") are not in ERROR_KEY, so mapping would swallow
-// the actionable reason. Do not reintroduce key-mapping here.
-function readMutationError(err: unknown, fallback: string): string {
-    if (err && typeof err === 'object') {
-        const { fallback: serverMessage } = resolveApiErrorKey(
-            err as { code?: string; message?: string }
-        );
-        if (serverMessage && serverMessage !== 'An error occurred.') return serverMessage;
-    }
-    if (err instanceof Error && err.message) return err.message;
-    return fallback;
-}
-
 // ────────────────────────────────────────────────────────────────
 // Page shell
 // ────────────────────────────────────────────────────────────────
@@ -151,6 +136,7 @@ export default function AdminUsersPage() {
     const [linkCopied, setLinkCopied] = useState(false);
     const [setEmailTarget, setSetEmailTarget] = useState<AdminUser | null>(null);
     const [newEmail, setNewEmail] = useState('');
+    const [inviteOpen, setInviteOpen] = useState(false);
 
     const closeSetEmail = () => {
         setSetEmailTarget(null);
@@ -211,6 +197,11 @@ export default function AdminUsersPage() {
                     'Manage platform accounts and audit hygiene.'
                 )}
                 icon={Users}
+                actions={
+                    <Button onClick={() => setInviteOpen(true)}>
+                        {t('admin.users.invite_dialog.title', 'Invite user')}
+                    </Button>
+                }
             />
 
             {isEmailManual && (
@@ -348,6 +339,13 @@ export default function AdminUsersPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <InviteUserDialog
+                open={inviteOpen}
+                onOpenChange={setInviteOpen}
+                onInvite={actions.invite}
+                isEmailManual={isEmailManual}
+            />
 
             <Dialog
                 open={revealedLink !== null}

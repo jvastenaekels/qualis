@@ -25,6 +25,7 @@ const {
     mockResetTotpHook,
     mockRecoveryLinkHook,
     mockSetEmailHook,
+    mockInviteHook,
 } = vi.hoisted(() => ({
     mockListUsersHook: vi.fn(),
     mockPatchHook: vi.fn(),
@@ -33,6 +34,7 @@ const {
     mockResetTotpHook: vi.fn(),
     mockRecoveryLinkHook: vi.fn(),
     mockSetEmailHook: vi.fn(),
+    mockInviteHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
@@ -43,6 +45,7 @@ vi.mock('@/api/generated', () => ({
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost: mockResetTotpHook,
     useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost: mockRecoveryLinkHook,
     useSetEmailEndpointApiAdminUsersUserIdSetEmailPost: mockSetEmailHook,
+    useCreateAccountInvitationApiAdminUsersInvitationsPost: mockInviteHook,
     getListUsersApiAdminUsersGetQueryKey: () => ['list-users'],
 }));
 
@@ -76,6 +79,7 @@ beforeEach(() => {
     mockResetTotpHook.mockReturnValue(makeIdleMutation());
     mockRecoveryLinkHook.mockReturnValue(makeIdleMutation());
     mockSetEmailHook.mockReturnValue(makeIdleMutation());
+    mockInviteHook.mockReturnValue(makeIdleMutation());
 });
 
 // ── Pure function tests ───────────────────────────────────────────
@@ -270,5 +274,24 @@ describe('useAdminUsersPage — filtered list integration', () => {
         // userA has 2 badges, userB has 0 → userA must sort first
         expect(result.current.users[0].id).toBe(10);
         expect(result.current.users[1].id).toBe(11);
+    });
+});
+
+describe('useAdminUsersPage — invite', () => {
+    it('returns the invite_url and posts the address', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue({
+            invite_url: 'https://qualis.test/invite?token=abc',
+            expires_at: '2026-11-11T00:00:00Z',
+        });
+        mockInviteHook.mockReturnValue({ mutateAsync, isPending: false, error: null });
+        const { result } = renderHook(() => useAdminUsersPage(), { wrapper: AllTheProviders });
+
+        let url = '';
+        await act(async () => {
+            url = await result.current.actions.invite('new@example.org');
+        });
+
+        expect(url).toBe('https://qualis.test/invite?token=abc');
+        expect(mutateAsync).toHaveBeenCalledWith({ data: { email: 'new@example.org' } });
     });
 });

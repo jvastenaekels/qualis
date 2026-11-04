@@ -71,3 +71,19 @@ export function resolveApiErrorKey(payload: ApiErrorPayload | undefined): {
     const fallback = message || code || 'An error occurred.';
     return { key, fallback };
 }
+
+// Deliberately surfaces the server's human-readable message and ignores the
+// resolved i18n key (unlike ProjectMembersPage, which prefers a mapped key):
+// backend guard-rail messages ("You cannot demote yourself.", "...must keep at
+// least one active superuser.") are not in ERROR_KEY, so mapping would swallow
+// the actionable reason. Do not reintroduce key-mapping here.
+export function readMutationError(err: unknown, fallback: string): string {
+    if (err && typeof err === 'object') {
+        const { fallback: serverMessage } = resolveApiErrorKey(
+            err as { code?: string; message?: string }
+        );
+        if (serverMessage && serverMessage !== 'An error occurred.') return serverMessage;
+    }
+    if (err instanceof Error && err.message) return err.message;
+    return fallback;
+}

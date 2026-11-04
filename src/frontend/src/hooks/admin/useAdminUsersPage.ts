@@ -36,6 +36,7 @@ import {
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost,
     useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost,
     useSetEmailEndpointApiAdminUsersUserIdSetEmailPost,
+    useCreateAccountInvitationApiAdminUsersInvitationsPost,
     getListUsersApiAdminUsersGetQueryKey,
 } from '@/api/generated';
 import type { UserReadAdmin } from '@/api/model';
@@ -141,6 +142,12 @@ export function useAdminUsersPage() {
         mutation: { onSuccess: invalidate },
     });
 
+    // Inviting adds no row (the invitee is not a user until they register),
+    // but the list is invalidated anyway so a stale view never outlives it.
+    const inviteMut = useCreateAccountInvitationApiAdminUsersInvitationsPost({
+        mutation: { onSuccess: invalidate },
+    });
+
     const now = useMemo(() => new Date(), []); // intentional: page-lifetime clock (admin page is short-lived)
 
     const filtered = useMemo(() => {
@@ -186,7 +193,8 @@ export function useAdminUsersPage() {
             forcePwReset.isPending ||
             resetTotp.isPending ||
             recoveryLink.isPending ||
-            setEmailMut.isPending,
+            setEmailMut.isPending ||
+            inviteMut.isPending,
         mutationError: patch.error ?? del.error ?? forcePwReset.error ?? resetTotp.error ?? null,
         actions: {
             deactivate: (u: AdminUser) =>
@@ -215,6 +223,10 @@ export function useAdminUsersPage() {
                     userId: u.id,
                     data: { new_email: newEmail },
                 });
+            },
+            invite: async (email: string): Promise<string> => {
+                const res = await inviteMut.mutateAsync({ data: { email } });
+                return res.invite_url;
             },
             delete: (u: AdminUser) => del.mutateAsync({ userId: u.id }),
         },

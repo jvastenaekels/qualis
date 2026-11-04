@@ -19,6 +19,7 @@ const {
     mockResetTotpHook,
     mockRecoveryLinkHook,
     mockSetEmailHook,
+    mockInviteHook,
 } = vi.hoisted(() => ({
     mockListUsersHook: vi.fn(),
     mockPatchHook: vi.fn(),
@@ -27,6 +28,7 @@ const {
     mockResetTotpHook: vi.fn(),
     mockRecoveryLinkHook: vi.fn(),
     mockSetEmailHook: vi.fn(),
+    mockInviteHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
@@ -37,6 +39,7 @@ vi.mock('@/api/generated', () => ({
     useResetTotpEndpointApiAdminUsersUserIdResetTotpPost: mockResetTotpHook,
     useRecoveryLinkEndpointApiAdminUsersUserIdRecoveryLinkPost: mockRecoveryLinkHook,
     useSetEmailEndpointApiAdminUsersUserIdSetEmailPost: mockSetEmailHook,
+    useCreateAccountInvitationApiAdminUsersInvitationsPost: mockInviteHook,
     getListUsersApiAdminUsersGetQueryKey: () => ['list-users'],
 }));
 
@@ -69,6 +72,7 @@ beforeEach(() => {
     mockForcePwHook.mockReturnValue(makeIdleMutation());
     mockResetTotpHook.mockReturnValue(makeIdleMutation());
     mockRecoveryLinkHook.mockReturnValue(makeIdleMutation());
+    mockInviteHook.mockReturnValue(makeIdleMutation());
     mockSetEmailHook.mockReturnValue({
         mutateAsync: vi.fn().mockResolvedValue({ ...base, email: 'new@example.com' }),
         isPending: false,
