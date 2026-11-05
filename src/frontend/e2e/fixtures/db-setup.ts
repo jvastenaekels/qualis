@@ -294,6 +294,18 @@ export class TestDatabase {
         return link.token;
     }
 
+    /** The study's CSV export, as the Data page downloads it. */
+    async exportCsv(token: string, slug: string): Promise<string> {
+        const response = await this.fetchWithRetry(
+            `${this.baseUrl}/api/admin/studies/${slug}/export/csv`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to export CSV: ${await response.text()}`);
+        }
+        return response.text();
+    }
+
     /**
      * Create a concourse via API. `ConcourseListPage` auto-creates one and
      * redirects to its detail page on first visit, so tests that want a

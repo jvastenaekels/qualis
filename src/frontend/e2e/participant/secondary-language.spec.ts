@@ -9,7 +9,7 @@
 
 import type { Page } from '@playwright/test';
 import { test, expect } from '../fixtures/db-setup';
-import { testDataBuilders } from '../fixtures/test-data';
+import { testDataBuilders, type StudyData } from '../fixtures/test-data';
 import { ConsentPage } from '../pages/ConsentPage';
 import { PreSortPage } from '../pages/PreSortPage';
 import { placeAllCards } from '../helpers/rough-sort';
@@ -17,6 +17,15 @@ import { placeAllCards } from '../helpers/rough-sort';
 const TITLE = { en: 'English study', fi: 'Suomalainen tutkimus' };
 const STATEMENT = { en: 'Statement', fi: 'Väittämä' };
 const STATEMENT_COUNT = 6;
+const LAST_SCREEN = {
+    en: { why: 'Why these choices', thanks: 'Thank you for your participation!' },
+    fi: { why: 'Miksi nämä valinnat', thanks: 'Kiitos osallistumisestasi!' },
+};
+const QUESTION = { en: 'Work arrangement', fi: 'Työjärjestely' };
+const OPTIONS = {
+    en: ['Fully remote', 'Hybrid', 'Fully in-office', 'Freelance', 'Between jobs'],
+    fi: ['Täysin etänä', 'Hybridi', 'Täysin toimistolla', 'Freelancer', 'Työnhaussa'],
+};
 
 function translation(language_code: 'en' | 'fi') {
     return {
@@ -45,7 +54,7 @@ function inBothLanguages<T extends { label: string; options?: unknown[] }>(field
     };
 }
 
-function bilingualStudy(slug: string) {
+function bilingualStudy(slug: string, overrides: Partial<StudyData> = {}) {
     return {
         ...testDataBuilders.study({
             slug,
@@ -80,6 +89,7 @@ function bilingualStudy(slug: string) {
                     })
                 ),
             }),
+            ...overrides,
         }),
         rough_sort_enabled: false,
     };
@@ -96,9 +106,11 @@ async function expectLanguage(page: Page, lang: 'en' | 'fi') {
 
 async function expectDeckLanguage(page: Page, lang: 'en' | 'fi') {
     await expect
-        .poll(async () =>
-            // Hyphenation inserts soft hyphens into displayed statements.
-            (await page.getByTestId('deck-cards-container').innerText()).replaceAll('­', '')
+        .poll(
+            async () =>
+                // Hyphenation inserts soft hyphens into displayed statements.
+                (await page.getByTestId('deck-cards-container').innerText()).replaceAll('­', ''),
+            { timeout: 30000 }
         )
         .toContain(STATEMENT[lang]);
 }
@@ -108,36 +120,45 @@ async function chooseLanguage(page: Page, lang: 'en' | 'fi') {
     await page.getByRole('button', { name: lang, exact: true }).click();
 }
 
-async function reachFineSort(page: Page) {
+async function reachFineSort(page: Page, answerPresort?: (presort: PreSortPage) => Promise<void>) {
     await page.getByTestId('start-btn').click();
     const consent = new ConsentPage(page);
     await consent.waitForLoad();
     await consent.acceptConsent();
     const presort = new PreSortPage(page);
     await presort.waitForLoad();
-    await presort.completePreSort();
+    await (answerPresort ? answerPresort(presort) : presort.completePreSort());
     await page.waitForURL(/\/fine-sort(\?|$)/, { timeout: 15000 });
     // The URL commits before the lazy sort chunk does, and until then the page is
     // empty and still in its old language. Assertions must wait for the deck.
     await expect(page.getByTestId('deck-cards-container')).toBeVisible({ timeout: 30000 });
 }
 
-async function finishInFinnish(page: Page) {
+async function finishIn(page: Page, lang: 'en' | 'fi') {
     await placeAllCards(page);
     const confirmSort = page.getByTestId('fine-sort-validate-btn');
     await expect(confirmSort).toBeEnabled({ timeout: 10000 });
     await confirmSort.click({ timeout: 10000 });
 
     await page.waitForURL(/\/post-sort(\?|$)/, { timeout: 20000 });
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Miksi nämä valinnat');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(LAST_SCREEN[lang].why);
     await page.getByTestId('postsort-step1-next-btn').click();
     await page.getByTestId('postsort-submit-btn').click();
 
-    await expect(page.getByTestId('thank-you-message')).toContainText(
-        'Kiitos osallistumisestasi!',
-        { timeout: 15000 }
-    );
-    await expectLanguage(page, 'fi');
+    await expect(page.getByTestId('thank-you-message')).toContainText(LAST_SCREEN[lang].thanks, {
+        timeout: 15000,
+    });
+    await expectLanguage(page, lang);
+}
+
+/** Fill the open question card in `lang`, then wait for the save to land. */
+async function writeQuestion(page: Page, lang: 'en' | 'fi') {
+    await page.getByRole('textbox', { name: 'Question label' }).fill(QUESTION[lang]);
+    for (const [i, option] of OPTIONS[lang].entries()) {
+        await page.getByRole('textbox', { name: `Option ${i + 1}`, exact: true }).fill(option);
+    }
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Saved', exact: true })).toBeVisible();
 }
 
 test.describe('A study taken in its second language', () => {
@@ -158,7 +179,7 @@ test.describe('A study taken in its second language', () => {
 
         await expectLanguage(page, 'fi');
         await expectDeckLanguage(page, 'fi');
-        await finishInFinnish(page);
+        await finishIn(page, 'fi');
     });
 
     test('the header language menu works up to the final screen', async ({
@@ -185,7 +206,7 @@ test.describe('A study taken in its second language', () => {
         await expectLanguage(page, 'fi');
         await expectDeckLanguage(page, 'fi');
 
-        await finishInFinnish(page);
+        await finishIn(page, 'fi');
     });
 
     test('the header language menu overrides a ?lang= link', async ({
@@ -204,7 +225,7 @@ test.describe('A study taken in its second language', () => {
 
         await page.reload();
         await expectLanguage(page, 'fi');
-        await finishInFinnish(page);
+        await finishIn(page, 'fi');
     });
 
     test('a reload mid-session keeps the persisted language', async ({
@@ -224,7 +245,7 @@ test.describe('A study taken in its second language', () => {
         await page.reload();
         await expectLanguage(page, 'fi');
         await expectDeckLanguage(page, 'fi');
-        await finishInFinnish(page);
+        await finishIn(page, 'fi');
     });
 
     test('test mode keeps ?mode=test past the disabled rough sort', async ({
@@ -239,5 +260,94 @@ test.describe('A study taken in its second language', () => {
         await reachFineSort(page);
 
         expect(new URL(page.url()).searchParams.get('mode')).toBe('test');
+    });
+});
+
+test.describe('The whole path, from the designer to the export', () => {
+    test.setTimeout(300_000);
+
+    test('five options added in the designer export as five answers, whatever the browser language', async ({
+        page,
+        browser,
+        testDb,
+        authToken,
+    }) => {
+        const slug = `lang-export-${crypto.randomUUID()}`;
+        await testDb.createStudy(
+            authToken,
+            bilingualStudy(slug, {
+                state: 'draft',
+                presort_config: testDataBuilders.presortConfig({}),
+            })
+        );
+
+        await testDb.loginToAdminUI(page);
+        await page.goto(`/app/${testDb.getWorkspaceSlug()}/studies/${slug}/design`);
+        // A cold Vite compile of the designer chunk outlasts the default action timeout.
+        await page.getByTestId('tab-pre-sort').click({ timeout: 90_000 });
+        await page.getByTestId('add-question-select').click();
+        await page.getByTestId('question-accordion-trigger').click();
+        for (const number of [3, 4, 5]) {
+            await page.getByRole('button', { name: 'Add option' }).click();
+            await expect(
+                page.getByRole('textbox', { name: `Option ${number}`, exact: true })
+            ).toBeVisible();
+        }
+        await writeQuestion(page, 'en');
+        await page.getByTestId('language-switcher').click();
+        await page.getByRole('menuitem', { name: 'FI', exact: true }).click();
+        await writeQuestion(page, 'fi');
+
+        const { presort_config } = await testDb.getStudy(authToken, slug);
+        const [[questionKey, question]] = Object.entries(presort_config.fields) as [
+            string,
+            { options: { value: string }[] },
+        ][];
+        const values = question.options.map((o) => o.value);
+        expect(values).toEqual(['opt_1', 'opt_2', 'opt_3', 'opt_4', 'opt_5']);
+
+        await testDb.activateStudy(authToken, slug);
+        const token = await testDb.createRecruitmentLink(authToken, slug);
+
+        // Options 4 and 5 came from "Add option", whose values used to collide.
+        const sorts = [
+            { locale: 'fi-FI', lang: 'fi', option: 3 },
+            { locale: 'en-US', lang: 'en', option: 4 },
+        ] as const;
+
+        for (const { locale, lang, option } of sorts) {
+            const context = await browser.newContext({ locale });
+            const participant = await context.newPage();
+            await participant.goto(`/study/${slug}?token=${token}`);
+            await expectLanguage(participant, lang);
+            await reachFineSort(participant, async (presort) => {
+                await participant
+                    .getByLabel(QUESTION[lang])
+                    .selectOption({ label: OPTIONS[lang][option] });
+                await presort.submit();
+            });
+            await expectDeckLanguage(participant, lang);
+            await finishIn(participant, lang);
+            await context.close();
+        }
+
+        // A CSV row holds one answer: the other three values need rows of their own.
+        for (const value of values.slice(0, 3)) {
+            await testDb.createParticipant(authToken, slug, {
+                presort_answers: { [questionKey]: value },
+            });
+        }
+
+        const csv = await testDb.exportCsv(authToken, slug);
+        await test.info().attach('export.csv', { body: csv, contentType: 'text/csv' });
+        // Labels come out in the study's default language, whatever the participant read.
+        const rowsAnswering = (option: number) =>
+            csv.split('\r\n').filter((row) => row.includes(`,${OPTIONS.en[option]},`));
+        for (const option of OPTIONS.en.keys()) {
+            expect(rowsAnswering(option)).toHaveLength(1);
+        }
+        for (const { lang, option } of sorts) {
+            expect(rowsAnswering(option)[0]).toContain(`,${lang},completed,`);
+        }
     });
 });
