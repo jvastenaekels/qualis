@@ -17,8 +17,22 @@ vi.mock('@/api/generated', async () => {
     };
 });
 
+// The real instance below would otherwise fetch locale files over the network.
+vi.mock('i18next-http-backend', () => ({
+    default: class {
+        static type = 'backend';
+        type = 'backend' as const;
+        init() {}
+        read(_lng: string, _ns: string, callback: (err: null, data: object) => void) {
+            callback(null, {});
+        }
+    },
+}));
+
 describe('admin language choice', () => {
     afterEach(async () => {
+        const { default: appI18n } = await vi.importActual<typeof import('@/i18n')>('@/i18n');
+        await appI18n.changeLanguage('en');
         localStorage.removeItem('i18nextLng');
         await testI18n.changeLanguage('en');
     });
@@ -43,12 +57,9 @@ describe('admin language choice', () => {
         localStorage.setItem('i18nextLng', 'en');
 
         // setupTests mocks '@/i18n'; the real instance is what the detector configures.
-        vi.stubGlobal('fetch', () => Promise.resolve(new Response('{}')));
         const { default: appI18n } = await vi.importActual<typeof import('@/i18n')>('@/i18n');
         await appI18n.changeLanguage('fi');
 
         expect(localStorage.getItem('i18nextLng')).toBe('en');
-        await appI18n.changeLanguage('en');
-        vi.unstubAllGlobals();
     });
 });
