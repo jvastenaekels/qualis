@@ -666,6 +666,55 @@ describe('Pilot Mode Logic', () => {
         expect(screen.getByText('layout.pilot_mode')).toBeInTheDocument();
     });
 
+    it('says the design changed and offers to start the test again', () => {
+        const assign = vi.spyOn(window.location, 'assign').mockImplementation(() => {});
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        useConfigStore.setState({
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
+            config: { slug: 'test', state: 'draft' } as any,
+            designChanged: true,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/*" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/fine-sort?mode=test&lang=fi'] }
+        );
+
+        expect(screen.getByText('layout.pilot_changed')).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'layout.pilot_restart' }));
+
+        // A test it stays, through the pilot reset signal; nothing leaves the test.
+        expect(localStorage.getItem('qualis-pilot-reset-test')).toBe('true');
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBe('true');
+        expect(assign).toHaveBeenCalledWith('/study/test?mode=test&lang=fi');
+        assign.mockRestore();
+        localStorage.removeItem('qualis-pilot-reset-test');
+        useConfigStore.setState({ designChanged: false });
+    });
+
+    it('says nothing about a change while the design is the one under test', () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        useConfigStore.setState({
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
+            config: { slug: 'test', state: 'draft' } as any,
+            designChanged: false,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/*" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome?mode=test'] }
+        );
+
+        expect(screen.queryByText('layout.pilot_changed')).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('button', { name: 'layout.pilot_restart' })
+        ).not.toBeInTheDocument();
+    });
+
     it('Restricts language list to available_languages', async () => {
         useSessionStore.setState({ isPilotMode: true });
         useConfigStore.setState({

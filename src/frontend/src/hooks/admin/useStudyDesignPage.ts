@@ -124,6 +124,8 @@ export interface StudyDesignPageApi {
     statementsCount: number;
     gridCapacity: number;
     isGridValid: boolean;
+    /** Labels of the required items still missing, or null when Test run is available. */
+    testRunBlockedReason: string | null;
 
     // Per-tab validation
     isIntroValid: boolean;
@@ -401,7 +403,12 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         (acc, col) => acc + (col.capacity || 0),
         0
     );
-    const isGridValid = statementsCount === gridCapacity;
+    // Same rule as StudyService._check_grid_capacity: free needs room for every statement,
+    // forced and flexible need the grid to hold exactly the Q-set.
+    const isGridValid =
+        draft?.distribution_mode === 'free'
+            ? gridCapacity >= statementsCount
+            : gridCapacity === statementsCount;
 
     const currentTranslation = useMemo(
         () =>
@@ -423,6 +430,11 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         if (!draft) return [];
         return buildChecklist(draft, currentTranslation, isGridValid, t);
     }, [draft, currentTranslation, isGridValid, t]);
+
+    const testRunBlockedReason = useMemo(() => {
+        const missing = checklist.filter((item) => item.required && !item.isComplete);
+        return missing.length > 0 ? missing.map((item) => item.label).join(', ') : null;
+    }, [checklist]);
 
     const globalRequirementsMet = (draft?.statements?.length || 0) > 0 && isGridValid;
 
@@ -530,7 +542,8 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         safeBrowserLocalStorage.setItem(`qualis-pilot-reset-${effectiveSlug}`, 'true');
 
         const testUrl = `/study/${effectiveSlug}?mode=test&lang=${encodeURIComponent(activeLocale)}`;
-        window.open(testUrl, '_blank');
+        // One named tab per study: a second Test run navigates it instead of piling up tabs.
+        window.open(testUrl, `qualis-pilot-${effectiveSlug}`);
         toast.info(`${t('admin.design.toolbar.test_run')}...`);
     }, [draft, effectiveSlug, activeLocale, t]);
 
@@ -555,6 +568,7 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         statementsCount,
         gridCapacity,
         isGridValid,
+        testRunBlockedReason,
         isIntroValid,
         isConditionValid,
         isQSortValid,

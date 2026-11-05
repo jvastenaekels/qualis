@@ -115,9 +115,11 @@
     "layout": {
         "title": "Qualis",
         "preparing": "Uw onderzoekssessie voorbereiden...",
-        "pilot_mode": "Pilotmodus: wijzigingen zijn tijdelijk en gegevens worden niet opgeslagen",
+        "pilot_mode": "Testmodus: er wordt niets opgeslagen",
         "pilot_stays": "Dit tabblad blijft in testmodus totdat u de test verlaat, ook als u hier een echte link opent.",
         "pilot_leave": "Test verlaten",
+        "pilot_changed": "Het ontwerp is gewijzigd",
+        "pilot_restart": "Test opnieuw starten",
         "pilot_no_draft_title": "Dit is een testlink, geen deelnemerslink",
         "pilot_no_draft_message": "Een test laat het onderzoek draaien zoals u het aan het bewerken bent. Open het met Testrun in de ontwerper. Verlaat de test om het onderzoek te zien zoals deelnemers het zien.",
         "default_study_title": "Q-methodologie onderzoek",

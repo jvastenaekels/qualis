@@ -55,7 +55,13 @@ import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
-import { isPilot, leavePilot, PILOT_NO_DRAFT, withTestMode } from '../utils/pilotMode';
+import {
+    isPilot,
+    leavePilot,
+    PILOT_NO_DRAFT,
+    restartPilot,
+    withTestMode,
+} from '../utils/pilotMode';
 import { restoreStudySession } from '../utils/sessionReset';
 import { setStudyStorageScope, releaseStudyStorageScope } from '../store/safeStorage';
 import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
@@ -85,6 +91,7 @@ const StudyLayoutContent: React.FC = () => {
     const config = useConfigStore((state) => state.config);
     const configLoading = useConfigStore((state) => state.isLoading);
     const configError = useConfigStore((state) => state.error);
+    const designChanged = useConfigStore((state) => state.designChanged);
     const setConfig = useConfigStore((state) => state.setConfig);
 
     // session selectors
@@ -394,17 +401,31 @@ const StudyLayoutContent: React.FC = () => {
             className="h-[100dvh] bg-gray-50 flex flex-col overflow-hidden"
             style={{ '--brand-accent': accentColor } as React.CSSProperties}
         >
-            {/* Pilot Mode Banner */}
+            {/* Test banner. On a phone it is one or two short lines: the long reminder waits for a wider screen, so the sort grid keeps its height. */}
             {isPilotModePersistent && (
-                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex flex-wrap items-center justify-center gap-x-2 text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
+                <div className="bg-amber-100 border-b border-amber-200 px-3 sm:px-4 py-1 sm:py-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 leading-tight text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     <span>{t('layout.pilot_mode')}</span>
-                    <span>
+                    <span className="hidden lg:inline">
                         {t(
                             'layout.pilot_stays',
                             'This tab stays in test mode until you leave the test, even if you open a real link here.'
                         )}
                     </span>
+                    {designChanged && (
+                        <>
+                            <span role="status">
+                                {t('layout.pilot_changed', 'The design changed')}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => slug && restartPilot(slug, location.search)}
+                                className="underline underline-offset-2 whitespace-nowrap hover:text-amber-700 transition-colors"
+                            >
+                                {t('layout.pilot_restart', 'Start the test again')}
+                            </button>
+                        </>
+                    )}
                     <button
                         type="button"
                         onClick={() => slug && leavePilot(slug)}

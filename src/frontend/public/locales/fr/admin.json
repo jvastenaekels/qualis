@@ -1195,6 +1195,7 @@
                 "manage_langs": "Gérer les langues",
                 "select_lang": "Choisir la langue",
                 "test_run_help": "Aperçu en tant que participant. Ces runs ne sont pas comptés dans vos données.",
+                "test_run_blocked": "Pour tester, il manque : {{missing}}",
                 "more_actions": "Autres actions"
             },
             "sync": {

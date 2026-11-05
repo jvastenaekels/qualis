@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { isPilot, isPilotSession, leavePilot } from './pilotMode';
+import { isPilot, isPilotSession, leavePilot, restartPilot } from './pilotMode';
 
 const FLAG = 'qualis-pilot-mode';
 
@@ -53,6 +53,20 @@ describe('pilotMode', () => {
         expect(localStorage.getItem('qualis-pilot-responses:s')).toBeNull();
         expect(localStorage.getItem('qualis-session:s')).not.toBeNull();
         expect(assign).toHaveBeenCalledWith('/study/s');
+    });
+
+    it('Start the test again asks for the pilot reset, stays a test, removes no flag', () => {
+        const assign = vi.spyOn(window.location, 'assign').mockImplementation(() => {});
+        sessionStorage.setItem(FLAG, 'true');
+        localStorage.setItem('qualis-pilot-responses:s', '{"state":{}}');
+
+        restartPilot('s', '?lang=fi');
+
+        expect(localStorage.getItem('qualis-pilot-reset-s')).toBe('true');
+        expect(sessionStorage.getItem(FLAG)).toBe('true');
+        // The wipe itself belongs to the reset path in useStudyConfig, run by the reload.
+        expect(localStorage.getItem('qualis-pilot-responses:s')).not.toBeNull();
+        expect(assign).toHaveBeenCalledWith('/study/s?lang=fi&mode=test');
     });
 
     it('the reads that run while the page unloads cannot undo Leave the test', () => {

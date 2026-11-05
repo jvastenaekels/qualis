@@ -549,7 +549,10 @@ describe('useStudyDesignPage', () => {
                 result.current.handleTestRun();
             });
 
-            expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test&lang=en', '_blank');
+            expect(openSpy).toHaveBeenCalledWith(
+                '/study/test-study?mode=test&lang=en',
+                'qualis-pilot-test-study'
+            );
         } finally {
             restoreLocalStorage();
             openSpy.mockRestore();
@@ -566,11 +569,95 @@ describe('useStudyDesignPage', () => {
         act(() => result.current.setActiveLocale('fi'));
         act(() => result.current.handleTestRun());
 
-        expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test&lang=fi', '_blank');
+        expect(openSpy).toHaveBeenCalledWith(
+            '/study/test-study?mode=test&lang=fi',
+            'qualis-pilot-test-study'
+        );
         // The draft is the only thing handed over; the old resolved snapshot is gone.
         expect(localStorage.getItem('qualis-test-draft-test-study')).not.toBeNull();
         expect(localStorage.getItem('qualis-test-config-test-study')).toBeNull();
         openSpy.mockRestore();
+    });
+
+    it('Test run reuses one named tab', () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+        act(() => result.current.handleTestRun());
+        act(() => result.current.setActiveLocale('fi'));
+        act(() => result.current.handleTestRun());
+
+        // Same name both times: the browser navigates the open tab, with the new language.
+        expect(openSpy.mock.calls.map((c) => c[1])).toEqual([
+            'qualis-pilot-test-study',
+            'qualis-pilot-test-study',
+        ]);
+        expect(openSpy.mock.calls[1][0]).toBe('/study/test-study?mode=test&lang=fi');
+        openSpy.mockRestore();
+    });
+
+    it.each([
+        ['free', 7, true],
+        ['forced', 7, false],
+        ['flexible', 7, false],
+    ])('%s distribution with spare capacity: testable is %s', (mode, _cap, testable) => {
+        const spare = {
+            ...mockStudy,
+            distribution_mode: mode,
+            grid_config: [
+                { score: -1, capacity: 2 },
+                { score: 0, capacity: 3 },
+                { score: 1, capacity: 2 },
+            ],
+        } as unknown as StudyRead;
+        useStudyDesigner.getState().setStudy(spare);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: spare }));
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+
+        expect(result.current.gridCapacity).toBe(7);
+        expect(result.current.isGridValid).toBe(testable);
+        expect(result.current.isLaunchReady).toBe(testable);
+    });
+
+    it('free distribution with too little capacity cannot be tested', () => {
+        const short = {
+            ...mockStudy,
+            distribution_mode: 'free',
+            grid_config: [{ score: 0, capacity: 5 }],
+        } as unknown as StudyRead;
+        useStudyDesigner.getState().setStudy(short);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: short }));
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+
+        expect(result.current.isGridValid).toBe(false);
+    });
+
+    it('the disabled Test run says why', () => {
+        const unbalanced = {
+            ...mockStudy,
+            statements: [...(mockStudy.statements ?? []), { code: 's7', translations: [] }],
+        } as StudyRead;
+        useStudyDesigner.getState().setStudy(unbalanced);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: unbalanced }));
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+
+        expect(result.current.isLaunchReady).toBe(false);
+        expect(result.current.testRunBlockedReason).toContain('Grid balanced');
+        expect(result.current.testRunBlockedReason).not.toContain('Study title');
+    });
+
+    it('a ready draft has no blocked reason', () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+
+        expect(result.current.testRunBlockedReason).toBeNull();
     });
 
     it('DESIGN_STEPS has the canonical 7 steps in expected order', () => {

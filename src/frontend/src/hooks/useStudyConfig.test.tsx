@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { PILOT_NO_DRAFT } from '../utils/pilotMode';
@@ -406,6 +407,160 @@ describe('useStudyConfig', () => {
                     'Hei',
                 ])
             );
+        });
+
+        it('a draft carries methodology tips and step help', async () => {
+            const stepHelp = { presort: { what: 'Sort', why: 'To see' } };
+            openDraft({
+                default_language: 'fi',
+                translations: [
+                    tr('en', 'Study', { methodology_tips: ['en tip'] }),
+                    tr('fi', 'Tutkimus', { methodology_tips: ['fi tip'], step_help: stepHelp }),
+                ],
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+            expect(useConfigStore.getState().config?.methodology_tips).toEqual(['fi tip']);
+            expect(useConfigStore.getState().config?.step_help).toEqual(stepHelp);
+        });
+
+        it('a designer change does not reload a running test', async () => {
+            const draft = (title: string) =>
+                JSON.stringify({
+                    slug: 'test-study',
+                    statements: [],
+                    default_language: 'en',
+                    translations: [tr('en', title)],
+                });
+            openDraft({ default_language: 'en', translations: [tr('en', 'First')] });
+            // The first load syncs the session language, which reloads once more: let it settle.
+            await waitFor(() => expect(useSessionStore.getState().language).toBe('en'));
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+            const running = useConfigStore.getState().config;
+
+            act(() => {
+                window.dispatchEvent(
+                    new StorageEvent('storage', {
+                        key: 'qualis-test-draft-test-study',
+                        newValue: draft('Second'),
+                    })
+                );
+            });
+
+            expect(useConfigStore.getState().config).toBe(running);
+            expect(useConfigStore.getState().config?.title).toBe('First');
+            expect(useConfigStore.getState().designChanged).toBe(true);
+        });
+
+        it('a draft that did not change leaves the test unmarked', async () => {
+            openDraft({ default_language: 'en', translations: [tr('en', 'First')] });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+
+            act(() => {
+                window.dispatchEvent(
+                    new StorageEvent('storage', {
+                        key: 'qualis-test-draft-test-study',
+                        newValue: localStorage.getItem('qualis-test-draft-test-study'),
+                    })
+                );
+            });
+
+            expect(useConfigStore.getState().designChanged).toBe(false);
+        });
+
+        it('a draft that appears on the refusal screen still loads', async () => {
+            vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) =>
+                key === 'mode' ? 'test' : null
+            );
+            localStorage.clear();
+            vi.mocked(useGetStudyConfig).mockReturnValue({
+                data: undefined,
+                isLoading: false,
+                error: null,
+                refetch: vi.fn(),
+                // biome-ignore lint/suspicious/noExplicitAny: mock hook
+            } as any);
+            renderHook(() => useStudyConfig());
+            await waitFor(() => expect(useConfigStore.getState().error).toBe(PILOT_NO_DRAFT));
+
+            const raw = JSON.stringify({
+                slug: 'test-study',
+                statements: [],
+                default_language: 'en',
+                translations: [tr('en', 'Late')],
+            });
+            localStorage.setItem('qualis-test-draft-test-study', raw);
+            act(() => {
+                window.dispatchEvent(
+                    new StorageEvent('storage', {
+                        key: 'qualis-test-draft-test-study',
+                        newValue: raw,
+                    })
+                );
+            });
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Late'));
+        });
+
+        it('a language switch mid-test keeps the design the test began with', async () => {
+            openDraft({
+                default_language: 'en',
+                translations: [tr('en', 'First'), tr('fi', 'Eka')],
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+            const newer = JSON.stringify({
+                slug: 'test-study',
+                statements: [],
+                default_language: 'en',
+                translations: [tr('en', 'Second'), tr('fi', 'Toka')],
+            });
+            localStorage.setItem('qualis-test-draft-test-study', newer);
+            act(() => {
+                window.dispatchEvent(
+                    new StorageEvent('storage', {
+                        key: 'qualis-test-draft-test-study',
+                        newValue: newer,
+                    })
+                );
+            });
+
+            act(() => useSessionStore.getState().setLanguage('fi'));
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Eka'));
+            expect(useConfigStore.getState().designChanged).toBe(true);
+        });
+
+        it('the pilot reset key wipes the test progress and is consumed', async () => {
+            vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) =>
+                key === 'mode' ? 'test' : null
+            );
+            localStorage.clear();
+            localStorage.setItem(
+                'qualis-test-draft-test-study',
+                JSON.stringify({
+                    slug: 'test-study',
+                    statements: [],
+                    default_language: 'en',
+                    translations: [tr('en', 'First')],
+                })
+            );
+            localStorage.setItem('qualis-pilot-reset-test-study', 'true');
+            useResponseStore.getState().setPresortResponse({ q: 'old answer' });
+            vi.mocked(useGetStudyConfig).mockReturnValue({
+                data: undefined,
+                isLoading: false,
+                error: null,
+                refetch: vi.fn(),
+                // biome-ignore lint/suspicious/noExplicitAny: mock hook
+            } as any);
+
+            renderHook(() => useStudyConfig());
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+            expect(localStorage.getItem('qualis-pilot-reset-test-study')).toBeNull();
+            expect(JSON.stringify(useResponseStore.getState().presort)).not.toContain('old answer');
         });
     });
 

@@ -115,9 +115,11 @@
     "layout": {
         "title": "Qualis",
         "preparing": "A preparar a sua sessão de estudo...",
-        "pilot_mode": "Modo piloto: as alterações são temporárias e os dados não serão guardados",
+        "pilot_mode": "Modo de teste: nada é guardado",
         "pilot_stays": "Este separador continua em modo de teste até sair do teste, mesmo que abra aqui uma ligação real.",
         "pilot_leave": "Sair do teste",
+        "pilot_changed": "O desenho do estudo mudou",
+        "pilot_restart": "Recomeçar o teste",
         "pilot_no_draft_title": "Esta é uma ligação de teste, não uma ligação de participação",
         "pilot_no_draft_message": "Um teste executa o estudo tal como o está a editar. Abra-o com Execução de teste no editor. Para ver o estudo como os participantes o veem, saia do teste.",
         "default_study_title": "Estudo de metodologia Q",

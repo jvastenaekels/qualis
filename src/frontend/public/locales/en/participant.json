@@ -115,9 +115,11 @@
     "layout": {
         "title": "Qualis",
         "preparing": "Preparing your study session...",
-        "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
+        "pilot_mode": "Test mode: nothing is saved",
         "pilot_stays": "This tab stays in test mode until you leave the test, even if you open a real link here.",
         "pilot_leave": "Leave the test",
+        "pilot_changed": "The design changed",
+        "pilot_restart": "Start the test again",
         "pilot_no_draft_title": "This is a test link, not a participant link",
         "pilot_no_draft_message": "A test runs the study as you are editing it. Open it with Test run in the designer. To see the study as participants do, leave the test.",
         "default_study_title": "Q-Method study",

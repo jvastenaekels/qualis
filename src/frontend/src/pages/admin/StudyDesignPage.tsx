@@ -284,27 +284,39 @@ const StudyDesignPage = () => {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={api.handleTestRun}
-                                disabled={!api.isLaunchReady}
-                                title={t(
-                                    'admin.design.toolbar.test_run_help',
-                                    "Preview as a participant. These runs aren't included in your data."
-                                )}
-                                className={cn(
-                                    'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
-                                    api.isLaunchReady
-                                        ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
-                                        : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
-                                )}
+                            {/* The tooltip sits on the wrapper: a disabled button shows none in every browser. */}
+                            <span
+                                title={
+                                    api.isLaunchReady || !api.testRunBlockedReason
+                                        ? t(
+                                              'admin.design.toolbar.test_run_help',
+                                              "Preview as a participant. These runs aren't included in your data."
+                                          )
+                                        : t(
+                                              'admin.design.toolbar.test_run_blocked',
+                                              'Test run needs: {{missing}}',
+                                              { missing: api.testRunBlockedReason }
+                                          )
+                                }
                             >
-                                <Eye className="h-4 w-4 text-indigo-500" />
-                                <span className="hidden md:inline">
-                                    {t('admin.design.toolbar.test_run')}
-                                </span>
-                            </Button>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={api.handleTestRun}
+                                    disabled={!api.isLaunchReady}
+                                    className={cn(
+                                        'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
+                                        api.isLaunchReady
+                                            ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+                                            : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
+                                    )}
+                                >
+                                    <Eye className="h-4 w-4 text-indigo-500" />
+                                    <span className="hidden md:inline">
+                                        {t('admin.design.toolbar.test_run')}
+                                    </span>
+                                </Button>
+                            </span>
 
                             <Button
                                 variant="outline"

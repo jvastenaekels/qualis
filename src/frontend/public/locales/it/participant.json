@@ -115,9 +115,11 @@
     "layout": {
         "title": "Qualis",
         "preparing": "Preparazione della sessione di studio in corso...",
-        "pilot_mode": "Modalità pilota: le modifiche sono temporanee e i dati non verranno salvati",
+        "pilot_mode": "Modalità test: nulla viene salvato",
         "pilot_stays": "Questa scheda resta in modalità test finché non esce dal test, anche se vi apre un link reale.",
         "pilot_leave": "Esci dal test",
+        "pilot_changed": "Il progetto è cambiato",
+        "pilot_restart": "Ricomincia il test",
         "pilot_no_draft_title": "Questo è un link di prova, non un link di partecipazione",
         "pilot_no_draft_message": "Una prova esegue lo studio così come lo sta modificando. La apra con «Esegui test» nell'editor. Per vedere lo studio come lo vedono i partecipanti, esca dal test.",
         "default_study_title": "Studio di metodologia Q",

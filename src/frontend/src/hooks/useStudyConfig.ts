@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
@@ -76,6 +76,8 @@ function parseStudyDraft(
             description: tr?.consent_description,
         },
         pre_instruction: tr?.pre_instruction,
+        methodology_tips: tr?.methodology_tips,
+        step_help: tr?.step_help,
         condition_of_instruction: tr?.condition_of_instruction,
         ui_labels: tr?.ui_labels || {},
         process_steps: tr?.process_steps || [],
@@ -92,6 +94,11 @@ function parseStudyDraft(
             };
         }),
     } as StudyConfig;
+}
+
+/** The draft a running test of this study began with, if one has loaded. */
+function heldDraft(held: { slug: string; json: string } | null, slug: string): string | null {
+    return held?.slug === slug ? held.json : null;
 }
 
 /** Sync i18n + session language to the resolved config language. */
@@ -155,6 +162,9 @@ export const useStudyConfig = () => {
     const setConfigError = useConfigStore((state) => state.setError);
     const config = useConfigStore((state) => state.config);
     const resetConfig = useConfigStore((state) => state.resetConfig);
+    const setDesignChanged = useConfigStore((state) => state.setDesignChanged);
+    // The draft this test began with: a language switch re-reads it, a designer edit must not replace it.
+    const testDraft = useRef<{ slug: string; json: string } | null>(null);
 
     // Session Store
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
@@ -227,6 +237,10 @@ export const useStudyConfig = () => {
 
                 await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
                 if (cancelled) return;
+                if (testDraft.current?.json !== draftJson) {
+                    testDraft.current = { slug, json: draftJson };
+                    setDesignChanged(false);
+                }
                 commitConfig(config);
             } catch (e) {
                 if (cancelled) return;
@@ -254,9 +268,11 @@ export const useStudyConfig = () => {
             if (safeBrowserLocalStorage.getItem(resetKey)) {
                 resetAllStores({ skipConfig: true });
                 safeBrowserLocalStorage.removeItem(resetKey);
+                testDraft.current = null; // a restart takes the latest draft
             }
 
-            const draftJson = safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
+            const held = heldDraft(testDraft.current, slug);
+            const draftJson = held ?? safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
 
             if (draftJson) {
                 await loadFromLocalDraft(draftJson);
@@ -271,8 +287,13 @@ export const useStudyConfig = () => {
         // Listen for changes from other tabs (Designer)
         const handleStorageChange = (e: StorageEvent) => {
             if (cancelled) return;
-            if (e.key === `qualis-test-draft-${slug}` || e.key === `qualis-pilot-reset-${slug}`) {
-                loadFromStorage();
+            const isDraft = e.key === `qualis-test-draft-${slug}`;
+            if (!isDraft && e.key !== `qualis-pilot-reset-${slug}`) return;
+            const running = heldDraft(testDraft.current, slug);
+            if (running === null) {
+                loadFromStorage(); // the refusal screen waits for a draft to appear
+            } else if (isDraft && e.newValue && e.newValue !== running) {
+                setDesignChanged(true); // a running test keeps its page; the banner says so
             }
         };
 
@@ -290,6 +311,7 @@ export const useStudyConfig = () => {
         setConfigError,
         setConfigLoading,
         resetConfig,
+        setDesignChanged,
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---

@@ -38,6 +38,16 @@ export const leavePilot = (slug: string): void => {
     window.location.assign(`/study/${slug}`);
 };
 
+/**
+ * Start the test again: the same pilot reset signal a new Test run sends, then a reload.
+ * The next load wipes the test's own progress, reads the latest draft, and writes nothing to
+ * the server. The tab flag stays: leavePilot is the only way out of a test.
+ */
+export const restartPilot = (slug: string, search: string): void => {
+    safeBrowserLocalStorage.setItem(`qualis-pilot-reset-${slug}`, 'true');
+    window.location.assign(`/study/${slug}${withTestMode(search)}`);
+};
+
 /** `mode=test` added to a query string, every other parameter kept. */
 export const withTestMode = (search: string): string => {
     const params = new URLSearchParams(search);

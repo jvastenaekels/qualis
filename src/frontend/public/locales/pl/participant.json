@@ -115,9 +115,11 @@
     "layout": {
         "title": "Qualis",
         "preparing": "Przygotowywanie sesji badania...",
-        "pilot_mode": "Tryb pilotażowy: zmiany są tymczasowe i dane nie zostaną zapisane",
+        "pilot_mode": "Tryb testowy: nic nie jest zapisywane",
         "pilot_stays": "Ta karta pozostaje w trybie testowym do czasu opuszczenia testu, nawet po otwarciu w niej prawdziwego linku.",
         "pilot_leave": "Opuść test",
+        "pilot_changed": "Projekt badania się zmienił",
+        "pilot_restart": "Rozpocznij test od nowa",
         "pilot_no_draft_title": "To jest link testowy, a nie link dla uczestników",
         "pilot_no_draft_message": "Test uruchamia badanie w takiej postaci, w jakiej je Pan/Pani edytuje. Proszę otworzyć go przyciskiem Uruchomienie testowe w edytorze. Aby zobaczyć badanie tak, jak widzą je uczestnicy, proszę opuścić test.",
         "default_study_title": "Badanie metodologią Q",
