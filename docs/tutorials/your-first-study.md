@@ -29,9 +29,9 @@ Projects in Qualis organize your studies and team members. Think of a project as
 
 1. Log in to Qualis. You will land on your last project dashboard, or on the Researcher Hub if you do not have a project yet.
 2. From the Hub, click **New project**. From a project dashboard, open the **Project Switcher** at the top of the left sidebar and select **New project**.
-3. Fill in the form:
+3. On the **Create project** page, fill in the form:
    - **Project name:** `Remote Work Research Lab`
-   - **Project URL:** `remote-work-lab` (this auto-generates from the name; you can customize it)
+   - **Project URL:** `remote-work-lab` (Qualis fills in `remote-work-research-lab` from the name; replace it)
 4. Click **Create project**. Qualis opens the project **Dashboard**, where a **First steps** checklist guides you through the next actions.
 
 **Expected result:** you are now inside **Remote Work Research Lab**, the sidebar shows project-level navigation, and the dashboard shows the onboarding checklist.
@@ -40,11 +40,11 @@ Projects in Qualis organize your studies and team members. Think of a project as
 
 ## Step 2: Create a New Study
 
-1. From your project dashboard, click **Create study** (or use the Study Switcher in the sidebar).
+1. From your project dashboard, click **Create study**.
 2. In the **Create new study** dialog, fill in:
    - **Study title:** `Attitudes Toward Remote Work`
-   - **URL slug:** `remote-work-attitudes` (auto-generated; must be lowercase letters, numbers, and hyphens only)
-   - **Languages:** Check **English**. You can add French or Finnish later if you want a multilingual study.
+   - **URL slug:** `remote-work-attitudes` (Qualis fills in `attitudes-toward-remote-work` from the title; replace it. Use only lowercase letters, numbers, and hyphens.)
+   - **Languages:** Check **English**. You can add **Français** or **Suomi** later if you want a multilingual study.
 3. Click **Create study**.
 
 **Expected result:** Qualis opens the **Study Designer** with a **Draft** badge. The designer has seven tabs:
@@ -123,7 +123,7 @@ Presort questions collect demographic or background information before participa
 The Condition of Instruction tells participants the mental frame through which they should sort the statements.
 
 1. Click the **Condition** tab.
-2. In **Q-Sort instruction**, replace the default text with the following (Markdown supported):
+2. Under **Q-sort instruction**, in the **Instruction text** field, replace the default text with the following (Markdown supported):
 
    > Please sort the following statements based on **your personal experience and opinion about remote work**. Think about how strongly you agree or disagree with each statement as it relates to your own working life. There are no right or wrong answers. Sort the statements from **most disagree** (left) to **most agree** (right).
 
@@ -131,7 +131,7 @@ The Condition of Instruction tells participants the mental frame through which t
 
 3. Click **Save**, then wait for **Saved**.
 
-**Expected result:** the **Q-Sort instruction** contains the remote-work prompt; **Test run** remains unavailable until the statements and grid are valid.
+**Expected result:** the **Q-sort instruction** contains the remote-work prompt; **Test run** remains unavailable until the statements and grid are valid.
 
 > **Writing a non-leading Condition of Instruction.**
 >
@@ -178,7 +178,7 @@ This is the core of your Q study.
 
 1. Open the **Distribution** subtab. The default grid has nine columns and 34 slots.
 2. Leave **Symmetry lock** on and click **Reduce** once. The grid now has seven columns, from -3 to +3.
-3. Use the **Decrease capacity** button above these columns:
+3. Use the **-** button below each of these columns:
    - `-3`: click twice, reducing it from 3 slots to 1;
    - `-2`: click three times, reducing it from 4 slots to 1;
    - `-1`: click three times, reducing it from 5 slots to 2;
@@ -241,7 +241,7 @@ The **rough-sort** is a 3-pile triage (agree / neutral / disagree) that precedes
 >
 > For this tutorial (12 statements, brief CoI), **disable** the rough-sort: open the **Condition** tab, switch off **Enable preliminary sort (3-pile triage)**, click **Save**, and wait for **Saved**. Participants will go directly from pre-sort to the fine-sort grid via a horizontally-scrollable deck.
 
-**Expected result:** the **Preliminary sort instruction** disappears, while the **Q-Sort instruction** remains.
+**Expected result:** the **Preliminary sort instruction** disappears, while the **Q-sort instruction** remains.
 
 ## Step 9: Optional — Customize Theme and Interface
 
@@ -260,7 +260,7 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 1. In the designer toolbar, click **Test run**. This opens the study in a new tab in pilot mode.
 2. Walk through the participant flow:
    - **Welcome:** review the page, scroll to the end, and click **Get started**.
-   - **Consent:** select the consent checkbox and click **Get started** again.
+   - **Consent:** select the consent checkbox and click **I agree — start the study**.
    - **Pre-sort:** answer both dropdown questions, then click **Next step**.
    - **Fine Sort:** select a statement, then select an empty grid slot. Place all 12 statements and click **Confirm sort**.
    - **Post-sort, Step 1:** explain the statements placed at -3 and +3, then click **Next step**.
@@ -275,7 +275,7 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 
 ## Step 11: Open a methodology memo
 
-1. Return to the designer tab and click **Methodology memo** in the toolbar.
+1. Return to the designer tab and click the notebook icon in the toolbar. It has no text; its tooltip reads **Methodology memo**.
 2. Click **Add entry**, enter `Design rationale` as the section title, and click **Save**.
 3. Open **0 comments**, write a short note recording why you chose this CoI, a forced distribution, no rough-sort, and 12 statements, then click **Post**.
 
@@ -295,7 +295,7 @@ Five minutes now, hours saved later when a co-author asks why forced over free, 
 4. Select **I have reviewed the consent text, the retention policy, and confirm this study is ready to receive real participants**, then click **Activate study** again.
 5. Qualis runs server-side validation. If there are issues, a dialog lists them; otherwise the study state changes from **Draft** to **Active**.
 
-Your study is now live: the status badge in the header turns green and reads **Active**, and the structural fields in the designer (grid, statements) become read-only. Translations and metadata remain editable.
+Your study is now live: the status badge in the header turns green and reads **Active**, and the whole designer becomes read-only. To edit text or translations, click **Draft mode**.
 
 ---
 

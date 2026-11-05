@@ -32,9 +32,9 @@ The page shows the study URL, the access rules, and the recruitment-links table 
 A public link can be used by multiple participants.
 
 1. Click the **New access link** button.
-2. Configure:
-   - **Link Type:** Public (Multiple usage)
-   - **Campaign Name:** `Social Media Campaign`
+2. In the **Create access links** dialog, configure:
+   - **Access strategy:** Open access (public)
+   - **Channel / campaign name:** `Social Media Campaign`
 3. Click **Provision links**.
 
 A new row appears in the table with the campaign name, link type, token, and usage count.
@@ -47,8 +47,8 @@ Individual links are single-use: each link can only be used for one submission.
 
 1. Click **New access link** again.
 2. Configure:
-   - **Link Type:** Individual (Single usage)
-   - **Campaign Name:** `Interview Panel Batch 1`
+   - **Access strategy:** Single-use passcode
+   - **Channel / campaign name:** `Interview Panel Batch 1`
    - **Batch size:** `10`
 3. Click **Provision links**.
 
@@ -58,8 +58,8 @@ Individual links are single-use: each link can only be used for one submission.
 
 1. Click **New access link**.
 2. Configure:
-   - **Link Type:** Limited (Set capacity)
-   - **Campaign Name:** `Department A`
+   - **Access strategy:** Capped participation
+   - **Channel / campaign name:** `Department A`
    - **Max submissions:** `25`
 3. Click **Provision links**.
 
@@ -74,17 +74,17 @@ https://your-instance.example.com/study/remote-work-attitudes?token=ABC123...
 ```
 
 To share:
-1. Find the link in the table and click the **QR Code** icon in the Actions column.
-2. A dialog shows a QR code and the full URL. Click **Copy Link** to copy to clipboard.
+1. Find the link in the table and click the **Show QR code** icon in the **Manage** column.
+2. The **Share via QR** dialog shows a QR code and the full URL. Click **Copy URL** to copy to clipboard.
 3. Paste in an email, survey invitation, or social media post. Use the QR code for printed materials.
 
 ---
 
 ## Step 6: Walk One Link Yourself
 
-Open the public link from Step 2 in a private window (so it does not pick up your admin session) and complete the study end-to-end as a participant would. You will go through Welcome → Consent → Presort → Rough Sort → Fine Sort → Post-Sort → Submission, and land on a confirmation code.
+Open the public link from Step 2 in a private window (so it does not pick up your admin session) and complete the study end-to-end as a participant would. You will go through Welcome → Consent → Presort → Fine Sort → Post-Sort → Submission, and land on a confirmation code.
 
-This is the single best way to spot rough edges in instructions, statement wording, or grid sizing before recruiting real people. It also creates a row in the participant table that you will use in the next steps.
+This is the single best way to spot rough edges in instructions, statement wording, or grid sizing before recruiting real people. It also creates a row in the **Responses** table that you will use in the next steps.
 
 ---
 
@@ -92,7 +92,7 @@ This is the single best way to spot rough edges in instructions, statement wordi
 
 1. Click **Overview** in the left sidebar.
 
-The page shows: the study status, three metric cards (**Sample size (N)**, **Completion rate**, **Median duration**), a recent-activity card, and a **Share study** module with the public study URL and a QR code. Per-link started and submitted counts are shown in the recruitment-links table on the Access page (from each link's start and usage counts).
+The page shows: the study status, three metric cards (**Number of participants (P-Set)**, **Completion rate**, **Median duration**), a recent-activity card, and a **Share study** module with the public study URL and a QR code. Per-link started and submitted counts are shown in the recruitment-links table on the Access page (from each link's start and usage counts).
 
 ---
 
@@ -101,21 +101,20 @@ The page shows: the study status, three metric cards (**Sample size (N)**, **Com
 1. Click **Data** in the left sidebar.
 
 The Data page provides:
-- **Participant Table**: Searchable, sortable table with status, duration, device type, and discard status
-- **Timeline Chart**: Submission trends over time
-- **Device Breakdown**: Desktop vs. mobile vs. tablet distribution
+- **Responses**: Searchable, sortable table with language, status, consent, flags, duration, and discard status, plus the **Export data** menu
+- **Submissions timeline**: Submission trends over time
+- **Device distribution**: Desktop vs. mobile vs. tablet distribution
 
 ---
 
 ## Step 9: Review Individual Participant Data
 
 1. Click on a participant row in the Data page.
-2. The detail view shows:
+2. The detail view has four tabs:
    - **Metadata**: Session info, device, language, duration
-   - **Presort Responses**: Demographic answers
-   - **Q-Sort Grid**: Visual reconstruction of their placement
-   - **Post-Sort Responses**: Explanations and additional answers
-   - **Audio Recordings**: Playback controls (if your study uses audio responses)
+   - **Pre-sort**: Demographic answers
+   - **Q-sort grid**: Visual reconstruction of their placement
+   - **Post-sort**: Explanations and additional answers, with playback controls if your study uses audio responses
 
 ---
 
@@ -131,7 +130,7 @@ Discarded participants are excluded from exports and analysis by default, but th
 
 For the full set of state transitions a study goes through (Active → Paused → Closed → Archived), see [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). For now, leave your tutorial study Active.
 
-> **Sharing access with team members.** To give a colleague access to monitor responses, invite them via the project Members page (`/app/<projectSlug>/members`). Roles: `Viewer` (read-only), `Member` (run analyses, manage recruitment), `Owner` (full access including member management). See [Admin Dashboard — Members](../reference/admin-dashboard.md#members).
+> **Sharing access with team members.** To give a colleague access to monitor responses, invite them via the project **Team members** page (`/app/<projectSlug>/members`). An invitation offers two roles: `Viewer` (read-only) and `Member` (run analyses, manage recruitment). `Owner` (full access including member management) is not offered. See [Admin Dashboard — Members](../reference/admin-dashboard.md#members).
 
 ---
 
