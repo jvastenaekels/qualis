@@ -53,13 +53,18 @@ export function copyOptions(
 }
 
 /**
- * Value for a newly added option: `opt_<n>`, one past the largest `opt_`
- * suffix in use (never a reused number after a removal), and at least
- * `options.length + 1` so legacy string options are counted too.
+ * Value for a newly added option: `opt_` + 8 random base-36 characters,
+ * redrawn while it collides with a value in use. A value is never derived
+ * from a count, so one freed by a removal is never handed out again: answers
+ * already stored on a study taken back to draft would otherwise export under
+ * the new option's label. Math.random, not crypto.randomUUID, which needs a
+ * secure context and self-hosted instances may run on plain http.
  */
 export function nextOptionValue(options: readonly (string | { value: string })[]): string {
-    const suffixes = options.map((o) =>
-        Number(/^opt_(\d+)$/.exec(typeof o === 'string' ? o : o.value)?.[1] ?? 0)
-    );
-    return `opt_${Math.max(options.length, ...suffixes) + 1}`;
+    const used = new Set(options.map((o) => (typeof o === 'string' ? o : o.value)));
+    let value: string;
+    do {
+        value = `opt_${Math.random().toString(36).slice(2, 10).padEnd(8, '0')}`;
+    } while (used.has(value));
+    return value;
 }

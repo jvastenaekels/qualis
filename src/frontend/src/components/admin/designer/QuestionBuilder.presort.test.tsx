@@ -222,7 +222,8 @@ describe('QuestionBuilder - presort config shape', () => {
             const draft: any = useStudyDesigner.getState().draft;
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const values = draft.presort_config.fields.q1.options.map((o: any) => o.value);
-            expect(values).toEqual(['opt_1', 'opt_2', 'opt_3', 'opt_4']);
+            expect(new Set(values).size).toBe(4);
+            expect(values.every((v: string) => v.startsWith('opt_'))).toBe(true);
         });
     });
 });

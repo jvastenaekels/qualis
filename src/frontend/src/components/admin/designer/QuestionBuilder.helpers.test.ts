@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { copyMultilangField, copyOptions, nextOptionValue } from './QuestionBuilder.helpers';
 
 describe('copyMultilangField', () => {
@@ -60,15 +60,25 @@ describe('copyOptions', () => {
 });
 
 describe('nextOptionValue', () => {
-    it('numbers after the options already there', () => {
-        expect(nextOptionValue([{ value: 'opt_1' }, { value: 'opt_2' }])).toBe('opt_3');
+    it('returns opt_ and 8 base-36 characters', () => {
+        expect(nextOptionValue([{ value: 'opt_1' }])).toMatch(/^opt_[0-9a-z]{8}$/);
     });
 
-    it('does not reuse a value left free by a removal', () => {
-        expect(nextOptionValue([{ value: 'opt_1' }, { value: 'opt_5' }])).toBe('opt_6');
+    it('draws again when the value is taken, legacy strings included', () => {
+        const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+        const taken = nextOptionValue([]);
+        spy.mockReset();
+        spy.mockReturnValueOnce(0.5).mockReturnValue(0.25);
+        const next = nextOptionValue([taken, 'Oui']);
+        spy.mockRestore();
+        expect(next).not.toBe(taken);
+        expect(next).toMatch(/^opt_[0-9a-z]{8}$/);
     });
 
-    it('counts legacy string options', () => {
-        expect(nextOptionValue(['Oui', { value: 'opt_2' }])).toBe('opt_3');
+    it("a removed last option's value is not reused", () => {
+        const options = [{ value: 'opt_1' }, { value: 'opt_2' }];
+        const removed = nextOptionValue(options);
+        const kept = [...options];
+        expect(nextOptionValue(kept)).not.toBe(removed);
     });
 });

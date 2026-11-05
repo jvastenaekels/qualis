@@ -304,7 +304,8 @@ test.describe('The whole path, from the designer to the export', () => {
             { options: { value: string }[] },
         ][];
         const values = question.options.map((o) => o.value);
-        expect(values).toEqual(['opt_1', 'opt_2', 'opt_3', 'opt_4', 'opt_5']);
+        expect(new Set(values).size).toBe(5);
+        expect(values.every((v) => /^opt_/.test(v))).toBe(true);
 
         await testDb.activateStudy(authToken, slug);
         const token = await testDb.createRecruitmentLink(authToken, slug);
