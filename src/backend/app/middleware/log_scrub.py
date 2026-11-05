@@ -20,7 +20,10 @@ Scope of redaction:
   the participant bearer that ``/api/study/{slug}``, the draft / erasure
   DELETEs and the audio routes take as a query parameter, ``link_token``
   the recruitment-link bearer and ``password`` the study unlock secret
-  (wave 7 — these three were logged raw before).
+  (wave 7 — these three were logged raw before). ``redirect`` is the
+  post-login target of ``/login?redirect=…``: it can carry an invitation
+  link (``/register?token=…``) percent-encoded, which the ``token`` key
+  does not match, so the whole value is redacted.
 
 * The resume-code path segment ``/resume/<code>`` (``/api/study/{slug}/resume/{code}``
   and the frontend ``/study/{slug}/resume/{code}``). The code is a bearer
@@ -57,7 +60,7 @@ import re
 # preserves the separator (``?`` or ``&``); the second preserves the
 # original key casing in the redacted output.
 _TOKEN_RE = re.compile(
-    r"([?&])(session_token|link_token|token|otp|code|password)=[^&]*",
+    r"([?&])(session_token|link_token|token|otp|code|password|redirect)=[^&]*",
     re.IGNORECASE,
 )
 

@@ -13,6 +13,12 @@ vi.mock('@/api/mutator', () => ({
     customInstance: vi.fn(),
 }));
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => mockNavigate,
+}));
+
 import { customInstance } from '@/api/mutator';
 
 const mockedCustomInstance = vi.mocked(customInstance);
@@ -80,5 +86,48 @@ describe('LoginPage', () => {
         expect(passwordInput).not.toHaveAttribute('placeholder', '••••••••');
         // Positive: the empty field genuinely looks empty.
         expect(passwordInput.placeholder).toBe('');
+    });
+
+    describe('redirect after login', () => {
+        const loginTo = async (redirect: string) => {
+            mockedCustomInstance.mockImplementation((async (config: { url: string }) =>
+                config.url === '/api/token'
+                    ? { access_token: 'tok', requires_2fa: false }
+                    : { id: 1, email: 'a@b.io', full_name: null, is_superuser: false }) as never);
+            renderWithProviders(<LoginPage />, {
+                initialEntries: [`/login?redirect=${encodeURIComponent(redirect)}`],
+            });
+            fireEvent.change(screen.getByPlaceholderText(/name@example\.com/i), {
+                target: { value: 'a@b.io' },
+            });
+            fireEvent.change(screen.getByLabelText('Password'), {
+                target: { value: 'pw12345678' },
+            });
+            fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+            await waitFor(() => expect(mockNavigate).toHaveBeenCalled());
+        };
+
+        it('sends a tab-and-dot-segment payload to the hub', async () => {
+            await loginTo('/\t./\t/evil.example/');
+            expect(mockNavigate).toHaveBeenCalledWith('/hub');
+        });
+
+        it.each(['https://evil.example/x', '//evil.example/x'])(
+            'sends %s to the hub',
+            async (payload) => {
+                await loginTo(payload);
+                expect(mockNavigate).toHaveBeenCalledWith('/hub');
+            }
+        );
+
+        it('keeps the query of an invitation link intact', async () => {
+            await loginTo('/register?token=x');
+            expect(mockNavigate).toHaveBeenCalledWith('/register?token=x');
+        });
+
+        it('lets a plain pathname through', async () => {
+            await loginTo('/app/p/dashboard');
+            expect(mockNavigate).toHaveBeenCalledWith('/app/p/dashboard');
+        });
     });
 });

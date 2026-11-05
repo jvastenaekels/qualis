@@ -37,6 +37,22 @@ class TestScrubTokenQuery:
         )
 
 
+class TestScrubRedirect:
+    def test_redacts_redirect_carrying_an_invitation_token(self) -> None:
+        line = (
+            'GET /login?redirect=%2Fregister%3Ftoken%3Dsecret.jwt.value HTTP/1.1" 200'
+        )
+        out = scrub_token_query(line)
+        assert "secret.jwt.value" not in out
+        assert "?redirect=REDACTED" in out
+
+    def test_redacts_redirect_in_middle(self) -> None:
+        assert (
+            scrub_token_query("/login?lang=fr&redirect=%2Fx%3Ftoken%3Da&page=2")
+            == "/login?lang=fr&redirect=REDACTED&page=2"
+        )
+
+
 class TestScrubResumePath:
     def test_redacts_resume_code_in_path(self) -> None:
         assert (

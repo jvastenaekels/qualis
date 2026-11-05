@@ -19,6 +19,18 @@ import { ApiError } from '@/api/client';
 
 type LoginStage = 'credentials' | 'two_factor';
 
+/** Same-origin path only: the router would otherwise let `/\t./\t/host/` leave the site. */
+const safeRedirect = (raw: string | null): string | null => {
+    if (!raw) return null;
+    try {
+        const u = new URL(raw, window.location.origin);
+        if (u.origin !== window.location.origin || u.pathname.startsWith('//')) return '/hub';
+        return u.pathname + u.search + u.hash;
+    } catch {
+        return '/hub';
+    }
+};
+
 const LoginPage = () => {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
@@ -62,7 +74,7 @@ const LoginPage = () => {
     };
 
     const navigateAfterLogin = async () => {
-        const explicitRedirect = searchParams.get('redirect');
+        const explicitRedirect = safeRedirect(searchParams.get('redirect'));
         if (explicitRedirect) {
             navigate(explicitRedirect);
             return;
