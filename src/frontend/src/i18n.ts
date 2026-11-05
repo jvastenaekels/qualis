@@ -48,12 +48,13 @@ i18n
         },
 
         detection: {
-            // `localStorage` must be read (not just written) so an explicit
-            // admin language choice survives a reload; without it the detector
-            // fell back to `navigator` every boot and the picker looked broken.
+            // `localStorage` is read so the admin language choice survives a reload,
+            // but never written by the detector: a participant switching language
+            // would otherwise change the admin interface. Only the sidebar menu
+            // writes `i18nextLng` (see AppSidebar).
             order: ['querystring', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
             lookupQuerystring: 'lang',
-            caches: ['localStorage'],
+            caches: [],
         },
     });
 

@@ -13,4 +13,13 @@ describe('DEFAULT_STUDY_CONTENT', () => {
         expect(DEFAULT_STUDY_CONTENT.de.process_steps).toHaveLength(4);
         expect(DEFAULT_STUDY_CONTENT.de.methodology_tips.length).toBeGreaterThan(0);
     });
+
+    it('no default text holds a literal backslash-n', () => {
+        for (const [lang, content] of Object.entries(DEFAULT_STUDY_CONTENT)) {
+            const withBackslashN = Object.entries(content)
+                .filter(([, v]) => JSON.stringify(v).includes('\\\\n'))
+                .map(([k]) => k);
+            expect(withBackslashN, `${lang} fields with a literal backslash-n`).toEqual([]);
+        }
+    });
 });

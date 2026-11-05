@@ -48,6 +48,7 @@ import { cn } from '@/lib/utils';
 import { usePermission } from '@/hooks/usePermission';
 import { useSidebar } from '@/components/ui/sidebar';
 import { getAdminLanguages } from '@/constants/languages';
+import { safeBrowserLocalStorage } from '@/store/safeStorage';
 
 function NavLanguage() {
     const { i18n, t } = useTranslation();
@@ -74,7 +75,11 @@ function NavLanguage() {
                         {adminLanguages.map((lang) => (
                             <DropdownMenuItem
                                 key={lang.code}
-                                onSelect={() => i18n.changeLanguage(lang.code)}
+                                onSelect={() => {
+                                    i18n.changeLanguage(lang.code);
+                                    // The detector no longer caches; this menu alone remembers the admin language.
+                                    safeBrowserLocalStorage.setItem('i18nextLng', lang.code);
+                                }}
                                 className={cn(
                                     'flex items-center gap-2 cursor-pointer',
                                     currentLang === lang.code && 'bg-accent text-accent-foreground'
