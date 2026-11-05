@@ -19,7 +19,9 @@ export const studyLayoutLoader = async ({ params, request }: LoaderFunctionArgs)
     if (!slug) throw new Error('Slug is required');
 
     const url = new URL(request.url);
-    // Same request as useStudyConfig's, or the query misses this cache and fetches again.
+    // Same request as useStudyConfig's, so the query can hit this cache. It does not
+    // on a fresh visit: restoreStudySession's queryClient.clear() wipes the cache
+    // first and the hook fetches again.
     const lang = url.searchParams.get('lang') || browserLanguage();
     const token = url.searchParams.get('token') || undefined;
 
