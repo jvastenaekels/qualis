@@ -55,6 +55,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
+import { isPilot, leavePilot, withTestMode } from '../utils/pilotMode';
 import { restoreStudySession } from '../utils/sessionReset';
 import { setStudyStorageScope, releaseStudyStorageScope } from '../store/safeStorage';
 import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
@@ -362,9 +363,22 @@ const StudyLayoutContent: React.FC = () => {
         >
             {/* Pilot Mode Banner */}
             {isPilotModePersistent && (
-                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
+                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex flex-wrap items-center justify-center gap-x-2 text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                    {t('layout.pilot_mode')}
+                    <span>{t('layout.pilot_mode')}</span>
+                    <span>
+                        {t(
+                            'layout.pilot_stays',
+                            'This tab stays in test mode until you leave the test, even if you open a real link here.'
+                        )}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => slug && leavePilot(slug)}
+                        className="underline underline-offset-2 whitespace-nowrap hover:text-amber-700 transition-colors"
+                    >
+                        {t('layout.pilot_leave', 'Leave the test')}
+                    </button>
                 </div>
             )}
 
@@ -984,6 +998,7 @@ const StudyLayoutContent: React.FC = () => {
 
 const StudyLayout: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
+    const location = useLocation();
     const [readySlug, setReadySlug] = useState(() =>
         !slug ||
         useSessionStore.getState().studySlug === slug ||
@@ -1011,6 +1026,15 @@ const StudyLayout: React.FC = () => {
         },
         [slug]
     );
+    // Before anything mounts: without the param no draft loads, and a step could write.
+    if (new URLSearchParams(location.search).get('mode') !== 'test' && isPilot()) {
+        return (
+            <Navigate
+                to={{ pathname: location.pathname, search: withTestMode(location.search) }}
+                replace
+            />
+        );
+    }
     if (readySlug !== slug) return null;
     return (
         <LayoutProvider>

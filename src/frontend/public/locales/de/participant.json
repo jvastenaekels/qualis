@@ -116,6 +116,8 @@
         "title": "Qualis",
         "preparing": "Ihre Studiensitzung wird vorbereitet...",
         "pilot_mode": "Pilotmodus: Änderungen sind temporär und Daten werden nicht gespeichert",
+        "pilot_stays": "Dieser Tab bleibt im Testmodus, bis Sie den Test verlassen, auch wenn Sie hier einen echten Link öffnen.",
+        "pilot_leave": "Test verlassen",
         "default_study_title": "Q-Methodologie-Studie",
         "loading_content": "Studieninhalt wird geladen...",
         "change_lang_title": "Sprache wechseln",

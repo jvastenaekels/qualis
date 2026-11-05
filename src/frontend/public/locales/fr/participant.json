@@ -116,6 +116,8 @@
         "title": "Qualis",
         "preparing": "Préparation de votre session...",
         "pilot_mode": "Mode Pilote : Les modifications sont temporaires et ne seront pas sauvegardées",
+        "pilot_stays": "Cet onglet reste en mode test jusqu'à ce que vous quittiez le test, même si vous y ouvrez un vrai lien.",
+        "pilot_leave": "Quitter le test",
         "default_study_title": "Étude Q-Method",
         "loading_content": "Chargement du contenu de l'étude...",
         "change_lang_title": "Changer de langue",

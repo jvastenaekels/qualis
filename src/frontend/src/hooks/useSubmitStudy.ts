@@ -11,6 +11,7 @@ import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { isPilotSession } from '../utils/pilotMode';
 
 const MAX_RETRIES = 3;
 const INITIAL_DELAY_MS = 1000;
@@ -117,9 +118,7 @@ function resolveSubmissionContext(
     sessionToken: string | null,
     isPilotMode: boolean
 ): SubmissionContext {
-    const searchParams = new URLSearchParams(window.location.search);
-    const isTestMode = searchParams.get('mode') === 'test' || isPilotMode;
-    return { isTestMode, sessionToken };
+    return { isTestMode: isPilotSession(isPilotMode), sessionToken };
 }
 
 function assertReadyToSubmit(

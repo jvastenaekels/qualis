@@ -46,8 +46,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     React.useEffect(() => {
         setStep(1);
 
-        // Pilot Mode Logic: "Running a test run and then a normal run should not contaminate the normal run"
-        // We strictly sync the pilot state with the URL presence of 'mode=test' at the entry point (Welcome).
+        // The URL can only turn pilot mode on: the stores are already named for this tab,
+        // so turning it off here would run a real session on the test's storage.
         const params = new URLSearchParams(location.search);
         const isUrlTest = params.get('mode') === 'test';
         const currentPilotMode = useSessionStore.getState().isPilotMode;
@@ -58,13 +58,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             }
             if (sessionStorage.getItem('qualis-pilot-mode') !== 'true') {
                 sessionStorage.setItem('qualis-pilot-mode', 'true');
-            }
-        } else {
-            if (currentPilotMode) {
-                setPilotMode(false);
-            }
-            if (sessionStorage.getItem('qualis-pilot-mode')) {
-                sessionStorage.removeItem('qualis-pilot-mode');
             }
         }
     }, [setStep, setPilotMode, location.search]);

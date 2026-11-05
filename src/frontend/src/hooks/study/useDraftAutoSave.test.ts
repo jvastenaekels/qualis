@@ -44,6 +44,18 @@ describe('useDraftAutoSave', () => {
         window.history.replaceState({}, '', '/');
     });
 
+    it('saves nothing in a tab that only the flag marks as a test', async () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        const { unmount } = renderHook(() => useDraftAutoSave('s'));
+
+        act(() => useResponseStore.setState({ qsort: { a: 1 } as never }));
+        await act(() => vi.advanceTimersByTimeAsync(5000));
+
+        expect(customInstance).not.toHaveBeenCalled();
+        unmount();
+        sessionStorage.removeItem('qualis-pilot-mode');
+    });
+
     it('resends the draft when the browser comes back online after a failed save', async () => {
         vi.mocked(customInstance).mockRejectedValueOnce(new Error('offline'));
         const { unmount } = renderHook(() => useDraftAutoSave('s'));

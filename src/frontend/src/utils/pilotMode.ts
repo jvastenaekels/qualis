@@ -1,20 +1,43 @@
+import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/safeStorage';
+
+const PILOT_FLAG = 'qualis-pilot-mode';
+
+const urlSaysTest = (): boolean =>
+    new URLSearchParams(window.location.search).get('mode') === 'test';
+
+const tabIsFlagged = (): boolean => safeBrowserSessionStorage.getItem(PILOT_FLAG) === 'true';
+
+/** Arms the tab when the URL says test. Writes the flag: not for code that runs on unload. */
 export const isPilot = (): boolean => {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('mode') === 'test') {
-            sessionStorage.setItem('qualis-pilot-mode', 'true');
-            return true;
-        }
-        return sessionStorage.getItem('qualis-pilot-mode') === 'true';
-    } catch {
-        return false;
+    if (urlSaysTest()) {
+        safeBrowserSessionStorage.setItem(PILOT_FLAG, 'true');
+        return true;
     }
+    return tabIsFlagged();
 };
 
-export const clearPilotFlag = (): void => {
-    try {
-        sessionStorage.removeItem('qualis-pilot-mode');
-    } catch {
-        /* ignore */
-    }
+/**
+ * What every write to the server asks first. Read-only: the page keeps running between
+ * leavePilot() and the unload, and a read that armed the tab would bring the test back.
+ * Takes the store's value because the stores import this module.
+ */
+export const isPilotSession = (isPilotMode: boolean): boolean =>
+    isPilotMode || urlSaysTest() || tabIsFlagged();
+
+/**
+ * The only exit from a test. A full reload, because the store names are fixed at module
+ * load. The store's isPilotMode stays true on purpose: writes stay off until the unload.
+ */
+export const leavePilot = (slug: string): void => {
+    safeBrowserSessionStorage.removeItem(PILOT_FLAG);
+    safeBrowserLocalStorage.removeItem(`qualis-pilot-session:${slug}`);
+    safeBrowserLocalStorage.removeItem(`qualis-pilot-responses:${slug}`);
+    window.location.assign(`/study/${slug}`);
+};
+
+/** `mode=test` added to a query string, every other parameter kept. */
+export const withTestMode = (search: string): string => {
+    const params = new URLSearchParams(search);
+    params.set('mode', 'test');
+    return `?${params}`;
 };

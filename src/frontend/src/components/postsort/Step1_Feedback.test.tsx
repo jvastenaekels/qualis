@@ -5,6 +5,7 @@
  */
 
 import userEvent from '@testing-library/user-event';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, renderWithProviders as render, screen } from '../../test-utils/test-utils';
 import { useConfigStore } from '@/store/useConfigStore';
@@ -53,6 +54,32 @@ const seed = () => {
     } as any);
     usePlatformConfigStore.setState({ audioStorage: 'unavailable' });
 };
+
+describe('Step1_Feedback navigation', () => {
+    beforeEach(seed);
+    afterEach(cleanup);
+
+    it('Back to sort keeps the query string', async () => {
+        const user = userEvent.setup();
+        const Where = () => {
+            const { pathname, search } = useLocation();
+            return <p>{`${pathname}${search}`}</p>;
+        };
+        render(
+            <Routes>
+                <Route path="/study/s">
+                    <Route path="post-sort" element={<Step1_Feedback onNext={vi.fn()} />} />
+                    <Route path="fine-sort" element={<Where />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/s/post-sort?mode=test&lang=fi'] }
+        );
+
+        await user.click(screen.getByRole('button', { name: /back to sort/i }));
+
+        expect(screen.getByText('/study/s/fine-sort?mode=test&lang=fi')).toBeInTheDocument();
+    });
+});
 
 describe('Step1_Feedback validation message', () => {
     beforeEach(seed);

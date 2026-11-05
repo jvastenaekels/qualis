@@ -12,7 +12,8 @@ import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
 import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
-import { useNavigate } from 'react-router-dom';
+import { isPilotSession } from '@/utils/pilotMode';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useViewport } from '@/contexts/ViewportContext';
 import {
     uploadAudioApiAudioUploadPost,
@@ -30,6 +31,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const { t, i18n } = useTranslation();
     const { isDesktop } = useViewport();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const config = useConfigStore((state) => state.config);
     const token = useSessionStore((state) => state.token);
@@ -160,7 +162,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const handleAudioUpload = useCallback(
         async (questionKey: string, blob: Blob, duration: number) => {
             // Pilot mode: store fake metadata locally, skip backend upload
-            if (isPilotMode) {
+            if (isPilotSession(isPilotMode)) {
                 // Revoke previous blob URL if replacing a recording (prevent memory leak)
                 const existing = getAudioRecording(questionKey);
                 if (existing?.presigned_url?.startsWith('blob:')) {
@@ -193,7 +195,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
             if (!recording) return;
 
             // Pilot mode: just clear local state, no backend call
-            if (isPilotMode) {
+            if (isPilotSession(isPilotMode)) {
                 deleteAudioRecording(questionKey);
                 return;
             }
@@ -695,7 +697,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
              * Phase 2 added.
              */}
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 sticky bottom-0 bg-white border-t border-slate-200 shadow-[0_-4px_12px_-6px_rgba(15,23,42,0.15)] pb-4 z-10">
-                <Button variant="outline" size="pill" onClick={() => navigate('../fine-sort')}>
+                <Button
+                    variant="outline"
+                    size="pill"
+                    onClick={() => navigate({ pathname: '../fine-sort', search: location.search })}
+                >
                     {/* The sibling button's arrow is a lucide SVG; a literal
                         U+2190 next to it is a different weight, size and
                         baseline. Using the icon set also keeps the direction

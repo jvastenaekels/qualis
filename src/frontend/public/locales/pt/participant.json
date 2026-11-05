@@ -116,6 +116,8 @@
         "title": "Qualis",
         "preparing": "A preparar a sua sessão de estudo...",
         "pilot_mode": "Modo piloto: as alterações são temporárias e os dados não serão guardados",
+        "pilot_stays": "Este separador continua em modo de teste até sair do teste, mesmo que abra aqui uma ligação real.",
+        "pilot_leave": "Sair do teste",
         "default_study_title": "Estudo de metodologia Q",
         "loading_content": "A carregar o conteúdo do estudo...",
         "change_lang_title": "Alterar idioma",

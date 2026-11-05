@@ -28,6 +28,7 @@ import { BASE_URL, customInstance } from '../../api/mutator';
 import { useResponseStore } from '../../store/useResponseStore';
 import { useSessionStore } from '../../store/useSessionStore';
 import { withStudyStorageScope } from '../../store/safeStorage';
+import { isPilotSession } from '../../utils/pilotMode';
 
 export type DraftSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -45,7 +46,7 @@ export function useDraftAutoSave(slug: string | undefined): {
         if (
             !session.token ||
             (session.studySlug !== null && session.studySlug !== slug) ||
-            session.isPilotMode ||
+            isPilotSession(session.isPilotMode) ||
             session.isCompleted ||
             session.isSubmitting ||
             !slug

@@ -116,6 +116,8 @@
         "title": "Qualis",
         "preparing": "Uw onderzoekssessie voorbereiden...",
         "pilot_mode": "Pilotmodus: wijzigingen zijn tijdelijk en gegevens worden niet opgeslagen",
+        "pilot_stays": "Dit tabblad blijft in testmodus totdat u de test verlaat, ook als u hier een echte link opent.",
+        "pilot_leave": "Test verlaten",
         "default_study_title": "Q-methodologie onderzoek",
         "loading_content": "Onderzoeksinhoud laden...",
         "change_lang_title": "Taal wijzigen",

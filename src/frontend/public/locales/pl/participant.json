@@ -116,6 +116,8 @@
         "title": "Qualis",
         "preparing": "Przygotowywanie sesji badania...",
         "pilot_mode": "Tryb pilotażowy: zmiany są tymczasowe i dane nie zostaną zapisane",
+        "pilot_stays": "Ta karta pozostaje w trybie testowym do czasu opuszczenia testu, nawet po otwarciu w niej prawdziwego linku.",
+        "pilot_leave": "Opuść test",
         "default_study_title": "Badanie metodologią Q",
         "loading_content": "Ładowanie treści badania...",
         "change_lang_title": "Zmień język",

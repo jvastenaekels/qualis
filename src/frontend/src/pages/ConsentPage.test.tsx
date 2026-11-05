@@ -156,6 +156,26 @@ describe('ConsentPage', () => {
         });
     });
 
+    it('records no consent in a tab that only the flag marks as a test', async () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
+        );
+
+        fireEvent.click(screen.getByRole('checkbox'));
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
+
+        expect(await screen.findByText('Presort Page')).toBeInTheDocument();
+        expect(recordConsent).not.toHaveBeenCalled();
+        sessionStorage.removeItem('qualis-pilot-mode');
+    });
+
     it('sends the recruitment token from the URL with the consent', async () => {
         window.history.pushState({}, '', '/study/test-study/consent?token=abc');
         try {

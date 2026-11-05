@@ -16,6 +16,7 @@
 import { useEffect, useRef } from 'react';
 import { customInstance } from '../../api/mutator';
 import { useSessionStore } from '../../store/useSessionStore';
+import { isPilotSession } from '../../utils/pilotMode';
 
 export function useProgressReporter(slug: string | undefined): void {
     const lastReportedStepRef = useRef(0);
@@ -25,7 +26,7 @@ export function useProgressReporter(slug: string | undefined): void {
             if (
                 step > prevState.maxReachedStep &&
                 step > lastReportedStepRef.current &&
-                !state.isPilotMode &&
+                !isPilotSession(state.isPilotMode) &&
                 state.token &&
                 slug
             ) {

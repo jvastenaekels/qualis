@@ -104,6 +104,22 @@ describe('ResumePage', () => {
         vi.restoreAllMocks();
     });
 
+    it('a resume link in a test tab stays a test and reads nothing', async () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+
+        renderResumePage('test-study');
+
+        await waitFor(() =>
+            expect(mocks.navigate).toHaveBeenCalledWith('/study/test-study?mode=test', {
+                replace: true,
+            })
+        );
+        expect(mocks.customInstance).not.toHaveBeenCalled();
+        expect(mocks.resetAllStores).not.toHaveBeenCalled();
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBe('true');
+        sessionStorage.removeItem('qualis-pilot-mode');
+    });
+
     it('shows loading state initially', () => {
         mocks.customInstance.mockReturnValue(new Promise(() => {})); // never resolves
         renderResumePage();

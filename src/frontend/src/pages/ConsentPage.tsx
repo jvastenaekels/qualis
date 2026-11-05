@@ -18,6 +18,7 @@ import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { isPilotSession } from '../utils/pilotMode';
 import { isPresortEnabled } from '../utils/studyConfig';
 import { createSessionToken, hashConsent } from '../utils/browserCrypto';
 
@@ -70,7 +71,7 @@ const ConsentPage: React.FC = () => {
             useSessionStore.getState().setStudySlug(slug || '');
 
             // Record proof of consent in DB (skip in pilot mode — no backend persistence)
-            if (!isPilotMode) {
+            if (!isPilotSession(isPilotMode)) {
                 try {
                     const consentText = config.consent?.description || t('consent.default_text');
                     const consentHash = await hashConsent(consentText);

@@ -37,6 +37,17 @@ describe('WelcomePage', () => {
         useSessionStore.getState().resetSession();
     });
 
+    it('the welcome page never turns pilot mode off', () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        useSessionStore.setState({ isPilotMode: true });
+
+        renderWithProviders(<WelcomePage />, { initialEntries: ['/study/test-study/welcome'] });
+
+        expect(useSessionStore.getState().isPilotMode).toBe(true);
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBe('true');
+        sessionStorage.removeItem('qualis-pilot-mode');
+    });
+
     it('renders study details (title, subtitle, description, objective)', () => {
         renderWithProviders(<WelcomePage />);
         expect(screen.getByText('Test Study')).toBeInTheDocument();

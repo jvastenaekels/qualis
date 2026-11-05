@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -268,12 +268,42 @@ describe('Session Isolation Tests', () => {
     });
 
     describe('Pilot Mode Isolation', () => {
-        it.skip('should use separate storage keys for pilot mode', () => {
-            // ... (rest of test)
+        // Store names are fixed at module load: each case loads the stores as a new page would.
+        const loadStores = async () => {
+            vi.resetModules();
+            const { useSessionStore: session } = await import('../store/useSessionStore');
+            const { useResponseStore: responses } = await import('../store/useResponseStore');
+            return { session, responses };
+        };
+
+        afterEach(() => {
+            sessionStorage.removeItem('qualis-pilot-mode');
+            localStorage.clear();
         });
 
-        it.skip('should not contaminate production data with pilot data', () => {
-            // ... (rest of test)
+        it('should use separate storage keys for pilot mode', async () => {
+            sessionStorage.setItem('qualis-pilot-mode', 'true');
+            const pilot = await loadStores();
+            expect(pilot.session.persist.getOptions().name).toBe('qualis-pilot-session');
+            expect(pilot.responses.persist.getOptions().name).toBe('qualis-pilot-responses');
+
+            sessionStorage.removeItem('qualis-pilot-mode');
+            const real = await loadStores();
+            expect(real.session.persist.getOptions().name).toBe('qualis-session');
+            expect(real.responses.persist.getOptions().name).toBe('qualis-responses');
+        });
+
+        it('should not contaminate production data with pilot data', async () => {
+            sessionStorage.setItem('qualis-pilot-mode', 'true');
+            const pilot = await loadStores();
+            pilot.session.getState().setToken('pilot-token');
+            expect(localStorage.getItem('qualis-pilot-session')).toContain('pilot-token');
+            expect(localStorage.getItem('qualis-session')).toBeNull();
+
+            sessionStorage.removeItem('qualis-pilot-mode');
+            const real = await loadStores();
+            expect(real.session.getState().token).toBeNull();
+            expect(real.session.getState().isPilotMode).toBe(false);
         });
     });
 

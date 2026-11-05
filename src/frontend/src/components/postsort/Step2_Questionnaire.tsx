@@ -23,6 +23,7 @@ import { evaluateVisibilityCondition } from '@/utils/visibilityEvaluator';
 import { buildQuestionnaireSchema } from '@/utils/buildQuestionnaireSchema';
 import { getLocalizedText } from '@/utils/localization';
 import { usePlatformConfigStore } from '@/store/usePlatformConfigStore';
+import { isPilotSession } from '@/utils/pilotMode';
 
 interface Step2Props {
     onBack: () => void;
@@ -128,7 +129,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
 
     const handleAudioUpload = useCallback(
         async (questionKey: string, blob: Blob, duration: number) => {
-            if (isPilotMode) {
+            if (isPilotSession(isPilotMode)) {
                 const existing = getAudioRecording(questionKey);
                 if (existing?.presigned_url?.startsWith('blob:')) {
                     URL.revokeObjectURL(existing.presigned_url);
@@ -175,7 +176,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
             const recording = getAudioRecording(questionKey);
             if (!recording) return;
 
-            if (isPilotMode) {
+            if (isPilotSession(isPilotMode)) {
                 deleteAudioRecordingStore(questionKey);
                 return;
             }

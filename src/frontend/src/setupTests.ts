@@ -73,7 +73,8 @@ window.confirm = vi.fn();
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => {
     server.resetHandlers();
-    // Reset Zustand stores
+    // Reset Zustand stores (a reset keeps a test tab in test: drop its flag first)
+    sessionStorage.removeItem('qualis-pilot-mode');
     resetAllStores();
     useUIStore.getState().setHoveredCard(null);
     // Reset StudyDesigner store

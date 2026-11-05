@@ -21,8 +21,10 @@ import { toast } from 'sonner';
 import type { ResumeResponse } from '../../api/model';
 import { customInstance } from '../../api/mutator';
 import { STEP_ROUTES } from '../../constants/stepRoutes';
+import { safeBrowserSessionStorage } from '../../store/safeStorage';
 import { initialResponses, useResponseStore } from '../../store/useResponseStore';
 import { useSessionStore } from '../../store/useSessionStore';
+import { isPilot } from '../../utils/pilotMode';
 import { resetAllStores } from '../../utils/sessionReset';
 
 export type ResumeError = 'not_found' | 'study_closed' | 'rate_limited' | 'error';
@@ -122,26 +124,12 @@ export function validateDraftResponses(draft: unknown): ValidatedDraft | null {
     };
 }
 
-function safeSessionStorage(action: 'set' | 'remove', key: string, value?: string): void {
-    try {
-        if (action === 'set' && value !== undefined) {
-            sessionStorage.setItem(key, value);
-        } else if (action === 'remove') {
-            sessionStorage.removeItem(key);
-        }
-    } catch {
-        // Ignore storage errors (private mode, full quota, …).
-    }
-}
-
 async function applyResumeSuccess(
     data: ResumeResponse & { draft_responses: Record<string, unknown> },
     slug: string,
     navigate: NavigateFunction,
     i18n: I18nType
 ): Promise<void> {
-    safeSessionStorage('remove', 'qualis-pilot-mode');
-
     // Reset all stores — including configStore — so the slug guard in
     // useStudyConfig does not wipe our hydrated session when StudyLayout mounts.
     resetAllStores();
@@ -165,7 +153,7 @@ async function applyResumeSuccess(
         useResponseStore.setState(validatedDraft);
     }
 
-    safeSessionStorage('set', 'qualis-resumed-via-link', '1');
+    safeBrowserSessionStorage.setItem('qualis-resumed-via-link', '1');
 
     const route = STEP_ROUTES[data.last_step_reached] || 'welcome';
     navigate(`/study/${slug}/${route}`, { replace: true });
@@ -203,6 +191,13 @@ export function useResumeSession(
     useEffect(() => {
         if (!slug || !token) {
             setError('not_found');
+            return;
+        }
+
+        // The stores of a test tab are already named for the test: a resumed session would
+        // land in them. The banner's button leaves; the link then works in the clean tab.
+        if (isPilot()) {
+            navigate(`/study/${slug}?mode=test`, { replace: true });
             return;
         }
 

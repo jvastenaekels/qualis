@@ -1,13 +1,10 @@
-import {
-    safeBrowserSessionStorage,
-    setStudyStorageScope,
-    withoutStudyStorageWrites,
-} from '../store/safeStorage';
+import { setStudyStorageScope, withoutStudyStorageWrites } from '../store/safeStorage';
 import { useSessionStore } from '../store/useSessionStore';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useUIStore } from '../store/useUIStore';
 import { queryClient } from '../lib/queryClient';
+import { isPilot } from './pilotMode';
 
 interface ResetOptions {
     skipConfig?: boolean;
@@ -34,8 +31,6 @@ export function restoreStudySession(slug: string): void {
     // turn so another navigation cannot interleave session and answer hydration.
     void useSessionStore.persist.rehydrate();
     void useResponseStore.persist.rehydrate();
-    if (new URLSearchParams(window.location.search).get('mode') === 'test') {
-        safeBrowserSessionStorage.setItem('qualis-pilot-mode', 'true');
-        useSessionStore.getState().setPilotMode(true);
-    }
+    // Rehydration can bring back a stored false; a flagged tab may have lost its ?mode=test.
+    if (isPilot()) useSessionStore.getState().setPilotMode(true);
 }
