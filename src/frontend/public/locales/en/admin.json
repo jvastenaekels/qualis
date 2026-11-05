@@ -1338,7 +1338,7 @@
                     "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'.",
                     "missing_question_label": "Question '{{id}}' is missing a label for language '{{lang}}' ({{section}}).",
                     "missing_option_label": "Option {{index}} of question '{{id}}' is missing a label for language '{{lang}}' ({{section}}).",
-                    "duplicate_option_value": "Question '{{id}}' has two options with the same value; each option needs its own value ({{section}})."
+                    "duplicate_option_value": "Question '{{id}}' has two options that cannot be told apart; delete one of them and add it again ({{section}})."
                 }
             },
             "languages": {

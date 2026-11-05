@@ -1227,7 +1227,7 @@
                     "empty_statement_text": "L'énoncé '{{code}}' a un texte vide pour la langue '{{lang}}'.",
                     "missing_question_label": "La question '{{id}}' n'a pas de libellé pour la langue '{{lang}}' ({{section}}).",
                     "missing_option_label": "L'option {{index}} de la question '{{id}}' n'a pas de libellé pour la langue '{{lang}}' ({{section}}).",
-                    "duplicate_option_value": "La question '{{id}}' a deux options avec la même valeur ; chaque option doit avoir la sienne ({{section}})."
+                    "duplicate_option_value": "La question '{{id}}' a deux options impossibles à distinguer ; supprimez l'une d'elles puis ajoutez-la de nouveau ({{section}})."
                 }
             },
             "languages": {
