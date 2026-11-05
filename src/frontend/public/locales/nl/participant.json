@@ -119,7 +119,7 @@
         "pilot_stays": "Dit tabblad blijft in testmodus totdat u de test verlaat, ook als u hier een echte link opent.",
         "pilot_leave": "Test verlaten",
         "pilot_no_draft_title": "Dit is een testlink, geen deelnemerslink",
-        "pilot_no_draft_message": "Een test laat het onderzoek draaien zoals u het aan het bewerken bent. Open het met Testen in de ontwerper. Verlaat de test om het onderzoek te zien zoals deelnemers het zien.",
+        "pilot_no_draft_message": "Een test laat het onderzoek draaien zoals u het aan het bewerken bent. Open het met Testrun in de ontwerper. Verlaat de test om het onderzoek te zien zoals deelnemers het zien.",
         "default_study_title": "Q-methodologie onderzoek",
         "loading_content": "Onderzoeksinhoud laden...",
         "change_lang_title": "Taal wijzigen",

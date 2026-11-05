@@ -119,7 +119,7 @@
         "pilot_stays": "Tämä välilehti pysyy testitilassa, kunnes poistut testistä, vaikka avaisit täällä oikean linkin.",
         "pilot_leave": "Poistu testistä",
         "pilot_no_draft_title": "Tämä on testilinkki, ei osallistujan linkki",
-        "pilot_no_draft_message": "Testi ajaa tutkimuksen siinä muodossa kuin muokkaat sitä. Avaa se suunnittelutilan Testaa-painikkeella. Jos haluat nähdä tutkimuksen osallistujan tavoin, poistu testistä.",
+        "pilot_no_draft_message": "Testi ajaa tutkimuksen siinä muodossa kuin muokkaat sitä. Avaa se suunnittelutilan Koeajo-painikkeella. Jos haluat nähdä tutkimuksen osallistujan tavoin, poistu testistä.",
         "default_study_title": "Q-metodologinen tutkimus",
         "loading_content": "Ladataan tutkimuksen sisältöä...",
         "change_lang_title": "Vaihda kieli",

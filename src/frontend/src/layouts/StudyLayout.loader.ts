@@ -2,6 +2,7 @@ import { getStudyApiStudySlugGet, getGetStudyApiStudySlugGetQueryKey } from '@/a
 import i18n from '../i18n';
 import { browserLanguage } from '@/constants/languages';
 import { queryClient } from '@/lib/queryClient';
+import { isPilotSession } from '../utils/pilotMode';
 import type { LoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router-dom';
 
 /**
@@ -19,6 +20,11 @@ export const studyLayoutLoader = async ({ params, request }: LoaderFunctionArgs)
     if (!slug) throw new Error('Slug is required');
 
     const url = new URL(request.url);
+    // A test runs on the draft in this browser and never reads the live study. The request
+    // URL, not window.location, which a client navigation has not updated yet. Read-only.
+    if (url.searchParams.get('mode') === 'test' || isPilotSession(false)) {
+        return { study: null, slug };
+    }
     // Same request as useStudyConfig's, so the query can hit this cache. It does not
     // on a fresh visit: restoreStudySession's queryClient.clear() wipes the cache
     // first and the hook fetches again.

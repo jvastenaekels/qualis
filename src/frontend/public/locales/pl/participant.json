@@ -119,7 +119,7 @@
         "pilot_stays": "Ta karta pozostaje w trybie testowym do czasu opuszczenia testu, nawet po otwarciu w niej prawdziwego linku.",
         "pilot_leave": "Opuść test",
         "pilot_no_draft_title": "To jest link testowy, a nie link dla uczestników",
-        "pilot_no_draft_message": "Test uruchamia badanie w takiej postaci, w jakiej je Pan/Pani edytuje. Proszę otworzyć go przyciskiem Test w edytorze. Aby zobaczyć badanie tak, jak widzą je uczestnicy, proszę opuścić test.",
+        "pilot_no_draft_message": "Test uruchamia badanie w takiej postaci, w jakiej je Pan/Pani edytuje. Proszę otworzyć go przyciskiem Uruchomienie testowe w edytorze. Aby zobaczyć badanie tak, jak widzą je uczestnicy, proszę opuścić test.",
         "default_study_title": "Badanie metodologią Q",
         "loading_content": "Ładowanie treści badania...",
         "change_lang_title": "Zmień język",

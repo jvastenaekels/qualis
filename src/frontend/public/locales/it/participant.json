@@ -119,7 +119,7 @@
         "pilot_stays": "Questa scheda resta in modalità test finché non esce dal test, anche se vi apre un link reale.",
         "pilot_leave": "Esci dal test",
         "pilot_no_draft_title": "Questo è un link di prova, non un link di partecipazione",
-        "pilot_no_draft_message": "Una prova esegue lo studio così come lo sta modificando. La apra con «Prova» nell'editor. Per vedere lo studio come lo vedono i partecipanti, esca dal test.",
+        "pilot_no_draft_message": "Una prova esegue lo studio così come lo sta modificando. La apra con «Esegui test» nell'editor. Per vedere lo studio come lo vedono i partecipanti, esca dal test.",
         "default_study_title": "Studio di metodologia Q",
         "loading_content": "Caricamento dei contenuti dello studio...",
         "change_lang_title": "Cambia lingua",

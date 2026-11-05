@@ -119,7 +119,7 @@
         "pilot_stays": "Este separador continua em modo de teste até sair do teste, mesmo que abra aqui uma ligação real.",
         "pilot_leave": "Sair do teste",
         "pilot_no_draft_title": "Esta é uma ligação de teste, não uma ligação de participação",
-        "pilot_no_draft_message": "Um teste executa o estudo tal como o está a editar. Abra-o com Testar no editor. Para ver o estudo como os participantes o veem, saia do teste.",
+        "pilot_no_draft_message": "Um teste executa o estudo tal como o está a editar. Abra-o com Execução de teste no editor. Para ver o estudo como os participantes o veem, saia do teste.",
         "default_study_title": "Estudo de metodologia Q",
         "loading_content": "A carregar o conteúdo do estudo...",
         "change_lang_title": "Alterar idioma",

@@ -119,7 +119,7 @@
         "pilot_stays": "Esta pestaña sigue en modo de prueba hasta que salga de la prueba, aunque abra aquí un enlace real.",
         "pilot_leave": "Salir de la prueba",
         "pilot_no_draft_title": "Este es un enlace de prueba, no un enlace de participación",
-        "pilot_no_draft_message": "Una prueba ejecuta el estudio tal como lo está editando. Ábrala con «Probar» en el diseñador. Para ver el estudio como lo ven los participantes, salga de la prueba.",
+        "pilot_no_draft_message": "Una prueba ejecuta el estudio tal como lo está editando. Ábrala con «Prueba piloto» en el diseñador. Para ver el estudio como lo ven los participantes, salga de la prueba.",
         "default_study_title": "Estudio de metodología Q",
         "loading_content": "Cargando contenido del estudio...",
         "change_lang_title": "Cambiar idioma",
