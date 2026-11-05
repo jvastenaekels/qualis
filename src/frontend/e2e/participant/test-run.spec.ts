@@ -25,6 +25,23 @@ const FI = {
 };
 const COMMENT = 'Tämä kortti ratkaisi asian.';
 const STATEMENT_TOTAL = 6;
+// After the exit the tab follows the browser, so the banner is looked for in both languages.
+const ANY_BANNER = /Testitila|Test mode/;
+const WRITES = /^\/api\/(study\/|audio\/|submit$)/;
+
+/** What a test leaves in the browser: the names of those still there. */
+function pilotTraces(tab: Page, slug: string): Promise<string[]> {
+    return tab.evaluate(
+        (slug) =>
+            [
+                window.localStorage.getItem(`qualis-pilot-session:${slug}`) && 'session',
+                window.localStorage.getItem(`qualis-pilot-responses:${slug}`) && 'responses',
+                window.sessionStorage.getItem('qualis-pilot-mode') && 'flag',
+                window.sessionStorage.getItem(`qualis-pilot-held-draft-${slug}`) && 'held draft',
+            ].filter((trace) => trace !== null),
+        slug
+    );
+}
 
 async function expectTest(tab: Page) {
     await expect(tab.getByText(FI.banner)).toBeVisible({ timeout: 30000 });
@@ -68,7 +85,7 @@ test.describe('Test run from the designer', () => {
         const writes: string[] = [];
         context.on('request', (request) => {
             const { pathname } = new URL(request.url());
-            if (request.method() !== 'GET' && /^\/api\/(study|audio)\//.test(pathname)) {
+            if (request.method() !== 'GET' && WRITES.test(pathname)) {
                 writes.push(`${request.method()} ${pathname}`);
             }
         });
@@ -112,10 +129,11 @@ test.describe('Test run from the designer', () => {
         await expect.poll(() => countPlacedCards(tab)).toBe(STATEMENT_TOTAL);
 
         await confirmSort(tab);
-        const comments = tab.getByTestId('extreme-comment-input');
-        for (const comment of await comments.all()) await comment.fill(COMMENT);
-        // The post-sort page sends a silent 'started' one second in: let it try.
+        // The post-sort page schedules a silent 'started' one second in: stay past that delay.
         await tab.waitForTimeout(1500);
+        const comments = tab.getByTestId('extreme-comment-input');
+        await expect(comments.first()).toBeVisible();
+        for (const comment of await comments.all()) await comment.fill(COMMENT);
         await reloadTest(tab);
         await expect(comments.last()).toHaveValue(COMMENT);
 
@@ -150,24 +168,40 @@ test.describe('Test run from the designer', () => {
         await tab.goto(`/study/${slug}?token=${token}`);
         await expectTest(tab);
 
+        // Settled, so a write still in flight is counted.
+        await tab.waitForLoadState('networkidle');
         expect(writes).toEqual([]);
         expect(await testDb.countParticipants(authToken, slug)).toBe(0);
+        expect(await pilotTraces(tab, slug)).toEqual([
+            'session',
+            'responses',
+            'flag',
+            'held draft',
+        ]);
 
         await tab.getByRole('button', { name: FI.leave }).click();
         await tab.waitForURL((url) => url.searchParams.get('mode') !== 'test');
         await expect(tab.getByTestId('start-btn')).toBeVisible({ timeout: 30000 });
-        await expect(tab.getByText(FI.banner)).toHaveCount(0);
-        expect(
-            await tab.evaluate((key) => window.sessionStorage.getItem(key), 'qualis-pilot-mode')
-        ).toBeNull();
+        await expect(tab.getByText(ANY_BANNER)).toHaveCount(0);
+        expect(await pilotTraces(tab, slug)).toEqual([]);
 
-        // Real from here on: the server hears it, and none of the test's answers came along.
+        // The exit drops the link's token: the real link has to be opened again.
+        await tab.goto(`/study/${slug}?token=${token}`);
+        await expect(tab.getByTestId('start-btn')).toBeVisible({ timeout: 30000 });
+        await expect(tab.getByText(ANY_BANNER)).toHaveCount(0);
+        expect(new URL(tab.url()).searchParams.get('mode')).toBeNull();
+        expect(await pilotTraces(tab, slug)).toEqual([]);
+
+        // Real from here on: the server hears it, on that link, and no test answer came along.
         await tab.getByTestId('start-btn').click();
         await consent.waitForLoad();
-        await consent.acceptConsent();
+        const [consentRequest] = await Promise.all([
+            tab.waitForRequest((request) => new URL(request.url()).pathname.endsWith('/consent')),
+            consent.acceptConsent(),
+        ]);
+        expect(consentRequest.postDataJSON().link_token).toBe(token);
         await presort.waitForLoad();
         await expect(tab.getByLabel('Age')).toHaveValue('');
-        expect(writes.some((write) => write.endsWith('/consent'))).toBe(true);
-        expect(await testDb.countParticipants(authToken, slug)).toBe(1);
+        await expect.poll(() => testDb.countParticipants(authToken, slug)).toBe(1);
     });
 });
