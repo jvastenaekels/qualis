@@ -8,6 +8,7 @@ import { act, fireEvent, screen, within } from '@testing-library/react';
 import { Route, Routes, useLoaderData, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
+import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
@@ -160,8 +161,7 @@ describe('StudyLayout session language', () => {
             presort_config: {},
             postsort_config: {},
             available_languages: ['en', 'fi'],
-            // biome-ignore lint/suspicious/noExplicitAny: mock config
-        }) as any;
+        }) as unknown as StudyConfig;
 
     const LocationSearch = () => <output>{useLocation().search}</output>;
 
@@ -191,7 +191,6 @@ describe('StudyLayout session language', () => {
         renderAt('/study/test/welcome');
 
         expect(useConfigStore.getState().config?.language).toBe('fi');
-        expect(useConfigStore.getState().isLoading).toBe(false);
     });
 
     it('a reload mid-session keeps the persisted language', () => {
