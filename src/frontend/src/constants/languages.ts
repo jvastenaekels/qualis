@@ -31,3 +31,10 @@ export const SUPPORTED_LANGUAGES: Language[] = [
  * directly since `participant.json` is mandatory for every declared language.
  */
 export const getAdminLanguages = (): Language[] => SUPPORTED_LANGUAGES.filter((l) => l.hasAdmin);
+
+/** Base code of the browser's language ("pt-BR" -> "pt"), if Qualis supports it. */
+export function browserLanguage(): string | undefined {
+    const tag = typeof navigator === 'undefined' ? undefined : navigator.language;
+    const base = tag?.split('-')[0]?.toLowerCase();
+    return SUPPORTED_LANGUAGES.find((l) => l.code === base)?.code;
+}

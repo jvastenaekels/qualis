@@ -1,5 +1,6 @@
 import { getStudyApiStudySlugGet, getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import i18n from '../i18n';
+import { browserLanguage } from '@/constants/languages';
 import { queryClient } from '@/lib/queryClient';
 import type { LoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router-dom';
 
@@ -18,7 +19,8 @@ export const studyLayoutLoader = async ({ params, request }: LoaderFunctionArgs)
     if (!slug) throw new Error('Slug is required');
 
     const url = new URL(request.url);
-    const lang = url.searchParams.get('lang') || undefined;
+    // Same request as useStudyConfig's, or the query misses this cache and fetches again.
+    const lang = url.searchParams.get('lang') || browserLanguage();
     const token = url.searchParams.get('token') || undefined;
 
     const queryParams = {

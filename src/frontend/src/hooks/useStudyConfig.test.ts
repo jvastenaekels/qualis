@@ -34,8 +34,7 @@ function mockBackend(offered: string[]): void {
             });
         }
         return { data: answers.get(language), isLoading: false, error: null, refetch: vi.fn() };
-        // biome-ignore lint/suspicious/noExplicitAny: mock hook
-    }) as any);
+    }) as unknown as typeof useGetStudyConfig);
 }
 
 describe('useStudyConfig language request', () => {
