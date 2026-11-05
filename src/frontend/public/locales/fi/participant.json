@@ -429,9 +429,9 @@
         "resetting_session": "Resetting study session…"
     },
     "erasure": {
-        "section_title": "Your right to erasure (GDPR Art. 17)",
+        "section_title": "Oikeutesi tietojen poistamiseen (GDPR, 17 artikla)",
         "section_intro": "You can request the removal of your personal data at any time. Your anonymous statement rankings will be kept as research data; everything that could identify you will be removed.",
-        "button": "Request my data deletion",
+        "button": "Pyydä tietojeni poistamista",
         "confirm_title": "Erase your personal data?",
         "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
         "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",

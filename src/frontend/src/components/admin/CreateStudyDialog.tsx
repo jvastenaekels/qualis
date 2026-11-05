@@ -34,7 +34,7 @@ import {
     getListStudiesApiAdminStudiesGetQueryKey,
 } from '@/api/generated';
 import { useAdminStore } from '@/store/useAdminStore';
-import { parseStudyCreationError } from './CreateStudyDialog.helpers';
+import { parseStudyCreationError, slugifyTitle } from './CreateStudyDialog.helpers';
 
 interface CreateStudyDialogProps {
     open: boolean;
@@ -83,12 +83,7 @@ export function CreateStudyDialog({ open, onOpenChange, projectSlug }: CreateStu
 
     useEffect(() => {
         if (!slugTouched.current && watchedTitle) {
-            const generated = watchedTitle
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-|-$/g, '')
-                .slice(0, 50);
-            form.setValue('slug', generated);
+            form.setValue('slug', slugifyTitle(watchedTitle));
         }
     }, [watchedTitle, form]);
 

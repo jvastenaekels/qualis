@@ -45,6 +45,7 @@ import { toast } from 'sonner';
 import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
     getListStudiesApiAdminStudiesGetQueryKey,
+    getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey,
     useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost,
     useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete,
 } from '@/api/generated';
@@ -222,15 +223,24 @@ export function useRecruitmentPage(): RecruitmentPageApi {
         }
     }, []);
 
+    // The loader reads links through the query cache: drop the cached list
+    // first, or revalidating would hand it back unchanged.
+    const refreshLinks = async () => {
+        await queryClient.invalidateQueries({
+            queryKey: getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey(slug ?? ''),
+        });
+        revalidator.revalidate();
+    };
+
     // ── Mutations ────────────────────────────────────────────────
     const createMutation = useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost({
         mutation: {
-            onSuccess: () => {
+            onSuccess: async () => {
                 toast.success(
                     t('admin.recruitment.toasts.created', 'Access links created successfully')
                 );
                 setIsCreateModalOpen(false);
-                revalidator.revalidate();
+                await refreshLinks();
                 setNewLinkName('');
                 setNewLinkCount(1);
             },
@@ -247,9 +257,9 @@ export function useRecruitmentPage(): RecruitmentPageApi {
 
     const revokeMutation = useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete({
         mutation: {
-            onSuccess: () => {
+            onSuccess: async () => {
                 toast.success(t('admin.recruitment.toasts.revoked', 'Link revoked'));
-                revalidator.revalidate();
+                await refreshLinks();
             },
             onError: () => {
                 toast.error(

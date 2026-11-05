@@ -15,6 +15,8 @@
  */
 
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createElement, type ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
 import {
@@ -41,6 +43,10 @@ vi.mock('@/api/generated', () => ({
     useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete: mockRevokeMutationHook,
     getListStudiesApiAdminStudiesGetQueryKey: () => ['list-studies'],
     getGetStudyApiAdminStudiesSlugGetQueryKey: (slug: string) => ['get-study', slug],
+    getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey: (slug: string) => [
+        'list-links',
+        slug,
+    ],
 }));
 
 const { mockUpdateStudy } = vi.hoisted(() => ({
@@ -286,6 +292,40 @@ describe('useRecruitmentPage', () => {
         });
 
         expect(mutate).toHaveBeenCalledWith({ linkId: 42 });
+    });
+
+    it.each([
+        ['creation', mockCreateMutationHook],
+        ['revocation', mockRevokeMutationHook],
+    ])('invalidates the links query before revalidating (%s)', async (_label, mutationHook) => {
+        // The loader reads links through the query cache: revalidating alone
+        // would hand back the cached list, so the new or revoked link would
+        // not show until a reload.
+        const queryClient = new QueryClient();
+        let release: () => void = () => {};
+        const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockReturnValue(
+            new Promise<void>((resolve) => {
+                release = resolve;
+            })
+        );
+        const wrapper = ({ children }: { children: ReactNode }) =>
+            createElement(QueryClientProvider, { client: queryClient }, children);
+
+        renderHook(() => useRecruitmentPage(), { wrapper });
+        const { onSuccess } = mutationHook.mock.calls[0][0].mutation;
+
+        let done: Promise<void> = Promise.resolve();
+        act(() => {
+            done = onSuccess();
+        });
+
+        expect(invalidate).toHaveBeenCalledWith({ queryKey: ['list-links', 'demo-study'] });
+        expect(mockRevalidate).not.toHaveBeenCalled();
+        release();
+        await act(async () => {
+            await done;
+        });
+        expect(mockRevalidate).toHaveBeenCalledTimes(1);
     });
 
     it('isCreatingLink and isRevokingLink reflect mutation pending state', () => {

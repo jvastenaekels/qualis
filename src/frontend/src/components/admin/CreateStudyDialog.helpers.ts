@@ -4,6 +4,17 @@ interface AxiosErrorShape {
     response?: { data?: { detail?: unknown } };
 }
 
+/** Suggested slug for a title: accents fall back to their base letter. */
+export function slugifyTitle(title: string): string {
+    return title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{M}/gu, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 50);
+}
+
 /**
  * Parse the various error shapes that can come back from the create-study
  * mutation into a user-displayable string. Handles:
