@@ -21,6 +21,7 @@
 | 7 | Supprimer l'Owner d'un projet laisse un projet sans Owner : `project_members` part en cascade, `delete_user` ne contrôle rien, et `list_projects` ne montre à un superuser que ses propres projets. Études et données participant deviennent inaccessibles depuis l'interface | `models/project.py:77`, `routers/admin/users.py:263`, `routers/admin/projects.py:39` | 4 |
 | 8 | `delete_user` n'a aucun test | `tests/integration/test_admin*.py` | 4 |
 | 10 | Un compte sans projet tombe sur « Access denied » à la connexion : `RequireAdmin` bloque aussi `/hub` et `/app/projects/new`, alors que l'API autorise tout compte actif à créer un projet. Trouvé en cours d'exécution ; sans correction, les invitations de compte mènent à une impasse | `components/auth/RequireAdmin.tsx`, `App.tsx:161,294-302`, `create_project` | 7 |
+| 11 | Un compte existant invité à un projet reçoit un faux succès et ne rejoint pas le projet : `/api/admin/invitations/accept` n'a aucun appelant côté interface, alors que `admin-management.md` promet l'accès immédiat | `RegistrationPage.tsx`, `routers/admin/invitations.py`, relecture finale | 8 |
 | 9 | `CLAUDE.md` et `pyproject.toml` déclarent `app.services.quotas`, un module absent | `pyproject.toml:361-363` | 5 |
 
 ## Décisions
@@ -186,11 +187,36 @@ test_email_sent_when_smtp_configured            # tâche de fond planifiée
 
 - [ ] **Step 6: Commit** — `fix(auth): let an account without a project reach the hub`.
 
+### Task 8: Rejoindre un projet avec un compte existant
+
+**Files:**
+- Modify: `src/frontend/src/pages/RegistrationPage.tsx`, `src/frontend/src/pages/RegistrationPage.test.tsx`, `src/frontend/public/locales/en/admin.json`, `docs/guides/admin-management.md:48`
+
+**Interfaces:**
+- Consumes: `POST /api/admin/invitations/accept`, corps `{ token }` ; 403 si le jeton vise une autre adresse, 400 s'il est expiré ou déjà utilisé. `useAuth()` donne `isAuthenticated` et `user`.
+
+Comportement, sur une invitation **à un projet** uniquement (`project_id` non nul) :
+- **Personne non connectée :** sous le formulaire, le lien `Already have an account? Sign in` mène à `/login?redirect=<encodeURIComponent('/register?token=…')>`.
+- **Personne connectée :** le formulaire disparaît. La page montre le projet, le rôle et le bouton `Join project`, qui appelle `accept`, invalide la liste des projets, puis navigue vers `/hub`.
+- **Invitation de compte :** rien ne change.
+
+- [ ] **Step 1: Écrire les tests qui échouent.** `offers sign-in on a project invitation`, avec l'URL exacte du lien ; `does not offer sign-in on an account invitation` ; `shows Join project instead of the form when signed in` ; `joining calls accept with the token and goes to the hub` ; `joining refreshes the project list` ; `shows the wrong-account message on 403 and stays on the page` ; `shows the invalid-link screen on 400`.
+
+- [ ] **Step 2: Vérifier l'échec.** Run: `cd src/frontend && npx vitest run src/pages/RegistrationPage.test.tsx`. Expected: FAIL.
+
+- [ ] **Step 3: Implémenter.** Utiliser le client généré pour `accept`. Vérifier dans `LoginPage.tsx` que `redirect` garde bien le paramètre `token` et refuse une URL externe ; si elle l'accepte, le signaler. Clés dans `auth.register` : `have_account` = `Already have an account? Sign in`, `join_project` = `Join project`, `wrong_account` = `This invitation was sent to another address. Sign out, then open the link again.`
+
+- [ ] **Step 4: Corriger `admin-management.md:48`** : une personne déjà inscrite se connecte depuis le lien, puis clique sur **Join project**.
+
+- [ ] **Step 5: Vérifier.** Même commande, puis `npm run i18n-check`. Expected: PASS.
+
+- [ ] **Step 6: Commit** — `feat(auth): let an existing account join a project from its invitation`.
+
 ### Task 6: Fermer l'inscription publique en production
 
 **Requiert l'accord explicite de Julien :** cette tâche suit un déploiement et modifie la production.
 
-- [ ] **Step 1: Déployer** les tâches 1 à 5 et 7, puis contrôler `scalingo --app qualis ps` et `/health` : `scalingo deployments` peut dire `success` avec `web-1` en panne.
+- [ ] **Step 1: Déployer** les tâches 1 à 5, 7 et 8, puis contrôler `scalingo --app qualis ps` et `/health` : `scalingo deployments` peut dire `success` avec `web-1` en panne.
 
 - [ ] **Step 2: Fermer.** Run: `scalingo --app qualis env-set ALLOW_PUBLIC_REGISTRATION=false && scalingo --app qualis restart`. `env-set` seul ne redémarre pas l'application.
 
