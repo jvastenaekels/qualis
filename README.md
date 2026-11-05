@@ -155,7 +155,7 @@ you change either.
 | | |
 | :--- | :--- |
 | **Participants** | Sort on a phone, tablet, or desktop browser — no app, no plugin. Touch-optimised drag-and-drop; studies translated into several languages, each participant choosing their own. |
-| **Study design** | Visual grid designer with capacity validation, a 10-type survey builder with conditional visibility, Markdown instructions and consent, import/export of designs, and a pilot mode that persists nothing. |
+| **Study design** | Visual grid designer with capacity validation, a 10-type survey builder with conditional visibility, Markdown instructions and consent, import/export of designs, and a Test run that stores nothing. |
 | **Concourse** | A project-level pool of candidate statements with a proposed/accepted/rejected workflow, per-item provenance and version history, item-level discussion, and one-click sampling into a study. |
 | **Analysis** | PCA or centroid extraction with Varimax or manual rotation, scree plot, auto- or manual flagging, distinguishing and consensus statements, factor arrays, z-scores, and composite reliability. |
 | **Monitoring** | Recruitment links (public, single-use, capacity-limited) with QR codes and funnel tracking, submission timelines, session review with audio playback. |

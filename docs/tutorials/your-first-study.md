@@ -268,7 +268,7 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 
    If you re-enable rough-sort, an extra 3-pile step appears between Pre-sort and Fine Sort.
 3. At the end, check that the page says **This was a test. Nothing was stored.** There is no confirmation code, because nothing reached the database: you can test as many times as you like without polluting the eventual dataset.
-4. In the banner, click **Leave the test**. The tab stays in test mode until you do, even if you paste a real participant link into it. Leaving reloads the study as a real session, so close the tab if you do not mean to take part.
+4. In the banner, click **Leave the test**. The tab stays in test mode until you do, even if you paste a real participant link into it. Leaving reloads the study as a real session, so close the tab if you do not mean to take part. Leaving also opens the study without the participant link's code, so open a pasted link again if you want to follow it.
 
 **Expected result:** the final page displays **Thank you for your participation!** and **This was a test. Nothing was stored.**, with no confirmation code.
 
