@@ -12,6 +12,7 @@ import { useGetStudyConfig } from './useGetStudyConfig';
 import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
 import i18n from '../i18n';
+import { SUPPORTED_LANGUAGES } from '@/constants/languages';
 
 /** Map a fetch/parse error onto an i18n translation key for the user-facing message. */
 function mapErrorToTranslationKey(error: unknown): string {
@@ -122,6 +123,13 @@ function syncResolvedLanguage(
     if (i18n.language !== newLang) i18n.changeLanguage(newLang);
 }
 
+/** Base code of the browser's language ("pt-BR" -> "pt"), if Qualis supports it. */
+function browserLanguage(): string | undefined {
+    const tag = typeof navigator === 'undefined' ? undefined : navigator.language;
+    const base = tag?.split('-')[0]?.toLowerCase();
+    return SUPPORTED_LANGUAGES.find((l) => l.code === base)?.code;
+}
+
 export const useStudyConfig = () => {
     const { slug } = useParams();
     const [password, setPasswordState] = useState<string | undefined>();
@@ -145,8 +153,8 @@ export const useStudyConfig = () => {
     const isTestMode = searchParams.get('mode') === 'test';
 
     // Determine language to request
-    // Priority: sessionLanguage (persisted) -> URL parameter -> null (let backend decide)
-    const langToRequest = sessionLanguage || searchParams.get('lang') || undefined;
+    // Priority: sessionLanguage (persisted) -> URL parameter -> browser language -> undefined (backend default)
+    const langToRequest = sessionLanguage || searchParams.get('lang') || browserLanguage();
 
     const { data, isLoading, error, refetch } = useGetStudyConfig(
         slug,
