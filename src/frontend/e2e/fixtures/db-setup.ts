@@ -379,7 +379,7 @@ export class TestDatabase {
             throw new Error(`Failed to get study: ${slug}`);
         }
 
-        return response.json();
+        return response.json() as Promise<{ presort_config: { fields: Record<string, unknown> } }>;
     }
 
     /**
