@@ -55,9 +55,11 @@ Threaded comments under each memo support `@mentions` of project members; mentio
 
 Five formats are available from **Data → Export**: CSV (wide), PQMethod ZIP, R-Kit ZIP, Research Package ZIP, and a JSON dump. Pick the format that matches the downstream tool — see the [Data Export guide](data-export.md) for which is which.
 
-## Preview a study before activating it
+## Test a study before activating it
 
-Use the **Preview** action in the designer toolbar (pilot mode) to walk through the participant experience yourself. The participant view loads the current draft from local storage, the submit step is short-circuited in the browser, and a local `PILOT-XXXXX` confirmation code is shown — nothing reaches the database. This is the right way to test a study end-to-end without polluting the dataset, and it works on any draft (you do not need to activate first).
+Use the **Test run** button in the designer toolbar to walk through the participant experience yourself. It opens one tab under a **Test mode** banner, in the language you are editing. The tab runs the current draft from this browser's local storage and sends nothing to the server, so the end screen says **This was a test. Nothing was stored.** and shows no confirmation code. This is the right way to test a study end-to-end without polluting the dataset. You do not need to activate first, but the button stays disabled until the checklist is complete, and it says what is missing.
+
+The tab stays in test mode until you click **Leave the test** in the banner, even if you paste a real participant link into it. A `?mode=test` link opened without a draft in the browser is refused, so it cannot be shared with participants.
 
 ## Study lifecycle
 

@@ -16,7 +16,7 @@ For the corresponding API endpoints (with rate limits and authorisation), see [`
 | **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata + memos (methodology + analysis trail). |
 | **JSON dump** | Backups; bespoke pipelines. | Complete study + every participant placement. |
 
-Discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump. (Pilot-mode previews never reach the database, so they cannot appear in any export.)
+Discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump. (Test runs never reach the database, so they cannot appear in any export.)
 
 ## Export the whole study
 

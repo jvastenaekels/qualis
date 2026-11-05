@@ -257,7 +257,7 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
 
 ## Step 10: Test Your Study
 
-1. In the designer toolbar, click **Test run**. This opens the study in a new tab in pilot mode.
+1. In the designer toolbar, click **Test run**. This opens the study in a new tab, under an amber **Test mode** banner.
 2. Walk through the participant flow:
    - **Welcome:** review the page, scroll to the end, and click **Get started**.
    - **Consent:** select the consent checkbox and click **I agree — start the study**.
@@ -267,9 +267,10 @@ Customize the navigation button labels, sorting terminology, methodology hints, 
    - **Post-sort, Step 2:** optionally answer the additional-thoughts question, then click **Share my perspective**.
 
    If you re-enable rough-sort, an extra 3-pile step appears between Pre-sort and Fine Sort.
-3. At the end, check that you receive a local `PILOT-XXXXX` confirmation code. Nothing is persisted to the database — you can preview as many times as you like without polluting the eventual dataset.
+3. At the end, check that the page says **This was a test. Nothing was stored.** There is no confirmation code, because nothing reached the database: you can test as many times as you like without polluting the eventual dataset.
+4. In the banner, click **Leave the test**. The tab stays in test mode until you do, even if you paste a real participant link into it. Leaving reloads the study as a real session, so close the tab if you do not mean to take part.
 
-**Expected result:** the final page displays **Thank you for your participation!** and a confirmation code beginning with `PILOT-`.
+**Expected result:** the final page displays **Thank you for your participation!** and **This was a test. Nothing was stored.**, with no confirmation code.
 
 ---
 

@@ -17,7 +17,7 @@ is the detail.
 - **Markdown-formatted content** for instructions, consent forms, and condition of instruction.
 - **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
 - **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study, since not every protocol uses it.
-- **Pilot mode** to run through the full participant experience without persisting any data.
+- **Test run** to go through the full participant experience without persisting any data.
 
 ### Concourse
 

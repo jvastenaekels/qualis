@@ -96,7 +96,7 @@ Customizes participant-facing wording: navigation/button labels, terminology (`u
 | ------ | ----- |
 | Export configuration | JSON; excludes participant data. Filename `{slug}_config_{YYYYMMDD}.json`. |
 | Import study | Validates JSON via `POST /api/admin/studies/validate-import`, then creates a new DRAFT study with an editable slug. |
-| Preview (pilot mode) | Opens the participant view with `?mode=test`, loading the current draft from local storage. The submit step is short-circuited locally; nothing reaches the backend. |
+| Test run | Opens the participant view with `?mode=test` in a tab of its own, in the language being edited, loading the current draft from local storage. Consent, progress, drafts, audio and submit are all short-circuited locally; nothing reaches the backend. Disabled until the checklist is complete. |
 
 ---
 
@@ -137,9 +137,9 @@ Click any row to open the inspector (four tabs: Session Metadata, Pre-Sort, Q-So
 
 Discarding a participant lets you record an optional reason. Discarded rows are excluded from analysis and exports but are preserved for audit.
 
-### Pilot-mode sessions
+### Test runs
 
-Sessions opened via Preview (pilot mode) never reach the database — the frontend short-circuits the submit step and generates a local `PILOT-XXXXX` confirmation code instead. The Data page therefore shows zero pilot records by default.
+Sessions opened with Test run never reach the database: the frontend short-circuits every write, and the end screen shows no confirmation code. The Data page therefore never lists a test.
 
 ### Exports
 

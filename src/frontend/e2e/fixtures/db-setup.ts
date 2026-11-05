@@ -382,6 +382,20 @@ export class TestDatabase {
         return response.json() as Promise<{ presort_config: { fields: Record<string, unknown> } }>;
     }
 
+    /** Rows the server holds for this study, whatever their status. */
+    async countParticipants(token: string, slug: string): Promise<number> {
+        const response = await this.fetchWithRetry(
+            `${this.baseUrl}/api/admin/studies/${slug}/participants`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!response.ok) {
+            throw new Error(`Failed to list participants: ${slug}`);
+        }
+
+        return ((await response.json()) as { total: number }).total;
+    }
+
     /**
      * Update study configuration
      */

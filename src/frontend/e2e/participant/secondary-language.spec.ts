@@ -9,14 +9,12 @@
 
 import type { Page } from '@playwright/test';
 import { test, expect } from '../fixtures/db-setup';
-import { testDataBuilders, type StudyData } from '../fixtures/test-data';
+import { testDataBuilders } from '../fixtures/test-data';
 import { ConsentPage } from '../pages/ConsentPage';
 import { PreSortPage } from '../pages/PreSortPage';
+import { bilingualStudy, expectLanguage, STATEMENT } from '../helpers/bilingual-study';
 import { placeAllCards } from '../helpers/rough-sort';
 
-const TITLE = { en: 'English study', fi: 'Suomalainen tutkimus' };
-const STATEMENT = { en: 'Statement', fi: 'Väittämä' };
-const STATEMENT_COUNT = 6;
 const LAST_SCREEN = {
     en: { why: 'Why these choices', thanks: 'Thank you for your participation!' },
     fi: { why: 'Miksi nämä valinnat', thanks: 'Kiitos osallistumisestasi!' },
@@ -26,83 +24,6 @@ const OPTIONS = {
     en: ['Fully remote', 'Hybrid', 'Fully in-office', 'Freelance', 'Between jobs'],
     fi: ['Täysin etänä', 'Hybridi', 'Täysin toimistolla', 'Freelancer', 'Työnhaussa'],
 };
-
-function translation(language_code: 'en' | 'fi') {
-    return {
-        language_code,
-        title: TITLE[language_code],
-        description: `${TITLE[language_code]} description`,
-        instructions: `${TITLE[language_code]} instructions`,
-        objective: `${TITLE[language_code]} objective`,
-        condition_of_instruction: `${TITLE[language_code]} condition`,
-        consent_title: `${TITLE[language_code]} consent`,
-        consent_description: `${TITLE[language_code]} consent text`,
-    };
-}
-
-/** Activation wants labels per language; PreSortPage finds the fields by their English ones. */
-const bothLanguages = (label: string) => ({ en: label, fi: label }) as unknown as string;
-
-function inBothLanguages<T extends { label: string; options?: unknown[] }>(field: T): T {
-    return {
-        ...field,
-        label: bothLanguages(field.label),
-        options: (field.options as string[] | undefined)?.map((value) => ({
-            value,
-            label: bothLanguages(value),
-        })),
-    };
-}
-
-function bilingualStudy(slug: string, overrides: Partial<StudyData> = {}) {
-    return {
-        ...testDataBuilders.study({
-            slug,
-            state: 'active',
-            translations: [translation('en'), translation('fi')],
-            statements: Array.from({ length: STATEMENT_COUNT }, (_, i) => ({
-                code: `S${i + 1}`,
-                translations: [
-                    { language_code: 'en', text: `${STATEMENT.en} ${i + 1}` },
-                    { language_code: 'fi', text: `${STATEMENT.fi} ${i + 1}` },
-                ],
-            })),
-            grid_config: [
-                { score: -1, capacity: 2 },
-                { score: 0, capacity: 2 },
-                { score: 1, capacity: 2 },
-            ],
-            presort_config: testDataBuilders.presortConfig({
-                age: inBothLanguages(
-                    testDataBuilders.presortField('number', 'Age', { required: true })
-                ),
-                gender: inBothLanguages(
-                    testDataBuilders.presortField('select', 'Gender', {
-                        required: true,
-                        options: ['Male', 'Female'],
-                    })
-                ),
-                education: inBothLanguages(
-                    testDataBuilders.presortField('select', 'Education', {
-                        required: true,
-                        options: ['High School', 'Bachelor'],
-                    })
-                ),
-            }),
-            ...overrides,
-        }),
-        rough_sort_enabled: false,
-    };
-}
-
-/** The page is live: not dimmed, and its content is in `lang`. */
-async function expectLanguage(page: Page, lang: 'en' | 'fi') {
-    await expect(page).toHaveTitle(new RegExp(TITLE[lang]));
-    await expect(page.locator('html')).toHaveAttribute('lang', lang);
-    await expect(page.locator('#main-scroll-container > div').first()).not.toHaveClass(
-        /pointer-events-none/
-    );
-}
 
 async function expectDeckLanguage(page: Page, lang: 'en' | 'fi') {
     await expect

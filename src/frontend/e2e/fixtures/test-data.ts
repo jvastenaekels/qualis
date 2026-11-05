@@ -294,6 +294,7 @@ export interface PresortConfig {
 }
 
 export interface PostsortConfig {
+    extreme_columns?: number[];
     email_collection_enabled?: boolean;
     interview_consent_enabled?: boolean;
     newsletter_consent_enabled?: boolean;
