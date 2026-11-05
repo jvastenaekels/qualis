@@ -299,6 +299,108 @@ describe('useStudyConfig', () => {
         expect(useConfigStore.getState().config).toBeNull();
     });
 
+    describe('Test run draft', () => {
+        const tr = (language_code: string, title: string, extra = {}) => ({
+            language_code,
+            title,
+            ui_labels: {},
+            process_steps: [],
+            ...extra,
+        });
+
+        function openDraft(
+            draft: Record<string, unknown>,
+            params: Record<string, string> = {}
+        ): void {
+            vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) =>
+                key === 'mode' ? 'test' : (params[key] ?? null)
+            );
+            localStorage.clear();
+            localStorage.setItem(
+                'qualis-test-draft-test-study',
+                JSON.stringify({ slug: 'test-study', statements: [], ...draft })
+            );
+            vi.mocked(i18n.changeLanguage).mockResolvedValue(
+                // biome-ignore lint/suspicious/noExplicitAny: i18n.changeLanguage returns a TFunction promise we don't use
+                undefined as any
+            );
+            vi.mocked(useGetStudyConfig).mockReturnValue({
+                data: undefined,
+                isLoading: false,
+                error: null,
+                refetch: vi.fn(),
+                // biome-ignore lint/suspicious/noExplicitAny: mock hook
+            } as any);
+            renderHook(() => useStudyConfig());
+        }
+
+        it('a draft lists its translations as available languages', async () => {
+            openDraft({
+                default_language: 'en',
+                translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+            });
+            await waitFor(() =>
+                expect(useConfigStore.getState().config?.available_languages).toEqual(['en', 'fi'])
+            );
+        });
+
+        it('a draft opens in default_language, not the first translation', async () => {
+            openDraft({
+                default_language: 'fi',
+                translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+            expect(useConfigStore.getState().config?.language).toBe('fi');
+        });
+
+        it('opens in the language named by ?lang= when the draft has it', async () => {
+            openDraft(
+                {
+                    default_language: 'en',
+                    translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+                },
+                { lang: 'fi' }
+            );
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+        });
+
+        it('a language the draft lacks falls back to its default', async () => {
+            useSessionStore.getState().setLanguage('de');
+            openDraft({
+                default_language: 'fi',
+                translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+        });
+
+        it('a Finnish-only draft offers no English', async () => {
+            openDraft({
+                default_language: 'fi',
+                translations: [tr('fi', 'Tutkimus')],
+            });
+            await waitFor(() =>
+                expect(useConfigStore.getState().config?.available_languages).toEqual(['fi'])
+            );
+        });
+
+        it('an untranslated statement shows its code, not an empty card', async () => {
+            openDraft({
+                default_language: 'fi',
+                translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+                statements: [
+                    { code: 'S1', translations: [{ language_code: 'en', text: 'Hello' }] },
+                    { code: 'S2', translations: [{ language_code: 'fi', text: 'Hei' }] },
+                ],
+            });
+            await waitFor(() =>
+                expect(useConfigStore.getState().config?.statements.map((s) => s.text)).toEqual([
+                    'S1',
+                    'Hei',
+                ])
+            );
+        });
+    });
+
     it('keeps the unlocked password for the consent call once the server accepts it', async () => {
         vi.mocked(useGetStudyConfig).mockReturnValue({
             data: {

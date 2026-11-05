@@ -549,11 +549,28 @@ describe('useStudyDesignPage', () => {
                 result.current.handleTestRun();
             });
 
-            expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test', '_blank');
+            expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test&lang=en', '_blank');
         } finally {
             restoreLocalStorage();
             openSpy.mockRestore();
         }
+    });
+
+    it('Test run opens the language being edited', () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+        localStorage.clear();
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+        act(() => result.current.setActiveLocale('fi'));
+        act(() => result.current.handleTestRun());
+
+        expect(openSpy).toHaveBeenCalledWith('/study/test-study?mode=test&lang=fi', '_blank');
+        // The draft is the only thing handed over; the old resolved snapshot is gone.
+        expect(localStorage.getItem('qualis-test-draft-test-study')).not.toBeNull();
+        expect(localStorage.getItem('qualis-test-config-test-study')).toBeNull();
+        openSpy.mockRestore();
     });
 
     it('DESIGN_STEPS has the canonical 7 steps in expected order', () => {

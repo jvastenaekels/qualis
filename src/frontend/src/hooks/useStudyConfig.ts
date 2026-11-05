@@ -39,13 +39,26 @@ function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig 
         return raw as StudyConfig;
     }
 
-    const lang = sessionLanguage || raw.translations[0]?.language_code || 'en';
+    // A disabled translation is not offered to participants, so the test does not offer it either.
+    // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+    const live = raw.translations.filter((t: any) => !t.is_disabled);
+    const offered = live.length > 0 ? live : raw.translations;
+    const available: string[] = offered.map(
+        // biome-ignore lint/suspicious/noExplicitAny: draft translation type
+        (t: any) => t.language_code
+    );
+    // The language the researcher asked for, else the study's own default, else the first translation.
+    const lang =
+        [sessionLanguage, raw.default_language].find((c) => c && available.includes(c)) ||
+        available[0] ||
+        'en';
     const tr =
         // biome-ignore lint/suspicious/noExplicitAny: draft translation type
         raw.translations.find((t: any) => t.language_code === lang) || raw.translations[0];
 
     return {
         ...raw,
+        available_languages: available,
         title: tr?.title || 'No Title',
         subtitle: tr?.subtitle,
         description: tr?.description,
@@ -67,7 +80,8 @@ function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig 
             return {
                 id: index + 1,
                 code: s.code,
-                text: st?.text || '',
+                // An untranslated statement shows its code rather than an empty card.
+                text: st?.text || s.code,
             };
         }),
     } as StudyConfig;
@@ -198,14 +212,12 @@ export const useStudyConfig = () => {
             setConfigError(null);
         };
 
-        const loadFromLocalDraft = async (
-            draftJson: string | null,
-            legacyJson: string | null
-        ): Promise<void> => {
+        const loadFromLocalDraft = async (draftJson: string): Promise<void> => {
             try {
-                const config = draftJson
-                    ? parseStudyDraft(JSON.parse(draftJson), sessionLanguage)
-                    : (JSON.parse(legacyJson as string) as StudyConfig);
+                // ?lang= is what the designer asked for; it wins, as in useStudyLocaleSync.
+                const requested =
+                    new URLSearchParams(window.location.search).get('lang') || sessionLanguage;
+                const config = parseStudyDraft(JSON.parse(draftJson), requested);
 
                 await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
                 if (cancelled) return;
@@ -273,10 +285,9 @@ export const useStudyConfig = () => {
             }
 
             const draftJson = safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
-            const legacyJson = safeBrowserLocalStorage.getItem(`qualis-test-config-${slug}`);
 
-            if (draftJson || legacyJson) {
-                await loadFromLocalDraft(draftJson, legacyJson);
+            if (draftJson) {
+                await loadFromLocalDraft(draftJson);
             } else {
                 await loadFromServerFallback();
             }

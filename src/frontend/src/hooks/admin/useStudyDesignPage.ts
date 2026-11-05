@@ -523,47 +523,13 @@ export function useStudyDesignPage(): StudyDesignPageApi {
     const handleTestRun = useCallback(() => {
         if (!draft || !effectiveSlug) return;
 
-        // 1. Build synthetic config (same logic as side-preview)
-        const translation = draft.translations?.find((tr) => tr.language_code === activeLocale);
-
-        const syntheticConfig = {
-            ...draft,
-            title: translation?.title || 'No Title',
-            subtitle: translation?.subtitle,
-            description: translation?.description,
-            objective: translation?.objective,
-            instructions: translation?.instructions,
-            consent: {
-                title: translation?.consent_title,
-                description: translation?.consent_description,
-            },
-            pre_instruction: translation?.pre_instruction,
-            condition_of_instruction: translation?.condition_of_instruction,
-
-            ui_labels: translation?.ui_labels || {},
-            process_steps: translation?.process_steps || [],
-            language: activeLocale,
-            statements: (draft.statements || []).map((s, index) => {
-                const st = s.translations?.find((tr) => tr.language_code === activeLocale);
-                return {
-                    id: index + 1,
-                    code: s.code,
-                    text: st?.text || '',
-                };
-            }),
-        };
-
         safeBrowserLocalStorage.setItem(
             `qualis-test-draft-${effectiveSlug}`,
             JSON.stringify(draft)
         );
-        safeBrowserLocalStorage.setItem(
-            `qualis-test-config-${effectiveSlug}`,
-            JSON.stringify(syntheticConfig)
-        );
         safeBrowserLocalStorage.setItem(`qualis-pilot-reset-${effectiveSlug}`, 'true');
 
-        const testUrl = `/study/${effectiveSlug}?mode=test`;
+        const testUrl = `/study/${effectiveSlug}?mode=test&lang=${encodeURIComponent(activeLocale)}`;
         window.open(testUrl, '_blank');
         toast.info(`${t('admin.design.toolbar.test_run')}...`);
     }, [draft, effectiveSlug, activeLocale, t]);
