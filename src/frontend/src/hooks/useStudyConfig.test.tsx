@@ -401,6 +401,14 @@ describe('useStudyConfig', () => {
             expect(useConfigStore.getState().designChanged).toBe(false);
         });
 
+        it('the config hook leaves arming the tab to the module load', async () => {
+            openDraft({ default_language: 'en', translations: [tr('en', 'First')] });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+
+            expect(useSessionStore.getState().isPilotMode).toBe(true);
+            expect(sessionStorage.getItem('qualis-pilot-mode')).toBeNull();
+        });
+
         it('a draft lists its translations as available languages', async () => {
             openDraft({
                 default_language: 'en',

@@ -343,6 +343,22 @@ describe('Layout Loading & Error States', () => {
         expect(screen.getByText('layout.preparing')).toBeInTheDocument();
     });
 
+    it('blocked storage does not crash a real participant on the error screen', () => {
+        // A browser that blocks storage throws on the property itself, not on getItem.
+        const blocked = vi.spyOn(window, 'sessionStorage', 'get').mockImplementation(() => {
+            throw new DOMException('Blocked', 'SecurityError');
+        });
+        useConfigStore.setState({ error: 'common.errors.network', isLoading: false });
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
+
+        try {
+            renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+            expect(screen.getByText('common.errors.network')).toBeInTheDocument();
+        } finally {
+            blocked.mockRestore();
+        }
+    });
+
     it('Renders StudyNotFound when error is common.errors.not_found', () => {
         useConfigStore.setState({
             error: 'common.errors.not_found',

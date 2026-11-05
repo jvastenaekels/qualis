@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from './useSessionStore';
 
 describe('useSessionStore', () => {
@@ -112,5 +112,27 @@ describe('useSessionStore', () => {
         expect(newState.currentStep).toBe(1);
         expect(newState.isCompleted).toBe(false);
         expect(newState.confirmationCode).toBeNull();
+    });
+
+    it('loading the store on a mode=test URL arms the tab, before any component runs', async () => {
+        window.history.replaceState({}, '', '/study/s?mode=test');
+        sessionStorage.removeItem('qualis-pilot-mode');
+        vi.resetModules();
+
+        await import('./useSessionStore');
+
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBe('true');
+        window.history.replaceState({}, '', '/');
+    });
+
+    it('a reset during Leave the test stays a test without re-arming the tab', () => {
+        window.history.replaceState({}, '', '/study/s/fine-sort?mode=test');
+        sessionStorage.removeItem('qualis-pilot-mode');
+
+        useSessionStore.getState().resetSession();
+
+        expect(useSessionStore.getState().isPilotMode).toBe(true);
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBeNull();
+        window.history.replaceState({}, '', '/');
     });
 });

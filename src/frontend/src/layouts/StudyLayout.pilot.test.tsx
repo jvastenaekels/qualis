@@ -151,13 +151,12 @@ describe('a pilot tab', () => {
         expect(assign).toHaveBeenCalledWith('/study/pilot');
     });
 
-    it('mode=test arms the tab without any help from the welcome page', async () => {
+    it('mode=test puts the session in test without any help from the welcome page', async () => {
         useSessionStore.setState({ isPilotMode: false, studySlug: 'pilot', hasConsented: true });
 
         openTab('/study/pilot/welcome?mode=test');
 
         expect(await screen.findByText('step body')).toBeInTheDocument();
-        expect(sessionStorage.getItem(FLAG)).toBe('true');
         expect(useSessionStore.getState().isPilotMode).toBe(true);
     });
 

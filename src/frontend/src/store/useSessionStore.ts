@@ -8,7 +8,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { resetBaseLocales } from '../utils/i18nOverrides';
-import { isPilot } from '../utils/pilotMode';
+import { isPilot, isPilotSession } from '../utils/pilotMode';
 import { studyScopedLocalStorage } from './safeStorage';
 
 interface SessionState {
@@ -106,7 +106,8 @@ export const useSessionStore = create<SessionState>()(
                     isSaving: false,
                     isSubmitting: false,
                     // A reset starts the session over; only leavePilot() ends a test.
-                    isPilotMode: isPilot(),
+                    // Read-only: a reset during the leave must not re-arm the tab.
+                    isPilotMode: isPilotSession(false),
                     studyPassword: null,
                     draftRevision: 0,
                 });

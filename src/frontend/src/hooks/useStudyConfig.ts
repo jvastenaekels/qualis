@@ -191,9 +191,7 @@ export const useStudyConfig = () => {
     // --- Effect: Handle Test Mode Loading ---
     useEffect(() => {
         if (slug && isTestMode && !isPilotMode) {
-            // Set flag for storage isolation in this tab
-            safeBrowserSessionStorage.setItem('qualis-pilot-mode', 'true');
-            setPilotMode(true);
+            setPilotMode(true); // the module-load isPilot() has already armed the tab
         }
     }, [isTestMode, slug, isPilotMode, setPilotMode]);
 

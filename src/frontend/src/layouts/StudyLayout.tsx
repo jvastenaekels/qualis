@@ -57,6 +57,7 @@ import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 import {
     isPilot,
+    isPilotSession,
     leavePilot,
     PILOT_NO_DRAFT,
     restartPilot,
@@ -221,10 +222,7 @@ const StudyLayoutContent: React.FC = () => {
     }, [location.pathname]);
 
     // Pilot mode allows viewing regardless of study state
-    const isPilotModePersistent =
-        isPilotMode ||
-        new URLSearchParams(location.search).get('mode') === 'test' ||
-        sessionStorage.getItem('qualis-pilot-mode') === 'true';
+    const isPilotModePersistent = isPilotSession(isPilotMode);
 
     // A flagged tab renders no banner on an error screen: this one carries the way out.
     if (configError && !config && isPilotModePersistent) {
