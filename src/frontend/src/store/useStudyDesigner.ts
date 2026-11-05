@@ -269,11 +269,16 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
         const draft = projectStudyToUpdate(study);
         normalizeStudyData(draft);
         const firstLang = study.default_language || study.translations?.[0]?.language_code || 'en';
-        set({
+        set((state: StudyDesignerState) => ({
             original: study,
             draft,
-            activeLocale: firstLang,
-        });
+            // After a save the same study comes back: stay on the language being edited.
+            activeLocale:
+                state.original?.id === study.id &&
+                study.translations?.some((tr) => tr.language_code === state.activeLocale)
+                    ? state.activeLocale
+                    : firstLang,
+        }));
     },
 
     updateDraft: (fn: (d: StudyUpdate) => void) =>

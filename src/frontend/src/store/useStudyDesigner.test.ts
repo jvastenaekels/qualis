@@ -153,3 +153,40 @@ describe('useStudyDesigner - setStudy normalize regression (admin-E2E crash)', (
         expect(pc.fields?.age).toBeDefined();
     });
 });
+
+describe('useStudyDesigner - setStudy keeps the edited language', () => {
+    const TWO_LANGUAGES: StudyRead = {
+        ...MOCK_STUDY,
+        translations: [
+            ...(MOCK_STUDY.translations ?? []),
+            { language_code: 'fi', title: 'Testitutkimus' },
+        ],
+    } as StudyRead;
+
+    beforeEach(() => {
+        useStudyDesigner.setState({ original: null, draft: null, activeLocale: 'en' });
+    });
+
+    it('setStudy keeps the active locale for the same study', () => {
+        useStudyDesigner.getState().setStudy(TWO_LANGUAGES);
+        useStudyDesigner.getState().setActiveLocale('fi');
+        useStudyDesigner
+            .getState()
+            .setStudy({ ...TWO_LANGUAGES, updated_at: '2025-02-01T00:00:00Z' });
+        expect(useStudyDesigner.getState().activeLocale).toBe('fi');
+    });
+
+    it('setStudy uses the default language for another study', () => {
+        useStudyDesigner.getState().setStudy(TWO_LANGUAGES);
+        useStudyDesigner.getState().setActiveLocale('fi');
+        useStudyDesigner.getState().setStudy({ ...TWO_LANGUAGES, id: 2 });
+        expect(useStudyDesigner.getState().activeLocale).toBe('en');
+    });
+
+    it('setStudy leaves a locale the study no longer has', () => {
+        useStudyDesigner.getState().setStudy(TWO_LANGUAGES);
+        useStudyDesigner.getState().setActiveLocale('fi');
+        useStudyDesigner.getState().setStudy(MOCK_STUDY);
+        expect(useStudyDesigner.getState().activeLocale).toBe('en');
+    });
+});
