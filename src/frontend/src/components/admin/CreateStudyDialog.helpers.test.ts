@@ -79,4 +79,9 @@ describe('slugifyTitle', () => {
     it('is cut at 50 characters', () => {
         expect(slugifyTitle('a'.repeat(80))).toHaveLength(50);
     });
+
+    it('does not end on a hyphen when the cut lands on one', () => {
+        const slug = slugifyTitle(`${'a'.repeat(49)} bcd`);
+        expect(slug).toBe('a'.repeat(49));
+    });
 });
