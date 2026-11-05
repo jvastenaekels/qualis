@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, expect, it, vi } from 'vitest';
 import { customInstance } from '../api/mutator';
@@ -16,6 +16,7 @@ function ResumedParticipant() {
 }
 afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     setStudyStorageScope(undefined);
     window.history.replaceState({}, '', '/');
 });
@@ -34,6 +35,7 @@ it('continues the server revision after resume when flushing the next answer', a
     });
     const fetchMock = vi.fn().mockResolvedValue({});
     vi.stubGlobal('fetch', fetchMock);
+    const addListener = vi.spyOn(window, 'addEventListener');
     render(
         <MemoryRouter initialEntries={['/study/revision-study/resume/code']}>
             <Routes>
@@ -44,6 +46,8 @@ it('continues the server revision after resume when flushing the next answer', a
     );
     expect(await screen.findByText('Restored from server')).toBeInTheDocument();
     expect(useSessionStore.getState().draftRevision).toBe(37);
+    // The text shows at commit; the hook attaches its listeners in a later passive effect.
+    await waitFor(() => expect(addListener).toHaveBeenCalledWith('pagehide', expect.any(Function)));
     act(() => useResponseStore.setState({ presort: { answer: 'new answer' } }));
     act(() => window.dispatchEvent(new Event('pagehide')));
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
