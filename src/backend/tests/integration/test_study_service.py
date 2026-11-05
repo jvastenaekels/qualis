@@ -952,3 +952,15 @@ async def test_activation_refuses_duplicate_string_options():
 async def test_activation_accepts_distinct_options():
     options = ["Oui", {"label": {"en": "B"}, "value": "opt_2"}]
     assert _option_errors(_study_with_options("presort", options)) == []
+
+
+@pytest.mark.asyncio
+async def test_activation_survives_unhashable_option_values():
+    # Hand-edited JSON can put a list or a dict where a value belongs.
+    options = [
+        {"label": {"en": "A"}, "value": ["x"]},
+        {"label": {"en": "B"}, "value": {"k": 1}},
+        {"label": {"en": "C"}, "value": ["x"]},
+    ]
+    errors = _option_errors(_study_with_options("presort", options))
+    assert [e["id"] for e in errors] == ["q1"]

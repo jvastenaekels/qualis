@@ -770,7 +770,8 @@ class StudyService:
                     opt.get("value") if isinstance(opt, dict) else opt
                     for opt in options
                 ]
-                if len(set(values)) < len(values):
+                # repr: hand-edited JSON may hold an unhashable value
+                if len(set(map(repr, values))) < len(values):
                     errors.append(
                         StudyService._activation_error(
                             "duplicate_option_value", id=q_id, section=section
