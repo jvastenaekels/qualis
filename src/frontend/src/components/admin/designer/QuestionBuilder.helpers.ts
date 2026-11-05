@@ -51,3 +51,15 @@ export function copyOptions(
         };
     });
 }
+
+/**
+ * Value for a newly added option: `opt_<n>`, one past the largest `opt_`
+ * suffix in use (never a reused number after a removal), and at least
+ * `options.length + 1` so legacy string options are counted too.
+ */
+export function nextOptionValue(options: readonly (string | { value: string })[]): string {
+    const suffixes = options.map((o) =>
+        Number(/^opt_(\d+)$/.exec(typeof o === 'string' ? o : o.value)?.[1] ?? 0)
+    );
+    return `opt_${Math.max(options.length, ...suffixes) + 1}`;
+}

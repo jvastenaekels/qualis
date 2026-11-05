@@ -190,4 +190,39 @@ describe('QuestionBuilder - presort config shape', () => {
         renderBuilder({ draft: newDraft });
         expect(screen.getByText('Enable pre-sort survey')).toBeInTheDocument();
     });
+
+    it('adding four options gives four distinct values', async () => {
+        const user = userEvent.setup();
+        renderBuilder({
+            draft: {
+                translations: [{ language_code: 'en' }],
+                presort_config: {
+                    enabled: true,
+                    fields: {
+                        q1: {
+                            type: 'select',
+                            label: { en: 'Pick' },
+                            options: [
+                                { label: { en: 'Option 1' }, value: 'opt_1' },
+                                { label: { en: 'Option 2' }, value: 'opt_2' },
+                            ],
+                        },
+                    },
+                },
+            },
+        });
+
+        await user.click(await screen.findByTestId('question-accordion-trigger'));
+        for (let i = 0; i < 2; i++) {
+            await user.click(await screen.findByRole('button', { name: 'Add option' }));
+        }
+
+        await waitFor(() => {
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const draft: any = useStudyDesigner.getState().draft;
+            // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+            const values = draft.presort_config.fields.q1.options.map((o: any) => o.value);
+            expect(values).toEqual(['opt_1', 'opt_2', 'opt_3', 'opt_4']);
+        });
+    });
 });

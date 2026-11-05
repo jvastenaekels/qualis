@@ -56,7 +56,7 @@ import {
 } from '@/utils/studyConfig';
 import { toast } from 'sonner';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
-import { copyMultilangField, copyOptions } from './QuestionBuilder.helpers';
+import { copyMultilangField, copyOptions, nextOptionValue } from './QuestionBuilder.helpers';
 import {
     Select,
     SelectContent,
@@ -962,10 +962,17 @@ const QuestionItem = (props: QuestionItemProps) => {
                                                     onClick={() => {
                                                         const newOpts = [
                                                             ...(question.options || []),
-                                                            t(
-                                                                'admin.design.questions.defaults.option',
-                                                                { lng: activeLocale }
-                                                            ),
+                                                            {
+                                                                label: {
+                                                                    [activeLocale]: t(
+                                                                        'admin.design.questions.defaults.option',
+                                                                        { lng: activeLocale }
+                                                                    ),
+                                                                },
+                                                                value: nextOptionValue(
+                                                                    question.options ?? []
+                                                                ),
+                                                            },
                                                         ];
                                                         onUpdate({ ...question, options: newOpts });
                                                     }}

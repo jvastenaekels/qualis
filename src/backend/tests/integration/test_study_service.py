@@ -916,3 +916,39 @@ async def test_deleting_study_cleans_up_memo(
         )
     ).scalar()
     assert count == 0
+
+
+def _study_with_options(section: str, options: list) -> SimpleNamespace:
+    study = _build_minimal_study_for_validation()
+    config = {"enabled": True, "fields": {"q1": {"label": "Q", "options": options}}}
+    if section == "postsort":
+        config = {"enabled": True, "questions": config["fields"]}
+    setattr(study, f"{section}_config", config)
+    return study
+
+
+def _option_errors(study: SimpleNamespace) -> list[dict]:
+    errors = [json.loads(e) for e in StudyService.validate_for_activation(study)]
+    return [e for e in errors if e["key"].endswith("duplicate_option_value")]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("section", ["presort", "postsort"])
+async def test_activation_refuses_duplicate_option_values(section):
+    options = [
+        {"label": {"en": "A"}, "value": "Option"},
+        {"label": {"en": "B"}, "value": "Option"},
+    ]
+    errors = _option_errors(_study_with_options(section, options))
+    assert [(e["id"], e["section"]) for e in errors] == [("q1", section)]
+
+
+@pytest.mark.asyncio
+async def test_activation_refuses_duplicate_string_options():
+    assert len(_option_errors(_study_with_options("presort", ["Oui", "Oui"]))) == 1
+
+
+@pytest.mark.asyncio
+async def test_activation_accepts_distinct_options():
+    options = ["Oui", {"label": {"en": "B"}, "value": "opt_2"}]
+    assert _option_errors(_study_with_options("presort", options)) == []

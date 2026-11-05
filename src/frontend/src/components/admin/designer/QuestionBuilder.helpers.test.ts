@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { copyMultilangField, copyOptions } from './QuestionBuilder.helpers';
+import { copyMultilangField, copyOptions, nextOptionValue } from './QuestionBuilder.helpers';
 
 describe('copyMultilangField', () => {
     it('copies sourceLang value into activeLocale on a record input', () => {
@@ -56,5 +56,19 @@ describe('copyOptions', () => {
         const out = copyOptions(['One', { label: { en: 'Two' }, value: '2' }], 'en', 'fr');
         expect(out[0]).toEqual({ label: { en: 'One', fr: 'One' }, value: 'One' });
         expect(out[1]?.label).toEqual({ en: 'Two', fr: 'Two' });
+    });
+});
+
+describe('nextOptionValue', () => {
+    it('numbers after the options already there', () => {
+        expect(nextOptionValue([{ value: 'opt_1' }, { value: 'opt_2' }])).toBe('opt_3');
+    });
+
+    it('does not reuse a value left free by a removal', () => {
+        expect(nextOptionValue([{ value: 'opt_1' }, { value: 'opt_5' }])).toBe('opt_6');
+    });
+
+    it('counts legacy string options', () => {
+        expect(nextOptionValue(['Oui', { value: 'opt_2' }])).toBe('opt_3');
     });
 });

@@ -766,6 +766,16 @@ class StudyService:
             for q_id, q_config in fields_of(config, section).items():
                 label = q_config.get("label")
                 options = q_config.get("options", [])
+                values = [
+                    opt.get("value") if isinstance(opt, dict) else opt
+                    for opt in options
+                ]
+                if len(set(values)) < len(values):
+                    errors.append(
+                        StudyService._activation_error(
+                            "duplicate_option_value", id=q_id, section=section
+                        )
+                    )
                 for lang in study_langs:
                     if is_empty_label(label_in_lang(label, lang)):
                         errors.append(
