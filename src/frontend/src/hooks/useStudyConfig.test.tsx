@@ -48,6 +48,7 @@ describe('useStudyConfig', () => {
         // Reset Stores
         useConfigStore.getState().resetConfig();
         useSessionStore.getState().resetSession();
+        sessionStorage.clear();
     });
 
     // The pilot-mode tests spy on URLSearchParams.get; without a restore, test mode leaks
@@ -293,10 +294,7 @@ describe('useStudyConfig', () => {
             ...extra,
         });
 
-        function openDraft(
-            draft: Record<string, unknown>,
-            params: Record<string, string> = {}
-        ): void {
+        function openDraft(draft: Record<string, unknown>, params: Record<string, string> = {}) {
             vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) =>
                 key === 'mode' ? 'test' : (params[key] ?? null)
             );
@@ -316,8 +314,92 @@ describe('useStudyConfig', () => {
                 refetch: vi.fn(),
                 // biome-ignore lint/suspicious/noExplicitAny: mock hook
             } as any);
+            return renderHook(() => useStudyConfig());
+        }
+
+        /** F5: the hook and the config go, the tab's sessionStorage and the answers stay. */
+        function reloadTab(): void {
+            useConfigStore.getState().resetConfig();
             renderHook(() => useStudyConfig());
         }
+
+        const statement = (code: string) => ({
+            code,
+            translations: [{ language_code: 'en', text: code }],
+        });
+
+        it('a reload keeps the draft under test and its notice', async () => {
+            const { unmount } = openDraft({
+                default_language: 'en',
+                translations: [tr('en', 'First')],
+                statements: [statement('S1'), statement('S2')],
+            });
+            await waitFor(() => expect(useSessionStore.getState().language).toBe('en'));
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+
+            // The designer removes a statement. The answers still hold both cards: under the
+            // shorter draft, Confirm would bounce between fine-sort and post-sort for good.
+            unmount();
+            localStorage.setItem(
+                'qualis-test-draft-test-study',
+                JSON.stringify({
+                    slug: 'test-study',
+                    default_language: 'en',
+                    translations: [tr('en', 'Second')],
+                    statements: [statement('S1')],
+                })
+            );
+            reloadTab();
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+            expect(useConfigStore.getState().config?.statements).toHaveLength(2);
+            await waitFor(() => expect(useConfigStore.getState().designChanged).toBe(true));
+        });
+
+        it('a reload with an unchanged design raises no notice', async () => {
+            const { unmount } = openDraft({
+                default_language: 'en',
+                translations: [tr('en', 'First')],
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+
+            unmount();
+            reloadTab();
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+            expect(useConfigStore.getState().designChanged).toBe(false);
+        });
+
+        it('the pilot reset key drops the held draft and takes the latest one', async () => {
+            const { unmount } = openDraft({
+                default_language: 'en',
+                translations: [tr('en', 'First')],
+            });
+            await waitFor(() => expect(useSessionStore.getState().language).toBe('en'));
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            });
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('First'));
+
+            unmount();
+            localStorage.setItem(
+                'qualis-test-draft-test-study',
+                JSON.stringify({
+                    slug: 'test-study',
+                    statements: [],
+                    default_language: 'en',
+                    translations: [tr('en', 'Second')],
+                })
+            );
+            localStorage.setItem('qualis-pilot-reset-test-study', 'true');
+            reloadTab();
+
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Second'));
+            expect(useConfigStore.getState().designChanged).toBe(false);
+        });
 
         it('a draft lists its translations as available languages', async () => {
             openDraft({

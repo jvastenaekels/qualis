@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
@@ -7,7 +7,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/safeStorage';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
-import { PILOT_NO_DRAFT } from '../utils/pilotMode';
+import { PILOT_NO_DRAFT, pilotHeldDraftKey } from '../utils/pilotMode';
 import { resetAllStores } from '../utils/sessionReset';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
@@ -108,11 +108,6 @@ function withoutSaveStamps(json: string): string {
     }
 }
 
-/** The draft a running test of this study began with, if one has loaded. */
-function heldDraft(held: { slug: string; json: string } | null, slug: string): string | null {
-    return held?.slug === slug ? held.json : null;
-}
-
 /** Sync i18n + session language to the resolved config language. */
 async function syncConfigLanguage(
     configLanguage: string | undefined,
@@ -175,8 +170,6 @@ export const useStudyConfig = () => {
     const config = useConfigStore((state) => state.config);
     const resetConfig = useConfigStore((state) => state.resetConfig);
     const setDesignChanged = useConfigStore((state) => state.setDesignChanged);
-    // The draft this test began with: a language switch re-reads it, a designer edit must not replace it.
-    const testDraft = useRef<{ slug: string; json: string } | null>(null);
 
     // Session Store
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
@@ -249,10 +242,13 @@ export const useStudyConfig = () => {
 
                 await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
                 if (cancelled) return;
-                if (testDraft.current?.json !== draftJson) {
-                    testDraft.current = { slug, json: draftJson };
-                    setDesignChanged(false);
-                }
+                // Held, because a designer edit must not replace a running test's draft: answers
+                // kept under a shorter draft would send Confirm back to the sort for good.
+                safeBrowserSessionStorage.setItem(pilotHeldDraftKey(slug), draftJson);
+                const latest = safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
+                setDesignChanged(
+                    latest !== null && withoutSaveStamps(latest) !== withoutSaveStamps(draftJson)
+                );
                 commitConfig(config);
             } catch (e) {
                 if (cancelled) return;
@@ -280,11 +276,12 @@ export const useStudyConfig = () => {
             if (safeBrowserLocalStorage.getItem(resetKey)) {
                 resetAllStores({ skipConfig: true });
                 safeBrowserLocalStorage.removeItem(resetKey);
-                testDraft.current = null; // a restart takes the latest draft
+                safeBrowserSessionStorage.removeItem(pilotHeldDraftKey(slug)); // a restart takes the latest draft
             }
 
-            const held = heldDraft(testDraft.current, slug);
-            const draftJson = held ?? safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
+            const draftJson =
+                safeBrowserSessionStorage.getItem(pilotHeldDraftKey(slug)) ??
+                safeBrowserLocalStorage.getItem(`qualis-test-draft-${slug}`);
 
             if (draftJson) {
                 await loadFromLocalDraft(draftJson);
@@ -301,7 +298,7 @@ export const useStudyConfig = () => {
             if (cancelled) return;
             const isDraft = e.key === `qualis-test-draft-${slug}`;
             if (!isDraft && e.key !== `qualis-pilot-reset-${slug}`) return;
-            const running = heldDraft(testDraft.current, slug);
+            const running = safeBrowserSessionStorage.getItem(pilotHeldDraftKey(slug));
             if (running === null) {
                 loadFromStorage(); // the refusal screen waits for a draft to appear
             } else if (

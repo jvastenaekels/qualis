@@ -2,6 +2,9 @@ import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/saf
 
 const PILOT_FLAG = 'qualis-pilot-mode';
 
+/** The draft a running test began with: per tab, so a reload keeps the test on it. */
+export const pilotHeldDraftKey = (slug: string): string => `qualis-pilot-held-draft-${slug}`;
+
 /** The config error of a test link that has no draft in this browser: refuse, never load the live study. */
 export const PILOT_NO_DRAFT = 'pilot.no_draft';
 
@@ -33,6 +36,7 @@ export const isPilotSession = (isPilotMode: boolean): boolean =>
  */
 export const leavePilot = (slug: string): void => {
     safeBrowserSessionStorage.removeItem(PILOT_FLAG);
+    safeBrowserSessionStorage.removeItem(pilotHeldDraftKey(slug));
     safeBrowserLocalStorage.removeItem(`qualis-pilot-session:${slug}`);
     safeBrowserLocalStorage.removeItem(`qualis-pilot-responses:${slug}`);
     window.location.assign(`/study/${slug}`);

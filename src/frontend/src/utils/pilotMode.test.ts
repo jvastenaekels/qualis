@@ -45,10 +45,12 @@ describe('pilotMode', () => {
         localStorage.setItem('qualis-pilot-session:s', '{"state":{"token":"pilot-token"}}');
         localStorage.setItem('qualis-pilot-responses:s', '{"state":{}}');
         localStorage.setItem('qualis-session:s', '{"state":{"token":"real-token"}}');
+        sessionStorage.setItem('qualis-pilot-held-draft-s', '{}');
 
         leavePilot('s');
 
         expect(sessionStorage.getItem(FLAG)).toBeNull();
+        expect(sessionStorage.getItem('qualis-pilot-held-draft-s')).toBeNull();
         expect(localStorage.getItem('qualis-pilot-session:s')).toBeNull();
         expect(localStorage.getItem('qualis-pilot-responses:s')).toBeNull();
         expect(localStorage.getItem('qualis-session:s')).not.toBeNull();
