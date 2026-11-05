@@ -13,7 +13,7 @@
  * Protected categories at time of writing:
  * - qualis-draft-backup-{slug}  (in-flight study designer recoveries)
  * - qualis-test-draft-{slug}    (cross-tab pilot synchronisation)
- * - qualis-test-config-{slug}   (study designer config snapshot)
+ * - qualis-test-config-{slug}   (legacy study designer config snapshot; no longer written or read)
  * - qualis-pilot-reset-{slug}   (pilot reset signal between tabs)
  * - qualis-pilot-mode           (sessionStorage flag)
  * - qualis-resumed-via-link     (sessionStorage flag)

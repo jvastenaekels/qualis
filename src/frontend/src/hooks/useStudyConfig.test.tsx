@@ -364,6 +364,30 @@ describe('useStudyConfig', () => {
             await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
         });
 
+        it('?lang= wins over the session language', async () => {
+            useSessionStore.getState().setLanguage('en');
+            openDraft(
+                {
+                    default_language: 'en',
+                    translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+                },
+                { lang: 'fi' }
+            );
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+        });
+
+        it('a ?lang= the draft lacks falls back to the session language, not the default', async () => {
+            useSessionStore.getState().setLanguage('fi');
+            openDraft(
+                {
+                    default_language: 'en',
+                    translations: [tr('en', 'Study'), tr('fi', 'Tutkimus')],
+                },
+                { lang: 'de' }
+            );
+            await waitFor(() => expect(useConfigStore.getState().config?.title).toBe('Tutkimus'));
+        });
+
         it('a language the draft lacks falls back to its default', async () => {
             useSessionStore.getState().setLanguage('de');
             openDraft({

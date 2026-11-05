@@ -33,8 +33,12 @@ function mapErrorToTranslationKey(error: unknown): string {
  * StudyConfig shape consumed by the player. Returns the input as-is if it's
  * already a resolved synthetic config (no `translations` array).
  */
-// biome-ignore lint/suspicious/noExplicitAny: localStorage draft has dynamic shape
-function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig {
+function parseStudyDraft(
+    // biome-ignore lint/suspicious/noExplicitAny: localStorage draft has dynamic shape
+    raw: any,
+    requestedLang: string | null,
+    sessionLanguage: string | null
+): StudyConfig {
     if (!raw.translations || !Array.isArray(raw.translations)) {
         return raw as StudyConfig;
     }
@@ -49,7 +53,9 @@ function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig 
     );
     // The language the researcher asked for, else the study's own default, else the first translation.
     const lang =
-        [sessionLanguage, raw.default_language].find((c) => c && available.includes(c)) ||
+        [requestedLang, sessionLanguage, raw.default_language].find(
+            (c) => c && available.includes(c)
+        ) ||
         available[0] ||
         'en';
     const tr =
@@ -81,7 +87,7 @@ function parseStudyDraft(raw: any, sessionLanguage: string | null): StudyConfig 
                 id: index + 1,
                 code: s.code,
                 // An untranslated statement shows its code rather than an empty card.
-                text: st?.text || s.code,
+                text: st?.text || s.code || '',
             };
         }),
     } as StudyConfig;
@@ -215,9 +221,8 @@ export const useStudyConfig = () => {
         const loadFromLocalDraft = async (draftJson: string): Promise<void> => {
             try {
                 // ?lang= is what the designer asked for; it wins, as in useStudyLocaleSync.
-                const requested =
-                    new URLSearchParams(window.location.search).get('lang') || sessionLanguage;
-                const config = parseStudyDraft(JSON.parse(draftJson), requested);
+                const requested = new URLSearchParams(window.location.search).get('lang');
+                const config = parseStudyDraft(JSON.parse(draftJson), requested, sessionLanguage);
 
                 await syncConfigLanguage(config.language, sessionLanguage, setLanguage);
                 if (cancelled) return;
