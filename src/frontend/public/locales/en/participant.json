@@ -118,6 +118,8 @@
         "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
         "pilot_stays": "This tab stays in test mode until you leave the test, even if you open a real link here.",
         "pilot_leave": "Leave the test",
+        "pilot_no_draft_title": "This is a test link, not a participant link",
+        "pilot_no_draft_message": "A test runs the study as you are editing it. Open it with Test run in the designer. To see the study as participants do, leave the test.",
         "default_study_title": "Q-Method study",
         "loading_content": "Loading study content...",
         "change_lang_title": "Change language",
@@ -315,6 +317,7 @@
         "success": {
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
+            "pilot_message": "This was a test. Nothing was stored.",
             "id_label": "Confirmation code",
             "share": {
                 "title": "Spread the word",

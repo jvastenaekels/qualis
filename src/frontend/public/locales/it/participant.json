@@ -118,6 +118,8 @@
         "pilot_mode": "Modalità pilota: le modifiche sono temporanee e i dati non verranno salvati",
         "pilot_stays": "Questa scheda resta in modalità test finché non esce dal test, anche se vi apre un link reale.",
         "pilot_leave": "Esci dal test",
+        "pilot_no_draft_title": "Questo è un link di prova, non un link di partecipazione",
+        "pilot_no_draft_message": "Una prova esegue lo studio così come lo sta modificando. La apra con «Prova» nell'editor. Per vedere lo studio come lo vedono i partecipanti, esca dal test.",
         "default_study_title": "Studio di metodologia Q",
         "loading_content": "Caricamento dei contenuti dello studio...",
         "change_lang_title": "Cambia lingua",
@@ -303,6 +305,7 @@
         "success": {
             "title": "Grazie per la sua partecipazione!",
             "message": "Il suo contributo allo studio è stato salvato.",
+            "pilot_message": "Questo era un test. Non è stato salvato nulla.",
             "id_label": "Codice di conferma",
             "share": {
                 "title": "Diffonda la notizia",

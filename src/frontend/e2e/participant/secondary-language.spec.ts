@@ -254,7 +254,13 @@ test.describe('A study taken in its second language', () => {
         authToken,
     }) => {
         const slug = `lang-pilot-${crypto.randomUUID()}`;
-        await testDb.createStudy(authToken, bilingualStudy(slug));
+        const study = bilingualStudy(slug);
+        await testDb.createStudy(authToken, study);
+        // A test runs on the draft the designer leaves in the browser, never on the live study.
+        await page.addInitScript(([key, draft]) => window.localStorage.setItem(key, draft), [
+            `qualis-test-draft-${slug}`,
+            JSON.stringify(study),
+        ] as const);
 
         await page.goto(`/study/${slug}/welcome?mode=test&lang=fi`);
         await reachFineSort(page);

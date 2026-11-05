@@ -118,6 +118,8 @@
         "pilot_mode": "Modo piloto: los cambios son temporales y los datos no se guardarán",
         "pilot_stays": "Esta pestaña sigue en modo de prueba hasta que salga de la prueba, aunque abra aquí un enlace real.",
         "pilot_leave": "Salir de la prueba",
+        "pilot_no_draft_title": "Este es un enlace de prueba, no un enlace de participación",
+        "pilot_no_draft_message": "Una prueba ejecuta el estudio tal como lo está editando. Ábrala con «Probar» en el diseñador. Para ver el estudio como lo ven los participantes, salga de la prueba.",
         "default_study_title": "Estudio de metodología Q",
         "loading_content": "Cargando contenido del estudio...",
         "change_lang_title": "Cambiar idioma",
@@ -303,6 +305,7 @@
         "success": {
             "title": "¡Gracias por su participación!",
             "message": "Su contribución al estudio ha sido guardada.",
+            "pilot_message": "Esto fue una prueba. No se guardó nada.",
             "id_label": "Código de confirmación",
             "share": {
                 "title": "Corra la voz",

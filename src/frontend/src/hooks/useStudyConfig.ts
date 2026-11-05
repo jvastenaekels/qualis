@@ -7,6 +7,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/safeStorage';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
+import { PILOT_NO_DRAFT } from '../utils/pilotMode';
 import { resetAllStores } from '../utils/sessionReset';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
@@ -236,45 +237,11 @@ export const useStudyConfig = () => {
             }
         };
 
-        // Sync i18n + session language to the server data's resolved language.
-        // Returns false when the load was cancelled mid-await (caller must abort).
-        const syncServerLang = async (serverData: StudyConfig): Promise<boolean> => {
-            const langChanged =
-                !sessionLanguage ||
-                (serverData.language && sessionLanguage !== serverData.language);
-            if (!langChanged) return true;
-            const newLang = serverData.language || 'en';
-            await i18n.changeLanguage(newLang);
-            if (cancelled) return false;
-            setLanguage(newLang);
-            return true;
-        };
-
-        const applyServerData = async (serverData: StudyConfig): Promise<void> => {
-            if (serverData.ui_labels) {
-                applyStudyOverrides(serverData.language || 'en', serverData.ui_labels);
-            }
-            if (!(await syncServerLang(serverData))) return;
-            if (cancelled) return;
-            setConfig(serverData);
-            setConfigError(null);
-        };
-
-        const loadFromServerFallback = async (): Promise<void> => {
-            console.warn(
-                `[useStudyConfig] No draft found in localStorage for ${slug}. Attempting server fallback.`
-            );
-            try {
-                const { data: serverData } = await refetch();
-                if (!serverData) throw new Error('Server returned no data');
-                await applyServerData(serverData);
-            } catch (err) {
-                if (cancelled) return;
-                console.error('[useStudyConfig] Server fallback failed', err);
-                setConfigError('common.errors.not_found');
-            } finally {
-                finishLoading();
-            }
+        // A test link only makes sense with the draft the designer left in this browser.
+        // Never fall back to the live study: a pasted participant link must not run as a test.
+        const refuseWithoutDraft = (): void => {
+            setConfigError(PILOT_NO_DRAFT);
+            finishLoading();
         };
 
         const loadFromStorage = async () => {
@@ -294,7 +261,7 @@ export const useStudyConfig = () => {
             if (draftJson) {
                 await loadFromLocalDraft(draftJson);
             } else {
-                await loadFromServerFallback();
+                refuseWithoutDraft();
             }
         };
 
@@ -323,7 +290,6 @@ export const useStudyConfig = () => {
         setConfigError,
         setConfigLoading,
         resetConfig,
-        refetch,
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---

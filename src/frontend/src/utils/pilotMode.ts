@@ -2,6 +2,9 @@ import { safeBrowserLocalStorage, safeBrowserSessionStorage } from '../store/saf
 
 const PILOT_FLAG = 'qualis-pilot-mode';
 
+/** The config error of a test link that has no draft in this browser: refuse, never load the live study. */
+export const PILOT_NO_DRAFT = 'pilot.no_draft';
+
 const urlSaysTest = (): boolean =>
     new URLSearchParams(window.location.search).get('mode') === 'test';
 

@@ -4,6 +4,7 @@ import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
+import { PILOT_NO_DRAFT } from '../utils/pilotMode';
 import { useGetStudyConfig } from './useGetStudyConfig';
 import { useStudyConfig } from './useStudyConfig';
 
@@ -132,26 +133,17 @@ describe('useStudyConfig', () => {
         });
     });
 
-    it('Pilot Mode: Falls back to server when local draft is missing', async () => {
-        // Mock URL to be in test mode
+    it('mode=test without a local draft shows it is not a participant link', async () => {
         vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) => {
             if (key === 'mode') return 'test';
             return null;
         });
-
-        // Ensure no local draft
         localStorage.clear();
 
-        const mockServerData = {
-            slug: 'test-study',
-            title: 'Server Fallback Title',
-            language: 'en',
-            presort_config: {},
-            statements: [],
-        };
-
-        const refetchMock = vi.fn().mockResolvedValue({ data: mockServerData });
-
+        // The server holds a live study: it must neither be asked for nor shown.
+        const refetchMock = vi.fn().mockResolvedValue({
+            data: { slug: 'test-study', title: 'Live Study Title', language: 'en' },
+        });
         vi.mocked(useGetStudyConfig).mockReturnValue({
             data: undefined,
             isLoading: false,
@@ -163,12 +155,14 @@ describe('useStudyConfig', () => {
         renderHook(() => useStudyConfig());
 
         await waitFor(() => {
-            expect(refetchMock).toHaveBeenCalled();
-            expect(useConfigStore.getState().config?.title).toBe('Server Fallback Title');
+            expect(useConfigStore.getState().error).toBe(PILOT_NO_DRAFT);
         });
+        expect(useConfigStore.getState().config).toBeNull();
+        expect(refetchMock).not.toHaveBeenCalled();
+        expect(vi.mocked(useGetStudyConfig).mock.calls.at(-1)?.[2]).toEqual({ enabled: false });
     });
 
-    it('Pilot Mode: Falls back to server when localStorage is unavailable', async () => {
+    it('mode=test refuses the same way when localStorage is unavailable', async () => {
         vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) => {
             if (key === 'mode') return 'test';
             return null;
@@ -179,16 +173,7 @@ describe('useStudyConfig', () => {
                 throw new Error('storage unavailable');
             },
         });
-
-        const mockServerData = {
-            slug: 'test-study',
-            title: 'Server Fallback Without Storage',
-            language: 'en',
-            presort_config: {},
-            statements: [],
-        };
-        const refetchMock = vi.fn().mockResolvedValue({ data: mockServerData });
-
+        const refetchMock = vi.fn();
         vi.mocked(useGetStudyConfig).mockReturnValue({
             data: undefined,
             isLoading: false,
@@ -201,11 +186,10 @@ describe('useStudyConfig', () => {
             renderHook(() => useStudyConfig());
 
             await waitFor(() => {
-                expect(refetchMock).toHaveBeenCalled();
-                expect(useConfigStore.getState().config?.title).toBe(
-                    'Server Fallback Without Storage'
-                );
+                expect(useConfigStore.getState().error).toBe(PILOT_NO_DRAFT);
             });
+            expect(useConfigStore.getState().config).toBeNull();
+            expect(refetchMock).not.toHaveBeenCalled();
         } finally {
             restoreLocalStorage();
         }

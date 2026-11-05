@@ -118,6 +118,8 @@
         "pilot_mode": "Pilottitila: Muutokset ovat väliaikaisia eikä tietoja tallenneta",
         "pilot_stays": "Tämä välilehti pysyy testitilassa, kunnes poistut testistä, vaikka avaisit täällä oikean linkin.",
         "pilot_leave": "Poistu testistä",
+        "pilot_no_draft_title": "Tämä on testilinkki, ei osallistujan linkki",
+        "pilot_no_draft_message": "Testi ajaa tutkimuksen siinä muodossa kuin muokkaat sitä. Avaa se suunnittelutilan Testaa-painikkeella. Jos haluat nähdä tutkimuksen osallistujan tavoin, poistu testistä.",
         "default_study_title": "Q-metodologinen tutkimus",
         "loading_content": "Ladataan tutkimuksen sisältöä...",
         "change_lang_title": "Vaihda kieli",
@@ -315,6 +317,7 @@
         "success": {
             "title": "Kiitos osallistumisestasi!",
             "message": "Vastauksesi tutkimukseen on tallennettu.",
+            "pilot_message": "Tämä oli testi. Mitään ei tallennettu.",
             "id_label": "Vahvistuskoodi",
             "share": {
                 "title": "Kerro muille",

@@ -1,6 +1,6 @@
 import { screen, fireEvent } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -261,6 +261,60 @@ describe('PostSortPage', () => {
         expect(await screen.findByTestId('thank-you-message')).toBeInTheDocument();
         expect(screen.getByText('Spread the word')).toBeInTheDocument();
         expect(screen.getByText('Copy link')).toBeInTheDocument();
+    });
+
+    describe('end of a test', () => {
+        beforeEach(async () => {
+            const { useSubmitStudy } = await import('../hooks/useSubmitStudy');
+            vi.mocked(useSubmitStudy).mockReturnValue({
+                submit: vi.fn(),
+                isLoading: false,
+                isSuccess: true,
+                error: null,
+                confirmationCode: 'PILOT-AB12C',
+            });
+            useSessionStore.setState({ isPilotMode: true });
+        });
+
+        afterEach(() => {
+            sessionStorage.clear();
+        });
+
+        const renderEnd = (entry = '/study/demo/post-sort') =>
+            renderWithProviders(
+                <Routes>
+                    <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+                </Routes>,
+                { initialEntries: [entry] }
+            );
+
+        it('the pilot end screen says nothing was stored', async () => {
+            renderEnd();
+
+            await screen.findByTestId('thank-you-message');
+            expect(screen.getByText('This was a test. Nothing was stored.')).toBeInTheDocument();
+            expect(screen.queryByText(/has been saved/i)).not.toBeInTheDocument();
+            expect(screen.queryByText('PILOT-AB12C')).not.toBeInTheDocument();
+        });
+
+        it('the pilot end screen shows no erasure and no share links', async () => {
+            renderEnd();
+
+            await screen.findByTestId('thank-you-message');
+            expect(screen.queryByText('Spread the word')).not.toBeInTheDocument();
+            expect(screen.queryByText('Copy link')).not.toBeInTheDocument();
+            expect(screen.queryByText(/right to erasure/i)).not.toBeInTheDocument();
+        });
+
+        it('a tab flagged as a test counts even when the store forgot', async () => {
+            useSessionStore.setState({ isPilotMode: false });
+            sessionStorage.setItem('qualis-pilot-mode', 'true');
+            renderEnd();
+
+            await screen.findByTestId('thank-you-message');
+            expect(screen.getByText('This was a test. Nothing was stored.')).toBeInTheDocument();
+            expect(screen.queryByText('Spread the word')).not.toBeInTheDocument();
+        });
     });
 
     it('offers a new session link on the confirmation screen', async () => {

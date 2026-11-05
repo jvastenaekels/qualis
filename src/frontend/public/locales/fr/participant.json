@@ -118,6 +118,8 @@
         "pilot_mode": "Mode Pilote : Les modifications sont temporaires et ne seront pas sauvegardées",
         "pilot_stays": "Cet onglet reste en mode test jusqu'à ce que vous quittiez le test, même si vous y ouvrez un vrai lien.",
         "pilot_leave": "Quitter le test",
+        "pilot_no_draft_title": "Ceci est un lien de test, pas un lien de participation",
+        "pilot_no_draft_message": "Un test fait passer l'étude telle que vous la modifiez. Ouvrez-le avec « Tester l'étude » dans l'éditeur. Pour voir l'étude comme les participants, quittez le test.",
         "default_study_title": "Étude Q-Method",
         "loading_content": "Chargement du contenu de l'étude...",
         "change_lang_title": "Changer de langue",
@@ -315,6 +317,7 @@
         "success": {
             "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
+            "pilot_message": "C'était un test. Rien n'a été enregistré.",
             "id_label": "Code de confirmation",
             "share": {
                 "title": "Faites passer le mot",

@@ -13,6 +13,7 @@ import { useSubmitStudy } from '../hooks/useSubmitStudy';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { isPilotSession } from '../utils/pilotMode';
 
 import { EraseMyDataDialog } from '../components/EraseMyDataDialog';
 import { ShareStudyLinks } from '../components/postsort/ShareStudyLinks';
@@ -22,6 +23,72 @@ import { Step2_Questionnaire } from '../components/postsort/Step2_Questionnaire'
 interface PostSortPageProps {
     highlightKey?: string | null;
 }
+
+interface SuccessScreenProps {
+    slug: string | undefined;
+    studyTitle: string;
+    code: string | null | undefined;
+    isPilotRun: boolean;
+}
+
+const SuccessScreen: React.FC<SuccessScreenProps> = ({ slug, studyTitle, code, isPilotRun }) => {
+    const { t } = useTranslation();
+    const location = useLocation();
+    return (
+        <div className="max-w-xl mx-auto px-4 py-12 sm:py-24 text-center animate-in zoom-in-50 duration-500">
+            <div
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-100"
+                style={{
+                    backgroundColor: 'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                    color: 'var(--brand-accent)',
+                }}
+            >
+                <Check size={40} strokeWidth={3} />
+            </div>
+            <h1
+                className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4"
+                data-testid="thank-you-message"
+            >
+                {t('post.success.title')}
+            </h1>
+            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                {isPilotRun
+                    ? t('post.success.pilot_message', 'This was a test. Nothing was stored.')
+                    : t('post.success.message')}
+            </p>
+            {code && (
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm max-w-full">
+                    <span className="text-xs font-semibold text-slate-400 block mb-2">
+                        {t('post.success.id_label')}
+                    </span>
+                    <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all break-all">
+                        {code}
+                    </span>
+                </div>
+            )}
+            {!isPilotRun && (
+                <>
+                    <ShareStudyLinks
+                        studyUrl={`${window.location.origin}/study/${slug}`}
+                        studyTitle={studyTitle}
+                    />
+                    <EraseMyDataDialog
+                        slug={slug || ''}
+                        sessionToken={useSessionStore.getState().token}
+                    />
+                </>
+            )}
+            <div className="mt-6">
+                <Link
+                    to={`/study/${slug}/reset${location.search}`}
+                    className="text-sm text-slate-500 hover:text-slate-700 underline decoration-slate-300 underline-offset-4 transition-colors"
+                >
+                    {t('welcome.restart', 'Start a new session')}
+                </Link>
+            </div>
+        </div>
+    );
+};
 
 const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey }) => {
     // Hooks
@@ -54,7 +121,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
     } = useSubmitStudy();
 
     const isSuccess = isSubmitSuccess || isCompleted;
-    const finalConfirmationCode = confirmationCode || submitConfirmationCode;
+    // A test stores nothing: its "code" is made up, so it is not shown.
+    const isPilotRun = isPilotSession(useSessionStore((state) => state.isPilotMode));
+    const finalConfirmationCode = isPilotRun ? null : confirmationCode || submitConfirmationCode;
 
     // Ref to prevent the 'started' silent submit from re-firing when submit identity changes
     const startedSentRef = useRef(false);
@@ -92,52 +161,12 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     if (isSuccess) {
         return (
-            <div className="max-w-xl mx-auto px-4 py-12 sm:py-24 text-center animate-in zoom-in-50 duration-500">
-                <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-100"
-                    style={{
-                        backgroundColor: 'color-mix(in srgb, var(--brand-accent), transparent 90%)',
-                        color: 'var(--brand-accent)',
-                    }}
-                >
-                    <Check size={40} strokeWidth={3} />
-                </div>
-                <h1
-                    className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4"
-                    data-testid="thank-you-message"
-                >
-                    {t('post.success.title')}
-                </h1>
-                <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                    {t('post.success.message')}
-                </p>
-                {finalConfirmationCode && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm max-w-full">
-                        <span className="text-xs font-semibold text-slate-400 block mb-2">
-                            {t('post.success.id_label')}
-                        </span>
-                        <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all break-all">
-                            {finalConfirmationCode}
-                        </span>
-                    </div>
-                )}
-                <ShareStudyLinks
-                    studyUrl={`${window.location.origin}/study/${slug}`}
-                    studyTitle={config.title}
-                />
-                <EraseMyDataDialog
-                    slug={slug || ''}
-                    sessionToken={useSessionStore.getState().token}
-                />
-                <div className="mt-6">
-                    <Link
-                        to={`/study/${slug}/reset${location.search}`}
-                        className="text-sm text-slate-500 hover:text-slate-700 underline decoration-slate-300 underline-offset-4 transition-colors"
-                    >
-                        {t('welcome.restart', 'Start a new session')}
-                    </Link>
-                </div>
-            </div>
+            <SuccessScreen
+                slug={slug}
+                studyTitle={config.title}
+                code={finalConfirmationCode}
+                isPilotRun={isPilotRun}
+            />
         );
     }
 

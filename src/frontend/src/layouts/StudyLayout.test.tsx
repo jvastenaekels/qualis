@@ -11,6 +11,7 @@ import i18n from '../i18n';
 import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { PILOT_NO_DRAFT } from '../utils/pilotMode';
 import { renderWithProviders } from '../test-utils/test-utils';
 import StudyLayout from './StudyLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -606,6 +607,49 @@ describe('Pilot Mode Logic', () => {
 
         expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
         expect(screen.queryByTestId('layout-header')).not.toBeInTheDocument();
+    });
+
+    it('mode=test without a local draft shows it is not a participant link', () => {
+        const assign = vi.spyOn(window.location, 'assign').mockImplementation(() => {});
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        useConfigStore.setState({ error: PILOT_NO_DRAFT, config: null });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/*" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome?mode=test'] }
+        );
+
+        expect(screen.getByText('layout.pilot_no_draft_title')).toBeInTheDocument();
+        expect(screen.getByText('layout.pilot_no_draft_message')).toBeInTheDocument();
+        expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'layout.pilot_leave' }));
+        expect(sessionStorage.getItem('qualis-pilot-mode')).toBeNull();
+        expect(assign).toHaveBeenCalledWith('/study/test');
+        assign.mockRestore();
+    });
+
+    it('a flagged tab that hits any config error can still leave the test', () => {
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        useConfigStore.setState({ error: 'common.errors.validation', config: null });
+
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome?mode=test'],
+        });
+
+        expect(screen.getByText('common.errors.validation')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'layout.pilot_leave' })).toBeInTheDocument();
+    });
+
+    it('a real link that fails offers no way out of a test it is not in', () => {
+        useConfigStore.setState({ error: 'common.errors.validation', config: null });
+
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+
+        expect(
+            screen.queryByRole('button', { name: 'layout.pilot_leave' })
+        ).not.toBeInTheDocument();
     });
 
     it('Displays Pilot Mode banner', () => {

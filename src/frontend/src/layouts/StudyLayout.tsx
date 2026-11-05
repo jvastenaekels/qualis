@@ -55,7 +55,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
-import { isPilot, leavePilot, withTestMode } from '../utils/pilotMode';
+import { isPilot, leavePilot, PILOT_NO_DRAFT, withTestMode } from '../utils/pilotMode';
 import { restoreStudySession } from '../utils/sessionReset';
 import { setStudyStorageScope, releaseStudyStorageScope } from '../store/safeStorage';
 import { shouldResetParticipantSessionForStudy } from '../utils/studySessionIsolation';
@@ -213,6 +213,46 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [location.pathname]);
 
+    // Pilot mode allows viewing regardless of study state
+    const isPilotModePersistent =
+        isPilotMode ||
+        new URLSearchParams(location.search).get('mode') === 'test' ||
+        sessionStorage.getItem('qualis-pilot-mode') === 'true';
+
+    // A flagged tab renders no banner on an error screen: this one carries the way out.
+    if (configError && !config && isPilotModePersistent) {
+        const noDraft = configError === PILOT_NO_DRAFT;
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
+                    <h1 className="text-2xl font-bold text-slate-900">
+                        {noDraft
+                            ? t(
+                                  'layout.pilot_no_draft_title',
+                                  'This is a test link, not a participant link'
+                              )
+                            : t('common.errors.default_title')}
+                    </h1>
+                    <p className="text-slate-600 leading-relaxed">
+                        {noDraft
+                            ? t(
+                                  'layout.pilot_no_draft_message',
+                                  'A test runs the study as you are editing it. Open it with Test run in the designer. To see the study as participants do, leave the test.'
+                              )
+                            : t(configError)}
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => slug && leavePilot(slug)}
+                        className="w-full px-6 py-3 bg-amber-100 text-amber-900 font-bold rounded-lg hover:bg-amber-200 transition-colors"
+                    >
+                        {t('layout.pilot_leave', 'Leave the test')}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
         // Special Case: Study Not Found (404) -> Custom User Friendly Page
@@ -238,13 +278,6 @@ const StudyLayoutContent: React.FC = () => {
             />
         );
     }
-
-    // Study State Check (Draft, Paused, Closed)
-    // Pilot mode allows viewing regardless of study state
-    const isPilotModePersistent =
-        isPilotMode ||
-        new URLSearchParams(location.search).get('mode') === 'test' ||
-        sessionStorage.getItem('qualis-pilot-mode') === 'true';
 
     // Hard Loading State (Initial Fetch)
     // In pilot mode, treat missing config as loading to prevent flash of raw keys

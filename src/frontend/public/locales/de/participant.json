@@ -118,6 +118,8 @@
         "pilot_mode": "Pilotmodus: Änderungen sind temporär und Daten werden nicht gespeichert",
         "pilot_stays": "Dieser Tab bleibt im Testmodus, bis Sie den Test verlassen, auch wenn Sie hier einen echten Link öffnen.",
         "pilot_leave": "Test verlassen",
+        "pilot_no_draft_title": "Dies ist ein Testlink, kein Teilnahmelink",
+        "pilot_no_draft_message": "Ein Test führt die Studie so durch, wie Sie sie gerade bearbeiten. Öffnen Sie ihn mit „Testlauf“ im Designer. Um die Studie so zu sehen wie die Teilnehmenden, verlassen Sie den Test.",
         "default_study_title": "Q-Methodologie-Studie",
         "loading_content": "Studieninhalt wird geladen...",
         "change_lang_title": "Sprache wechseln",
@@ -315,6 +317,7 @@
         "success": {
             "title": "Vielen Dank für Ihre Teilnahme!",
             "message": "Ihr Beitrag zur Studie wurde gespeichert.",
+            "pilot_message": "Dies war ein Test. Es wurde nichts gespeichert.",
             "id_label": "Bestätigungscode",
             "share": {
                 "title": "Weiterempfehlen",
