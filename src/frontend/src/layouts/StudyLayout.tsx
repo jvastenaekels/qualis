@@ -171,8 +171,15 @@ const StudyLayoutContent: React.FC = () => {
     });
 
     const changeLanguage = (lng: string) => {
-        // Sync store (this will trigger config refetch)
-        useSessionStore.getState().setLanguage(lng);
+        const params = new URLSearchParams(location.search);
+        if (params.has('lang')) {
+            // ?lang= wins in useStudyLocaleSync: rewrite it, or the choice snaps back.
+            params.set('lang', lng);
+            navigate(`${location.pathname}?${params}`, { replace: true });
+        } else {
+            // Sync store (this will trigger config refetch)
+            useSessionStore.getState().setLanguage(lng);
+        }
         setIsLangMenuOpen(false);
     };
 
@@ -183,7 +190,11 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync loader data to config store
     useEffect(() => {
-        if (study && !isPilotMode) {
+        // Without ?lang= the loader answers in the default language, and useStudyConfig
+        // would never correct it. Not a dependency: switching back to the loader's
+        // language must not replace the config fetched with the session token.
+        const language = useSessionStore.getState().language;
+        if (study && !isPilotMode && (!language || language === study.language)) {
             setConfig(study);
         }
     }, [study, setConfig, isPilotMode]);

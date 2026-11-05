@@ -21,13 +21,14 @@
  * This guard catches the URL-paste path that those don't.
  */
 
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import RoughSortPage from '../../pages/RoughSortPage';
 import { useConfigStore } from '../../store/useConfigStore';
 import { isRoughSortEnabled } from '../../utils/studyConfig';
 
 export function RoughSortGuard() {
     const { slug } = useParams();
+    const { search } = useLocation();
     const config = useConfigStore((s) => s.config);
 
     // Wait for config to load before deciding (otherwise we may flicker
@@ -37,7 +38,7 @@ export function RoughSortGuard() {
     }
 
     if (!isRoughSortEnabled(config)) {
-        return <Navigate to={`/study/${slug}/fine-sort`} replace />;
+        return <Navigate to={`/study/${slug}/fine-sort${search}`} replace />;
     }
     return <RoughSortPage />;
 }

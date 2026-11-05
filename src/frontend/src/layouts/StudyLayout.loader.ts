@@ -1,7 +1,17 @@
 import { getStudyApiStudySlugGet, getGetStudyApiStudySlugGetQueryKey } from '@/api/generated';
 import i18n from '../i18n';
 import { queryClient } from '@/lib/queryClient';
-import type { LoaderFunctionArgs } from 'react-router-dom';
+import type { LoaderFunctionArgs, ShouldRevalidateFunctionArgs } from 'react-router-dom';
+
+/**
+ * Reload only for another study. Losing `?lang=` or `?token=` from the URL (consent
+ * drops the token on purpose) would re-read the study in its default language.
+ */
+export const studyLayoutShouldRevalidate = ({
+    currentParams,
+    nextParams,
+}: Pick<ShouldRevalidateFunctionArgs, 'currentParams' | 'nextParams'>): boolean =>
+    currentParams.slug !== nextParams.slug;
 
 export const studyLayoutLoader = async ({ params, request }: LoaderFunctionArgs) => {
     const { slug } = params;

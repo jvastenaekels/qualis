@@ -5,8 +5,8 @@
  */
 
 import { act, fireEvent, screen, within } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Route, Routes, useLoaderData, useLocation } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -146,6 +146,91 @@ describe('StudyLayout Language Sync', () => {
 
         // Verify i18n updated
         expect(i18n.changeLanguage).toHaveBeenCalledWith('fr');
+    });
+});
+
+describe('StudyLayout session language', () => {
+    const studyIn = (language: string) =>
+        ({
+            title: `Study ${language}`,
+            slug: 'test',
+            language,
+            statements: [],
+            grid_config: [],
+            presort_config: {},
+            postsort_config: {},
+            available_languages: ['en', 'fi'],
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
+        }) as any;
+
+    const LocationSearch = () => <output>{useLocation().search}</output>;
+
+    const renderAt = (url: string) =>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="welcome" element={<LocationSearch />} />
+                </Route>
+            </Routes>,
+            { initialEntries: [url] }
+        );
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useConfigStore.setState({ config: studyIn('fi'), isLoading: false, error: null });
+        useSessionStore.setState({ language: 'fi', hasConsented: true, isPilotMode: false });
+    });
+
+    afterEach(() => {
+        vi.mocked(useLoaderData).mockReturnValue({});
+    });
+
+    it('keeps the session language when loader data arrives in the default language', () => {
+        vi.mocked(useLoaderData).mockReturnValue({ study: studyIn('en') });
+
+        renderAt('/study/test/welcome');
+
+        expect(useConfigStore.getState().config?.language).toBe('fi');
+        expect(useConfigStore.getState().isLoading).toBe(false);
+    });
+
+    it('a reload mid-session keeps the persisted language', () => {
+        useConfigStore.setState({ config: null, isLoading: true });
+        vi.mocked(useLoaderData).mockReturnValue({ study: studyIn('en') });
+
+        renderAt('/study/test/welcome');
+
+        // Left empty for useStudyConfig to fill in Finnish, never filled in English.
+        expect(useConfigStore.getState().config).toBeNull();
+    });
+
+    it('takes loader data that matches the session language', () => {
+        useConfigStore.setState({ config: null });
+        vi.mocked(useLoaderData).mockReturnValue({ study: studyIn('fi') });
+
+        renderAt('/study/test/welcome');
+
+        expect(useConfigStore.getState().config?.title).toBe('Study fi');
+    });
+
+    it('takes loader data before any language is chosen', () => {
+        useConfigStore.setState({ config: null });
+        useSessionStore.setState({ language: null });
+        vi.mocked(useLoaderData).mockReturnValue({ study: studyIn('en') });
+
+        renderAt('/study/test/welcome');
+
+        expect(useConfigStore.getState().config?.language).toBe('en');
+    });
+
+    it('the header language menu rewrites ?lang= and keeps ?mode=test', async () => {
+        renderAt('/study/test/welcome?lang=fi&mode=test');
+
+        fireEvent.click(screen.getByTitle('layout.change_lang_title'));
+        fireEvent.click(screen.getByText('en'));
+
+        expect(await screen.findByText('?lang=en&mode=test')).toBeInTheDocument();
+        expect(useSessionStore.getState().language).toBe('en');
     });
 });
 

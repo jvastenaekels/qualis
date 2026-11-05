@@ -274,6 +274,26 @@ export class TestDatabase {
         return study;
     }
 
+    /** Create a public recruitment link and return its token, as a real invitation carries. */
+    async createRecruitmentLink(token: string, slug: string): Promise<string> {
+        const response = await this.fetchWithRetry(
+            `${this.baseUrl}/api/admin/recruitment/${slug}/links`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ type: 'public' }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to create recruitment link: ${await response.text()}`);
+        }
+        const [link] = (await response.json()) as { token: string }[];
+        return link.token;
+    }
+
     /**
      * Create a concourse via API. `ConcourseListPage` auto-creates one and
      * redirects to its detail page on first visit, so tests that want a

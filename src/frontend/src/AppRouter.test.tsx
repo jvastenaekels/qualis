@@ -5,7 +5,7 @@
  */
 
 import { screen } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RoughSortGuard } from './components/participant/RoughSortGuard';
 import StudyLayout from './layouts/StudyLayout';
@@ -138,6 +138,23 @@ describe('RoughSortGuard', () => {
 
         expect(screen.queryByTestId('rough-sort-page')).toBeNull();
         expect(screen.getByTestId('fine-sort-redirect-target')).toBeTruthy();
+    });
+
+    it('test mode keeps ?mode=test and ?lang= through the redirect', () => {
+        useConfigStore
+            .getState()
+            .setConfig({ ...mockConfig, rough_sort_enabled: false } as StudyConfig);
+        const LocationSearch = () => <output>{useLocation().search}</output>;
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<RoughSortGuard />} />
+                <Route path="/study/:slug/fine-sort" element={<LocationSearch />} />
+            </Routes>,
+            { initialEntries: ['/study/demo-study/rough-sort?mode=test&lang=fi'] }
+        );
+
+        expect(screen.getByText('?mode=test&lang=fi')).toBeTruthy();
     });
 
     it('allows /rough-sort when study has rough_sort_enabled=true (default)', () => {

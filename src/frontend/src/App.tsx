@@ -65,7 +65,7 @@ const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
 const ResearcherHub = lazy(() => import('./pages/ResearcherHub'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 
-import { studyLayoutLoader } from './layouts/StudyLayout.loader';
+import { studyLayoutLoader, studyLayoutShouldRevalidate } from './layouts/StudyLayout.loader';
 import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
 import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
@@ -347,6 +347,7 @@ export const routes: RouteObject[] = [
         path: '/study/:slug',
         element: <StudyLayout />,
         loader: studyLayoutLoader,
+        shouldRevalidate: studyLayoutShouldRevalidate,
         HydrateFallback: DesignerSkeleton,
         errorElement: <RouteErrorBoundary />,
         children: [
