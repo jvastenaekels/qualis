@@ -107,7 +107,11 @@
             "errors": {
                 "password_mismatch": "Passwords do not match",
                 "generic_fail": "Registration failed"
-            }
+            },
+            "title_join": "Join a project",
+            "have_account": "Already have an account? Sign in",
+            "join_project": "Join project",
+            "wrong_account": "This invitation was sent to another address. Sign out, then open the link again."
         }
     },
     "admin": {

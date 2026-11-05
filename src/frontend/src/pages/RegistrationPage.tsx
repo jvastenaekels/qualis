@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import {
     ShieldCheck,
     UserPlus,
@@ -23,11 +23,17 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { customInstance } from '@/api/mutator';
-import { registerUserApiRegisterPost } from '@/api/generated';
+import {
+    registerUserApiRegisterPost,
+    acceptInvitationApiAdminInvitationsAcceptPost,
+    getListProjectsApiAdminProjectsGetQueryKey,
+} from '@/api/generated';
+import { ApiError } from '@/api/client';
+import { useAuthStore } from '@/store/useAuthStore';
 import type { UserCreate } from '@/api/model';
 
 const RegistrationPage = () => {
@@ -35,6 +41,9 @@ const RegistrationPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const token = searchParams.get('token');
+    const queryClient = useQueryClient();
+    // Not useAuth(): its /api/me call answers 401 to a visitor, and the mutator then bounces them to /login.
+    const isSignedIn = useAuthStore((state) => state.token !== null);
 
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
@@ -68,6 +77,17 @@ const RegistrationPage = () => {
     const registerMutation = useMutation({
         mutationFn: (data: UserCreate) => registerUserApiRegisterPost(data),
     });
+
+    const joinMutation = useMutation({
+        mutationFn: () => acceptInvitationApiAdminInvitationsAcceptPost({ token: token ?? '' }),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: getListProjectsApiAdminProjectsGetQueryKey(),
+            });
+            navigate('/hub');
+        },
+    });
+    const joinStatus = joinMutation.error instanceof ApiError ? joinMutation.error.status : null;
 
     const isAccountInvite = !!invite && invite.project_id === null;
 
@@ -133,7 +153,7 @@ const RegistrationPage = () => {
         );
     }
 
-    if (verifyError) {
+    if (verifyError || joinStatus === 400) {
         return (
             <div className="flex h-screen items-center justify-center bg-slate-50 p-6">
                 <Card className="max-w-md shadow-2xl border-none">
@@ -189,6 +209,60 @@ const RegistrationPage = () => {
         );
     }
 
+    const projectBox = (
+        <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
+            <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
+                <span className="text-2xs font-black text-indigo-400">
+                    {t('auth.register.invitation_to')}
+                </span>
+            </div>
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-slate-900">{invite?.project_name}</span>
+                <Badge
+                    variant="outline"
+                    className="bg-white text-2xs font-bold text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
+                >
+                    {invite?.role}
+                </Badge>
+            </div>
+        </div>
+    );
+
+    if (isSignedIn && invite && !isAccountInvite) {
+        return (
+            <div className="flex flex-1 items-center justify-center bg-slate-50 p-6">
+                <Card className="w-full max-w-[420px] shadow-2xl border-none">
+                    <CardHeader className="space-y-4">
+                        <CardTitle className="text-xl tracking-tight">
+                            {t('auth.register.title_join', 'Join a project')}
+                        </CardTitle>
+                        {projectBox}
+                        {joinStatus === 403 && (
+                            <Alert variant="destructive">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription>
+                                    {t(
+                                        'auth.register.wrong_account',
+                                        'This invitation was sent to another address. Sign out, then open the link again.'
+                                    )}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                    </CardHeader>
+                    <CardFooter>
+                        <Button
+                            className="w-full h-12 text-lg font-bold"
+                            disabled={joinMutation.isPending}
+                            onClick={() => joinMutation.mutate()}
+                        >
+                            {t('auth.register.join_project', 'Join project')}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-slate-50 p-6">
             <div className="w-full max-w-[420px] space-y-8">
@@ -215,28 +289,7 @@ const RegistrationPage = () => {
                             <UserPlus className="h-5 w-5 text-indigo-600" />
                         </CardTitle>
                         {!isAccountInvite && (
-                            <CardDescription className="pt-4">
-                                <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
-                                    <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
-                                        <span className="text-2xs font-black text-indigo-400">
-                                            {t('auth.register.invitation_to')}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-slate-900">
-                                                {invite?.project_name}
-                                            </span>
-                                        </div>
-                                        <Badge
-                                            variant="outline"
-                                            className="bg-white text-2xs font-bold text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
-                                        >
-                                            {invite?.role}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            </CardDescription>
+                            <CardDescription className="pt-4">{projectBox}</CardDescription>
                         )}
                     </CardHeader>
                     <form onSubmit={handleRegister}>
@@ -329,6 +382,17 @@ const RegistrationPage = () => {
                         </CardFooter>
                     </form>
                 </Card>
+
+                {!isAccountInvite && (
+                    <p className="text-center text-sm text-slate-500">
+                        <Link
+                            to={`/login?redirect=${encodeURIComponent(`/register?token=${token}`)}`}
+                            className="font-semibold text-primary hover:underline"
+                        >
+                            {t('auth.register.have_account', 'Already have an account? Sign in')}
+                        </Link>
+                    </p>
+                )}
 
                 <p className="text-center text-2xs text-slate-400 font-medium opacity-50">Qualis</p>
             </div>

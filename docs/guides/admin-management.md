@@ -45,7 +45,7 @@ Project Owners can invite collaborators and set their role from **Project settin
 
 Qualis generates a unique registration link. If SMTP is configured, the user receives an email; otherwise, the link is shown in the dashboard for manual sharing.
 
-For an invited person already registered, the link grants project access immediately. For a new user, the link pre-fills the registration form; access is granted once the account is created.
+A person who already has an account signs in from the link, then clicks **Join project**; nothing is granted before that click. For a new user, the link pre-fills the registration form; access is granted once the account is created.
 
 An account invited without a project (by a superuser, from the Users page) signs in on the researcher hub. With no project yet, the hub offers **New project**: the person creates their own project there and becomes its Owner. Project pages stay closed to them until they own or join a project.
 
