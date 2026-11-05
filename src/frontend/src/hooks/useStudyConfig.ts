@@ -44,13 +44,8 @@ function parseStudyDraft(
         return raw as StudyConfig;
     }
 
-    // A disabled translation is not offered to participants, so the test does not offer it either.
-    // biome-ignore lint/suspicious/noExplicitAny: draft translation type
-    const live = raw.translations.filter((t: any) => !t.is_disabled);
-    const offered = live.length > 0 ? live : raw.translations;
-    const available: string[] = offered.map(
-        // biome-ignore lint/suspicious/noExplicitAny: draft translation type
-        (t: any) => t.language_code
+    const available: string[] = raw.translations.map(
+        (t: { language_code: string }) => t.language_code
     );
     // The language the researcher asked for, else the study's own default, else the first translation.
     const lang =
