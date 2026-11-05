@@ -109,6 +109,26 @@ describe('useSubmitStudy', () => {
         });
     });
 
+    it('submits nothing in a tab that only the flag marks as a test', async () => {
+        const submitted = vi.fn();
+        server.use(
+            http.post('/api/submit', () => {
+                submitted();
+                return HttpResponse.json({ success: true, confirmation_code: 'REAL' });
+            })
+        );
+        sessionStorage.setItem('qualis-pilot-mode', 'true');
+        expect(useSessionStore.getState().isPilotMode).toBe(false);
+
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        await act(async () => {
+            await result.current.submit();
+        });
+
+        expect(submitted).not.toHaveBeenCalled();
+        expect(result.current.confirmationCode).not.toBe('REAL');
+    });
+
     it('handles generic API errors', async () => {
         server.use(
             http.post('/api/submit', () => {

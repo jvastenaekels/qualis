@@ -52,13 +52,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
         const isUrlTest = params.get('mode') === 'test';
         const currentPilotMode = useSessionStore.getState().isPilotMode;
 
-        if (isUrlTest) {
-            if (!currentPilotMode) {
-                setPilotMode(true);
-            }
-            if (sessionStorage.getItem('qualis-pilot-mode') !== 'true') {
-                sessionStorage.setItem('qualis-pilot-mode', 'true');
-            }
+        if (isUrlTest && !currentPilotMode) {
+            setPilotMode(true);
         }
     }, [setStep, setPilotMode, location.search]);
 

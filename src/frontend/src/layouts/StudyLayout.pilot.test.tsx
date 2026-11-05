@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { customInstance } from '../api/mutator';
 import { queryClient } from '../lib/queryClient';
+import type { StudyConfig } from '../schemas/study';
 import { setStudyStorageScope } from '../store/safeStorage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -124,8 +125,7 @@ describe('a pilot tab', () => {
 
     it('a tab with no flag and no param is left alone', async () => {
         useConfigStore.setState({
-            // biome-ignore lint/suspicious/noExplicitAny: only the fields the layout reads
-            config: { slug: 'real', state: 'active', statements: [] } as any,
+            config: { slug: 'real', state: 'active', statements: [] } as unknown as StudyConfig,
         });
         useSessionStore.setState({ isPilotMode: false, studySlug: 'real', hasConsented: true });
 
@@ -149,6 +149,16 @@ describe('a pilot tab', () => {
         });
         expect(sessionStorage.getItem(FLAG)).toBeNull();
         expect(assign).toHaveBeenCalledWith('/study/pilot');
+    });
+
+    it('mode=test arms the tab without any help from the welcome page', async () => {
+        useSessionStore.setState({ isPilotMode: false, studySlug: 'pilot', hasConsented: true });
+
+        openTab('/study/pilot/welcome?mode=test');
+
+        expect(await screen.findByText('step body')).toBeInTheDocument();
+        expect(sessionStorage.getItem(FLAG)).toBe('true');
+        expect(useSessionStore.getState().isPilotMode).toBe(true);
     });
 
     it('reset keeps a test tab in test: only the banner button leaves', () => {
