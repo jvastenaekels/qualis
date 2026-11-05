@@ -170,6 +170,44 @@ describe('StudyDesignPage Feature Tests', () => {
         );
     });
 
+    describe('Test run when the draft is not ready', () => {
+        const unbalanced = () =>
+            server.use(
+                http.get('*/api/admin/studies/test-study-designer', () =>
+                    HttpResponse.json({
+                        ...mockStudy,
+                        statements: [...mockStudy.statements, { code: 's7', translations: [] }],
+                    })
+                )
+            );
+
+        it('stays reachable, says why to a screen reader, and does nothing when pressed', async () => {
+            unbalanced();
+            const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+            renderPage();
+
+            const button = await screen.findByRole('button', { name: /Test run/i });
+            await waitFor(() => expect(button).toHaveAttribute('aria-disabled', 'true'));
+            // Not natively disabled: a keyboard user can still land on it and hear the reason.
+            expect(button).not.toBeDisabled();
+            const reason = document.getElementById(
+                button.getAttribute('aria-describedby') ?? 'missing'
+            );
+            expect(reason).toHaveTextContent(/Grid balanced/);
+
+            fireEvent.click(button);
+            expect(openSpy).not.toHaveBeenCalled();
+            openSpy.mockRestore();
+        });
+
+        it('has an accessible name when only its icon shows', async () => {
+            renderPage();
+            // The visible label is hidden below md; the name must not depend on it.
+            const button = await screen.findByRole('button', { name: /Test run/i });
+            expect(button).toHaveAttribute('aria-label');
+        });
+    });
+
     it('shows draft mode button when study is active', async () => {
         server.use(
             http.get('*/api/admin/studies/test-study-designer', () => {

@@ -96,6 +96,18 @@ function parseStudyDraft(
     } as StudyConfig;
 }
 
+/** A draft without the timestamps a plain Save rewrites, so Save alone is not a design change. */
+function withoutSaveStamps(json: string): string {
+    try {
+        const draft = JSON.parse(json);
+        delete draft.updated_at;
+        delete draft.last_updated_at;
+        return JSON.stringify(draft);
+    } catch {
+        return json;
+    }
+}
+
 /** The draft a running test of this study began with, if one has loaded. */
 function heldDraft(held: { slug: string; json: string } | null, slug: string): string | null {
     return held?.slug === slug ? held.json : null;
@@ -292,7 +304,11 @@ export const useStudyConfig = () => {
             const running = heldDraft(testDraft.current, slug);
             if (running === null) {
                 loadFromStorage(); // the refusal screen waits for a draft to appear
-            } else if (isDraft && e.newValue && e.newValue !== running) {
+            } else if (
+                isDraft &&
+                e.newValue &&
+                withoutSaveStamps(e.newValue) !== withoutSaveStamps(running)
+            ) {
                 setDesignChanged(true); // a running test keeps its page; the banner says so
             }
         };

@@ -1196,6 +1196,7 @@
                 "select_lang": "Choisir la langue",
                 "test_run_help": "Aperçu en tant que participant. Ces runs ne sont pas comptés dans vos données.",
                 "test_run_blocked": "Pour tester, il manque : {{missing}}",
+                "test_run_popup_blocked": "Votre navigateur a bloqué l'onglet de test. Autorisez les fenêtres surgissantes pour ce site, puis réessayez.",
                 "more_actions": "Autres actions"
             },
             "sync": {

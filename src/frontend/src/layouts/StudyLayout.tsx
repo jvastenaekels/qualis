@@ -406,7 +406,7 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="bg-amber-100 border-b border-amber-200 px-3 sm:px-4 py-1 sm:py-1.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 leading-tight text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     <span>{t('layout.pilot_mode')}</span>
-                    <span className="hidden lg:inline">
+                    <span className="sr-only lg:not-sr-only">
                         {t(
                             'layout.pilot_stays',
                             'This tab stays in test mode until you leave the test, even if you open a real link here.'

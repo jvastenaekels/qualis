@@ -533,7 +533,8 @@ export function useStudyDesignPage(): StudyDesignPageApi {
     }, [effectiveSlug, t]);
 
     const handleTestRun = useCallback(() => {
-        if (!draft || !effectiveSlug) return;
+        // The button is aria-disabled, not disabled, so a press still reaches here.
+        if (!draft || !effectiveSlug || !isLaunchReady) return;
 
         safeBrowserLocalStorage.setItem(
             `qualis-test-draft-${effectiveSlug}`,
@@ -543,9 +544,21 @@ export function useStudyDesignPage(): StudyDesignPageApi {
 
         const testUrl = `/study/${effectiveSlug}?mode=test&lang=${encodeURIComponent(activeLocale)}`;
         // One named tab per study: a second Test run navigates it instead of piling up tabs.
-        window.open(testUrl, `qualis-pilot-${effectiveSlug}`);
+        const tab = window.open(testUrl, `qualis-pilot-${effectiveSlug}`);
+        if (!tab) {
+            // No tab will consume the reset key: left behind, it would wipe a running test's answers later.
+            safeBrowserLocalStorage.removeItem(`qualis-pilot-reset-${effectiveSlug}`);
+            toast.error(
+                t(
+                    'admin.design.toolbar.test_run_popup_blocked',
+                    'Your browser blocked the test tab. Allow pop-ups for this site, then try again.'
+                )
+            );
+            return;
+        }
+        tab.focus();
         toast.info(`${t('admin.design.toolbar.test_run')}...`);
-    }, [draft, effectiveSlug, activeLocale, t]);
+    }, [draft, effectiveSlug, activeLocale, isLaunchReady, t]);
 
     return {
         effectiveSlug,

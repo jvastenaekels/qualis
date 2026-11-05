@@ -97,6 +97,15 @@ const StudyDesignPage = () => {
     // legible but inert: every editor already receives readOnly={isFullyReadOnly}.
     const [isLockNoticeDismissed, setIsLockNoticeDismissed] = useState(false);
     const api = useStudyDesignPage();
+    const testRunHint =
+        !api.isLaunchReady && api.testRunBlockedReason
+            ? t('admin.design.toolbar.test_run_blocked', 'Test run needs: {{missing}}', {
+                  missing: api.testRunBlockedReason,
+              })
+            : t(
+                  'admin.design.toolbar.test_run_help',
+                  "Preview as a participant. These runs aren't included in your data."
+              );
     const original = useStudyDesigner((s) => s.original);
     const { user: currentUser } = useAuthStore();
     const { role: projectRole } = usePermission();
@@ -284,39 +293,32 @@ const StudyDesignPage = () => {
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            {/* The tooltip sits on the wrapper: a disabled button shows none in every browser. */}
-                            <span
-                                title={
-                                    api.isLaunchReady || !api.testRunBlockedReason
-                                        ? t(
-                                              'admin.design.toolbar.test_run_help',
-                                              "Preview as a participant. These runs aren't included in your data."
-                                          )
-                                        : t(
-                                              'admin.design.toolbar.test_run_blocked',
-                                              'Test run needs: {{missing}}',
-                                              { missing: api.testRunBlockedReason }
-                                          )
-                                }
+                            {/* aria-disabled, not disabled: the button stays focusable so the reason can be read, and a press does nothing (handleTestRun guards). */}
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={api.handleTestRun}
+                                aria-disabled={!api.isLaunchReady}
+                                aria-label={t('admin.design.toolbar.test_run')}
+                                aria-describedby={api.isLaunchReady ? undefined : 'test-run-hint'}
+                                title={testRunHint}
+                                className={cn(
+                                    'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
+                                    api.isLaunchReady
+                                        ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+                                        : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed hover:bg-slate-50'
+                                )}
                             >
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={api.handleTestRun}
-                                    disabled={!api.isLaunchReady}
-                                    className={cn(
-                                        'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
-                                        api.isLaunchReady
-                                            ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
-                                            : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
-                                    )}
-                                >
-                                    <Eye className="h-4 w-4 text-indigo-500" />
-                                    <span className="hidden md:inline">
-                                        {t('admin.design.toolbar.test_run')}
-                                    </span>
-                                </Button>
-                            </span>
+                                <Eye className="h-4 w-4 text-indigo-500" />
+                                <span className="hidden md:inline">
+                                    {t('admin.design.toolbar.test_run')}
+                                </span>
+                            </Button>
+                            {!api.isLaunchReady && (
+                                <span id="test-run-hint" className="sr-only">
+                                    {testRunHint}
+                                </span>
+                            )}
 
                             <Button
                                 variant="outline"

@@ -118,6 +118,23 @@ function makeUpdateMutation() {
 
 // ── Tests ─────────────────────────────────────────────────────────
 
+// A study with a finished Finnish translation: Test run needs the edited language to be ready.
+const finnishToo = {
+    ...mockStudy,
+    translations: [
+        ...(mockStudy.translations ?? []),
+        {
+            language_code: 'fi',
+            title: 'Tutkimus',
+            condition_of_instruction: 'Lajittele',
+            consent_title: 'Suostumus',
+            consent_description: 'Kuvaus',
+        },
+    ],
+} as unknown as StudyRead;
+
+const fakeTab = { focus: vi.fn() } as unknown as Window;
+
 describe('useStudyDesignPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -531,7 +548,7 @@ describe('useStudyDesignPage', () => {
     it('opens test run even when localStorage is unavailable', () => {
         useStudyDesigner.getState().setStudy(mockStudy);
         mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
-        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => fakeTab);
 
         Object.defineProperty(globalThis, 'localStorage', {
             configurable: true,
@@ -560,9 +577,9 @@ describe('useStudyDesignPage', () => {
     });
 
     it('Test run opens the language being edited', () => {
-        useStudyDesigner.getState().setStudy(mockStudy);
-        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
-        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+        useStudyDesigner.getState().setStudy(finnishToo);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: finnishToo }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => fakeTab);
         localStorage.clear();
 
         const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
@@ -580,9 +597,9 @@ describe('useStudyDesignPage', () => {
     });
 
     it('Test run reuses one named tab', () => {
-        useStudyDesigner.getState().setStudy(mockStudy);
-        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
-        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+        useStudyDesigner.getState().setStudy(finnishToo);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: finnishToo }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => fakeTab);
 
         const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
         act(() => result.current.handleTestRun());
@@ -658,6 +675,49 @@ describe('useStudyDesignPage', () => {
         const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
 
         expect(result.current.testRunBlockedReason).toBeNull();
+    });
+
+    it('a blocked test tab leaves no reset key behind and says so', async () => {
+        const { toast } = await import('sonner');
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        vi.spyOn(window, 'open').mockImplementation(() => null);
+        localStorage.clear();
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+        act(() => result.current.handleTestRun());
+
+        // A key left here would wipe the answers of a running test on its next language switch.
+        expect(localStorage.getItem('qualis-pilot-reset-test-study')).toBeNull();
+        expect(toast.error).toHaveBeenCalled();
+        expect(toast.info).not.toHaveBeenCalled();
+    });
+
+    it('a reused test tab is brought to the front', () => {
+        useStudyDesigner.getState().setStudy(mockStudy);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: mockStudy }));
+        const focus = vi.fn();
+        vi.spyOn(window, 'open').mockImplementation(() => ({ focus }) as unknown as Window);
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+        act(() => result.current.handleTestRun());
+
+        expect(focus).toHaveBeenCalled();
+        expect(localStorage.getItem('qualis-pilot-reset-test-study')).toBe('true');
+    });
+
+    it('Test run does nothing while the draft is not ready', () => {
+        const short = { ...mockStudy, statements: [] } as unknown as StudyRead;
+        useStudyDesigner.getState().setStudy(short);
+        mockStudyQuery.mockReturnValue(makeStudyQueryResult({ data: short }));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(() => fakeTab);
+        localStorage.clear();
+
+        const { result } = renderHook(() => useStudyDesignPage(), { wrapper: AllTheProviders });
+        act(() => result.current.handleTestRun());
+
+        expect(openSpy).not.toHaveBeenCalled();
+        expect(localStorage.getItem('qualis-pilot-reset-test-study')).toBeNull();
     });
 
     it('DESIGN_STEPS has the canonical 7 steps in expected order', () => {

@@ -1314,6 +1314,7 @@
                 "select_lang": "Select language",
                 "test_run_help": "Preview as a participant. These runs aren't included in your data.",
                 "test_run_blocked": "Test run needs: {{missing}}",
+                "test_run_popup_blocked": "Your browser blocked the test tab. Allow pop-ups for this site, then try again.",
                 "more_actions": "More actions"
             },
             "sync": {

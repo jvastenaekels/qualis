@@ -470,6 +470,39 @@ describe('useStudyConfig', () => {
             expect(useConfigStore.getState().designChanged).toBe(false);
         });
 
+        it('a Save with no other change raises no notice, a real change does', async () => {
+            const stamped = (title: string, at: string) =>
+                JSON.stringify({
+                    slug: 'test-study',
+                    statements: [],
+                    default_language: 'en',
+                    updated_at: at,
+                    last_updated_at: at,
+                    translations: [tr('en', title)],
+                });
+            openDraft({ default_language: 'en', translations: [tr('en', 'First')] });
+            await waitFor(() => expect(useSessionStore.getState().language).toBe('en'));
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            });
+            const send = (newValue: string) =>
+                act(() => {
+                    window.dispatchEvent(
+                        new StorageEvent('storage', {
+                            key: 'qualis-test-draft-test-study',
+                            newValue,
+                        })
+                    );
+                });
+            // The draft the test began with carries no stamps; Save adds both.
+            const began = localStorage.getItem('qualis-test-draft-test-study') ?? '';
+            send(JSON.stringify({ ...JSON.parse(began), updated_at: 'T1', last_updated_at: 'T1' }));
+            expect(useConfigStore.getState().designChanged).toBe(false);
+
+            send(stamped('Second', 'T2'));
+            expect(useConfigStore.getState().designChanged).toBe(true);
+        });
+
         it('a draft that appears on the refusal screen still loads', async () => {
             vi.spyOn(URLSearchParams.prototype, 'get').mockImplementation((key) =>
                 key === 'mode' ? 'test' : null
