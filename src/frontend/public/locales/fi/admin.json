@@ -19,7 +19,14 @@
             "two_factor_app_prompt": "Syötä todennussovelluksen 6-numeroinen koodi.",
             "two_factor_submit": "Vahvista",
             "two_factor_invalid": "Virheellinen koodi. Yritä uudelleen.",
-            "lost_2fa_link": "Onko 2FA-pääsysi kadonnut?"
+            "lost_2fa_link": "Onko 2FA-pääsysi kadonnut?",
+            "back_to_home": "Palaa etusivulle",
+            "demo": {
+                "title": "Tervetuloa — tämä on Qualisin demo",
+                "body": "Kaikki täällä on esimerkkiaineistoa, joten tutustu vapaasti — et voi rikkoa mitään.",
+                "fill": "Täytä demotilin tiedot puolestani",
+                "credentials": "{{email}} · salasana {{password}}"
+            }
         },
         "twofa": {
             "recovery": {
@@ -74,11 +81,13 @@
         "register": {
             "title": "Luo tili",
             "subtitle": "Liity tutkimusprojektiin",
+            "subtitle_account": "Luo tutkijatilisi",
             "secure_invitation": "Suojattu kutsu",
             "invitation_to": "Kutsu kohteeseen:",
             "study_label": "Tutkimus",
             "role_label": "Rooli",
             "email_label": "Sähköpostiosoite",
+            "full_name_label": "Koko nimi (valinnainen)",
             "password_label": "Valitse salasana",
             "confirm_password_label": "Vahvista salasana",
             "placeholder_password": "••••••••",
@@ -86,6 +95,7 @@
             "loading": "Luodaan tiliä...",
             "success_title": "Tervetuloa mukaan!",
             "success_desc": "Tilisi on luotu ja linkitetty tutkimukseen.",
+            "success_desc_account": "Tilisi on valmis.",
             "success_cta": "Siirry hallintapaneeliin",
             "success_hint": "Voit nyt kirjautua hallintapaneeliin aloittaaksesi yhteistyön.",
             "invalid_title": "Virheellinen kutsu",
@@ -97,7 +107,11 @@
             "errors": {
                 "password_mismatch": "Salasanat eivät täsmää",
                 "generic_fail": "Rekisteröityminen epäonnistui"
-            }
+            },
+            "title_join": "Liity projektiin",
+            "have_account": "Onko sinulla jo tili? Kirjaudu sisään",
+            "join_project": "Liity projektiin",
+            "wrong_account": "Tämä kutsu lähetettiin toiseen osoitteeseen. Kirjaudu ulos ja avaa linkki uudelleen."
         }
     },
     "admin": {
@@ -119,7 +133,7 @@
                 }
             },
             "rough_sort": {
-                "toggle_label": "Ota esilajittelu käyttöön (samaa mieltä / neutraali / eri mieltä)",
+                "toggle_label": "Ota karkea lajittelu käyttöön (kolmen pinon jako)",
                 "lock_banner": "Lukittu. {{count}} osallistuja(a) on aloittanut kyselyn; arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
                 "deck_mode_note": "Pois käytöstä. Osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."
             }
@@ -184,7 +198,7 @@
             "beta": "Tutkimuksen beta-versio",
             "logout": "Kirjaudu ulos",
             "account": "Tilin asetukset",
-            "admin_user": "Ylläpitäjä",
+            "admin_user": "Pääkäyttäjä",
             "platform_settings": "Käyttäjät"
         },
         "account": {
@@ -208,7 +222,7 @@
                 "tfa_subtitle": "Kaksivaiheinen todennus",
                 "password_subtitle": "Salasana",
                 "enabled": "Käytössä",
-                "setup_cta": "Ota 2FA käyttöön",
+                "setup_cta": "Ota 2FA käyttöön nyt",
                 "configure_title": "Määritä todennussovellus",
                 "scan_desc": "Skannaa tämä QR-koodi todennussovelluksellasi (Google Authenticator, Authy, jne.)",
                 "enter_code": "Syötä 6-numeroinen koodi",
@@ -242,7 +256,7 @@
         "sidebar": {
             "home": "Hallintapaneeli",
             "add_study": "Lisää tutkimus",
-            "create_project": "LUO UUSI PROJEKTI",
+            "create_project": "Luo uusi projekti",
             "dashboard": "Hallintapaneeli",
             "overview": "Yleisnäkymä",
             "design": "Suunnittelu",
@@ -250,7 +264,7 @@
             "data": "Tiedot",
             "analysis": "Analyysi",
             "team": "Tiimi",
-            "settings": "Asetukset",
+            "settings": "Tutkimuksen asetukset",
             "documentation": "Dokumentaatio",
             "support": "Tuki",
             "study_management": "Tutkimuksen hallinta",
@@ -281,7 +295,7 @@
             "create_success": "Lausekokoelma luotu",
             "create_error": "Lausekokoelman luonti epäonnistui",
             "create_dialog_title": "Luo lausekokoelma",
-            "create_dialog_desc": "Lausekokoelma on kokoelma ehdokaslauseita, joista valitset Q-setin.",
+            "create_dialog_desc": "Lausekokoelma on kokoelma ehdokasväittämiä, joista valitset Q-joukon.",
             "field_title": "Otsikko",
             "field_title_placeholder": "esim. Ilmastonmuutosasenteet",
             "field_description": "Kuvaus",
@@ -372,7 +386,7 @@
             "bulk_confirm_desc": "Aseta {{count}} kohdetta tilaan \"{{status}}\"?",
             "no_translation": "Ei tekstiä",
             "language_tooltip": "Väittämätekstien kieli",
-            "loading": "Valmistellaan concourse...",
+            "loading": "Valmistellaan lausekokoelmaa...",
             "diff_code": "koodi",
             "diff_status": "tila",
             "diff_text": "teksti",
@@ -394,7 +408,9 @@
             "status_for": "Tila: {{code}}",
             "create_tag": "Luo tunniste",
             "delete_tag": "Poista {{tag}}",
-            "cancel_delete_tag": "Peruuta tunnisteen {{tag}} poisto"
+            "cancel_delete_tag": "Peruuta tunnisteen {{tag}} poisto",
+            "viewer_empty_state": "Lausekokoelmaa ei ole vielä. Pyydä projektin omistajaa tai jäsentä luomaan se.",
+            "retry": "Yritä uudelleen"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
@@ -441,6 +457,8 @@
             "reanalyzing": "Analysoidaan uudelleen...",
             "success": "Analyysi valmis. {{n}} faktoria poimittu.",
             "error": "Analyysi epäonnistui: {{message}}",
+            "warnings_title": "Tämä analyysi tuotti varoituksia",
+            "ci_tooltip": "95 %:n persentiililuottamusväli (bootstrap-z-arvojen 2,5.–97,5. persentiili) [{{lo}}, {{hi}}]",
             "scree_hint": "Jokainen palkki näyttää, kuinka paljon varianssia faktori selittää (sen ominaisarvo). Katkoviiva merkitsee ominaisarvoa = 1 (Kaiserin kriteeri). Napsauta palkkia valitaksesi poimittavien faktorien lukumäärä.",
             "kaiser_suggestion": "{{n}} faktorilla on ominaisarvo yli 1 (Kaiserin kriteeri)",
             "factor": "Faktori",
@@ -463,7 +481,7 @@
                 "bootstrap_on": "{{n}} iteraatiota"
             },
             "tab_loadings": "Lataukset",
-            "tab_factor_arrays": "Faktoritaulukot",
+            "tab_factor_arrays": "Faktorijärjestykset",
             "tab_statements": "Väittämät",
             "tab_summary": "Yhteenveto",
             "participant": "Osallistuja",
@@ -489,7 +507,7 @@
             "pca": "PCA",
             "varimax": "Varimax",
             "metric": "Mittari",
-            "caption_loadings": "Faktorikuormitukset osallistujittain",
+            "caption_loadings": "Faktorilataukset osallistujittain",
             "caption_statements": "Väittämien z-arvot ja faktorijärjestykset faktoreittain",
             "caption_characteristics": "Faktorien ominaisuudet ja luotettavuustilastot",
             "caption_correlations": "Faktorien välinen korrelaatiomatriisi",
@@ -497,22 +515,22 @@
             "flagging_method": "Merkintä",
             "auto": "Automaattinen",
             "manual": "Manuaalinen",
-            "manual_flag_hint": "Napsauta kuormitussolua merkitäksesi/poistaaksesi osallistujan merkinnän kyseiselle faktorille. Suorita analyysi uudelleen päivittääksesi tulokset.",
+            "manual_flag_hint": "Napsauta lataussolua merkitäksesi/poistaaksesi osallistujan merkinnän kyseiselle faktorille. Suorita analyysi uudelleen päivittääksesi tulokset.",
             "no_flagged_participants": "Yhtään osallistujaa ei ole merkitty millekään faktorille. Kokeile muuttaa faktorien lukumäärää tai merkintämenetelmää.",
             "no_statement_scores": "Väittämäpisteitä ei saatavilla. Varmista, että osallistujia on merkitty vähintään yhdelle faktorille.",
             "no_characteristics": "Faktorien ominaisuustietoja ei saatavilla.",
             "export": "Vie",
-            "export_loadings": "Faktorikuormitukset (CSV)",
+            "export_loadings": "Faktorilataukset (CSV)",
             "export_scores": "Väittämäpisteet (CSV)",
             "export_xlsx": "Koko analyysi (XLSX)",
             "export_error": "XLSX-viennin luominen epäonnistui.",
             "select_factors": "Valitse faktorien lukumäärä",
-            "loadings_help": "Faktorikuormitukset osoittavat, kuinka voimakkaasti kunkin osallistujan lajittelu korreloi kunkin faktorin kanssa. Korostetut solut ylittävät yllä näkyvän merkitsevyyskynnyksen.",
+            "loadings_help": "Faktorilataukset osoittavat, kuinka voimakkaasti kunkin osallistujan lajittelu korreloi kunkin faktorin kanssa. Korostetut solut ylittävät yllä näkyvän merkitsevyyskynnyksen.",
             "factor_array_help": "Komposiitti-Q-lajittelu, joka näyttää tämän faktorin idealisoidun lajittelukuvion. Väittämät sijoitetaan jakaumaan painotettujen z-arvojen perusteella.",
             "factor_array_label": "Faktorin {{n}} komposiittilajittelu",
             "factor_arrays": {
-                "toggle_narratives": "Show factor narratives",
-                "toggle_narratives_aria": "Toggle per-factor interpretive narratives"
+                "toggle_narratives": "Näytä faktorien narratiivit",
+                "toggle_narratives_aria": "Näytä tai piilota faktorikohtaiset tulkitsevat narratiivit"
             },
             "statements_help": "Z-arvot näyttävät kunkin faktorin standardoidun aseman kullakin väittämällä. D = erotteleva (merkitsevä ero faktorien välillä), C = konsensus (ei merkitseviä eroja).",
             "z_scores_description": "Väittämien z-arvot ja faktorijärjestyksen sijoitukset",
@@ -542,16 +560,16 @@
             "bootstrap": {
                 "toggle_label": "Suorita bootstrap-vakausanalyysi",
                 "iterations_label": "Iteraatiot (B)",
-                "helper": "Valinnainen. Ottaa Q-lajitteluista otokset B kertaa luottamusvälien arvioimiseksi faktoripisteille.",
+                "helper": "Valinnainen. Ottaa Q-lajitteluista otokset B kertaa persentiililuottamusvälien arvioimiseksi faktoripisteille.",
                 "running": "Bootstrap käynnissä…",
                 "se_column": "Keskim. KV (z)",
-                "tooltip": "Q-lajittelujen ei-parametrinen bootstrap (otokset takaisinpalauttaen); analyysi toistetaan B kertaa 95 %:n luottamusvälien arvioimiseksi z-arvoille."
+                "tooltip": "Q-lajittelujen ei-parametrinen bootstrap (otokset takaisinpalauttaen); analyysi toistetaan B kertaa 95 %:n persentiililuottamusvälien (2,5.–97,5. persentiili) arvioimiseksi z-arvoille. Uudelleenotanta ei säilytä osallistujien identiteettiä, joten jokainen uudelleenotos merkitään automaattisesti, vaikka tallennetussa ajossa olisi käytetty manuaalista merkintää."
             },
-            "guide_loadings_title": "Faktorikuormitusten lukeminen",
-            "guide_loadings_1": "Jokainen kuormitus on korrelaatio (-1 – +1) osallistujan ja faktorin (jaetun näkökulman) välillä.",
+            "guide_loadings_title": "Faktorilatausten lukeminen",
+            "guide_loadings_1": "Jokainen lataus on korrelaatio (-1 – +1) osallistujan ja faktorin (jaetun näkökulman) välillä.",
             "guide_loadings_2": "Korostetut arvot ylittävät taulukon yläpuolella näkyvän merkitsevyyskynnyksen.",
-            "guide_arrays_title": "Faktoritaulukoiden tulkinta",
-            "guide_arrays_1": "Jokainen faktoritaulukko on komposiitti-Q-lajittelu, joka edustaa yhtä jaettua näkökulmaa.",
+            "guide_arrays_title": "Faktorijärjestysten tulkinta",
+            "guide_arrays_1": "Jokainen faktorijärjestys on komposiitti-Q-lajittelu, joka edustaa yhtä jaettua näkökulmaa.",
             "guide_arrays_2": "Lue vasemmalta oikealle: eniten eri mieltä – eniten samaa mieltä. Ääriasennot kantavat vahvimman signaalin tulkintaa varten.",
             "guide_statements_title": "Väittämäpisteiden ymmärtäminen",
             "guide_statements_1": "Z-arvot osoittavat, kuinka voimakkaasti kukin faktori on samaa tai eri mieltä kunkin väittämän kanssa (0 = neutraali).",
@@ -562,70 +580,71 @@
             "benchmark_above": "Kynnyksen yläpuolella",
             "benchmark_below": "Kynnyksen alapuolella",
             "history": {
-                "title": "Analysis history",
-                "loading": "Loading history…",
-                "fetch_error": "Could not load analysis history.",
-                "empty": "No previous analyses for this study yet. Run one to start the audit trail.",
-                "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
+                "title": "Analyysihistoria",
+                "loading": "Ladataan historiaa…",
+                "fetch_error": "Analyysihistoriaa ei voitu ladata.",
+                "empty": "Tälle tutkimukselle ei ole vielä aiempia analyysejä. Aloita kirjausketju suorittamalla analyysi.",
+                "empty_explainer": "Jokainen ajo kirjataan tänne, jotta voit dokumentoida jokaisen päätöksen ja palata siihen.",
                 "load_error": "Tätä analyysiajoa ei voitu ladata. Päivitä sivu yrittääksesi uudelleen.",
-                "load_run_aria": "Load analysis run from {{date}}",
-                "loading_run": "Loading…",
-                "current_tag": "current",
+                "load_run_aria": "Lataa analyysiajo päivältä {{date}}",
+                "loading_run": "Ladataan…",
+                "current_tag": "nykyinen",
                 "n_factors_label": "{{n}}F",
-                "edit_notes": "Edit notes",
-                "edit_notes_aria": "Edit notes for this run",
-                "notes_placeholder": "Add a note about this run…",
-                "notes_aria": "Edit notes for this run",
-                "save_notes_aria": "Save notes",
-                "cancel_edit_aria": "Cancel editing",
-                "notes_saved": "Notes saved.",
+                "edit_notes": "Muokkaa muistiinpanoja",
+                "edit_notes_aria": "Muokkaa tämän ajon muistiinpanoja",
+                "notes_placeholder": "Lisää muistiinpano tästä ajosta…",
+                "notes_aria": "Muokkaa tämän ajon muistiinpanoja",
+                "save_notes_aria": "Tallenna muistiinpanot",
+                "cancel_edit_aria": "Peruuta muokkaus",
+                "notes_saved": "Muistiinpanot tallennettu.",
                 "notes_error": "Muistiinpanoja ei voitu tallentaa. Tarkista yhteytesi ja yritä uudelleen.",
-                "delete_run": "Delete run",
-                "delete_run_aria": "Delete this analysis run",
-                "delete_dialog_title": "Delete analysis run?",
-                "delete_dialog_description": "Deleting an analysis run removes evidence of an analytical choice from the audit trail. Are you sure?",
-                "cancel": "Cancel",
-                "delete_confirm": "Delete",
-                "deleted": "Analysis run deleted.",
-                "delete_error": "Failed to delete the run.",
-                "viewing_banner": "Viewing run from {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
-                "back_to_current": "Back to current"
+                "delete_run": "Poista ajo",
+                "delete_run_aria": "Poista tämä analyysiajo",
+                "delete_dialog_title": "Poistetaanko analyysiajo?",
+                "delete_dialog_description": "Analyysiajon poistaminen poistaa kirjausketjusta todisteen analyyttisestä valinnasta. Oletko varma?",
+                "cancel": "Peruuta",
+                "delete_confirm": "Poista",
+                "deleted": "Analyysiajo poistettu.",
+                "delete_error": "Ajon poistaminen epäonnistui.",
+                "viewing_banner": "Tarkastellaan ajoa päivältä {{date}}: {{extraction}} · {{n}}F · {{rotation}}",
+                "back_to_current": "Takaisin nykyiseen",
+                "run_label": "Ajo #{{id}}"
             },
             "factor_voices": {
-                "title": "Voices on Factor {{n}}",
-                "no_audio": "No post-sort audio recordings from participants flagged on this factor.",
-                "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
-                "loading": "Loading recordings…",
-                "error": "Could not load audio recordings. Please try again.",
-                "context": "Ground factor interpretation in participants' own words: their audio rationales and their written card comments.",
-                "context_aria": "About this panel",
-                "audio_label": "Recording: {{key}} by {{participant}}",
-                "url_unavailable": "Audio URL not available.",
-                "comments_label": "Card comments",
+                "title": "Faktorin {{n}} äänet",
+                "no_audio": "Tälle faktorille merkityiltä osallistujilta ei ole jälkikyselyn äänitallenteita.",
+                "no_material": "Tälle faktorille merkityiltä osallistujilta ei ole jälkikyselyn äänitallenteita tai kirjallisia kommentteja.",
+                "loading": "Ladataan tallenteita…",
+                "error": "Äänitallenteita ei voitu ladata. Yritä uudelleen.",
+                "context": "Perusta faktorin tulkinta osallistujien omiin sanoihin: heidän ääniperusteluihinsa ja kirjallisiin korttikommentteihinsa.",
+                "context_aria": "Tietoa tästä paneelista",
+                "audio_label": "Tallenne: {{key}}, osallistuja {{participant}}",
+                "url_unavailable": "Äänen URL-osoite ei ole saatavilla.",
+                "comments_label": "Korttikommentit",
                 "question_default": "Puhuttu kommentti"
             },
             "factor_note": {
-                "label": "Factor narrative",
-                "placeholder": "Write the interpretive narrative for this factor: the discourse, voices, and tensions it foregrounds.",
-                "empty_hint": "Add an interpretive narrative for this factor",
+                "label": "Faktorin narratiivi",
+                "placeholder": "Kirjoita tämän faktorin tulkitseva narratiivi: diskurssi, äänet ja jännitteet, jotka se tuo esiin.",
+                "empty_hint": "Lisää tälle faktorille tulkitseva narratiivi",
                 "char_count": "{{n}}/{{max}}",
-                "edit_aria": "Edit factor {{n}} narrative",
-                "save_aria": "Save factor narrative",
-                "cancel_aria": "Cancel editing",
-                "aria": "Edit factor {{n}} narrative",
-                "saved": "Factor narrative saved.",
-                "error": "Failed to save the factor narrative."
+                "edit_aria": "Muokkaa faktorin {{n}} narratiivia",
+                "save_aria": "Tallenna faktorin narratiivi",
+                "cancel_aria": "Peruuta muokkaus",
+                "aria": "Muokkaa faktorin {{n}} narratiivia",
+                "saved": "Faktorin narratiivi tallennettu.",
+                "error": "Faktorin narratiivin tallentaminen epäonnistui."
             },
             "explore": {
                 "diagnostics_title": "Diagnostiikka",
                 "kaiser": "Kaiser",
                 "parallel": "Rinnakkaisanalyysi",
                 "map": "Velicerin MAP",
-                "advisory": "Vain ohjaava. Q-menetelmän tekijöiden säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012).",
+                "advisory": "Vain ohjaava. Q-menetelmän faktorien säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012).",
                 "preview_range_title": "Esikatselu k:lle",
                 "preview_range_disabled": "Esikatselu tukee vain PCA + varimax -yhdistelmää. Centroid-poiminta ja arvioon perustuva rotaatio ovat polkuriippuvaisia; aja oikea analyysi tarkastellaksesi.",
-                "select_k": "{{k}} tekijää",
-                "empty_factor": "Tyhjä tekijä (ylifaktoroitu)",
+                "select_k": "{{k}} faktoria",
+                "empty_factor": "Tyhjä faktori (ylifaktoroitu)",
                 "cumvar": "kum. %",
                 "pct_flagged": "% flagattu",
                 "n_distinguishing": "# erottavia",
@@ -639,14 +658,14 @@
                 "statements_title": "Väittämät",
                 "narrative_title": "F{{n}} narratiivi",
                 "insert_comment_quote": "Lisää kommentti lainauksena",
-                "focus_mode": "Tekijäkohtainen näkymä",
+                "focus_mode": "Faktorikohtainen näkymä",
                 "overview_mode": "Yleisnäkymä",
                 "mode_toggle": "Näkymätila"
             },
             "compare": {
                 "pin_cta": "Kiinnitä vertailu",
                 "no_other_runs": "Ei muita vertailtavia ajoja",
-                "run_label": "Ajo #{{id}} ({{n}} tekijää)",
+                "run_label": "Ajo #{{id}} ({{n}} faktoria)",
                 "pinned": "Verrataan ajoon #{{id}}",
                 "phi": "φ = {{phi}}",
                 "ambiguous": "epäselvä vastaavuus (tulkitse delta-arvoja varoen)",
@@ -654,7 +673,8 @@
                 "delta_z_aria": "Δz {{delta}} vs vertailuajo",
                 "delta_loading_aria": "Δlataus {{delta}} vs vertailuajo"
             },
-            "quote_insert_format": "> {{text}}\n> {{p}}, väittämästä {{code}}: \"{{stmt}}\""
+            "quote_insert_format": "> {{text}}\n> {{p}}, väittämästä {{code}}: \"{{stmt}}\"",
+            "loading_run": "Ladataan ajoa…"
         },
         "project": {
             "remove_member": "Poista jäsen",
@@ -667,7 +687,7 @@
             },
             "roles": {
                 "owner": "Omistaja",
-                "admin": "Ylläpitäjä",
+                "admin": "Pääkäyttäjä",
                 "member": "Jäsen",
                 "viewer": "Tarkastelija"
             },
@@ -694,7 +714,7 @@
         },
         "recruitment": {
             "title": "Pääsy",
-            "description": "Määritä tutkimuksen URL-osoite, hallitse osallistujien pääsyä ja seuraa rekrytoinnin tehokkuutta.",
+            "description": "Määritä tutkimuksen URL-osoite, hallitse osallistujien pääsyä ja seuraa, miten kukin pääsylinkki toimii.",
             "study_url": {
                 "title": "Tutkimuksen URL",
                 "description": "Julkinen osoite, josta osallistujat pääsevät tutkimukseesi.",
@@ -705,8 +725,8 @@
             },
             "state_draft": "Luonnostila. Linkit toimivat tutkimuksen aktivoinnin jälkeen.",
             "state_closed": "Tämä tutkimus on suljettu. Olemassa olevat linkit näkyvät edelleen, mutta uudet osallistujat eivät voi aloittaa.",
-            "state_archived": "Tämä tutkimus on arkistoitu. Kaikki rekrytointitiedot ovat vain luku -tilassa.",
-            "empty_title": "Ei rekrytointilinkkejä vielä",
+            "state_archived": "Tämä tutkimus on arkistoitu. Pääsylinkit ovat vain luku -tilassa.",
+            "empty_title": "Ei vielä pääsylinkkejä",
             "empty_description": "Luo ensimmäinen linkki aloittaaksesi osallistujien kutsumisen.",
             "empty_cta": "Luo pääsylinkki",
             "stats_summary": {
@@ -736,10 +756,10 @@
                 "non_draft_notice": "Luonnostilan ulkopuolella vain keruuikkunaa voi muokata. Palauta tutkimus luonnostilaan muiden pääsysääntöjen muuttamiseksi.",
                 "archived_notice": "Tämä tutkimus on arkistoitu. Pääsysäännöt ovat vain luettavissa."
             },
-            "new_link": "Uusi pääsulinkki",
-            "create_title": "Luo pääsulinkejä",
+            "new_link": "Uusi pääsylinkki",
+            "create_title": "Luo pääsylinkkejä",
             "link_type": "Pääsystrategia",
-            "select_type": "Valitse rekrytointityyppi...",
+            "select_type": "Valitse pääsystrategia...",
             "campaign_name": "Kanava / Kampanjan nimi",
             "name_placeholder": "esim. LinkedIn, Sähköpostierä A, Opiskelijalista...",
             "link_count": "Erän koko",
@@ -749,7 +769,7 @@
             "revoked": "Pääsy peruutettu",
             "qr_title": "Jaa QR-koodina",
             "copy_link": "Kopioi URL",
-            "table_title": "Rekrytointilinkit",
+            "table_title": "Pääsylinkit",
             "share_title": "Jaa tutkimus",
             "share_desc": "Levitä tutkimuslinkkiä kutsuaksesi osallistujia.",
             "public_url_label": "Julkinen osallistumislinkki",
@@ -757,7 +777,7 @@
             "show_qr": "Näytä QR-koodi",
             "delete_link": "Poista linkki",
             "qr_alt": "QR-koodi osoitteelle {{url}}",
-            "table_caption": "Rekrytointilinkit",
+            "table_caption": "Pääsylinkit",
             "progress_label": "{{count}} / {{max}} vastausta",
             "usage": {
                 "started": "aloitettu",
@@ -770,7 +790,7 @@
             "download_qr": "Lataa kuva",
             "qr_print_hint": "Skannaa tai tulosta tämä koodi fyysisiä materiaaleja varten (esitteet, julisteet).",
             "analytics_title": "Kampanja-analytiikka",
-            "analytics_desc": "Suorat linkit ja QR-skannaukset seurataan automaattisesti kojelaudalla yläpuolella.",
+            "analytics_desc": "Suoria linkkejä ja QR-skannauksia seurataan automaattisesti yllä olevassa hallintapaneelissa.",
             "copy_success": "Linkki kopioitu leikepöydälle",
             "types": {
                 "public": "Avoin pääsy (Julkinen)",
@@ -785,7 +805,7 @@
             "table": {
                 "name": "Kampanja",
                 "type": "Tyyppi",
-                "token": "Tunniste",
+                "token": "Linkin tunniste",
                 "usage": "Kapasiteetti",
                 "status": "Tila",
                 "actions": "Hallitse",
@@ -797,12 +817,15 @@
                 "limited": "Rajoitettu"
             },
             "toasts": {
-                "created": "Rekrytointilinkit luotu onnistuneesti",
-                "failed": "Rekrytointilinkkejä ei voitu luoda. Tarkista syöte ja yritä uudelleen.",
+                "created": "Pääsylinkit luotu onnistuneesti",
+                "failed": "Pääsylinkkejä ei voitu luoda. Tarkista syötteet ja yritä uudelleen.",
                 "revoked": "Linkki peruutettu",
                 "revoke_failed": "Linkkiä ei voitu peruuttaa. Se saattaa olla jo käytössä.",
                 "copied": "Kopioitu leikepöydälle"
-            }
+            },
+            "copied": "Kopioitu",
+            "copy_url": "Kopioi URL",
+            "generating": "Luodaan..."
         },
         "analytics": {
             "charts": {
@@ -840,7 +863,7 @@
             "analysis": "Analyysi",
             "project_settings": "Projektin asetukset",
             "study_settings": "Asetukset",
-            "concourse": "Concourse",
+            "concourse": "Lausekokoelma",
             "members": "Tiimin jäsenet",
             "users": "Käyttäjät",
             "nav_label": "murupolku"
@@ -854,7 +877,7 @@
             "study_actions": "Tutkimuksen toiminnot",
             "system": "Järjestelmä",
             "no_studies": "Ei tutkimuksia tässä projektissa.",
-            "open_dashboard": "Avaa kojelauta",
+            "open_dashboard": "Avaa hallintapaneeli",
             "design_study": "Tutkimuksen suunnittelu",
             "copy_link": "Kopioi julkinen linkki",
             "toggle_theme": "Vaihda teemaa",
@@ -898,21 +921,21 @@
             "onboarding_title": "Ensimmäiset askeleet",
             "step_create_project": "Luo projekti",
             "step_create_project_desc": "Projektisi on valmis.",
-            "step_concourse": "Kerää väittämät concourseen",
+            "step_concourse": "Kerää väittämät lausekokoelmaan",
             "step_concourse_desc": "Lisää ehdokasväittämät kirjallisuuskatsauksestasi.",
-            "step_qset": "Valitse Q-set",
-            "step_qset_desc": "Tarkista ja hyväksy kohteet, jotka muodostavat Q-setin.",
+            "step_qset": "Valitse Q-joukko",
+            "step_qset_desc": "Tarkista ja hyväksy kohteet, jotka muodostavat Q-joukon.",
             "step_study": "Luo tutkimus",
             "step_study_desc": "Määritä lajitteluruudukko Q-lajittelua varten.",
-            "step_import": "Tuo Q-set tutkimukseen",
-            "step_import_desc": "Tuo hyväksytyt concourse-kohteet tutkimuslauseiksi.",
+            "step_import": "Tuo Q-joukko tutkimukseen",
+            "step_import_desc": "Tuo hyväksytyt lausekokoelman kohteet tutkimuksen väittämiksi.",
             "step_configure": "Määritä osallistujapolku",
-            "step_configure_desc": "Aseta ohjeet, esilajittelu ja jälkilajittelukysymykset.",
+            "step_configure_desc": "Aseta ohjeet sekä esi- ja jälkikyselyn kysymykset.",
             "step_launch": "Käynnistä rekrytointi",
-            "step_launch_desc": "Luo osallistumislinkit ja jaa ne.",
-            "go_to_concourse": "Avaa concourse",
-            "go_to_qset": "Avaa Q-setti",
-            "concourse": "Concourse",
+            "step_launch_desc": "Testaa ja aktivoi tutkimus ja luo sitten osallistumislinkit.",
+            "go_to_concourse": "Avaa lausekokoelma",
+            "go_to_qset": "Avaa Q-joukko",
+            "concourse": "Lausekokoelma",
             "concourse_empty": "Ei kohteita. Aloita lausekokoelmasi rakentaminen.",
             "team": "Tiimi",
             "team_loading": "Ladataan...",
@@ -1010,25 +1033,27 @@
                     "no_translations": "Vähintään yksi käännös vaaditaan",
                     "missing_translation_field": "Käännöksestä {{index}} puuttuu pakollinen kenttä: {{field}}",
                     "invalid_lang_code": "Virheellinen kielikoodi: {{lang}}",
-                    "no_statements": "Vähintään yksi väite vaaditaan",
-                    "duplicate_codes": "Väitteiden tunnisteissa on kaksoiskappaleita: {{codes}}",
-                    "missing_stmt_translations": "Väitteeltä {{index}} puuttuu käännökset",
+                    "no_statements": "Vähintään yksi väittämä vaaditaan",
+                    "duplicate_codes": "Väittämien tunnisteissa on kaksoiskappaleita: {{codes}}",
+                    "missing_stmt_translations": "Väittämältä {{index}} puuttuvat käännökset",
                     "invalid_grid_config": "Virheellinen grid_config: on oltava lista",
                     "invalid_grid_structure": "Virheellinen grid_config-rakenne: {{error}}"
                 },
                 "warnings": {
-                    "grid_capacity_mismatch": "Väitteiden määrä ({{count}}) ei vastaa ruudukon kapasiteettia ({{capacity}})",
+                    "grid_capacity_mismatch": "Väittämien määrä ({{count}}) ei vastaa ruudukon kapasiteettia ({{capacity}})",
                     "missing_consent_draft": "Suostumuksen otsikko tai kuvaus puuttuu (luonnostila)",
                     "external_branding_logo": "Brändilogo käyttää ulkoista URL-osoitetta: {{url}}",
                     "external_partner_logo": "Kumppanin '{{name}}' logo käyttää ulkoista URL-osoitetta: {{url}}",
                     "external_logo": "Logon URL viittaa ulkoiseen resurssiin - se ei ehkä ole saavutettavissa"
                 }
-            }
+            },
+            "error": "Asetuksia ei voitu tuoda. Katso lisätiedot alta ja yritä uudelleen.",
+            "invalid_type": "Virheellinen tiedostotyyppi. Lataa JSON-tiedosto."
         },
         "dialogs": {
             "create_study": {
                 "title": "Luo uusi tutkimus",
-                "description": "Aloita uusi Q-metodologinen tutkimus. Voit määrittää väitteet ja asetukset myöhemmin.",
+                "description": "Aloita uusi Q-metodologinen tutkimus. Voit määrittää väittämät ja asetukset myöhemmin.",
                 "study_title": "Tutkimuksen otsikko",
                 "study_title_placeholder": "esim. Näkökulmia tekoälyyn",
                 "url_slug": "URL-tunniste",
@@ -1044,21 +1069,22 @@
         "validation": {
             "required": "Pakollinen",
             "slug_min": "Tunnisteen on oltava vähintään 3 merkkiä",
-            "slug_regex": "Tunniste saa sisältää vain pieniä kirjaimia, numeroita ja väliviivoja"
+            "slug_regex": "Tunniste saa sisältää vain pieniä kirjaimia, numeroita ja väliviivoja",
+            "language_required": "Valitse vähintään yksi kieli"
         },
         "study_overview": {
-            "title": "Hallintapaneeli",
+            "title": "Yleiskatsaus",
             "back_to_overview": "Takaisin yhteenvetoon",
             "sample_size": "Osallistujamäärä (P-Set)",
             "valid": "kelvollinen",
-            "completion_rate": "Konversioprosentti",
+            "completion_rate": "Valmistumisaste",
             "active": "aktiivinen",
             "mobile": "mobiili",
             "median_duration": "Keston mediaani",
             "suspect": "Epäilyttävä",
             "recent_activity": "Viimeaikainen toiminta",
             "latest_participants": "Viimeisimmät osallistujat ({{count}} / {{total}})",
-            "recently_completed": "Viimeksi valmistuneet",
+            "recently_completed": "Valmiit",
             "in_progress": "Keskeneräiset",
             "discarded": "Hylätyt",
             "started": "Aloitettu",
@@ -1072,7 +1098,7 @@
             "steps": {
                 "welcome": "Tervetuloa",
                 "consent": "Suostumus",
-                "rough_sort": "Alustava lajittelu",
+                "rough_sort": "Karkea lajittelu",
                 "fine_sort": "Tarkka lajittelu",
                 "final": "Viimeiset vaiheet"
             }
@@ -1110,7 +1136,7 @@
                 },
                 "active": {
                     "label": "Aktiivinen",
-                    "description": "Vastausten kerääminen"
+                    "description": "Tiedonkeruu"
                 },
                 "paused": {
                     "label": "Tauolla",
@@ -1194,7 +1220,9 @@
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
                 "select_lang": "Valitse kieli",
-                "test_run_help": "Esikatsele osallistujan tavoin. Testiajoja ei sisällytetä tietoihisi.",
+                "test_run_help": "Esikatsele osallistujan tavoin. Koeajoja ei sisällytetä tietoihisi.",
+                "test_run_blocked": "Koeajo edellyttää: {{missing}}",
+                "test_run_popup_blocked": "Selaimesi esti testivälilehden. Salli ponnahdusikkunat tälle sivustolle ja yritä uudelleen.",
                 "more_actions": "Lisää toimintoja"
             },
             "sync": {
@@ -1213,20 +1241,21 @@
                 "failed_title": "Määritys puutteellinen",
                 "failed_desc": "Korjaa nämä ongelmat aktivoidaksesi:",
                 "errors": {
-                    "no_statements": "Tutkimuksessa on oltava vähintään yksi väite.",
+                    "no_statements": "Tutkimuksessa on oltava vähintään yksi väittämä.",
                     "no_grid": "Ruudukon määritykset puuttuvat.",
-                    "capacity_mismatch": "Ruudukon kapasiteetti ({{total}}) ei vastaa väitteiden määrää ({{count}}).",
+                    "capacity_mismatch": "Ruudukon kapasiteetti ({{total}}) ei vastaa väittämien määrää ({{count}}).",
                     "no_translations": "Tutkimuksella on oltava vähintään yksi kielikäännös.",
                     "missing_default_lang": "Oletuskielen ({{lang}}) käännös puuttuu.",
                     "missing_title": "Otsikko puuttuu kieleltä '{{lang}}'.",
                     "missing_consent_title": "Suostumuksen otsikko puuttuu kieleltä '{{lang}}'.",
                     "missing_consent_description": "Suostumuksen kuvaus puuttuu kieleltä '{{lang}}'.",
-                    "missing_grid_instructions": "Ruudukon lajitteluohjeet puuttuvat kieleltä '{{lang}}'.",
+                    "missing_grid_instructions": "Q-lajittelun ohjeet puuttuvat kieleltä '{{lang}}'.",
                     "missing_step_title": "Vaiheen {{index}} otsikko puuttuu kieleltä '{{lang}}'.",
-                    "missing_statement_translation": "Väitteeltä '{{code}}' puuttuu käännökset kielille: {{missing}}.",
-                    "empty_statement_text": "Väitteellä '{{code}}' on tyhjä teksti kielellä '{{lang}}'.",
+                    "missing_statement_translation": "Väittämältä '{{code}}' puuttuvat käännökset kielille: {{missing}}.",
+                    "empty_statement_text": "Väittämällä '{{code}}' on tyhjä teksti kielellä '{{lang}}'.",
                     "missing_question_label": "Kysymykseltä '{{id}}' puuttuu otsikko kielelle '{{lang}}' ({{section}}).",
-                    "missing_option_label": "Kysymyksen '{{id}}' vaihtoehdolta {{index}} puuttuu otsikko kielelle '{{lang}}' ({{section}})."
+                    "missing_option_label": "Kysymyksen '{{id}}' vaihtoehdolta {{index}} puuttuu otsikko kielelle '{{lang}}' ({{section}}).",
+                    "duplicate_option_value": "Kysymyksessä '{{id}}' on kaksi vaihtoehtoa, joita ei voi erottaa toisistaan; poista niistä toinen ja lisää se uudelleen ({{section}})."
                 }
             },
             "languages": {
@@ -1249,7 +1278,7 @@
                 "interface": "Käyttöliittymä",
                 "theme": "Teema",
                 "general": "Yleistä",
-                "statements": "Väitteet",
+                "statements": "Väittämät",
                 "grid": "Ruudukko",
                 "survey": "Kysely",
                 "branding": "Visuaalinen ilme",
@@ -1277,7 +1306,8 @@
                         "title": "Vaiheen otsikko",
                         "description": "Lyhyt kuvaus",
                         "icon": "Kuvake",
-                        "toggle": "Vaihda"
+                        "toggle": "Vaihda",
+                        "color": "Väri"
                     },
                     "defaults": {
                         "new_step": "Uusi tutkimusvaihe",
@@ -1292,8 +1322,8 @@
                     },
                     "inconsistent": {
                         "banner_title": "Epäjohdonmukaiset prosessivaiheet",
-                        "rough_disabled": "Vaihe 'Ensivaikutelma' (esilajittelu) on tässä luettelossa, mutta tutkimuksessa esilajittelu on poistettu käytöstä. Osallistujat eivät näe sitä.",
-                        "presort_disabled": "Vaihe 'Tutustutaan' (esilajittelukysely) on tässä luettelossa, mutta tutkimuksessa esilajittelukysely on poistettu käytöstä. Osallistujat eivät näe sitä.",
+                        "rough_disabled": "Vaihe 'Ensivaikutelmat' (karkea lajittelu) on tässä luettelossa, mutta tutkimuksessa karkea lajittelu on poistettu käytöstä. Osallistujat eivät näe sitä.",
+                        "presort_disabled": "Vaihe 'Tutustutaan' (esikysely) on tässä luettelossa, mutta tutkimuksessa esikysely on poistettu käytöstä. Osallistujat eivät näe sitä.",
                         "remove_action": "Poista"
                     },
                     "actions": {
@@ -1325,18 +1355,18 @@
                 "label": "Määritä ohjeistuksen ehto",
                 "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
                 "field_label": "Ohjeteksti",
-                "placeholder": "esim. Ole hyvä ja järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä",
+                "placeholder": "esim. Järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä",
                 "grid_title": "Q-lajittelun ohje",
                 "grid_desc": "Tämä on keskeinen ohje, joka ohjaa osallistujia Q-lajitteluprosessin aikana.",
-                "pre_title": "Ohjeistus alustavaan lajitteluun",
-                "pre_desc": "Ohje, joka annetaan osallistujille alustavan ryhmittelyn aikana kolmeen pinoon.",
+                "pre_title": "Ohjeistus karkeaan lajitteluun",
+                "pre_desc": "Ohje, joka annetaan osallistujille karkean lajittelun aikana.",
                 "pre_field_label": "Ohjeteksti",
                 "pre_placeholder": "esim. Oman näkemyksesi perusteella, jaa kortit kolmeen pinoon...",
                 "enable_pre": "Ota käyttöön esiohje-vaihe",
                 "pre_label": "Esiohjeen sisältö",
                 "tips": {
                     "title": "Miksi tämä on tärkeää?",
-                    "desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja."
+                    "desc": "Q-metodologiassa 'ohjeistuksen ehto' määrittää näkökulman, josta osallistuja lajittelee väittämät. Sen on oltava selkeä ja johdonmukainen kaikissa lajitteluvaiheissa."
                 }
             },
             "questions": {
@@ -1439,9 +1469,9 @@
                     "updated": "Väittämä päivitetty",
                     "cleared": "Kaikki väittämät poistettu",
                     "imported": "{{count}} väittämää tuotu onnistuneesti",
-                    "reset_codes": "Reset Codes",
-                    "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väitekoodit (s1, s2, s3…)?",
-                    "codes_reset": "Väitekoodit uudelleennumeroitu",
+                    "reset_codes": "Numeroi koodit uudelleen",
+                    "confirm_reset_codes": "Haluatko varmasti uudelleennumeroida kaikki väittämäkoodit (s1, s2, s3…)?",
+                    "codes_reset": "Väittämäkoodit uudelleennumeroitu",
                     "save_item": "Tallenna {{code}}",
                     "cancel_edit": "Peruuta kohteen {{code}} muokkaus",
                     "reorder_item": "Järjestä uudelleen {{code}}"
@@ -1458,22 +1488,22 @@
                     "title": "Q-lajittelun jakaumaruudukko",
                     "desc": "Ruudukon muoto pakottaa osallistujat erottelemaan väittämät toisistaan.",
                     "perfect": "Täydellinen tasapaino",
-                    "too_many": "{{count}} väitettä liikaa",
-                    "stat_count": "{{count}} väitettä",
+                    "too_many": "{{count}} väittämää liikaa",
+                    "stat_count": "{{count}} väittämää",
                     "slot_count": "{{count}} ruutua varattu",
-                    "too_few": "{{count}} väitettä puuttuu",
+                    "too_few": "{{count}} väittämää puuttuu",
                     "min_reached": "Minimiraja saavutettu (±2)",
                     "max_reached": "Maksimiraja saavutettu (±6)",
                     "remove_extreme_columns": "Poista äärimmäiset sarakkeet",
                     "add_extreme_columns": "Lisää äärimmäisiä sarakkeita",
                     "symmetry_lock": "Symmetrialukitus",
-                    "symmetry_lock_desc": "Ota symmetrialukitus käyttöön.",
+                    "symmetry_lock_desc": "Tee muutokset automaattisesti myös vastakkaisiin sarakkeisiin, jotta jakauma pysyy tasapainoisena.",
                     "auto_balance": "Auto-tasapainotus",
                     "auto_balance_desc": "Tasaa ruudukko standardijakauman mukaiseksi",
                     "reshaped": "Ruudukko tasapainotettu onnistuneesti",
                     "balanced": "Ruudukko tasapainotettu standardien mukaan",
                     "no_statements": "Lisää väittämiä ensin tasapainottaaksesi ruudukon",
-                    "statements": "väitettä",
+                    "statements": "väittämää",
                     "ideal_shape": "Ihanteellinen muoto",
                     "symmetric": "Symmetrinen",
                     "asymmetric": "Epäsymmetrinen",
@@ -1487,7 +1517,7 @@
                     "view_read_only": "Katso vain luku -tilassa",
                     "locked_dialog_desc": "Muokkaus on lukittu, kun tutkimus on tässä tilassa. Sulje tämä ilmoitus, niin voit lukea asetukset muuttamatta niitä.",
                     "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
-                    "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
+                    "mismatch_desc": "Sinulla on {{statements}} väittämää, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
                 }
             },
@@ -1566,8 +1596,8 @@
                     "neutral": "Neutraali",
                     "disagree": "Eri mieltä",
                     "grid": "Ruudukon selitteet (ääripäät)",
-                    "most_agree": "Täysin samaa mieltä",
-                    "most_disagree": "Täysin eri mieltä"
+                    "most_agree": "Eniten samaa mieltä",
+                    "most_disagree": "Eniten eri mieltä"
                 },
                 "hints": {
                     "title": "Metodologiset vinkit",
@@ -1610,7 +1640,7 @@
                     "desc": "Lisää tukevien instituutioiden tai kumppaneiden logot.",
                     "add": "Lisää kumppani",
                     "name_label": "Kumppanin nimi",
-                    "name_placeholder": "Institution nimi",
+                    "name_placeholder": "Instituution nimi",
                     "logo_label": "Logon URL",
                     "url_label": "Verkkosivusto (valinnainen)",
                     "url_placeholder": "https://...",
@@ -1666,7 +1696,7 @@
                 "completed": "Valmis",
                 "in_progress": "Kesken",
                 "abandoned_count": "{{count}} hylätty(ä)",
-                "interview_interested": "Avoin jatkohaastattelulle",
+                "interview_interested": "Hyväksyy jatkoyhteydenoton",
                 "interview": "Hyväksyy seurannan",
                 "email": "Sähköpostit"
             },
@@ -1677,16 +1707,16 @@
                 "export": "Tiedonvienti"
             },
             "status": {
-                "started": "aloitettu",
+                "started": "Aloitettu",
                 "completed": "Valmis",
-                "in_progress": "Kesken",
-                "abandoned": "Hylätty",
-                "discarded": "hylätty"
+                "in_progress": "Käynnissä",
+                "abandoned": "Keskeytetty",
+                "discarded": "Hylätty"
             },
             "step": {
                 "consent": "Suostumus",
                 "presort": "Esikysely",
-                "rough": "Alustava lajittelu",
+                "rough": "Karkea lajittelu",
                 "fine": "Q-lajitteluruudukko",
                 "post": "Jälkikysely"
             },
@@ -1697,7 +1727,8 @@
                 "clear_all": "Nollaa kaikki tiedot",
                 "clear_all_confirm": "VAARA: Tämä poistaa pysyvästi KAIKKI tämän tutkimuksen osallistujatiedot. Tätä ei voi peruuttaa.",
                 "clear_all_success": "Kaikki tiedot poistettu",
-                "clear_all_error": "Tietoja ei voitu tyhjentää. Tarkista käyttöoikeutesi ja yritä uudelleen."
+                "clear_all_error": "Tietoja ei voitu tyhjentää. Tarkista käyttöoikeutesi ja yritä uudelleen.",
+                "confirm_delete": "Poista"
             },
             "confirm_discard": {
                 "title": "Hylätäänkö osallistuja?",
@@ -1747,7 +1778,7 @@
                 "email_provided": "Sähköposti annettu",
                 "newsletter_consent": "Haluaa tulokset",
                 "interview_consent": "Hyväksyy seurannan",
-                "recruitment_link": "Rekrytointilinkki",
+                "recruitment_link": "Pääsylinkki",
                 "device_info": "Laite: {{os}}, {{browser}}"
             },
             "toast": {
@@ -1797,7 +1828,7 @@
                 "all_steps": "Kaikki vaiheet",
                 "has_comments": "Sisältää kommentteja",
                 "has_audio": "Sisältää ääntä",
-                "has_recruitment": "Rekrytointilinkki"
+                "has_recruitment": "Pääsylinkki käytössä"
             },
             "charts": {
                 "section_title": "Vastausten jakaumat",
@@ -1809,7 +1840,7 @@
                 "count": "Määrä"
             },
             "search": {
-                "placeholder": "Hae ID:llä tai tunnisteella...",
+                "placeholder": "Hae ID:llä tai linkin tunnisteella...",
                 "records_found": "tulosta löytyi",
                 "no_results": "Ei tuloksia"
             },
@@ -1840,8 +1871,8 @@
             },
             "designer": {
                 "title": "Tabula Rasa",
-                "desc": "Tässä tutkimuksessa ei ole vielä väitteitä. Lisää Q-set-kohtia aloittaaksesi lajittelun suunnittelun.",
-                "action": "Lataa esimerkki Q-Set"
+                "desc": "Tässä tutkimuksessa ei ole vielä väittämiä. Lisää Q-joukon kohteita aloittaaksesi lajittelun suunnittelun.",
+                "action": "Lataa esimerkki-Q-joukko"
             }
         },
         "status": {
@@ -1851,7 +1882,7 @@
             "draft": "Luonnos"
         },
         "settings": {
-            "title": "Asetukset",
+            "title": "Tutkimuksen asetukset",
             "description": "Tietojen säilytys, arkistointi ja tutkimuksen poistaminen.",
             "lifecycle": {
                 "title": "Arkistointi",
@@ -1924,8 +1955,8 @@
                 },
                 "team_growth_title": "Tiimin hallinta",
                 "team": {
-                    "desc": "Luettelo käyttäjistä, joilla on pääsy tähän projektiin.",
-                    "col_user": "Käyttäjä",
+                    "desc": "Luettelo jäsenistä, joilla on pääsy tähän projektiin.",
+                    "col_user": "Jäsen",
                     "col_role": "Rooli",
                     "col_joined": "Liittynyt",
                     "col_actions": "Toiminnot",
@@ -1937,12 +1968,12 @@
                     "remove_success": "Jäsen poistettu onnistuneesti",
                     "remove_error": "Jäsenen poistaminen epäonnistui",
                     "growth_title": "Tiimin kasvu",
-                    "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita projektiisi. He pystyvät hallitsemaan kaikkia tämän projektin tutkimuksia.",
-                    "invite_button": "Kutsu yhteistyökumppani",
+                    "growth_desc": "Tarvitsetko lisää jäseniä? Kutsu heidät projektiisi. He pystyvät hallitsemaan kaikkia tämän projektin tutkimuksia.",
+                    "invite_button": "Kutsu jäsen",
                     "permissions_matrix": {
                         "title": "Käyttöoikeusmatriisi",
                         "admin": {
-                            "label": "Admin",
+                            "label": "Pääkäyttäjä",
                             "desc": "Voi hallita projektin asetuksia, jäseniä ja kaikkia tutkimuksia."
                         },
                         "owner": {
@@ -1960,8 +1991,8 @@
                     },
                     "coming_soon": "Tulossa pian",
                     "invite_modal": {
-                        "title": "Kutsu yhteistyökumppani",
-                        "email_label": "Yhteistyökumppanin sähköposti",
+                        "title": "Kutsu jäsen",
+                        "email_label": "Jäsenen sähköposti",
                         "role_label": "Määritetty rooli",
                         "success": "Kutsulinkki luotu!",
                         "error": "Kutsun luominen epäonnistui.",
@@ -1970,7 +2001,9 @@
                         "copy_link": "Kopioi linkki",
                         "copied": "Kopioitu"
                     },
-                    "role_for": "Rooli: {{name}}"
+                    "role_for": "Rooli: {{name}}",
+                    "role_update_success": "Rooli päivitetty",
+                    "role_update_error": "Roolia ei voitu päivittää. Yritä uudelleen."
                 }
             }
         },
@@ -1989,11 +2022,11 @@
             "n_studies_other": "{{count}} tutkimusta",
             "n_active_one": "{{count}} aktiivinen",
             "n_active_other": "{{count}} aktiivista",
-            "collecting": "Tiedonkeruu käynnissä",
+            "collecting": "Aktiiviset tutkimukset",
             "no_studies": "Ei tutkimuksia",
             "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi.",
             "no_projects_title": "Aloita ensimmäinen tutkimusprojektisi",
-            "no_projects_body": "Luo projekti ennen concourse-kokoelmien, Q-settien tai tutkimusten lisäämistä."
+            "no_projects_body": "Luo projekti ennen lausekokoelmien, Q-joukkojen tai tutkimusten lisäämistä."
         },
         "memo": {
             "title_concourse": "Valintamuistio",
@@ -2061,7 +2094,7 @@
                         "title": "Q-joukon koko"
                     },
                     "pre_post_design": {
-                        "title": "Esi-/jälkilajittelun valinnat"
+                        "title": "Esi-/jälkikyselyn valinnat"
                     },
                     "limitations": {
                         "title": "Rajoitukset"
@@ -2087,6 +2120,7 @@
                 "no_comment": "Ei kommenttia",
                 "read_only_mode": "Vain luku -tila",
                 "score": "Pisteet",
+                "no_response": "Ei vastausta.",
                 "select_instruction": "Valitse kortti nähdäksesi tiedot"
             },
             "metadata": {
@@ -2099,12 +2133,13 @@
                 "submitted": "Lähetetty",
                 "id": "Sisäinen ID",
                 "ip_hash": "IP-tiiviste",
-                "recruitment_token": "Rekrytointitunnus",
+                "recruitment_token": "Linkin tunniste",
                 "device": {
                     "mobile": "Mobiili",
                     "tablet": "Tabletti",
                     "desktop": "Työpöytä"
-                }
+                },
+                "recruitment_link": "Pääsylinkki"
             },
             "status": {
                 "started": "Aloitettu",
@@ -2113,8 +2148,8 @@
                 "in_progress": "Käynnissä"
             },
             "survey": {
-                "postsort": "Jälkilajittelu",
-                "presort": "Esilajittelu",
+                "postsort": "Jälkikyselyn kysymykset",
+                "presort": "Esikyselyn kysymykset",
                 "no_answers": "Tähän osioon ei ole kirjattu vastauksia.",
                 "question_default": "Puhuttu vastaus",
                 "answer_default": "Vastaus",
@@ -2123,53 +2158,55 @@
                     "questions": "Kyselyvastaukset",
                     "comments": "Korttikommentit",
                     "feedback": "Yleiset huomiot"
-                }
+                },
+                "audio_recordings": "Äänitallenteet"
             },
+            "previous": "Edellinen",
             "tabs": {
                 "session": "Metatiedot",
                 "grid": "Lajitteluruudukko",
-                "postsort": "Jälkilajittelu",
-                "presort": "Esilajittelu"
+                "postsort": "Jälkikysely",
+                "presort": "Esikysely"
             }
         },
         "privacy": {
             "title": "Tietosuoja",
             "header_desc": "Suostumus, inventaario & anonymisointi",
-            "load_error": "Failed to load data inventory.",
-            "participants_title": "Participants snapshot",
-            "stat_started": "Started",
-            "stat_completed": "Completed",
-            "stat_discarded": "Discarded",
-            "stat_anonymised": "Anonymised",
-            "older_1y": "Older than 1 year (not anonymised)",
-            "older_2y": "Older than 2 years (not anonymised)",
-            "audio_title": "Audio storage",
-            "audio_count": "Recordings",
-            "audio_mb": "Total size",
-            "locale_title": "Language breakdown",
-            "locale_col": "Language",
-            "locale_count_col": "Participants",
-            "locale_empty": "No language data yet.",
-            "timeline_title": "Timeline",
-            "tl_first": "First submission",
-            "tl_last": "Last submission",
-            "tl_anon": "Last anonymisation",
-            "bulk_title": "Bulk anonymisation",
-            "bulk_desc": "Remove personal data from completed participants submitted before a cutoff date. Q-sort rankings are preserved.",
-            "cutoff_label": "Cutoff date",
-            "cutoff_help": "Only completed participants submitted strictly before this date will be anonymised.",
+            "load_error": "Tietoinventaarion lataaminen epäonnistui.",
+            "participants_title": "Osallistujien tilannekuva",
+            "stat_started": "Aloitettu",
+            "stat_completed": "Valmis",
+            "stat_discarded": "Hylätty",
+            "stat_anonymised": "Anonymisoitu",
+            "older_1y": "Yli 1 vuoden vanhat (ei anonymisoitu)",
+            "older_2y": "Yli 2 vuoden vanhat (ei anonymisoitu)",
+            "audio_title": "Äänitallenteiden tallennustila",
+            "audio_count": "Tallenteet",
+            "audio_mb": "Kokonaiskoko",
+            "locale_title": "Kielijakauma",
+            "locale_col": "Kieli",
+            "locale_count_col": "Osallistujat",
+            "locale_empty": "Kielitietoja ei ole vielä.",
+            "timeline_title": "Aikajana",
+            "tl_first": "Ensimmäinen vastaus",
+            "tl_last": "Viimeisin vastaus",
+            "tl_anon": "Viimeisin anonymisointi",
+            "bulk_title": "Joukkoanonymisointi",
+            "bulk_desc": "Poista henkilötiedot valmiilta osallistujilta, jotka lähettivät vastauksensa ennen määräpäivää. Q-lajittelujen sijoitukset säilytetään.",
+            "cutoff_label": "Määräpäivä",
+            "cutoff_help": "Vain valmiit osallistujat, jotka lähettivät vastauksensa ennen tätä päivää, anonymisoidaan. Päivä itse ei sisälly.",
             "preview_label": "Ehdokkaat:",
             "preview_zero": "Tällä rajalla ei ole sopivia osallistujia. Kokeile aikaisempaa päivämäärää.",
-            "anonymise_button": "Anonymise",
-            "anonymise_success": "Anonymisation complete",
-            "anonymise_success_desc": "{{n}} participant(s) anonymised, {{s}} already anonymous.",
-            "anonymise_error": "Anonymisation failed",
-            "confirm_title": "Anonymise participant data?",
-            "confirm_candidates": "{{count}} completed participant(s) submitted before {{date}} will be anonymised.",
-            "confirm_preserved": "Q-sort rankings are kept; identity is removed.",
-            "confirm_irreversible": "This action is immediate and cannot be undone.",
-            "confirm_in_progress": "Anonymising…",
-            "confirm_action": "Yes, anonymise",
+            "anonymise_button": "Anonymisoi",
+            "anonymise_success": "Anonymisointi valmis",
+            "anonymise_success_desc": "Anonymisoituja osallistujia: {{n}}. Jo anonyymejä: {{s}}.",
+            "anonymise_error": "Anonymisointi epäonnistui",
+            "confirm_title": "Anonymisoidaanko osallistujien tiedot?",
+            "confirm_candidates": "Anonymisoitavia valmiita osallistujia, jotka lähettivät vastauksensa ennen päivää {{date}}: {{count}}.",
+            "confirm_preserved": "Q-lajittelujen sijoitukset säilytetään; henkilöllisyys poistetaan.",
+            "confirm_irreversible": "Tämä toiminto tapahtuu heti, eikä sitä voi peruuttaa.",
+            "confirm_in_progress": "Anonymisoidaan…",
+            "confirm_action": "Kyllä, anonymisoi",
             "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta).",
             "empty": {
                 "title": "Ei vielä osallistujadataa",
@@ -2252,6 +2289,15 @@
                 "help": "Jaa tämä kertakäyttöinen linkki käyttäjälle toista kanavaa pitkin. Se vanhenee salasanan nollausikkunan mukaisesti.",
                 "title": "Salasanan nollauslinkki"
             },
+            "invite_dialog": {
+                "title": "Kutsu käyttäjä",
+                "label": "Sähköpostiosoite",
+                "submit": "Luo kutsu",
+                "link_manual": "Lähetä tämä linkki henkilölle itse. Se toimii kerran ja vanhenee 7 päivässä.",
+                "link_sent": "Tämän linkin sisältävä sähköposti lähetettiin osoitteeseen {{email}}. Linkki toimii kerran ja vanhenee 7 päivässä.",
+                "copy": "Kopioi linkki",
+                "already_registered": "Tällä osoitteella on jo tili."
+            },
             "set_email_dialog": {
                 "current": "Nykyinen",
                 "description": "Tämä kirjaa käyttäjän {{email}} ulos; hänen on kirjauduttava uudelleen sisään uudella osoitteella. Vahvistussähköpostia ei lähetetä.",
@@ -2267,7 +2313,17 @@
             "recording": "Äänitallenne",
             "play": "Toista ääni",
             "pause": "Keskeytä ääni",
-            "seek": "Toistokohta"
+            "seek": "Toistokohta",
+            "file_size": "Tiedostokoko"
+        },
+        "sync": {
+            "saving": "Tallennetaan..."
+        },
+        "errors": {
+            "access_denied": {
+                "title": "Käyttö estetty",
+                "message": "Sinulla ei ole pääsyä tutkijaosioon. Pyydä projektin omistajaa lisäämään sinut projektiin."
+            }
         }
     }
 }

@@ -82,7 +82,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         {
             "id": "rough",
             "icon": "Zap",
-            "title": "Ensivaikutelma",
+            "title": "Ensivaikutelmat",
             "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).",
             "color": "#f59e0b",
         },
@@ -180,14 +180,14 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, TranslationDefaults] = {
     "fi": {
         "instructions": "T\u00e4m\u00e4 tutkimus k\u00e4sitt\u00e4\u00e4 oman n\u00e4k\u00f6kulmasi ilmaisemisen lajitteluprosessin kautta. Oikeita tai v\u00e4\u00e4ri\u00e4 vastauksia ei ole; olemme kiinnostuneita vain sinun n\u00e4k\u00f6kulmastasi.",
         "consent_title": "Tietoon perustuva suostumus",
-        "consent_description": "### Ymm\u00e4rryksen vahvistus\nRastittamalla alla olevan ruudun vahvistat lukeneesi etusivulla kuvatut tutkimuksen tavoitteet ja prosessin. Ymm\u00e4rr\u00e4t ett\u00e4:\n* T\u00e4ss\u00e4 teht\u00e4v\u00e4ss\u00e4 lajitellaan v\u00e4itteit\u00e4 henkil\u00f6kohtaisen n\u00e4kemyksesi mallintamiseksi.\n* Oikeita tai v\u00e4\u00e4ri\u00e4 vastauksia ei ole.\n\n### Luottamuksellisuus ja tietosuoja\n* **Nimett\u00f6myys:** Osallistumisesi on nimet\u00f6nt\u00e4. Vastauksesi yhdistet\u00e4\u00e4n koodiin, eik\u00e4 niit\u00e4 linkitet\u00e4 henkil\u00f6llisyytesi miss\u00e4\u00e4n raportissa tai julkaisussa.\n* **Tietojen k\u00e4ytt\u00f6:** Ker\u00e4tyt tiedot analysoidaan kollektiivisesti jaettujen n\u00e4k\u00f6kulmien (tekij\u00f6iden) tunnistamiseksi.\n* **Lainaukset:** Lajittelun j\u00e4lkeisess\u00e4 vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimett\u00f6m\u00e4sti n\u00e4iden n\u00e4k\u00f6kulmien havainnollistamiseksi.\n\n### Vapaaehtoinen osallistuminen\nOsallistuminen on t\u00e4ysin vapaaehtoista. Pid\u00e4t\u00e4t oikeuden keskeyttää lajitteluprosessin ja sulkea selaimen milloin tahansa ilman seuraamuksia. Jos vetäydyt ennen lähettämistä, osittaisia tietojasi ei säilytetä.",
-        "pre_instruction": "Lajittele v\u00e4itteet kolmeen pinoon oman n\u00e4kemyksesi mukaan: ne, joiden kanssa olet samaa mielt\u00e4, ne, joiden kanssa olet eri mielt\u00e4, ja ne, joihin suhtaudut neutraalisti tai joista et ole varma.",
-        "condition_of_instruction": "Ole hyv\u00e4 ja j\u00e4rjest\u00e4 seuraavat v\u00e4itt\u00e4m\u00e4t siit\u00e4, mink\u00e4 kanssa olet eniten samaa mielt\u00e4, siihen, mink\u00e4 kanssa olet eniten eri mielt\u00e4",
+        "consent_description": "### Ymm\u00e4rryksen vahvistus\nRastittamalla alla olevan ruudun vahvistat lukeneesi etusivulla kuvatut tutkimuksen tavoitteet ja prosessin. Ymm\u00e4rr\u00e4t ett\u00e4:\n* T\u00e4ss\u00e4 teht\u00e4v\u00e4ss\u00e4 lajitellaan v\u00e4itt\u00e4mi\u00e4 henkil\u00f6kohtaisen n\u00e4kemyksesi mallintamiseksi.\n* Oikeita tai v\u00e4\u00e4ri\u00e4 vastauksia ei ole.\n\n### Luottamuksellisuus ja tietosuoja\n* **Nimett\u00f6myys:** Osallistumisesi on nimet\u00f6nt\u00e4. Vastauksesi yhdistet\u00e4\u00e4n koodiin, eik\u00e4 niit\u00e4 linkitet\u00e4 henkil\u00f6llisyyteesi miss\u00e4\u00e4n raportissa tai julkaisussa.\n* **Tietojen k\u00e4ytt\u00f6:** Ker\u00e4tyt tiedot analysoidaan kollektiivisesti jaettujen n\u00e4k\u00f6kulmien (faktorien) tunnistamiseksi.\n* **Lainaukset:** Lajittelun j\u00e4lkeisess\u00e4 vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimett\u00f6m\u00e4sti n\u00e4iden n\u00e4k\u00f6kulmien havainnollistamiseksi.\n\n### Vapaaehtoinen osallistuminen\nOsallistuminen on t\u00e4ysin vapaaehtoista. Pid\u00e4t\u00e4t oikeuden keskeyttää lajitteluprosessin ja sulkea selaimen milloin tahansa ilman seuraamuksia. Jos vetäydyt ennen lähettämistä, osittaisia tietojasi ei säilytetä.",
+        "pre_instruction": "Lajittele v\u00e4itt\u00e4m\u00e4t kolmeen pinoon oman n\u00e4kemyksesi mukaan: ne, joiden kanssa olet samaa mielt\u00e4, ne, joiden kanssa olet eri mielt\u00e4, ja ne, joihin suhtaudut neutraalisti tai joista et ole varma.",
+        "condition_of_instruction": "J\u00e4rjest\u00e4 seuraavat v\u00e4itt\u00e4m\u00e4t siit\u00e4, mink\u00e4 kanssa olet eniten samaa mielt\u00e4, siihen, mink\u00e4 kanssa olet eniten eri mielt\u00e4",
         "methodology_tips": [
             "Vinkki: Aloita siit\u00e4, mik\u00e4 on sinulle selkeint\u00e4 (\u00e4\u00e4rip\u00e4\u00e4t).",
             "Samassa sarakkeessa j\u00e4rjestyksell\u00e4 ylh\u00e4\u00e4lt\u00e4 alas ei ole v\u00e4li\u00e4.",
             "Kaikki pit\u00e4\u00e4 mahduttaa! Se voi olla palapeli\u00e4, mutta tarkoitus on priorisoida.",
-            "Muistutus: v\u00e4itteet lajitellaan suhteessa toisiinsa.",
+            "Muistutus: v\u00e4itt\u00e4m\u00e4t lajitellaan suhteessa toisiinsa.",
             "Voit zoomata ruudukon eri osiin n\u00e4hd\u00e4ksesi paremmin.",
             "Mik\u00e4\u00e4n ei ole lopullista: voit siirt\u00e4\u00e4 kortteja tai palauttaa ne pakkaan milloin tahansa.",
         ],
@@ -198,7 +198,7 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, TranslationDefaults] = {
             },
             "presort": {
                 "what": "Anna taustatietoja profiilisi m\u00e4\u00e4rittelemiseksi.",
-                "why": "T\u00e4m\u00e4 taustoitus mahdollistaa sen, ett\u00e4 tutkijat voivat analysoida, miten erilaiset n\u00e4k\u00f6kulmat (faktorits) korreloivat osallistujaryhmän taustamuuttujien kanssa.",
+                "why": "T\u00e4m\u00e4 taustoitus mahdollistaa sen, ett\u00e4 tutkijat voivat analysoida, miten erilaiset n\u00e4k\u00f6kulmat (faktorit) korreloivat osallistujaryhmän taustamuuttujien kanssa.",
             },
             "rough": {
                 "what": "Lajittele v\u00e4itt\u00e4m\u00e4t kolmeen alustavaan pinoon v\u00e4litt\u00f6m\u00e4n reaktiosi perusteella.",

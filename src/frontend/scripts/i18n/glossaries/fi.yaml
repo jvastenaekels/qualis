@@ -12,7 +12,7 @@ language_name: Suomi
 
 terms:
   # Q-methodology core (anchored to existing fi locale usage)
-  concourse: Lausekokoelma          # sidebar canon; body prose may say "väittämäpooli"
+  concourse: Lausekokoelma
   Q-methodology: Q-metodologia
   Q-sort: Q-lajittelu
   Q-set: Q-joukko
@@ -22,16 +22,18 @@ terms:
   factor loading: faktorilataus
   factor array: faktorijärjestys
   eigenvalue: ominaisarvo
-  presort: alustava lajittelu
+  presort: esikysely                  # the survey before the sort, not a sort
   rough sort: karkea lajittelu
   fine sort: tarkka lajittelu
-  postsort: jälkilajittelu
+  postsort: jälkikysely               # the survey after the sort, not a sort
   sorting grid: lajitteluruudukko
 
   # Product entities
   study: tutkimus
   study design: tutkimuksen suunnittelu
   recruitment: rekrytointi
+  access link: pääsylinkki            # never "rekrytointilinkki"
+  link token: linkin tunniste
   participant: osallistuja
   user: käyttäjä
   member: jäsen
@@ -42,6 +44,9 @@ terms:
   consent form: suostumuslomake
   audio recording: äänitallenne
   memo: muistio
+  test run: Koeajo
+  factor narrative: faktorin narratiivi
+  audit trail: kirjausketju
   draft: luonnos
   resume code: jatkamiskoodi
   invitation: kutsu
@@ -57,7 +62,7 @@ terms:
   copy: Kopioi
   view (verb / button): Näytä
   loading: Ladataan
-  dashboard: Koontinäyttö
+  dashboard: Hallintapaneeli
   slug: slug                          # technical term, keep lowercase English
   share (verb / button): Jaa
   settings: asetukset
@@ -74,7 +79,7 @@ terms:
   # State labels (standardise to these)
   draft (state): Luonnos
   active: Aktiivinen
-  paused: Keskeytetty
+  paused: Tauolla
   closed: Suljettu
   archived: Arkistoitu
   completed: Valmis

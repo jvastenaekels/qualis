@@ -1541,7 +1541,7 @@
                     "replace_all": "Replace all",
                     "append": "Append to list",
                     "sync_by_code": "Sync/Merge by code",
-                    "placeholder": "Simple:. My statement",
+                    "placeholder": "Simple: \n1. My statement\n\nExpert (Excel paste with headers): \ncode\ten\tfr\ns1\tHello\tSalut",
                     "detected": "{{count}} statements detected",
                     "process_replace": "Process & replace statements",
                     "process_append": "Process & append statements",

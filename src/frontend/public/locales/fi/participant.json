@@ -22,7 +22,7 @@
         "attention": "Huomio",
         "error": "Virhe",
         "submitting": "Lähetetään...",
-        "cards": "väitettä",
+        "cards": "väittämää",
         "close": "Sulje",
         "unknown_card": "Tuntematon kortti",
         "unknown": "Tuntematon",
@@ -30,7 +30,7 @@
         "duration_long": "{{h}} t {{m}} min {{s}} s",
         "optional": "Valinnainen",
         "processing": "Käsitellään...",
-        "statement": "Väite",
+        "statement": "Väittämä",
         "step": "Vaihe",
         "back": "Takaisin",
         "cancel": "Peruuta",
@@ -79,7 +79,7 @@
         "status": {
             "draft": {
                 "title": "Tutkimus valmisteilla",
-                "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Ole hyvä ja palaa myöhemmin.",
+                "message": "Tämä tutkimus ei ole vielä avoinna osallistujille. Palaa myöhemmin.",
                 "action": "Siirry etusivulle"
             },
             "steps": {
@@ -134,8 +134,8 @@
     },
     "study": {
         "help": {
-            "title": "Apua & Tietoa",
-            "trigger": "Apua",
+            "title": "Ohje ja tiedot",
+            "trigger": "Ohje",
             "what": "Mitä kysymme",
             "why": "Miksi se on tärkeää",
             "step_welcome": {
@@ -144,7 +144,7 @@
             },
             "step_presort": {
                 "what": "Anna taustatietoja profiilisi määrittelemiseksi.",
-                "why": "Tämä taustoitus mahdollistaa sen, että tutkijat voivat analysoida, miten erilaiset näkökulmat (faktorits) korreloivat osallistujaryhmän taustamuuttujien kanssa."
+                "why": "Tämä taustoitus mahdollistaa sen, että tutkijat voivat analysoida, miten erilaiset näkökulmat (faktorit) korreloivat osallistujaryhmän taustamuuttujien kanssa."
             },
             "step_rough": {
                 "what": "Lajittele väittämät kolmeen alustavaan pinoon välittömän reaktiosi perusteella.",
@@ -180,7 +180,7 @@
         "how_it_works": "Tutkimuksen kulku",
         "objective_label": "Tutkimuksen tavoite",
         "instructions_label": "Kulku",
-        "default_instructions": "1. **Tutustutaan :** Ensin sinulta kysytään muutamia lyhyitä taustakysymyksiä.\n2. **Ensivaikutelmat :** Luet läpi erilaisia väittämiä ja lajittelet ne karkeasti oman näkemyksesi mukaan: oletko niiden kanssa samaa mieltä, neutraali vai eri mieltä.\n3. **Näkökulmasi :** Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät \"eniten samaa mieltä\" -vaihtoehdosta \"eniten eri mieltä\" -vaihtoehtoon.\n4. **Miksi :** Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä tiedonkeruun helpottamiseksi.",
+        "default_instructions": "1. **Tutustutaan:** Ensin sinulta kysytään muutamia lyhyitä taustakysymyksiä.\n2. **Ensivaikutelmat:** Luet läpi erilaisia väittämiä ja lajittelet ne karkeasti oman näkemyksesi mukaan: oletko niiden kanssa samaa mieltä, neutraali vai eri mieltä.\n3. **Näkökulmasi:** Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät \"eniten samaa mieltä\" -vaihtoehdosta \"eniten eri mieltä\" -vaihtoehtoon asettamalla kunkin väittämän vastaavaan ruutuun.\n4. **Miksi:** Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä, jotka auttavat meitä ymmärtämään paremmin merkittävimmät valintasi.",
         "steps": {
             "profile": {
                 "title": "Tutustutaan",
@@ -204,11 +204,11 @@
         "title": "Tietoon perustuva suostumus ja tietojenkäsittelysopimus",
         "subtitle": "Lue seuraavat tiedot huolellisesti.",
         "record_error": "Suostumustietueen tallentaminen epäonnistui. Voit jatkaa.",
-        "default_text": "1. Tutkimuksen luonne ja osallistujan ymmärrys\nRastittamalla alla olevan ruudun vahvistat tutustuneesi etusivulla kuvattuihin tutkimuksen tavoitteisiin. Ymmärrät, että tässä harjoituksessa käytetään Q-metodologiaa, joka on subjektiivisten näkökulmien mallintamiseen suunniteltu tutkimusmenetelmä. Tehtävänäsi on lajitella väitteitä sen perusteella, kuinka merkityksellisiä ne ovat oman näkökulmasi kannalta; näin ollen objektiivisesti \"oikeita\" tai \"vääriä\" vastauksia ei ole.\n\n2. Tietojenkäsittely ja pseudonymisointi (GDPR:n noudattaminen)\n\nTietojen keruu: Vastauksillesi (Q-lajittelu ja selitykset) annetaan yksilöllinen aakkosnumeerinen koodi lähettämisen yhteydessä.\n\nTunnisteiden poistaminen ja säilytys:\n\nVakiomenettely: Suorat tunnisteet (kuten IP-osoitteet) muutetaan välittömästi tunnistamattomaan muotoon, eikä niitä koskaan tallenneta alkuperäisessä asussaan. Tämä tekninen prosessi varmistaa, ettei digitaalista jalanjälkeäsi voida käyttää tunnistamiseesi istunnon päätyttyä.\n\nPoikkeus jatkotutkimusta varten: Jos annat vapaaehtoisesti yhteystietosi tutkimuksen lopussa jatkoyhteydenottoa varten, yhteys henkilöllisyytesi (sähköposti) ja vastauksesi välillä säilytetään tiukasti kyseisen seurantavaiheen keston ajan.\n\nRaportointi: Lopulliset tulokset esitetään anonymisoidussa muodossa. Tiedot yhdistetään jaettujen sosiaalisten näkökulmien (faktorien) tunnistamiseksi. Laadullisia kommentteja voidaan lainata näiden faktorien havainnollistamiseksi, mutta ne tarkistetaan tunnistetietojen poistamiseksi.\n\n3. Vapaaehtoinen osallistuminen ja peruuttamisoikeus\nOsallistumisesi on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ennen vastausten lähettämistä ilman seuraamuksia.\n\nEnnen lähettämistä: Jos keskeytät ennen lajittelun viimeistelyä, osittaisia tietoja ei tallenneta.\n\nLähettämisen jälkeen: Q-metodologian tilastollisen luonteen (faktorianalyysi) vuoksi yksittäisen vastauksen poistaminen ei välttämättä ole mahdollista sen jälkeen, kun tiedot on lähetetty ja yhdistetty aineistoon.\n\n4. Tietojen säilytys ja oikeudet\nYleisen tietosuoja-asetuksen (GDPR) mukaisesti sinulla on oikeus pyytää pääsyä henkilötietoihisi tai niiden oikaisemista niin kauan kuin ne ovat tunnistettavissa (ts. ennen lopullista anonymisointia)."
+        "default_text": "1. Tutkimuksen luonne ja osallistujan ymmärrys\nRastittamalla alla olevan ruudun vahvistat tutustuneesi etusivulla kuvattuihin tutkimuksen tavoitteisiin. Ymmärrät, että tässä harjoituksessa käytetään Q-metodologiaa, joka on subjektiivisten näkökulmien mallintamiseen suunniteltu tutkimusmenetelmä. Tehtävänäsi on lajitella väittämiä sen perusteella, kuinka merkityksellisiä ne ovat oman näkökulmasi kannalta; näin ollen objektiivisesti \"oikeita\" tai \"vääriä\" vastauksia ei ole.\n\n2. Tietojenkäsittely ja pseudonymisointi (GDPR:n noudattaminen)\n\nTietojen keruu: Vastauksillesi (Q-lajittelu ja selitykset) annetaan yksilöllinen aakkosnumeerinen koodi lähettämisen yhteydessä.\n\nTunnisteiden poistaminen ja säilytys:\n\nVakiomenettely: Suorat tunnisteet (kuten IP-osoitteet) muutetaan välittömästi tunnistamattomaan muotoon, eikä niitä koskaan tallenneta alkuperäisessä asussaan. Tämä tekninen prosessi varmistaa, ettei digitaalista jalanjälkeäsi voida käyttää tunnistamiseesi istunnon päätyttyä.\n\nPoikkeus jatkotutkimusta varten: Jos annat vapaaehtoisesti yhteystietosi tutkimuksen lopussa jatkoyhteydenottoa varten, yhteys henkilöllisyytesi (sähköposti) ja vastauksesi välillä säilytetään tiukasti kyseisen seurantavaiheen keston ajan.\n\nRaportointi: Lopulliset tulokset esitetään anonymisoidussa muodossa. Tiedot yhdistetään jaettujen sosiaalisten näkökulmien (faktorien) tunnistamiseksi. Laadullisia kommentteja voidaan lainata näiden faktorien havainnollistamiseksi, mutta ne tarkistetaan tunnistetietojen poistamiseksi.\n\n3. Vapaaehtoinen osallistuminen ja peruuttamisoikeus\nOsallistumisesi on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ennen vastausten lähettämistä ilman seuraamuksia.\n\nEnnen lähettämistä: Jos keskeytät ennen lajittelun viimeistelyä, osittaisia tietoja ei tallenneta.\n\nLähettämisen jälkeen: Q-metodologian tilastollisen luonteen (faktorianalyysi) vuoksi yksittäisen vastauksen poistaminen ei välttämättä ole mahdollista sen jälkeen, kun tiedot on lähetetty ja yhdistetty aineistoon.\n\n4. Tietojen säilytys ja oikeudet\nYleisen tietosuoja-asetuksen (GDPR) mukaisesti sinulla on oikeus pyytää pääsyä henkilötietoihisi tai niiden oikaisemista niin kauan kuin ne ovat tunnistettavissa (ts. ennen lopullista anonymisointia)."
     },
     "presort": {
         "title": "Tutustutaan",
-        "description": "Ole hyvä ja vastaa muutamaan kysymykseen auttaaksesi meitä ymmärtämään näkökulmaasi.",
+        "description": "Vastaa muutamaan kysymykseen, jotta ymmärrämme näkökulmaasi paremmin.",
         "submit": "Jatka lajitteluun",
         "select_placeholder": "Valitse...",
         "error_required": "Tämä kysymys on pakollinen."
@@ -233,11 +233,11 @@
     },
     "fine": {
         "deck": {
-            "title": "Vapaat väitteet",
-            "all_placed": "Kaikki väitteet on lajiteltu"
+            "title": "Vapaat väittämät",
+            "all_placed": "Kaikki tämän pinon väittämät on lajiteltu"
         },
         "toolbar": {
-            "preview": "Väite",
+            "preview": "Väittämä",
             "zoom_in": "Lähennä",
             "zoom_out": "Loitonna",
             "fit_screen": "Sovita näyttöön",
@@ -251,7 +251,7 @@
             "in_column": "sarakkeessa"
         },
         "legend": {
-            "disagree": "Täysin eri mieltä",
+            "disagree": "Eniten eri mieltä",
             "neutral": "Neutraali",
             "agree": "Eniten samaa mieltä",
             "label": "Ruudukon selite"
@@ -260,20 +260,20 @@
             "validate": "Vahvista lajittelu",
             "finish": "Lopeta lajittelu",
             "ready": "Tarkastele näkemystäni",
-            "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
+            "not_ready": "Sijoita kaikki väittämät jatkaaksesi"
         },
         "header": {
-            "title": "Sijoita väitteet ruudukkoon",
+            "title": "Sijoita väittämät ruudukkoon",
             "instruction_label": "Ohje",
             "expand_instructions": "Näytä ohjeet",
             "minimize_instructions": "Piilota ohjeet"
         },
         "workbench": {
-            "active_card": "Aktiivinen väite",
+            "active_card": "Aktiivinen väittämä",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
-            "initial_instruction": "Napauta (tai vedä) väitettä",
-            "initial_instruction_mobile": "Napauta väitettä",
+            "initial_instruction": "Napauta (tai vedä) väittämää",
+            "initial_instruction_mobile": "Napauta väittämää",
             "cancel_selection": "Peruuta valinta",
             "help": "Miten tämä toimii?",
             "previous_tip": "Edellinen vinkki",
@@ -283,7 +283,7 @@
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
                 "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
                 "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
-                "relative": "Muistutus: väitteet lajitellaan suhteessa toisiinsa.",
+                "relative": "Muistutus: väittämät lajitellaan suhteessa toisiinsa.",
                 "zoom": "Voit zoomata ruudukon eri osiin nähdäksesi paremmin.",
                 "flexibility": "Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa."
             }
@@ -291,30 +291,30 @@
     },
     "post": {
         "title": "Miksi nämä valinnat",
-        "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
+        "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väittämistä ovat erittäin tärkeitä analyysillemme.",
         "step2_title": "Melkein valmista!",
         "step2_description": "Vastaa vielä näihin viimeisiin kysymyksiin viimeistelläksesi tutkimuksen.",
         "extreme": {
             "title": "Keskeiset valinnat",
             "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
-            "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
+            "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väittämässä...",
             "min_chars": "Perustele valintasi ennen jatkamista.",
             "hint": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",
-            "label_disagree": "Vahvin eri mieltä oleminen",
+            "label_disagree": "Vahvimmin eri mieltä",
             "label_neutral": "Neutraali",
-            "missing_statement": "Puuttuva väite",
+            "missing_statement": "Puuttuva väittämä",
             "general_comment": "Yleinen kommentti"
         },
         "optional": {
-            "title": "Tuntuivatko jotkin väitteet erityisen yllättäviltä, epäselviltä tai hämmentäviltä? Jos kyllä, miksi?",
-            "description": "Voit myös lisätä kommentteja muihin väitteisiin, jos haluat selittää valintojasi tarkemmin.",
-            "select_placeholder": "Valitse kommentoitava väite...",
+            "title": "Tuntuivatko jotkin väittämät erityisen yllättäviltä, epäselviltä tai hämmentäviltä? Jos kyllä, miksi?",
+            "description": "Voit myös lisätä kommentteja muihin väittämiin, jos haluat selittää valintojasi tarkemmin.",
+            "select_placeholder": "Valitse kommentoitava väittämä...",
             "placeholder": "Kommenttisi tähän..."
         },
         "submit": "Lähetä vastaukset",
         "validation_error": "Täytä kaikki pakolliset kentät.",
-        "text_audio_info": "Teksti + ääni -kysymyksissä voit vastata tekstillä, äänitteellä tai molemmilla.",
+        "text_audio_info": "Teksti + ääni -kysymyksissä voit vastata tekstillä, äänitallenteella tai molemmilla.",
         "text_audio_required": "Muutama sana tai äänitallenne auttaa meitä ymmärtämään näkökulmaasi.",
         "success": {
             "title": "Kiitos osallistumisestasi!",
@@ -365,7 +365,7 @@
         "play": "Toista",
         "delete": "Poista",
         "deleted": "Ääni poistettu",
-        "delete_failed": "Tallennusta ei voitu poistaa. Yritä uudelleen.",
+        "delete_failed": "Tallennetta ei voitu poistaa. Yritä uudelleen.",
         "file_size": "Tiedostokoko",
         "upload_success": "Ääni lähetetty onnistuneesti",
         "upload_failed": "Lähetys epäonnistui. Yritä uudelleen.",
@@ -376,7 +376,7 @@
         "unsupported": "Äänen tallennus ei ole tuettu tässä selaimessa.",
         "https_required": "Äänen tallennus edellyttää HTTPS-yhteyttä. Avaa tämä tutkimus uudelleen suojatulla HTTPS-osoitteella.",
         "permission_revoked": "Mikrofonin käyttöoikeus menetetty - tallennus pysäytetty",
-        "refresh_failed": "Ääntä ei voitu päivittää. Tallennuksesi on yhä tallennettu.",
+        "refresh_failed": "Ääntä ei voitu päivittää. Äänitallenteesi on yhä tallessa.",
         "refreshing": "Päivitetään ääntä...",
         "playback_failed": "Ääntä ei voitu toistaa. Päivitä sivu ja yritä uudelleen.",
         "error": {
@@ -428,26 +428,26 @@
         "go_to_study": "Aloita uusi istunto"
     },
     "landing": {
-        "page_title": "Qualis study access",
-        "instruction": "Enter your study code to begin.",
+        "page_title": "Pääsy Qualis-tutkimukseen",
+        "instruction": "Aloita syöttämällä tutkimuskoodi.",
         "study_code_label": "Tutkimuskoodi",
-        "study_code_placeholder": "e.g. my-study",
+        "study_code_placeholder": "esim. oma-tutkimus",
         "go_to_study": "Siirry tutkimukseen",
-        "resetting_session": "Resetting study session…"
+        "resetting_session": "Nollataan tutkimusistuntoa…"
     },
     "erasure": {
         "section_title": "Oikeutesi tietojen poistamiseen (GDPR, 17 artikla)",
-        "section_intro": "You can request the removal of your personal data at any time. Your anonymous statement rankings will be kept as research data; everything that could identify you will be removed.",
+        "section_intro": "Voit milloin tahansa pyytää henkilötietojesi poistamista. Väittämille antamasi anonyymit sijoitukset säilytetään tutkimusaineistona; kaikki, mistä sinut voisi tunnistaa, poistetaan.",
         "button": "Pyydä tietojeni poistamista",
-        "confirm_title": "Erase your personal data?",
-        "confirm_what_erased": "The following will be permanently removed: any IP address logged with your session, your browser identifier, your written answers (pre- and post-sort), and any audio recording you provided.",
-        "confirm_what_kept": "Your statement rankings will be preserved as anonymous research data. They no longer link to you.",
-        "confirm_irreversible": "This action is immediate and cannot be undone.",
-        "confirm_action": "Yes, erase my data",
-        "confirm_in_progress": "Erasing…",
-        "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
-        "error": "We could not process your request. Please try again or contact the researcher.",
-        "already_erased": "Your personal data has been removed for this session."
+        "confirm_title": "Poistetaanko henkilötietosi?",
+        "confirm_what_erased": "Seuraavat tiedot poistetaan pysyvästi: istuntosi yhteydessä mahdollisesti kirjattu IP-osoite, selaintunnisteesi, kirjalliset vastauksesi (esi- ja jälkikysely) ja antamasi äänitallenteet.",
+        "confirm_what_kept": "Väittämille antamasi sijoitukset säilytetään anonyyminä tutkimusaineistona. Niitä ei enää voi yhdistää sinuun.",
+        "confirm_irreversible": "Tämä toiminto tapahtuu heti, eikä sitä voi peruuttaa.",
+        "confirm_action": "Kyllä, poista tietoni",
+        "confirm_in_progress": "Poistetaan…",
+        "success": "Henkilötietosi on poistettu. Anonyymit Q-lajittelun sijoituksesi säilyvät tutkimuksessa.",
+        "error": "Pyyntöäsi ei voitu käsitellä. Yritä uudelleen tai ota yhteyttä tutkijaan.",
+        "already_erased": "Henkilötietosi on poistettu tästä istunnosta."
     },
     "footer": {
         "powered_by": "Qualisin tarjoama",
@@ -461,6 +461,6 @@
         "rate_limited_title": "Liikaa pyyntöjä",
         "rate_limited_description": "Odota hetki ja yritä uudelleen.",
         "conflict_title": "Ristiriita",
-        "conflict_description": "Resurssi on muokattu tai se on jo olemassa."
+        "conflict_description": "Resurssia on muokattu tai se on jo olemassa."
     }
 }
