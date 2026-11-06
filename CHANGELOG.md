@@ -1,5 +1,64 @@
 # Changelog
 
+## [0.8.2](https://github.com/jvastenaekels/qualis/compare/v0.8.1...v0.8.2) (2026-11-06)
+
+
+### Features
+
+* **admin:** invite a researcher without a project ([4298310](https://github.com/jvastenaekels/qualis/commit/42983109fbaf01d32977547497ca8aced34dd012))
+* **admin:** invite user from the Users page ([bd3a532](https://github.com/jvastenaekels/qualis/commit/bd3a5320bc29ea901e4b0a8a7cb790d6f245e8ce))
+* **auth:** let an existing account join a project from its invitation ([1fe3ccd](https://github.com/jvastenaekels/qualis/commit/1fe3ccd6ca02f82f9eaad070af75ffe8ea5539e8))
+* **pilot:** one test tab, a clear disabled state, and no reload mid-test ([4128f47](https://github.com/jvastenaekels/qualis/commit/4128f475c9765a7766a8760221dc8610bbcd3261))
+
+
+### Bug fixes
+
+* **activation:** do not crash on an unhashable option value ([43f9569](https://github.com/jvastenaekels/qualis/commit/43f9569093fa0cbffe1f0fb28107ab825f5b1c1d))
+* **admin:** refuse to delete a project owner ([780f5d9](https://github.com/jvastenaekels/qualis/commit/780f5d954fac61b88de6686f0010fa85498340a5))
+* **auth:** close the used-link and bad-token holes, keep tokens out of logs ([3884c15](https://github.com/jvastenaekels/qualis/commit/3884c156eaa3fe411d4eeb4a4b95257f6fdcde9c))
+* **auth:** fold case when an invitation is redeemed ([9d90ca8](https://github.com/jvastenaekels/qualis/commit/9d90ca80db68251fddce63ad08cff86f83f557c1))
+* **auth:** let an account without a project reach the hub ([7f5548d](https://github.com/jvastenaekels/qualis/commit/7f5548d8363297677a0fa493ad37202655bc063b))
+* **auth:** show the project on invitations, add the account variant and a name field ([fa2067b](https://github.com/jvastenaekels/qualis/commit/fa2067ba1c4a136c3f7fc129c268b6ea8b63af49))
+* **auth:** validate the login redirect and redact it in logs ([9922998](https://github.com/jvastenaekels/qualis/commit/992299883f0ad842f4bbefb566109adc28f561b5))
+* **cors:** allow PUT, the method of save-draft ([c0c069b](https://github.com/jvastenaekels/qualis/commit/c0c069b5dff377845312a403f471fbb240069c3e))
+* **designer:** give every added option its own value ([9190aac](https://github.com/jvastenaekels/qualis/commit/9190aace664c5232bccd578c55f06c64792c8f54))
+* **designer:** never reuse a removed option's value ([b98b441](https://github.com/jvastenaekels/qualis/commit/b98b4419d08829c4922d498dff463f5dab93acb5))
+* **designer:** stay on the edited language after saving ([559365c](https://github.com/jvastenaekels/qualis/commit/559365c438d2f35328e7627f0c386583f7100115))
+* **designer:** trim hyphens after cutting the slug to 50 ([06d7f95](https://github.com/jvastenaekels/qualis/commit/06d7f958260995f28d9500b5f30b52d69643fc06))
+* **i18n:** finish the Finnish locale and restore cut English text ([f0f9b87](https://github.com/jvastenaekels/qualis/commit/f0f9b87fb7e48a18739e6b3880044dc92fc55290))
+* **i18n:** real line breaks in default consent, admin language set only by its menu ([78cf7a5](https://github.com/jvastenaekels/qualis/commit/78cf7a57d94e3b9de916780f8c71064eb4d42781))
+* **i18n:** tell the researcher how to resolve a duplicate option value ([2a6bbce](https://github.com/jvastenaekels/qualis/commit/2a6bbcefc9f91391aaeb43dc9b283f2443ff1b39))
+* **participant:** ask the loader for the browser language too ([1d5109a](https://github.com/jvastenaekels/qualis/commit/1d5109a5507b867acae7a2a9fcabfc35349d8ef6))
+* **participant:** keep the chosen language when the route reloads ([aaf2e12](https://github.com/jvastenaekels/qualis/commit/aaf2e12322446e497e3fc5399379e7cd7ae32eac))
+* **participant:** use the browser language when the study offers it ([7039ec5](https://github.com/jvastenaekels/qualis/commit/7039ec54d291f5e4a99ff6334816323fddfc5b16))
+* **pilot:** a reload keeps the test on its draft and its notice ([8efa3f3](https://github.com/jvastenaekels/qualis/commit/8efa3f3602eed2fda02d91f7dafa0373da869d97))
+* **pilot:** a test tab never reads the live study in the route loader ([a9e68be](https://github.com/jvastenaekels/qualis/commit/a9e68bea42ab3190e8277f59e6a5d75707def5c0))
+* **pilot:** a test tab stays a test until the researcher leaves it ([9f07aae](https://github.com/jvastenaekels/qualis/commit/9f07aae0b41069fd3e64d0a9572831cd2f782d47))
+* **pilot:** an honest end screen, and no test without a draft ([88a2365](https://github.com/jvastenaekels/qualis/commit/88a2365256e5fe4f2b55dc6471fa5f4c6e783195))
+* **pilot:** fall back to the session language before the default ([f6f9b34](https://github.com/jvastenaekels/qualis/commit/f6f9b34ff3997493f128062235e7cb3c0b338fbc))
+* **pilot:** open the test in the edited language, with a real language menu ([bc9a3c9](https://github.com/jvastenaekels/qualis/commit/bc9a3c9c8b699e61151f6ada122a6f438e4e44f7))
+* **pilot:** reach the Test run reason by keyboard, handle a blocked tab, ignore Save stamps ([ba56522](https://github.com/jvastenaekels/qualis/commit/ba565222c0d152abdd794d53b67ffde745eac417))
+* **pilot:** read the test flag without writing it or crashing on it ([bc94138](https://github.com/jvastenaekels/qualis/commit/bc94138daa9f5771022b74d8a687e3c2a84a4512))
+* refresh new access links, keep accented letters in slugs, translate erasure labels ([9a9e9f8](https://github.com/jvastenaekels/qualis/commit/9a9e9f8f5789a07f572c1d2eadab6f13f1f9542b))
+
+
+### Refactor
+
+* **pilot:** drop the is_disabled filter nothing writes ([645d6b0](https://github.com/jvastenaekels/qualis/commit/645d6b055bb23d587490e5dace58f704df89ef48))
+
+
+### Documentation
+
+* add the existing-account join task to the user plan ([3f58f35](https://github.com/jvastenaekels/qualis/commit/3f58f3568adcc5b715da9c12f88fcdf65a04baad))
+* add the project-less hub task to the user plan ([c2b9510](https://github.com/jvastenaekels/qualis/commit/c2b9510cb2d7d64338501d3a3bda26cc08271c50))
+* correct the tutorials against the real interface ([bda1bf2](https://github.com/jvastenaekels/qualis/commit/bda1bf2fa0f5c3235d375dd41113a874bee949bb))
+* **loader:** say why the fresh-visit fetch is not served from cache ([caa3581](https://github.com/jvastenaekels/qualis/commit/caa35810b101a8b88a911da0bdef48eff4c63574))
+* plan for Test run ([b55f2a9](https://github.com/jvastenaekels/qualis/commit/b55f2a9d946a8e9933205c206091ff47d87e866f))
+* plan for the language and option bugs ([cb2d3de](https://github.com/jvastenaekels/qualis/commit/cb2d3de707b6942491bf9cf227893aef8f836116))
+* plan for user creation and management ([d3845f5](https://github.com/jvastenaekels/qualis/commit/d3845f5e20eecc59edc0bbf90cb136b8ae2f9f66))
+* say Test run in the README, and that leaving drops the link's code ([c9e7966](https://github.com/jvastenaekels/qualis/commit/c9e79663ce2808c79277423e13b8268c2d2ce975))
+* state the email case rule per invitation flow ([ded4d18](https://github.com/jvastenaekels/qualis/commit/ded4d1806e185a7c5719d4c78869ad4011809513))
+
 ## [0.8.1](https://github.com/jvastenaekels/qualis/compare/v0.8.0...v0.8.1) (2026-11-04)
 
 ### Bug fixes
